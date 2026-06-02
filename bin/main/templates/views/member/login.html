@@ -16,9 +16,10 @@
             <h1 class="text-4xl font-bold text-gray-800 tracking-tight">떠나봄</h1>
         </div>
 
-        <!-- 로그인 폼 (배운 컨트롤러 매핑 방식에 맞게 사용하세요) -->
+        <!-- 로그인 폼 -->
         <form action="/login" method="POST" class="space-y-6">
-            
+        <!-- 메인페이지 만들기전까지만 -->
+            <input type="hidden" name="targetUrl" value="/member/edit">
             <!-- 아이디 입력 -->
             <div>
                 <label for="username" class="block text-sm font-medium text-gray-700 mb-2">아이디</label>
@@ -50,7 +51,7 @@
                 <a href="/find-pw" class="hover:text-gray-800 transition-colors">비밀번호 찾기</a>
             </div>
             <div>
-                <a href="/signup" class="text-indigo-600 hover:text-indigo-500 font-medium transition-colors">회원가입</a>
+                <a href="/join" class="text-indigo-600 hover:text-indigo-500 font-medium transition-colors">회원가입</a>
             </div>
         </div>
 
