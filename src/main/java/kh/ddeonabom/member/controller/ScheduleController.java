@@ -9,4 +9,9 @@ public class ScheduleController {
 	public String scheduleList() {
 		return "views/schedule/my-list";
 	}
+	
+	@GetMapping("schedule/new")
+	public String schedule() {
+		return "views/schedule/new";
+	}
 }
