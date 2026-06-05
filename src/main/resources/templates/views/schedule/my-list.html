@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{views/common/head :: head}"></head>
 <body>
 	<div th:replace="~{views/common/navbar :: navbar}"></div>
@@ -20,7 +20,7 @@
 	  </div>
 	
 	  <div class="grid grid-cols-3 gap-5 py-6">
-	    <a href="itinerary.html" class="flex min-h-72 flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-line bg-sunk text-center text-muted transition hover:border-brand hover:bg-brand-soft hover:text-brand">
+	    <a href="/schedule/new" class="flex min-h-72 flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-line bg-sunk text-center text-muted transition hover:border-brand hover:bg-brand-soft hover:text-brand">
 	      <span class="flex h-13 w-13 items-center justify-center rounded-full bg-white text-2xl shadow-soft">＋</span>
 	      <b class="text-base font-bold">새 일정 만들기</b>
 	      <span class="text-13">관심 관광지를 끌어와 동선을 그려보세요</span>
