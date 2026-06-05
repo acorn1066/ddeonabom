@@ -22,4 +22,7 @@ public interface MemberMapper {
 
 	int updatePasswordOnly(Member m);
 
+
+	int withdrawMember(String id);
+
 }

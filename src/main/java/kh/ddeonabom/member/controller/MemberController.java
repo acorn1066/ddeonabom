@@ -32,6 +32,21 @@ public class MemberController {
 		
 		return "views/member/join";
 	}
+	// =========================================================
+	// [추가] 아이디 중복 체크 (Ajax)
+	// =========================================================
+	@ResponseBody
+	@GetMapping("/check-id")
+	public String checkId(@RequestParam("id") String id) {
+	    
+	    // 만약 STATUS='Y'인 회원이 이미 존재한다면 중복된 아이디
+	    Member m = mService.selectOneMember(id);
+	    
+	    if (m != null) {
+	        return "DUPLICATE"; // 이미 사용 중인 아이디
+	    }
+	    return "AVAILABLE"; // 사용 가능한 아이디
+	}
 	
 	// 이메일 인증번호 발송 (AJAX)
     // 입력한 이메일로 인증번호 전송
@@ -51,8 +66,6 @@ public class MemberController {
 
         return "SUCCESS"; // 대문자 SUCCESS
     }
-
-
  // 인증번호 검증 (AJAX)
     //  사용자가 입력한 코드와 세션 코드 비교
     //  성공 시 인증 완료 상태 저장
@@ -265,21 +278,53 @@ public class MemberController {
     // 수정 페이지에서 [회원 탈퇴] 링크를 클릭했을 때 (GET)
     @GetMapping("/withdraw")
     public String withdrawPage() {
-        return "withdraw"; 
+        return "/views/member/withdraw"; 
     }
 
-    // 탈퇴 뷰 페이지에서 [탈퇴하기] 버튼을 눌렀을 때 (POST)
-    @PostMapping("/withdraw")
-    public String doWithdraw(@RequestParam String password, HttpSession session) {
-        // 탈퇴 로직 처리...
-        return "redirect:/"; 
-    }
- // 괄호 갯수 정돈 완료 (에러 해결!)
+ // =========================================================
+ // [버그 박멸] 회원 탈퇴 최종 처리 (POST)
+ // =========================================================
+ @PostMapping("/withdraw")
+ public String doWithdraw(@RequestParam("password") String password, HttpSession session) {
+     
+     // 세션에서 현재 로그인한 유저 정보 확인
+     Member loginUser = (Member) session.getAttribute("loginUser");
+     if (loginUser == null) {
+         return "redirect:/member/login"; // 로그인 안 되어 있으면 로그인창으로
+     }
+
+     //  [버그 해결의 핵심]: 세션 비밀번호는 변조/오염되었을 수 있으므로
+     // DB에서 실시간으로 해당 회원의 원본 데이터를 새로 조회
+     Member dbUser = mService.selectOneMember(loginUser.getId());
+     if (dbUser == null) {
+         return "redirect:/member/login";
+     }
+
+     //  실시간으로 갓 퍼온 진짜 암호문(dbUser.getPwd())과 화면 입력값(password)
+     if (!BCrypt.checkpw(password, dbUser.getPwd())) {
+         // ❌ 비밀번호가 틀리면 withdraw.html 화면에 에러 문구를 들고 리다이렉트
+         return "redirect:/member/withdraw?error";
+     }
+
+     //비밀번호가 일치하면 서비스-매퍼를 타고 DB 상태 변경 혹은 삭제 수행
+     // 보통 서비스단에서 mMapper.withdrawMember 또는 deleteMember를 호출
+     int result = mService.withdrawMember(loginUser.getId()); 
+
+     if (result > 0) {
+         //  탈퇴가 최종 성공했다면 현재 세션을 완전히 파기(로그아웃) 처리
+         session.invalidate(); 
+         return "redirect:/"; // 메인 페이지로 안전하게 튕겨주기
+     }
+
+     // 알 수 없는 DB 오류 대비 안전빵 튕기기
+     return "redirect:/member/withdraw?fail";
+ }
+ // 괄호 갯수 정돈 완료 (에러 해결)
 // 아이디 찾기 페이지 열기
-@GetMapping("/find-id")
-public String findIdPage() {
-    return "views/member/find-id";
-}
+    @GetMapping("/find-id")
+    public String findIdPage() {
+    	return "views/member/find-id";
+    }
 
 // 비밀번호 찾기 페이지 열기
 @GetMapping("/find-pwd")
@@ -363,17 +408,17 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
 @PostMapping("/find-account/send")
 public String sendAuthCodeForFind(@RequestParam("email") String email, HttpSession session) {
     
-    // 1. 실제로 가입된 이메일이 맞는지 먼저 체크 (없으면 메일 안 보냄)
+    // 실제로 가입된 이메일이 맞는지 먼저 체크 (없으면 메일 안감)
     boolean isExist = mService.existsByEmail(email); 
     if (!isExist) {
         return "NOT_FOUND"; // 가입되지 않은 메일이면 프론트에 즉시 알림
     }
 
-    // 2. 가입된 회원이 맞으므로 6자리 랜덤 인증번호 생성 후 발송
+    // 가입된 회원이 맞으므로 6자리 랜덤 인증번호 생성 후 발송
     // (기존 회원가입 시 사용하던 emailService의 인증코드 생성 로직 그대로 재활용)
     String code = emailService.sendAuthCode(email);
 
-    // 3. 기존의 auth.js 및 검증 컨트롤러(/member/verify)가 그대로 읽을 수 있도록 세션 Key 바인딩
+    // 기존의 auth.js 및 검증 컨트롤러(/member/verify)가 그대로 읽을 수 있도록 세션 Key 바인딩
     session.setAttribute("authCode", code);
     session.setAttribute("targetEmail", email);
     session.setMaxInactiveInterval(5 * 60); // 안전하게 5분간 세션 유지

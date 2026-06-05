@@ -2,10 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="kh.ddeonabom.member.model.mappers.MemberMapper">
+
+<select id="existsById" resultType="int">
+    SELECT COUNT(*)
+    FROM MEMBER
+    WHERE ID = #{id}
+     
+</select>
+
 <select id="existsByEmail" resultType="int">
     SELECT COUNT(*)
     FROM MEMBER
     WHERE EMAIL = #{email}
+      AND STATUS = 'Y'
 </select>
 
 
@@ -65,4 +74,13 @@
      WHERE ID = #{id}
        AND STATUS = 'Y'
 </update>
+<update id="withdrawMember">
+    UPDATE MEMBER
+       SET STATUS = 'N',
+           ID = ID || '_' || TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+           EMAIL = EMAIL || '_' || TO_CHAR(SYSDATE, 'YYMMDDHH24MISS'),
+           NICKNAME = NICKNAME || '_' || TO_CHAR(SYSDATE, 'YYMMDDHH24MISS')
+     WHERE ID = #{id}
+</update>
+
 </mapper>

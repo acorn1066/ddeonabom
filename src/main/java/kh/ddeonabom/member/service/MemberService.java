@@ -81,4 +81,8 @@ public class MemberService implements UserDetailsService { // 💡 1. 시큐리�
 		
 		return mapper.updatePasswordOnly(m);
 	}
+
+	public int withdrawMember(String id) {
+		return mapper.withdrawMember(id);
+	}
 }

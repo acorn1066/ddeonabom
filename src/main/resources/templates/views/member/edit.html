@@ -10,7 +10,7 @@
     theme: {
       extend: {
         colors: {
-          brand: '#4F46E5', // 서비스 포인트 컬러 (예시: 인디고 계열)
+          brand: '#4F46E5', 
           'brand-ink': '#4338CA',
           'brand-soft': '#E0E7FF',
           ink: '#1F2937',
@@ -167,15 +167,15 @@
 <script>
 $(document).ready(function() {
     
-    // 1. 페이지 진입 시 이메일 인증 플래그 리셋
+    // 페이지 진입 시 이메일 인증 플래그 리셋
     sessionStorage.setItem("emailVerified", "false"); 
 
-    // 2. 비밀번호 실시간 검증 모듈 연동
+    // 비밀번호 실시간 검증 모듈 연동
     if (typeof initPasswordValidation === "function") {
         initPasswordValidation("#newPassword", "#confirmPassword", "#pwdRuleMsg", "#pwdMsg");
     }
 
-    // 3. 이메일 인증 초기화 (메일 발송 엔진)
+    // 이메일 인증 초기화 (메일 발송 엔진)
     if (typeof initEmailVerification === "function") {
         initEmailVerification({
             sendBtn: "#sendCodeBtn",
@@ -189,7 +189,7 @@ $(document).ready(function() {
         });
     }
 
-    // 4. 수정페이지 전용 안전장치 (인풋창 잠금 강제 해제)
+    // 수정페이지 전용 안전장치 (인풋창 잠금 강제 해제)
     $("#sendCodeBtn").click(function() {
         setTimeout(function() {
             $("#authCode").prop("disabled", false).prop("readonly", false);
@@ -198,14 +198,14 @@ $(document).ready(function() {
         }, 100);
     });
 
-    // 5. 정보 수정 폼 서브밋 제어 (여기가 핵심 교정 구역입니다)
+    // 정보 수정 폼 서브밋 제어 (여기가 핵심 교정 구역입니다)
     $("form").submit(function (e) {
         e.preventDefault(); // 기본 폼 제출 막기
 
         let pwd = $("#newPassword").val();
         let pwdCheck = $("#confirmPassword").val();
 
-        // [검증 A] 새로운 비밀번호 유효성 검사
+        // 새로운 비밀번호 유효성 검사
         if (pwd.trim() !== "") {
             let reg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,20}$/;
             if(!reg.test(pwd)){
@@ -218,23 +218,23 @@ $(document).ready(function() {
             }
         }
 
-        // [검증 B] 본인 인증 여부 체크
+        //  본인 인증 여부 체크
         if (sessionStorage.getItem("emailVerified") !== "true") {
             alert("수정을 완료하려면 이메일 인증이 필수입니다.");
             return;
         }
 
-        // [검증 C] 닉네임 공백 검증
+        // 닉네임 공백 검증
         let nickName = $("#nickName").val().trim();
         if(nickName === ""){
             alert("닉네임을 입력하세요.");
             return;
         }
 
-        // 💡 [정상 복구] 데이터를 안전하게 묶어주는 직렬화 코드를 명확히 선언!
+        // 데이터를 안전하게 묶어주는 직렬화 코드를 명확히 선언
         let formData = $(this).serialize();
         
-        // [서버 통신] AJAX 요청 전송
+        // AJAX 요청 전송
         $.post("/member/update", formData, function(res){
             if(res === "SUCCESS" || res === "success"){
                 alert("회원정보 수정이 완료되었습니다.");
@@ -256,7 +256,7 @@ $(document).ready(function() {
     }); // form submit 끝
 }); // document ready 끝
 
-// 6. 탈퇴 재확인 얼럿 함수
+// 탈퇴 재확인
 function confirmWithdraw(event) {
     event.preventDefault(); 
     const response = confirm("정말로 탈퇴하시겠습니까?\n탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.");
