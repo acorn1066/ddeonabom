@@ -89,7 +89,7 @@ public class MemberController {
     public String join(@ModelAttribute Member m, HttpSession session) {
 
         // -------------------------------
-        // 1) 이메일 인증 여부 체크
+        // 이메일 인증 여부 체크
         // -------------------------------
         Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
         String verifiedEmail = (String) session.getAttribute("verifiedEmail");
@@ -99,7 +99,7 @@ public class MemberController {
         }
 
         // -------------------------------
-        // 2) 인증된 이메일과 실제 가입 이메일 비교
+        // 인증된 이메일과 실제 가입 이메일 비교
         // (중간 변조 방지)
         // -------------------------------
         if (verifiedEmail == null || !verifiedEmail.equals(m.getEmail())) {
@@ -107,26 +107,26 @@ public class MemberController {
         }
 
         // -------------------------------
-        // 3) 이메일 중복 체크
+        // 이메일 중복 체크
         // -------------------------------
         if (mService.existsByEmail(m.getEmail())) {
             return "DUPLICATE_EMAIL";
         }
 
         // -------------------------------
-        // 4) 비밀번호 암호화
+        // 비밀번호 암호화
         // -------------------------------
         m.setPwd(BCrypt.hashpw(m.getPwd(), BCrypt.gensalt(10)));
 
         // -------------------------------
-        // 5) DB 저장
+        // DB 저장
         // -------------------------------
         int result = mService.insertMember(m);
 
         if (result > 0) {
 
             // -------------------------------
-            // 6) 가입 완료 후 세션 정리
+            // 가입 완료 후 세션 정리
             // -------------------------------
             session.removeAttribute("emailVerified");
             session.removeAttribute("verifiedEmail");
@@ -142,7 +142,7 @@ public class MemberController {
 		return "views/member/login";
 	}
 	 // =========================================================
-    // 6. 로그인 처리
+    // 로그인 처리
     // =========================================================
     @PostMapping("/login")
     
@@ -169,22 +169,22 @@ public class MemberController {
     
     @GetMapping("/edit")
     public String editPage(HttpSession session,Model model) {
-    	// 1. 세션에서 로그인된 회원 정보 가져오기
+    	// 세션에서 로그인된 회원 정보 가져오기
         Member loginUser = (Member) session.getAttribute("loginUser");
         
-        // 2. 혹시나 세션이 끊긴 상태로 접근했다면 로그인 페이지로 튕겨내기
+        // 혹시나 세션이 끊긴 상태로 접근했다면 로그인 페이지로 튕겨내기
         if (loginUser == null) {
             return "redirect:/member/login";
         }
         
-        // 3. edit.html이 데이터를 꺼내 쓸 수 있도록 모델에 담아서 배달하기
+        // edit.html이 데이터를 꺼내 쓸 수 있도록 모델에 담아서 배달하기
         model.addAttribute("loginUser", loginUser);
         
         return "views/member/edit";
    
     }
  // =========================================================
-    // 3. 회원정보 수정 최종 처리 (교정 및 버그 박멸 완료 구역)
+    // 회원정보 수정 최종 처리 (교정 및 버그 박멸 완료 구역)
     // =========================================================
     @ResponseBody
     @PostMapping("/update")
@@ -195,13 +195,13 @@ public class MemberController {
             @RequestParam(name="authCode", required = false) String authCode,                     
             HttpSession session) {
         
-        // ① 로그인 세션 체크
+        // 로그인 세션 체크
         Member loginUser = (Member) session.getAttribute("loginUser");
         if (loginUser == null) {
             return "NOT_LOGGED_IN"; 
         }
         
-        // 💡 [버그 해결 핵심]: 세션 대신 기존 로그인 로직(mService.login)을 재사용해서
+        // [버그 해결 핵심]: 세션 대신 기존 로그인 로직(mService.login)을 재사용해서
         // DB에 들어있는 오염되지 않은 진짜 암호 원본을 실시간으로 새로 가져옵니다.
         Member dbUser = mService.selectOneMember(loginUser.getId()); 
         if (dbUser == null) {
@@ -221,7 +221,7 @@ public class MemberController {
         // 세션의 안전한 ID를 모델에 강제 세팅
         m.setId(loginUser.getId()); 
 
-        // ③ 백엔드 최종 방어선: 세션에 저장된 인증 상태와 이메일 일치 여부 확인
+        // 백엔드 최종 방어선: 세션에 저장된 인증 상태와 이메일 일치 여부 확인
         Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
         String verifiedEmail = (String) session.getAttribute("verifiedEmail");
         
@@ -229,7 +229,7 @@ public class MemberController {
             return "EMAIL_NOT_VERIFIED"; 
         }
 
-        // ④ DB 업데이트 실행 (비밀번호 변경 여부에 따른 분기)
+        // DB 업데이트 실행 (비밀번호 변경 여부에 따른 분기)
         int result = 0;
         if (newPassword != null && !newPassword.trim().isEmpty()) {
             m.setPwd(BCrypt.hashpw(newPassword,BCrypt.gensalt(10))); // 변경할 새 비밀번호 암호화
@@ -238,7 +238,7 @@ public class MemberController {
             result = mService.updateMemberWithoutPassword(m);
         }
         
-        // ⑤ 결과 처리 및 세션 정리
+        // 결과 처리 및 세션 정리
         if (result > 0) {
             session.removeAttribute("authCode");
             session.removeAttribute("targetEmail");
@@ -275,19 +275,19 @@ public class MemberController {
         return "redirect:/"; 
     }
  // 괄호 갯수 정돈 완료 (에러 해결!)
-//1. 아이디 찾기 페이지 열기
+// 아이디 찾기 페이지 열기
 @GetMapping("/find-id")
 public String findIdPage() {
     return "views/member/find-id";
 }
 
-// 2. 비밀번호 찾기 페이지 열기
+// 비밀번호 찾기 페이지 열기
 @GetMapping("/find-pwd")
 public String findPwPage() {
     return "views/member/find-pwd";
 }
 //=========================================================
-// 7. 아이디 찾기 최종 처리 (Ajax)
+// 아이디 찾기 최종 처리 (Ajax)
 // =========================================================
 @ResponseBody
 @PostMapping("/find-id")
@@ -300,7 +300,7 @@ public String findId(@RequestParam("email") String email, HttpSession session) {
         return "EMAIL_NOT_VERIFIED";
     }
 
-    // ② 이메일로 회원 ID 조회 (서비스단 구현 필요)
+    // 이메일로 회원 ID 조회 (서비스단 구현 필요)
     String foundId = mService.findIdByEmail(email); 
     
     if (foundId != null) {
@@ -317,12 +317,12 @@ public String findId(@RequestParam("email") String email, HttpSession session) {
 }
 
 // =========================================================
-// 8. 비밀번호 찾기 (임시 비밀번호 생성 + BCrypt 암호화 + 메일 전송)
+// 비밀번호 찾기 (임시 비밀번호 생성 + BCrypt 암호화 + 메일 전송)
 // =========================================================
 @ResponseBody
 @PostMapping("/find-pwd")
 public String findPw(@RequestParam("id") String id, @RequestParam("email") String email, HttpSession session) {
-    // ① 세션 검증
+    // 세션 검증
     Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
     String verifiedEmail = (String) session.getAttribute("verifiedEmail");
     
@@ -330,23 +330,23 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
         return "EMAIL_NOT_VERIFIED";
     }
 
-    // ② 실제 가입된 회원 아이디와 이메일이 매칭되는지 체크하는 단선 방어
+    // 실제 가입된 회원 아이디와 이메일이 매칭되는지 체크하는 단선 방어
     Member m = mService.selectOneMember(id);
     if (m == null || !email.equals(m.getEmail())) {
         return "MEMBER_NOT_FOUND";
     }
 
-    // ③ 8자리 안전한 임시 비밀번호 랜덤 생성 (예시 규격)
+    // 8자리 안전한 임시 비밀번호 랜덤 생성 (예시 규격)
     String rawTempPw = java.util.UUID.randomUUID().toString().substring(0, 8) + "!";
     
-    // ④ 오리지널 BCrypt 엔진으로 암호화 후 DB 저장
+    // 오리지널 BCrypt 엔진으로 암호화 후 DB 저장
     String encryptedTempPw = BCrypt.hashpw(rawTempPw, BCrypt.gensalt(10));
     m.setPwd(encryptedTempPw);
     
     int result = mService.updatePasswordOnly(m); // 비밀번호만 새로 바꾸는 서비스 호출
 
     if (result > 0) {
-        // ⑤ 원본 글자(rawTempPw)를 유저 메일로 발송 (emailService 연동)
+        // 원본 글자(rawTempPw)를 유저 메일로 발송 (emailService 연동)
         emailService.sendTempPassword(email, rawTempPw);
         
         session.removeAttribute("emailVerified"); // 세션 클린업
@@ -357,7 +357,7 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
     return "FAIL";
 }
 //=========================================================
-// [★ 추가] 계정 찾기 전용 인증번호 발송 (기존 회원 대상 우회로)
+// 계정 찾기 전용 인증번호 발송 (기존 회원 대상 우회로)
 // =========================================================
 @ResponseBody
 @PostMapping("/find-account/send")
