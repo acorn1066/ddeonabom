@@ -31,4 +31,38 @@
 	select * from member
 	where id=#{id} and status ='Y'
 </select>
+<select id="selectOneMember" resultType="Member">
+	select *from member
+	where id=#{id} and status ='Y'
+</select>
+
+<update id="updateMemberWithPassword">
+	update Member
+	set
+	nickname=#{nickName},
+	email=#{email},
+	pwd=#{pwd}
+	where id=#{id}
+
+</update>
+<update id="updateMemberWithoutPassword">
+	update Member
+	set
+	nickname=#{nickName},
+	email=#{email}
+	where id=#{id}
+	</update>
+	
+<select id="findIdByEmail" resultType="string">
+    SELECT ID
+      FROM MEMBER
+     WHERE EMAIL = #{email}
+       AND STATUS = 'Y'
+</select>
+<update id="updatePasswordOnly">
+    UPDATE MEMBER
+       SET PWD = #{pwd}
+     WHERE ID = #{id}
+       AND STATUS = 'Y'
+</update>
 </mapper>
