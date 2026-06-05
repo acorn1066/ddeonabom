@@ -23,7 +23,7 @@ public class EmailService {
         message.setSubject("이메일 인증번호");
         message.setText("인증번호: " + code);
 
-        mailSender.send(message); // 👉 실제 Gmail SMTP 발송
+        mailSender.send(message); // 실제 Gmail SMTP 발송
 
         return code;
     }
@@ -42,7 +42,7 @@ public class EmailService {
         jakarta.mail.internet.MimeMessage message = mailSender.createMimeMessage();
         
         try {
-            // true 설정을 주어야 멀티파트(HTML, 인코딩) 설정이 활성화됩니다.
+            // true 설정을 주어야 멀티파트(HTML, 인코딩) 설정이 활성화
             org.springframework.mail.javamail.MimeMessageHelper helper = 
                 new org.springframework.mail.javamail.MimeMessageHelper(message, true, "UTF-8");
             
@@ -60,7 +60,7 @@ public class EmailService {
                     + "  <p style='color: #ef4444; font-size: 12px; margin-bottom: 0;'>⚠️ 로그인 후 보안을 위해 회원정보 수정 메뉴에서 비밀번호를 꼭 변경해 주세요.</p>"
                     + "</div>";
 
-            // 두 번째 인자를 true로 주어야 HTML 태그가 정상 렌더링됩니다.
+            // 두 번째 인자를 true로 주어야 HTML 태그가 정상 렌더링됨
             helper.setText(htmlContent, true);
 
             mailSender.send(message); // 발송
