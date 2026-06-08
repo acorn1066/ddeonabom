@@ -25,3 +25,5 @@ replay_pid*
 
 /bin/
 application-local.properties
+
+node_modules/
