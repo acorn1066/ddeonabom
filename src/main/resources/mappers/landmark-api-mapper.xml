@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kh.ddeonabom.admin.model.mapper.LandmarkApiMapper">
+
+    <select id="selectSyncLog" resultType="ApiSyncLog">
+        SELECT LOG_ID       AS logId,
+               LAST_PAGE    AS lastPage,
+               TOTAL_PAGES  AS totalPages,
+               COLLECT_SYNC AS collectSync,
+               UPDATE_SYNC  AS updateSync,
+               STATUS       AS status,
+               DAILY_CALLS  AS dailyCalls,
+               LAST_RESET_DATE AS lastResetDate
+        FROM API_SYNC_LOG
+        WHERE LOG_ID = 1
+    </select>
+
+    <update id="updateSyncLog" parameterType="ApiSyncLog">
+        UPDATE API_SYNC_LOG
+        SET LAST_PAGE       = #{lastPage},
+            TOTAL_PAGES     = #{totalPages},
+            COLLECT_SYNC    = #{collectSync},
+            UPDATE_SYNC     = #{updateSync},
+            STATUS          = #{status},
+            DAILY_CALLS     = #{dailyCalls},
+            LAST_RESET_DATE = #{lastResetDate}
+        WHERE LOG_ID = 1
+    </update>
+
+</mapper>
