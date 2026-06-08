@@ -9,6 +9,13 @@
 		where status = 'Y'
 	</select>
 	
+	<select id="selectQList" resultType="_int">
+		select count(*)
+		from qlist
+		where status = 'Y'
+	</select>
+	
+	
 	<insert id="">
 		
 	</insert>
