@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{views/common/head :: head}"></head>
 <body>
 
@@ -28,7 +28,7 @@
         </div>
 
         <button
-            onclick="location.href='/admin/notice/write'"
+            onclick="location.href='/admin/nwrite'"
             class="rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700">
 
             공지 등록
