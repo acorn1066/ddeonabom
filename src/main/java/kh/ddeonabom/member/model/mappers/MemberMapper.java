@@ -12,4 +12,17 @@ public interface MemberMapper {
 
 	int existsByEmail(String email);
 
+	int updateMemberWithPassword(Member m);
+
+	int updateMemberWithoutPassword(Member m);
+
+	Member selectOneMember(String id);
+
+	String findIdByEmail(String email);
+
+	int updatePasswordOnly(Member m);
+
+
+	int withdrawMember(String id);
+
 }

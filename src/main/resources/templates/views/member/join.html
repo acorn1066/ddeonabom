@@ -24,8 +24,12 @@
 <form th:action="@{/member/join}" method="post">
 
     <!-- 아이디 -->
-    <input type="text" name="id" class="form-control mb-2" placeholder="아이디">
-
+    <label class="form-label font-weight-bold small">아이디</label>
+	<div class="input-group mb-1">
+    <input type="text" name="id" id="userId" class="form-control" placeholder="아이디 입력">
+    <button type="button" class="btn btn-outline-primary" id="checkIdBtn">중복 확인</button>
+	</div>
+<small id="idMsg" class="mb-3 d-block"></small>
     <!-- 비밀번호 -->
     <input type="password" name="pwd" class="form-control mb-2" placeholder="비밀번호">
 	<small id="pwdRuleMsg"></small>
@@ -49,7 +53,7 @@
         <button type="button" class="btn btn-outline-primary" id="sendCodeBtn">인증</button>
     </div>
 
-    <!-- 인증번호 -->
+    <!-- 인증번호 초기에는 숨어있고 인증 버튼 클릭시 튀어나옴-->
     <div class="input-group mb-2" id="authArea" style="display:none;">
         <input type="text" id="authCode" class="form-control" placeholder="인증번호">
         <button type="button" class="btn btn-outline-success" id="verifyBtn">확인</button>
@@ -75,10 +79,50 @@
 
 <script>
 $(document).ready(function() {
-    // 1. 비밀번호 실시간 검증 초기화
+    // 비밀번호 실시간 검증 초기화
     initPasswordValidation("input[name='pwd']", "#pwdCheck", "#pwdRuleMsg", "#pwdMsg");
+ // 아이디 중복 체크 검증용 변수
+    let isIdChecked = false; 
+    let checkedId = "";      
 
-    // 2. 이메일 인증 초기화
+    // 중복 확인 버튼 클릭 이벤트
+    $("#checkIdBtn").click(function() {
+        let id = $("#userId").val().trim();
+        let $idMsg = $("#idMsg");
+        
+        if(id === "") {
+            $idMsg.text("아이디를 입력해 주세요.").css("color", "red");
+            return;
+        }
+
+        let idReg = /^[a-zA-Z0-9]{4,12}$/;
+        if(!idReg.test(id)) {
+            $idMsg.text("아이디는 영문 및 숫자 4~12자리로 입력하세요.").css("color", "red");
+            return;
+        }
+
+        $.get("/member/check-id", { id: id }, function(res) {
+            if(res === "AVAILABLE") {
+                $idMsg.text("사용 가능한 아이디입니다.").css("color", "green");
+                isIdChecked = true;
+                checkedId = id; 
+            } else {
+                $idMsg.text("이미 사용 중이거나 탈퇴한 아이디입니다.").css("color", "red");
+                isIdChecked = false;
+                checkedId = "";
+            }
+        });
+    });
+
+    // 아이디 수정 시 중복 확인 초기화
+    $("#userId").on("input", function() {
+        if(isIdChecked && $(this).val().trim() !== checkedId) {
+            isIdChecked = false;
+            checkedId = "";
+            $("#idMsg").text("아이디가 변경되었습니다. 다시 중복 확인을 해주세요.").css("color", "orange");
+        }
+    });
+    // 이메일 인증 초기화
     initEmailVerification({
         sendBtn: "#sendCodeBtn",
         verifyBtn: "#verifyBtn",
@@ -90,9 +134,6 @@ $(document).ready(function() {
             return $("#emailId").val() + "@" + $("#emailDomain").val();
         }
     });
-
-    // 이메일 변경 시 인증 초기화 이벤트 별도 분리
-    
     // 진짜로 이메일 인증에 성공했을 때의 값을 저장해 둘 변수
     let certifiedEmail = ""; 
 
@@ -104,37 +145,43 @@ $(document).ready(function() {
         // 세션에 저장된 인증 상태 확인
         let isVerified = sessionStorage.getItem("emailVerified");
 
-        // 💡 상황 1: 아직 인증을 안 받았거나 성공한 적이 없는 경우
+        //아직 인증을 안 받았거나 성공한 적이 없는 경우
         if (isVerified !== "true") {
             // 값이 바뀌더라도 경고를 띄우지 않고 메시지 칸을 깔끔하게 비워둡니다.
             $("#emailMsg").text(""); 
             return;
         }
 
-        // 이메일 인증에 성공한 직후 최초 1회만 인증 당시의 이메일을 변수에 박아둡니다.
+        // 이메일 인증에 성공한 직후 최초 1회만 인증 당시의 이메일을 변수에 고정해둠
         if (isVerified === "true" && certifiedEmail === "") {
             certifiedEmail = currentEmail;
         }
 
-        // 💡 상황 2: 이미 인증을 받았는데(true), 현재 입력한 값이 인증받은 이메일과 '진짜로 다를 때만' 초기화
+        //  이미 인증을 받았는데(true), 현재 입력한 값이 인증받은 이메일과 '진짜로 다를 때만' 초기화
         if (isVerified === "true" && currentEmail !== certifiedEmail) {
             sessionStorage.setItem("emailVerified", "false");
             $("#emailMsg").text("이메일이 변경되어 인증이 초기화되었습니다.").css("color", "red");
         } 
-        // 💡 상황 3: 사용자가 수정하려다가 다시 원상복구(원래 인증받은 이메일로 입력) 시켰을 때
+        // 사용자가 수정하려다가 다시 원상복구(원래 인증받은 이메일로 입력) 시켰을 때
         else if (currentEmail === certifiedEmail) {
             sessionStorage.setItem("emailVerified", "true");
             $("#emailMsg").text("이메일 인증이 완료되었습니다.").css("color", "green");
         }
     });
 
-    // 3. submit 제어 (페이지 특화 로직이므로 가입 페이지에 둠)
+ // submit 제어
     $("form").submit(function (e) {
-        e.preventDefault();
+        e.preventDefault(); // 기본 폼 제출 차단
 
         // 공통 유효성 검증
         let id = $("input[name='id']").val().trim();
-        if(id === ""){ alert("아이디를 입력하세요."); return; }
+        if(id === ""){ alert("아이디를 입력하세요."); return; 
+	}
+     // 중복 확인을 통과했는지 혹은 통과 후 아이디를 조작했는지 검증
+        if(!isIdChecked || $("#userId").val().trim() !== checkedId) {
+            alert("아이디 중복 확인이 필요합니다.");
+            return;
+        }
 
         let pwd = $("input[name='pwd']").val();
         let pwdCheck = $("#pwdCheck").val();
@@ -147,18 +194,32 @@ $(document).ready(function() {
         let nickName = $("input[name='nickName']").val().trim();
         if(nickName === ""){ alert("닉네임을 입력하세요."); return; }
 
-        // 가입 요청 서버 전송
+        // 
+        let combinedEmail = $("#emailId").val() + "@" + $("#emailDomain").val();
+        $("#fullEmail").val(combinedEmail);
+
+        // 
         let formData = $(this).serialize();
-        $.post("/member/join", formData, function(res){
-            if(res === "SUCCESS"){
-                alert("회원가입 완료");
-                location.href="/member/login";
-            } else if(res === "EMAIL_NOT_VERIFIED"){
-                alert("이메일 인증 필요");
-            } else if(res === "DUPLICATE_EMAIL"){
-                alert("이미 가입된 이메일입니다");
-            } else {
-                alert("회원가입 실패");
+        
+        // AJAX 전송
+        $.ajax({
+            url: "/member/join",
+            type: "POST",
+            data: formData,
+            success: function(res){
+                if(res === "SUCCESS"){
+                    alert("회원가입 완료");
+                    location.href = "/member/login";
+                } else if(res === "EMAIL_NOT_VERIFIED"){
+                    alert("이메일 인증이 올바르지 않거나 변경되었습니다.");
+                } else if(res === "DUPLICATE_EMAIL"){
+                    alert("이미 가입된 이메일입니다");
+                } else {
+                    alert("회원가입 실패");
+                }
+            },
+            error: function() {
+                alert("서버 통신 중 오류가 발생했습니다.");
             }
         });
     });
