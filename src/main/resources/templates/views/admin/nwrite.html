@@ -2,9 +2,87 @@
 <html>
 <head th:replace="~{views/common/head :: head}"></head>
 <body>
-	<div th:replace="~{views/common/navbar :: navbar}"></div>
-	
-	<div th:replace="~{views/common/modal :: modal}"></div>
-	<footer th:replace="~{views/common/footer :: footer}"></footer>
+
+<div th:replace="~{views/common/navbar :: navbar}"></div>
+
+<main class="flex min-h-screen bg-gray-100">
+
+    <!-- 사이드바 -->
+    <div th:replace="~{views/admin/adminbar :: adminbar}"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <section class="flex-1 p-8">
+
+        <!-- 페이지 제목 -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold">
+                공지사항 작성
+            </h1>
+
+            <p class="mt-2 text-gray-500">
+                새로운 공지사항을 등록합니다.
+            </p>
+        </div>
+
+        <!-- 작성 폼 -->
+        <div class="rounded-xl border bg-white p-8 shadow-sm">
+
+            <form action="/admin/notice/insert" method="post">
+
+                <!-- 제목 -->
+                <div class="mb-6">
+                    <label class="mb-2 block font-semibold">
+                        제목
+                    </label>
+
+                    <input
+                        type="text"
+                        name="title"
+                        placeholder="공지사항 제목을 입력하세요"
+                        class="w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <!-- 내용 -->
+                <div class="mb-6">
+                    <label class="mb-2 block font-semibold">
+                        내용
+                    </label>
+
+                    <textarea
+                        name="content"
+                        rows="15"
+                        placeholder="공지사항 내용을 입력하세요"
+                        class="w-full rounded-lg border px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="flex justify-end gap-3">
+
+                    <button
+                        type="submit"
+                        class="rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700">
+                        등록
+                    </button>
+                    <button
+                        type="button"
+                        onclick="history.back()"
+                        class="rounded-lg border px-6 py-2 hover:bg-gray-100">
+                        취소
+                    </button>
+
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </section>
+
+</main>
+
+<div th:replace="~{views/common/modal :: modal}"></div>
+<footer th:replace="~{views/common/footer :: footer}"></footer>
+
 </body>
 </html>
