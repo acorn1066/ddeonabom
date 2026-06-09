@@ -1,8 +1,13 @@
-<div class="sticky top-0 z-50 h-header border-b border-line bg-white/80 backdrop-blur-md backdrop-saturate-150" th:fragment="navbar">
+<div class="sticky top-0 z-50 h-header border-b border-line bg-white/80 backdrop-blur-md backdrop-saturate-150" 
+     th:fragment="navbar"
+     xmlns:th="http://www.thymeleaf.org"
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+     
   <div class="mx-auto flex h-full max-w-wide items-center justify-between px-6 relative">
     <a href="/" class="flex items-center gap-2">
       <span class="text-xl font-extralight tracking-wide">떠나봄</span>
     </a>
+    
     <nav class="absolute left-1/2 -translate-x-1/2 flex items-center gap-8 text-sm font-medium text-muted">
 		<a th:href="@{/landmark/list}"
 		   th:class="${currentURI != null and currentURI.contains('/landmark')} ? 
@@ -31,8 +36,20 @@
     </nav>
     
     <div class="flex items-center gap-3">
+    
+  <th:block th:if="${session.loginUser == null}">
       <a href="/member/join" class="inline-flex h-9 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-sunk">회원가입</a>
       <a href="/member/login" class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">로그인</a>
-    </div>
+  </th:block>
+  
+  <th:block th:unless="${session.loginUser == null}">
+      <a href="/member/mypage" class="inline-flex h-9 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-sunk">마이페이지</a>
+      
+      <a href="/member/logout" class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">
+          로그아웃
+      </a>
+  </th:block>
+  
+</div>
   </div>
 </div>

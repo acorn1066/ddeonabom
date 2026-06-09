@@ -29,7 +29,7 @@
 <style> body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing:antialiased; letter-spacing:-0.01em; } </style>
 </head>
 <body class="bg-white text-ink">
-
+<header th:replace="~{views/common/navbar :: navbar}"></header>
 <div th:replace="~{views/common/head::head}"></div>
 
 <main class="mx-auto max-w-2xl px-6 pb-24 pt-16">
@@ -202,9 +202,9 @@ $(document).ready(function() {
         }, 100);
     });
 
-    // 정보 수정 폼 서브밋 제어 (여기가 핵심 교정 구역입니다)
+    // 정보 수정 폼 서브밋 제어 (교정 완료 버전)
     $("form").submit(function (e) {
-        e.preventDefault(); // 기본 폼 제출 막기
+        e.preventDefault(); 
 
         let pwd = $("#newPassword").val();
         let pwdCheck = $("#confirmPassword").val();
@@ -235,14 +235,19 @@ $(document).ready(function() {
             return;
         }
 
-        // 데이터를 안전하게 묶어주는 직렬화 코드를 명확히 선언
+        // [교정] 데이터 전송 누락 방지를 위해 이메일 잠금을 순간적으로 해제
+        $("#email").prop("disabled", false).prop("readonly", false);
+        
         let formData = $(this).serialize();
+        
+        // [교정] 전송 직후 다시 화면 보호를 위해 되돌려놓기
+        $("#email").prop("readonly", true);
         
         // AJAX 요청 전송
         $.post("/member/update", formData, function(res){
             if(res === "SUCCESS" || res === "success"){
                 alert("회원정보 수정이 완료되었습니다.");
-                location.href = "index"; 
+                location.href = "/"; // [교정] 안전한 메인 절대경로로 변경
             } else if(res === "WRONG_CURRENT_PASSWORD") {
                 alert("현재 비밀번호가 일치하지 않습니다. 다시 확인해주세요.");
                 $("#currentPassword").val("").focus();
