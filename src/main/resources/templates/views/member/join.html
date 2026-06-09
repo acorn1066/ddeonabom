@@ -36,7 +36,7 @@
             <input type="password" id="pwdCheck" class="form-control mb-1" placeholder="비밀번호 확인">
             <small id="pwdMsg"></small>
 
-            <input type="text" name="nickName" class="form-control mb-2" placeholder="닉네임">
+            <input type="text" name="nickname" class="form-control mb-2" placeholder="닉네임">
 
             <div class="input-group mb-2">
                 <input type="text" id="emailId" class="form-control" placeholder="이메일 아이디">
@@ -191,8 +191,8 @@
                 }
 
                 // 4. 닉네임 빈값 검증
-                let nickName = $("input[name='nickName']").val().trim();
-                if(nickName === ""){ 
+                let nickname = $("input[name='nickname']").val().trim();
+                if(nickname === ""){ 
                     alert("닉네임을 입력하세요."); 
                     return; 
                 }
@@ -217,7 +217,7 @@
                             alert("이메일 인증이 올바르지 않거나 변경되었습니다.");
                         } else if(res === "DUPLICATE_EMAIL"){
                             alert("이미 가입된 이메일입니다");
-                        } else if(res === "DUPLICATE_NICKNAME"){
+                        } else if(res === "DUPLICATE_nickname"){
                             alert("이미 존재하는 닉네임입니다");    
                         } else {
                             alert("회원가입 실패");

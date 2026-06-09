@@ -23,4 +23,8 @@ public class ApiSyncLog {
     private String status;
     private int dailyCalls;
     private Date lastResetDate;
+    private int lastOverviewId;
+    private int count;
+    private int overviewCount;
+    private String apiKey;
 }
