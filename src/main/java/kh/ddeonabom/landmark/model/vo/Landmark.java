@@ -1,5 +1,28 @@
 package kh.ddeonabom.landmark.model.vo;
 
-public class Landmark {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+public class Landmark {
+	private int contentId;
+	private String addr1;
+	private String addr2;
+	private double mapx;
+	private double mapy;
+	private String tel;
+	private String title;
+	private int landCount;
+	private int contentTypeId;
+	private String overview;
+	private String firstImage;
+	private String firstImage2;
+	
 }
