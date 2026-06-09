@@ -11,8 +11,6 @@ import kh.ddeonabom.landmark.model.vo.Landmark;
 @Mapper
 public interface LandmarkApiMapper {
 
-	ApiSyncLog selectSyncLog();
-
 	void mergeLandmark(Landmark landmark);
 	
 	List<Integer> selectContentIdsForOverview(@Param("lastOverviewId") int lastOverviewId, @Param("limit") int limit);
@@ -24,7 +22,9 @@ public interface LandmarkApiMapper {
 	int selectOverviewCount();
 	
 	ApiSyncLog selectSyncLog(String apiKey);
+	
 	int updateSyncLog(ApiSyncLog syncLog);
+	
 	int insertSyncLog(ApiSyncLog syncLog);
 	
 	
