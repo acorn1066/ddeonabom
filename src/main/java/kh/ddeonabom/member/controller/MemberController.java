@@ -130,7 +130,7 @@ public class MemberController {
         if (mService.existsByEmail(m.getEmail())) {
             return "DUPLICATE_EMAIL";
         }
-        if (mService.existsByNickname(m.getNickname())) { 
+        if (mService.existsBynickname(m.getNickname())) { 
             return "DUPLICATE_nickname"; // 프론트엔드에 닉네임 중복 알림 전달
         }
 
@@ -446,8 +446,8 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
 }
 	@GetMapping("/mypage")
 	public String mypage(
-	        @RequestParam(value = "tab", defaultValue = "schedule") String tab,
-	        @RequestParam(value = "page", defaultValue = "1") int page,
+	        @RequestParam(value="tab", defaultValue = "schedule") String tab,
+	        @RequestParam(value="page", defaultValue = "1") int page,
 	        Model model) {
 	    
 	    // 현재 어떤 탭이 켜졌는지 타임리프에 알려주기
@@ -480,7 +480,7 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
 	            fakeComments.add("[" + (startNum + i) + "] 우도 들어가실 때 배 시간표 꼭 확인하고 가세요~");
 	        }
 	        
-	        //  중요: 댓글 탭일 때도 동일하게 "list"라는 이름으로 전달
+	        //  댓글 탭일 때도 동일하게 "list"라는 이름으로 전달
 	        model.addAttribute("list", fakeComments);
 	        
 	        // 댓글은 총 57개, 한 페이지에 10개씩 보이도록 세팅
@@ -493,10 +493,3 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
 	    return "views/member/mypage";
 	}
 }
-
-
-
-
-
-
-

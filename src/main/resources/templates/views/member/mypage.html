@@ -19,9 +19,9 @@
             
             <div class="mb-6 flex items-center gap-3 border-b border-line pb-5">
                 <div class="flex h-12 w-12 items-center justify-center rounded-full bg-brand text-lg font-bold text-white"
-                     th:text="${#strings.substring(session.loginUser?.nickName ?: '유', 0, 1)}">바</div>
+                     th:text="${#strings.substring(session.loginUser?.nickname ?: '유', 0, 1)}">바</div>
                 <div>
-                    <div class="font-bold text-ink text-sm" th:text="${session.loginUser?.nickName}">사용자 닉네임</div>
+                    <div class="font-bold text-ink text-sm" th:text="${session.loginUser?.nickname}">사용자 닉네임</div>
                     <div class="text-xs text-faint" th:text="${session.loginUser?.id}">user_id</div>
                 </div>
             </div>
