@@ -18,7 +18,7 @@ public class QListService {
 		return qMapper.getListCount();
 	}
 
-	public ArrayList<QList> selectQList(PageInfo pi, int i) {
-		return qMapper.selectQList(pi, i);
+	public ArrayList<QList> selectQList(PageInfo pi) {
+		return qMapper.selectQList(pi);
 	}
 }
