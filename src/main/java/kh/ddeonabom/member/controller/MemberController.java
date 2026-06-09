@@ -175,6 +175,12 @@ public class MemberController {
         if (loginUser != null && bcrypt.matches(m.getPwd(), loginUser.getPwd())) {
 
             session.setAttribute("loginUser", loginUser);
+            
+            // 관리자면 admin 페이지 우선 이동
+            if ("Y".equals(loginUser.getIsAdmin())) {
+                return "redirect:/admin/dash";
+            }
+            
          // 히든 인풋으로 넘어온 targetUrl(목적지)이 진짜로 존재한다면?
             if (targetUrl != null && !targetUrl.isEmpty()) {
                 return "redirect:" + targetUrl; // 🚀 그 목적지(/member/edit)로 바로 튕겨줍니다!

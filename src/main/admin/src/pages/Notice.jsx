@@ -27,7 +27,7 @@ const Notice = () => {
                 </div>
 
                 <button
-                    onClick={() => navigate("/admin/nwrite")}
+                    onClick={() => navigate("/notice/write")}
                     className="rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
                 >
                     공지 등록

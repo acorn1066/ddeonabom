@@ -57,6 +57,15 @@ const AdminBar = () => {
               🚨 신고 관리
             </Link>
           </li>
+
+          <li>
+            <Link
+              to="/landmark"
+              className="block rounded-lg px-4 py-3 hover:bg-gray-100"
+            >
+              🏞️ 관광지 관리
+            </Link>
+          </li>
         </ul>
       </nav>
     </aside>
