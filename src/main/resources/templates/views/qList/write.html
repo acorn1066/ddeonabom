@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{views/common/head :: head}"></head>
+<body>
+	<div th:replace="~{views/common/navbar :: navbar}"></div>
+	
+	<!-- ════════════ MAIN ════════════ -->
+	<main class="mx-auto max-w-3xl px-6 pb-24 pt-16">
+	  <h1 class="mb-2 text-3xl font-extrabold tracking-tight">질문하기</h1>
+	  <p class="mb-12 text-15 text-muted">구체적으로 적을수록 좋은 답변을 받을 수 있어요.</p>
+	
+	  <form onsubmit="return false;" class="flex flex-col gap-6">
+	    <div class="flex flex-col gap-2">
+	      <label class="text-13 font-semibold">카테고리</label>
+	      <div class="flex flex-wrap gap-2">
+	        <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-transparent bg-brand px-4 text-sm font-semibold text-white">교통·이동</span>
+	        <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-sm font-semibold text-muted transition hover:border-muted hover:text-ink">숙소</span>
+	        <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-sm font-semibold text-muted transition hover:border-muted hover:text-ink">맛집</span>
+	        <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-sm font-semibold text-muted transition hover:border-muted hover:text-ink">일정</span>
+	        <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-sm font-semibold text-muted transition hover:border-muted hover:text-ink">준비물</span>
+	        <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-sm font-semibold text-muted transition hover:border-muted hover:text-ink">기타</span>
+	      </div>
+	    </div>
+	
+	    <div class="flex flex-col gap-2">
+	      <label class="text-13 font-semibold">제목</label>
+	      <input class="h-14 rounded-lg border border-line bg-white px-4 text-17 font-semibold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft" placeholder="질문을 한 줄로 요약해주세요" />
+	    </div>
+	
+	    <div class="flex flex-col gap-2">
+	      <label class="text-13 font-semibold">내용</label>
+	      <textarea class="min-h-56 rounded-lg border border-line bg-white p-4 text-sm leading-relaxed outline-none transition placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft" placeholder="여행 시기, 동행 인원, 이동 수단 등 상황을 함께 적어주시면 더 정확한 답변을 받을 수 있어요."></textarea>
+	    </div>
+	
+	    <div class="flex flex-col gap-2">
+	      <label class="text-13 font-semibold">공개 설정</label>
+	      <div class="flex flex-col gap-3">
+	        <label class="flex items-center gap-2.5 text-sm text-muted"><input type="radio" name="vis" class="accent-brand" checked /><span><b class="text-ink">전체 공개</b> · 누구나 질문과 답변을 볼 수 있습니다</span></label>
+	        <label class="flex items-center gap-2.5 text-sm text-muted"><input type="radio" name="vis" class="accent-brand" /><span><b class="text-ink">회원 공개</b> · 로그인한 떠나봄 회원만 볼 수 있습니다</span></label>
+	      </div>
+	    </div>
+	
+	    <div class="flex justify-end gap-2">
+	      <a href="qa-board.html" class="inline-flex h-11 items-center rounded-lg border border-line bg-white px-5 text-sm font-semibold text-ink transition hover:bg-sunk">취소</a>
+	      <button class="inline-flex h-11 items-center rounded-lg bg-brand px-5 text-sm font-semibold text-white transition hover:bg-brand-ink">질문 등록</button>
+	    </div>
+	  </form>
+	</main>
+	
+	<div th:replace="~{views/common/modal :: modal}"></div>
+	<footer th:replace="~{views/common/footer :: footer}"></footer>
+</body>
+</html>
