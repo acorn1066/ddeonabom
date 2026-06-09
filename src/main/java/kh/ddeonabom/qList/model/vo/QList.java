@@ -23,4 +23,5 @@ public class QList {
 	private String status;
 	private int memberNo;
 	private String writer;
+	private String category;
 }

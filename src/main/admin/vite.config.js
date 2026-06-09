@@ -12,7 +12,10 @@ export default defineConfig({
       '/react': {
         target: 'http://localhost:8080',
         changeOrigin: true,
+<<<<<<< HEAD
         rewrite: path => path.replace(/^\/react/, '')
+=======
+>>>>>>> origin/main
       }
     }
   }

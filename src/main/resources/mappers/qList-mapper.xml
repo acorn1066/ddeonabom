@@ -9,10 +9,20 @@
 		where status = 'Y'
 	</select>
 	
-	<select id="selectQList" resultType="_int">
-		select count(*)
-		from qlist
-		where status = 'Y'
+	<select id="selectQList" resultType="QList">
+	    SELECT q.*, m.nickname AS writer
+	    FROM qlist q
+	    JOIN member m ON q.member_no = m.member_no
+	    WHERE q.status = 'Y'
+	    ORDER BY q.create_date DESC
+	</select>
+	
+	<select id="detailQList" parameterType="_int" resultType="QList">
+	    SELECT q.*, m.nickname AS writer
+	    FROM qlist q
+	    JOIN member m ON q.member_no = m.member_no
+	    WHERE q.q_no = #{qNo}
+	    AND q.status = 'Y'
 	</select>
 	
 	
