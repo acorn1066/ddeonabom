@@ -125,8 +125,8 @@ public class MemberController {
         if (mService.existsByEmail(m.getEmail())) {
             return "DUPLICATE_EMAIL";
         }
-        if (mService.existsByNickName(m.getNickName())) { 
-            return "DUPLICATE_NICKNAME"; // 프론트엔드에 닉네임 중복 알림 전달
+        if (mService.existsByNickname(m.getNickname())) { 
+            return "DUPLICATE_nickname"; // 프론트엔드에 닉네임 중복 알림 전달
         }
 
         // -------------------------------
@@ -270,7 +270,7 @@ public class MemberController {
             session.removeAttribute("verifiedEmail");
             
             // 데이터가 최종 성공했을 때만 세션 객체를 안전하게 동기화 갱신
-            if (m.getNickName() != null) loginUser.setNickName(m.getNickName());
+            if (m.getNickname() != null) loginUser.setNickname(m.getNickname());
             if (m.getEmail() != null) loginUser.setEmail(m.getEmail());
             
             //  비밀번호도 정상 변경되었다면 새 암호문으로 세션을 완벽 동기화

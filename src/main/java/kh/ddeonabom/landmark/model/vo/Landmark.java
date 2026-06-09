@@ -6,10 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class Landmark {
 	private int contentId;
@@ -22,7 +22,7 @@ public class Landmark {
 	private int landCount;
 	private int contentTypeId;
 	private String overview;
-	private String firstImage;
-	private String firstImage2;
+	private String firstimage;
+	private String firstimage2;
 	
 }
