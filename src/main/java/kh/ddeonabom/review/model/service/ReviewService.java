@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.springframework.stereotype.Service;
 
+import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.review.model.mappers.ReviewMapper;
 import kh.ddeonabom.review.model.vo.Review;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,14 @@ public class ReviewService {
     public ArrayList<Review> selectReviewList() {
         return reviewMapper.selectReviewList();
     }
+
+	public int selectListCount() {
+		return reviewMapper.selectListCount();
+	}
+
+	public ArrayList<Review> selectReviewList(PageInfo pi) {
+		return reviewMapper.selectReviewList(pi);
+	}
 
 
 
