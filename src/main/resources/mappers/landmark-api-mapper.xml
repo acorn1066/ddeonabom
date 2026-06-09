@@ -4,28 +4,50 @@
 <mapper namespace="kh.ddeonabom.admin.model.mapper.LandmarkApiMapper">
 
     <select id="selectSyncLog" resultType="ApiSyncLog">
-        SELECT LOG_ID       AS logId,
-               LAST_PAGE    AS lastPage,
-               TOTAL_PAGES  AS totalPages,
-               COLLECT_SYNC AS collectSync,
-               UPDATE_SYNC  AS updateSync,
-               STATUS       AS status,
-               DAILY_CALLS  AS dailyCalls,
-               LAST_RESET_DATE AS lastResetDate
-        FROM API_SYNC_LOG
-        WHERE LOG_ID = 1
-    </select>
-
-    <update id="updateSyncLog" parameterType="ApiSyncLog">
-        UPDATE API_SYNC_LOG
-        SET LAST_PAGE       = #{lastPage},
-            TOTAL_PAGES     = #{totalPages},
-            COLLECT_SYNC    = #{collectSync},
-            UPDATE_SYNC     = #{updateSync},
-            STATUS          = #{status},
-            DAILY_CALLS     = #{dailyCalls},
-            LAST_RESET_DATE = #{lastResetDate}
-        WHERE LOG_ID = 1
-    </update>
-
+	    SELECT * FROM API_SYNC_LOG
+	    WHERE API_KEY = #{apiKey}
+	</select>
+	
+	<update id="updateSyncLog" parameterType="ApiSyncLog">
+	    UPDATE API_SYNC_LOG
+	    SET LAST_PAGE        = #{lastPage},
+	        TOTAL_PAGES      = #{totalPages},
+	        COLLECT_SYNC     = #{collectSync},
+	        UPDATE_SYNC      = #{updateSync},
+	        STATUS           = #{status},
+	        DAILY_CALLS      = #{dailyCalls},
+	        LAST_RESET_DATE  = #{lastResetDate},
+	        LAST_OVERVIEW_ID = #{lastOverviewId}
+	    WHERE API_KEY = #{apiKey}
+	</update>
+	
+	<insert id="insertSyncLog" parameterType="ApiSyncLog">
+	    INSERT INTO API_SYNC_LOG (LOG_ID, API_KEY, DAILY_CALLS, LAST_PAGE, TOTAL_PAGES, STATUS, LAST_RESET_DATE)
+	    VALUES (API_SYNC_LOG_SEQ.NEXTVAL, #{apiKey}, 0, 0, 0, 'IDLE', SYSDATE)
+	</insert>
+	
+	<select id="selectContentIdsForOverview" resultType="int">
+	    SELECT CONTENT_ID
+	    FROM LANDMARK
+	    WHERE CONTENT_ID > #{lastOverviewId}
+	      AND (OVERVIEW IS NULL OR OVERVIEW = '')
+	    ORDER BY CONTENT_ID
+	    FETCH FIRST #{limit} ROWS ONLY
+	</select>
+	
+	<update id="updateOverview" parameterType="map">
+	    UPDATE LANDMARK
+	    SET OVERVIEW = #{overview}
+	    WHERE CONTENT_ID = #{contentId}
+	</update>
+	
+	<select id="selectLandmarkCount" resultType="int">
+	    SELECT COUNT(*) FROM LANDMARK
+	</select>
+	
+	<select id="selectOverviewCount" resultType="int">
+	    SELECT COUNT(*) FROM LANDMARK
+	    WHERE OVERVIEW IS NOT NULL
+	    AND DBMS_LOB.GETLENGTH(OVERVIEW) > 0
+	</select>
 </mapper>

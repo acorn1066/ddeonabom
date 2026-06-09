@@ -14,4 +14,6 @@ public interface QListMapper {
 
 	ArrayList<QList> selectQList(PageInfo pi);
 
+	QList detailQList(int qNo);
+
 }

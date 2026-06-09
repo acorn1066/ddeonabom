@@ -21,4 +21,8 @@ public class QListService {
 	public ArrayList<QList> selectQList(PageInfo pi) {
 		return qMapper.selectQList(pi);
 	}
+
+	public QList detailQList(int qNo) {
+		return qMapper.detailQList(qNo);
+	}
 }

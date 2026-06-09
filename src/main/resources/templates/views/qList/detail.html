@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{views/common/head :: head}"></head>
+<body>
+	<div th:replace="~{views/common/navbar :: navbar}"></div>
+	
+	<!-- ════════════ MAIN ════════════ -->
+	<main class="mx-auto max-w-post px-6 pb-24 pt-12">
+	  <div class="mb-5 text-13 text-muted"><a href="qa-board.html" class="hover:text-brand">질문 게시판</a> › 교통·이동</div>
+	
+	  <div class="border-b border-line pb-5">
+	    <div class="mb-3 flex items-center gap-2">
+	      <span class="inline-flex h-7.5 items-center rounded-full border border-line px-3 text-13 font-medium text-muted">교통·이동</span>
+	    </div>
+	    <h1 class="mb-4 text-28 font-extrabold leading-snug tracking-tight">제주공항에서 성산일출봉까지 버스로 갈 수 있나요?</h1>
+	    <div class="flex items-center gap-2.5">
+	      <span class="flex h-9.5 w-9.5 items-center justify-center rounded-full bg-sunk font-bold text-muted">제</span>
+	     	<div>
+	      		<div class="text-sm font-bold">제주한바퀴</div>
+	      	  	<div class="text-13 text-muted tabular-nums" th:text="${q.createDate} + ' · 조회 ' + ${q.count}">2026.04.18 · 조회 312</div>
+				<!-- 수정됐을 때만 -->
+				<th:block th:if="${q.modifyDate != null}">
+					 · <span class="edited-info" th:text="'수정됨 ' + ${#temporals.format(q.modifyDate, 'yyyy.MM.dd')}"></span>
+				</th:block>
+      	  	</div>
+	      <div class="ml-auto flex gap-2 text-13 text-muted"><a href="qa-edit.html" class="hover:text-brand">수정</a><span class="text-line">·</span><a href="#" class="hover:text-brand">삭제</a></div>
+	    </div>
+	  </div>
+	
+	  <div class="py-6 text-base leading-loose text-ink/85">4월 중순에 혼자 제주 여행 갑니다. 렌터카를 안 빌릴 예정인데, 제주공항에서 성산일출봉까지 대중교통(버스)으로 갈 수 있을까요? 소요 시간이랑 환승 정보도 알려주시면 감사하겠습니다!</div>
+	
+	  <div class="flex gap-2">
+	    <span class="inline-flex h-7.5 items-center rounded-full border border-line px-3 text-13 font-medium text-muted">제주</span>
+	    <span class="inline-flex h-7.5 items-center rounded-full border border-line px-3 text-13 font-medium text-muted">대중교통</span>
+	    <span class="inline-flex h-7.5 items-center rounded-full border border-line px-3 text-13 font-medium text-muted">성산일출봉</span>
+	  </div>
+	
+	  <section class="mt-6">
+	    <div class="mb-5 text-lg font-bold">댓글 <span class="text-brand tabular-nums">3</span></div>
+	
+	    <div class="flex gap-4 border-t border-line py-5">
+	      <span class="flex h-10.5 w-10.5 flex-none items-center justify-center rounded-full bg-brand-soft font-bold text-brand-ink">제</span>
+	      <div class="flex-1">
+	        <div class="mb-1.5 flex items-center gap-2"><span class="text-sm font-bold">제주한바퀴</span><span class="text-xs text-faint tabular-nums">2026.04.18</span><span class="ml-auto flex gap-2.5 text-xs text-muted"><a href="#" class="hover:text-brand">수정</a><a href="#" class="hover:text-brand">삭제</a></span></div>
+	        <p class="text-15 leading-relaxed text-ink/85">혹시 시간표 사이트도 같이 아시는 분 계실까요? 새벽 첫차 시간이 궨1금합니다.</p>
+	      </div>
+	    </div>
+	
+	    <div class="flex gap-4 border-t border-line py-5">
+	      <span class="flex h-10.5 w-10.5 flex-none items-center justify-center rounded-full bg-sunk font-bold text-muted">별</span>
+	      <div class="flex-1">
+	        <div class="mb-1.5 flex items-center gap-2"><span class="text-sm font-bold">별헤는밤</span><span class="text-xs text-faint tabular-nums">2026.04.18</span></div>
+	        <p class="text-15 leading-relaxed text-ink/85">공항에서 311번 또는 312번 급행버스를 타시면 성산일출봉 입구까지 한 번에 갈 수 있어요. 약 1시간 20분 정도 걸립니다. 배차 간격이 20~30분이라 시간표를 미리 확인하시는 게 좋아요. 카드 충전식이라 교통카드 챙기세요!</p>
+	      </div>
+	    </div>
+	
+	    <div class="flex gap-4 border-t border-line py-5">
+	      <span class="flex h-10.5 w-10.5 flex-none items-center justify-center rounded-full bg-sunk font-bold text-muted">노</span>
+	      <div class="flex-1">
+	        <div class="mb-1.5 flex items-center gap-2"><span class="text-sm font-bold">노을수집가</span><span class="text-xs text-faint tabular-nums">2026.04.18</span></div>
+	        <p class="text-15 leading-relaxed text-ink/85">저도 버스로 다녀왔는데 짐이 많으면 좀 힘들어요. 캐리어 있으시면 공항 리무진이나 택시 분할도 고려해보세요.</p>
+	      </div>
+	    </div>
+	
+	    <div class="mt-7 border-t-2 border-ink pt-6">
+	      <h3 class="mb-4 text-base font-bold">댓글 작성</h3>
+	      <div class="overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
+	        <textarea class="block min-h-composer w-full resize-none border-none bg-transparent px-4 py-3 text-sm leading-relaxed outline-none placeholder:text-faint" placeholder="질문에 도움이 되는 댓글을 남겨보세요"></textarea>
+	        <div class="flex items-center justify-between border-t border-line py-2 pl-4 pr-2">
+	          <span class="text-xs text-faint">서로 존중하는 댓글 문화를 만들어요</span>
+	          <button class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">댓글 등록</button>
+	        </div>
+	      </div>
+	    </div>
+	  </section>
+	</main>
+
+	<div th:replace="~{views/common/modal :: modal}"></div>
+	<footer th:replace="~{views/common/footer :: footer}"></footer>
+</body>
+</html>
