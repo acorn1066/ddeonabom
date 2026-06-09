@@ -16,7 +16,12 @@
     WHERE EMAIL = #{email}
       AND STATUS = 'Y'
 </select>
-
+<select id="existsByNickname" resultType="int">
+    SELECT COUNT(*)
+    FROM MEMBER
+    WHERE nickname = #{nickname}
+      AND STATUS = 'Y'
+</select>
 
 <insert id="insertMember">
 	insert into Member(
@@ -30,7 +35,7 @@
 	MEMBER_SEQ.NEXTVAL,
 	#{id},
 	#{pwd},
-	#{nickName},
+	#{nickname},
 	#{email},
 	#{phone}
 	
@@ -48,7 +53,7 @@
 <update id="updateMemberWithPassword">
 	update Member
 	set
-	nickname=#{nickName},
+	nickname=#{nickname},
 	email=#{email},
 	pwd=#{pwd}
 	where id=#{id}
@@ -57,7 +62,7 @@
 <update id="updateMemberWithoutPassword">
 	update Member
 	set
-	nickname=#{nickName},
+	nickname=#{nickname},
 	email=#{email}
 	where id=#{id}
 	</update>
@@ -79,7 +84,7 @@
        SET STATUS = 'N',
            ID = ID || '_' || TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
            EMAIL = EMAIL || '_' || TO_CHAR(SYSDATE, 'YYMMDDHH24MISS'),
-           NICKNAME = NICKNAME || '_' || TO_CHAR(SYSDATE, 'YYMMDDHH24MISS')
+           nickname = nickname || '_' || TO_CHAR(SYSDATE, 'YYMMDDHH24MISS')
      WHERE ID = #{id}
 </update>
 

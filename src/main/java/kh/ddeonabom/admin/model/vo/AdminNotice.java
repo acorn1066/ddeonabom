@@ -20,5 +20,8 @@ public class AdminNotice {
 	private String status;
 	private Date createDate;
 	private Date modifyDate;
+	private int memberNo;
+	
+	private String memberName;
 
 }

@@ -18,10 +18,11 @@ public class Member {
 	private int memberNo;
 	private String id;
 	private String pwd;
-	private String nickName;
+	private String nickname;
 	private String email;
 	private String phone;
 	private String isAdmin;
+	private String status;
 	private Date enrollDate;
 	private Date modifyDate;
 	
