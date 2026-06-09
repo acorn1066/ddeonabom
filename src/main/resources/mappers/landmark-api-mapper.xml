@@ -8,6 +8,10 @@
 	    WHERE API_KEY = #{apiKey}
 	</select>
 	
+	<insert id="insertSyncLog" parameterType="ApiSyncLog">
+	    INSERT INTO API_SYNC_LOG (LOG_ID, API_KEY, DAILY_CALLS, LAST_PAGE, TOTAL_PAGES, STATUS, LAST_RESET_DATE)
+	    VALUES (API_SYNC_LOG_SEQ.NEXTVAL, #{apiKey}, 0, 0, 0, 'IDLE', SYSDATE)
+	</insert>
 	<update id="updateSyncLog" parameterType="ApiSyncLog">
 	    UPDATE API_SYNC_LOG
 	    SET LAST_PAGE        = #{lastPage},
@@ -20,17 +24,32 @@
 	        LAST_OVERVIEW_ID = #{lastOverviewId}
 	    WHERE API_KEY = #{apiKey}
 	</update>
-	
-	<insert id="insertSyncLog" parameterType="ApiSyncLog">
-	    INSERT INTO API_SYNC_LOG (LOG_ID, API_KEY, DAILY_CALLS, LAST_PAGE, TOTAL_PAGES, STATUS, LAST_RESET_DATE)
-	    VALUES (API_SYNC_LOG_SEQ.NEXTVAL, #{apiKey}, 0, 0, 0, 'IDLE', SYSDATE)
+
+	<insert id="mergeLandmark" parameterType="Landmark">
+	    MERGE INTO LANDMARK L
+	    USING (SELECT #{contentId} AS CONTENT_ID FROM DUAL) S
+	    ON (L.CONTENT_ID = S.CONTENT_ID)
+	    WHEN MATCHED THEN
+	        UPDATE SET
+	            TITLE           = #{title},
+	            ADDR1           = #{addr1},
+	            ADDR2           = #{addr2},
+	            FIRSTIMAGE      = #{firstimage},
+	            FIRSTIMAGE2     = #{firstimage2},
+	            MAPX            = #{mapx},
+	            MAPY            = #{mapy},
+	            TEL             = #{tel},
+	            CONTENT_TYPE_ID = #{contentTypeId}
+	    WHEN NOT MATCHED THEN
+	        INSERT (CONTENT_ID, TITLE, ADDR1, ADDR2, FIRSTIMAGE, FIRSTIMAGE2, MAPX, MAPY, TEL, CONTENT_TYPE_ID)
+	        VALUES (#{contentId}, #{title}, #{addr1}, #{addr2}, #{firstimage}, #{firstimage2}, #{mapx}, #{mapy}, #{tel}, #{contentTypeId})
 	</insert>
 	
 	<select id="selectContentIdsForOverview" resultType="int">
 	    SELECT CONTENT_ID
 	    FROM LANDMARK
 	    WHERE CONTENT_ID > #{lastOverviewId}
-	      AND (OVERVIEW IS NULL OR OVERVIEW = '')
+	      AND (OVERVIEW IS NULL OR DBMS_LOB.GETLENGTH(OVERVIEW) = 0)
 	    ORDER BY CONTENT_ID
 	    FETCH FIRST #{limit} ROWS ONLY
 	</select>

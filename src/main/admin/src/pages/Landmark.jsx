@@ -154,9 +154,9 @@ export default function Landmark() {
           accent
         />
         <StatCard
-          label="마지막 수집"
-          value={syncLog?.collectSync ? fmt(new Date(syncLog.collectSync)) : null}
-          caption={`${page} / ${totalPages} 페이지까지 완료`}
+          label="수집된 관광지 개요"
+          value={syncLog?.overviewCount ? syncLog.overviewCount.toLocaleString() : null}
+          caption={`${syncLog?.count ?? 0} 건 중`}
         />
         <StatCard
           label="마지막 업데이트"
@@ -164,9 +164,9 @@ export default function Landmark() {
           caption="전체 갱신 기준"
         />
         <StatCard
-          label="개요 수집"
-          value={syncLog?.overviewCount ? syncLog.overviewCount.toLocaleString() : null}
-          caption={`${syncLog?.overviewCount ?? 0} / ${syncLog?.count ?? 0} 건`}
+          label="마지막 개요 업데이트"
+          value={syncLog?.collectSync ? fmt(new Date(syncLog.collectSync)) : null}
+          caption="개요 갱신 기준"
         />
       </div>
 
@@ -191,10 +191,10 @@ export default function Landmark() {
           </div>
         </div>
 
-        {/* 진행 상황 */}
+        {/* 업데이트 진행 상황 */}
         <div className="mt-5">
           <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="font-semibold text-muted">수집 진행 상황</span>
+            <span className="font-semibold text-muted">업데이트 진행 상황</span>
             <span className="tabular-nums text-faint">
               <span className="font-semibold text-ink">{page.toLocaleString()}</span> / {totalPages.toLocaleString()} 페이지
               <span className="ml-2">({pct}%)</span>
@@ -202,6 +202,21 @@ export default function Landmark() {
           </div>
           <div className="h-2.5 w-full overflow-hidden rounded-full bg-line">
             <div className="h-full rounded-full bg-cobalt transition-[width] duration-150 ease-out" style={{ width: `${pct}%` }} />
+          </div>
+        </div>
+
+        {/* 개요 업데이트 진행 상황 */}
+        <div className="mt-4">
+          <div className="mb-2 flex items-center justify-between text-sm">
+            <span className="font-semibold text-muted">개요 업데이트 진행 상황</span>
+            <span className="tabular-nums text-faint">
+              <span className="font-semibold text-ink">{(syncLog?.overviewCount ?? 0).toLocaleString()}</span> / {(syncLog?.count ?? 0).toLocaleString()} 건
+              <span className="ml-2">({syncLog?.count ? Math.round((syncLog.overviewCount / syncLog.count) * 100) : 0}%)</span>
+            </span>
+          </div>
+          <div className="h-2.5 w-full overflow-hidden rounded-full bg-line">
+            <div className="h-full rounded-full bg-cobalt/60 transition-[width] duration-150 ease-out"
+              style={{ width: `${syncLog?.count ? Math.round((syncLog.overviewCount / syncLog.count) * 100) : 0}%` }} />
           </div>
         </div>
 
@@ -220,16 +235,6 @@ export default function Landmark() {
           )}
 
           <button
-            onClick={collectOverview}
-            disabled={busy}
-            className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-white px-6 text-sm font-semibold text-ink transition hover:border-faint hover:bg-sunk disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {busy === 'overview'
-              ? <><Icon.refresh className="animate-spin" width="17" height="17" /> 개요 수집 중…</>
-              : <><Icon.download width="17" height="17" /> 개요 수집</>}
-          </button>
-
-          <button
             onClick={update}
             disabled={busy}
             className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-white px-6 text-sm font-semibold text-ink transition hover:border-faint hover:bg-sunk disabled:cursor-not-allowed disabled:opacity-50"
@@ -237,6 +242,16 @@ export default function Landmark() {
             {busy === 'update'
               ? <><Icon.refresh className="animate-spin" width="17" height="17" /> 갱신 중…</>
               : <><Icon.refresh width="17" height="17" /> 전체 업데이트</>}
+          </button>
+
+          <button
+            onClick={collectOverview}
+            disabled={busy}
+            className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-white px-6 text-sm font-semibold text-ink transition hover:border-faint hover:bg-sunk disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {busy === 'overview'
+              ? <><Icon.refresh className="animate-spin" width="17" height="17" /> 개요 수집 중…</>
+              : <><Icon.download width="17" height="17" /> 개요 수집</>}
           </button>
         </div>
       </div>
