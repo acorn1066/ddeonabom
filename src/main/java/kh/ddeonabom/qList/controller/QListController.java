@@ -20,11 +20,13 @@ public class QListController {
 	private final QListService qListService;
 	
 	@GetMapping("list")
-	public void selectQList(@RequestParam(value="page", defaultValue="1") int currentPage) {
+	public String selectQList(@RequestParam(value="page", defaultValue="1") int currentPage) {
 		int listCount = qListService.getListCount();
 		PageInfo pi = Pagination.getPageInfo(currentPage, listCount, 8, 8);
-		ArrayList<QList> qList = qListService.selectQList(pi, 1);
+		ArrayList<QList> qList = qListService.selectQList(pi);
 		System.out.println(qList);
+		
+		return "views/qList/qBoard";
 	}
 	
 	

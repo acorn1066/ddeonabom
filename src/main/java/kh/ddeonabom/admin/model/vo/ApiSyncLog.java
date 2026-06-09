@@ -8,20 +8,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class AdminNotice {
-	private int noticeNo;
-	private String title;
-	private String content;
-	private String status;
-	private Date createDate;
-	private Date modifyDate;
-	private int memberNo;
-	
-	private String memberName;
-
+public class ApiSyncLog {
+	private int logId;
+    private int lastPage;
+    private int totalPages;
+    private Date collectSync;
+    private Date updateSync;
+    private String status;
+    private int dailyCalls;
+    private Date lastResetDate;
 }

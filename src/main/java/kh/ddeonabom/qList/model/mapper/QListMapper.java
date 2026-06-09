@@ -12,6 +12,6 @@ public interface QListMapper {
 
 	int getListCount();
 
-	ArrayList<QList> selectQList(PageInfo pi, int i);
+	ArrayList<QList> selectQList(PageInfo pi);
 
 }
