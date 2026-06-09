@@ -1,24 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="model.mapper.ReviewMapper">
+<mapper namespace="kh.ddeonabom.review.model.mappers.ReviewMapper">
 
-    <select id="selectReviewList" resultType="kh.ddeonabom.review.model.vo.Review">
-        SELECT 
-            T.TRAVEL_NO,
-            T.TRAVEL_TITLE,
-            T.STATUS,
-            T.CREATE_DATE,
-            T.MODIFY_DATE,
-            T.COUNT,
-            T.MEMBER_NO,
-            T.SCHEDULE_NO,
-            (SELECT COUNT(*) 
-             FROM NICE N 
-             WHERE N.POST_NO = T.TRAVEL_NO) AS LIKE_COUNT
-        FROM TRAVEL_LIST T
-        WHERE T.STATUS = 'Y'
-        ORDER BY T.TRAVEL_NO DESC
-    </select>
-
+    <select id="selectListCount" resultType="_int">
+	    SELECT COUNT(*)
+	    FROM TRAVEL_LIST
+	    WHERE STATUS = 'Y'
+	</select>
+	
+	<select id="selectReviewList" parameterType="kh.ddeonabom.common.paging.PageInfo" resultType="kh.ddeonabom.review.model.vo.Review">
+	    
+	    SELECT 
+	        T.TRAVEL_NO,
+	        T.TRAVEL_TITLE,
+	        T.STATUS,
+	        T.CREATE_DATE,
+	        T.MODIFY_DATE,
+	        T.COUNT,
+	        T.MEMBER_NO,
+	        T.SCHEDULE_NO,
+	        (SELECT COUNT(*) 
+	         FROM NICE N 
+	         WHERE N.POST_NO = T.TRAVEL_NO) AS LIKE_COUNT
+	    FROM TRAVEL_LIST T
+	    WHERE T.STATUS = 'Y'
+	    ORDER BY T.TRAVEL_NO DESC
+	    OFFSET (#{currentPage} - 1) * #{boardLimit} ROWS
+	    FETCH NEXT #{boardLimit} ROWS ONLY
+	</select>
+	
+	
+	
 </mapper>
