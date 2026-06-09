@@ -48,8 +48,8 @@
       </div>
       <div class="mt-6 flex flex-col gap-5">
         <div class="flex flex-col gap-2">
-          <label for="nickName" class="text-xs font-semibold">닉네임</label>
-          <input type="text" id="nickName" name="nickName" th:value="${session.loginUser?.nickName}" required 
+          <label for="nickname" class="text-xs font-semibold">닉네임</label>
+          <input type="text" id="nickname" name="nickname" th:value="${session.loginUser?.nickname}" required 
                  class="h-12 rounded-lg border border-line bg-white px-4 text-sm outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft" />
         </div>
         <div class="flex flex-col gap-2">
@@ -229,8 +229,8 @@ $(document).ready(function() {
         }
 
         // 닉네임 공백 검증
-        let nickName = $("#nickName").val().trim();
-        if(nickName === ""){
+        let nickname = $("#nickname").val().trim();
+        if(nickname === ""){
             alert("닉네임을 입력하세요.");
             return;
         }

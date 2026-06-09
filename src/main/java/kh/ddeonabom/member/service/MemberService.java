@@ -84,7 +84,7 @@ public class MemberService implements UserDetailsService { // 💡 1. 시큐리�
 		return mapper.withdrawMember(id);
 	}
 
-	public boolean existsByNickName(String nickName) {
-		return mapper.existsByNickName(nickName) > 0;
+	public boolean existsByNickname(String nickname) {
+		return mapper.existsByNickname(nickname) > 0;
 	}
 }
