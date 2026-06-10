@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kh.ddeonabom.admin.model.mapper.AdminMapper">
+
+    <select id="selectMemberCount" resultType="int">
+        SELECT COUNT(*)
+        FROM MEMBER
+        WHERE STATUS = 'Y'
+    </select>
+
+    <select id="selectTravelCount" resultType="int">
+        SELECT COUNT(*)
+        FROM TRAVEL_LIST
+        WHERE STATUS = 'Y'
+    </select>
+
+    <select id="selectScheduleCount" resultType="int">
+        SELECT COUNT(*)
+        FROM SCHEDULE_MAIN
+        WHERE SCHEDULE_STATUS = 'Y'
+    </select>
+
+    <select id="selectQlistCount" resultType="int">
+        SELECT COUNT(*)
+        FROM QLIST
+        WHERE STATUS = 'Y'
+    </select>
+
+    <select id="selectReplyCount" resultType="int">
+        SELECT COUNT(*)
+        FROM REPLY
+        WHERE STATUS = 'Y'
+    </select>
+
+    <select id="selectReportCount" resultType="int">
+        SELECT COUNT(*)
+        FROM REPORT
+        WHERE REPORT_STATUS = 'N'
+    </select>
+    
+    <select id="selectMemberList" resultType="Member">
+	    SELECT
+	        MEMBER_NO,
+	        ID,
+	        ENROLL_DATE
+	    FROM MEMBER
+	    ORDER BY MEMBER_NO DESC
+	</select>
+	
+	<update id="updateMemberStatus">
+	    UPDATE MEMBER
+	    SET STATUS = #{status}
+	    WHERE MEMBER_NO = #{memberNo}
+	</update>
+
+</mapper>

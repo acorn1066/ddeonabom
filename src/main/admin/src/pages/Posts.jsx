@@ -35,9 +35,9 @@ const Posts = () => {
                     <select
                         value={searchType}
                         onChange={(e) => setSearchType(e.target.value)}
-                        className="rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="cursor-pointer rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                        <option>전체</option>
+                        <option >전체</option>
                         <option>제목</option>
                         <option>작성자</option>
                     </select>
@@ -52,7 +52,7 @@ const Posts = () => {
 
                     <button
                         onClick={handleSearch}
-                        className="rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
+                        className="cursor-pointer rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
                     >
                         검색
                     </button>
