@@ -16,7 +16,7 @@
     WHERE EMAIL = #{email}
       AND STATUS = 'Y'
 </select>
-<select id="existsByNickname" resultType="int">
+<select id="existsBynickname" resultType="int">
     SELECT COUNT(*)
     FROM MEMBER
     WHERE nickname = #{nickname}

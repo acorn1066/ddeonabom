@@ -2,6 +2,9 @@ package kh.ddeonabom.member.controller;
 
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpSession;
+import kh.ddeonabom.common.paging.PageInfo;
+import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.member.model.vo.Member;
 import kh.ddeonabom.member.service.EmailService;
 import kh.ddeonabom.member.service.MemberService;
@@ -125,7 +130,7 @@ public class MemberController {
         if (mService.existsByEmail(m.getEmail())) {
             return "DUPLICATE_EMAIL";
         }
-        if (mService.existsByNickname(m.getNickname())) { 
+        if (mService.existsBynickname(m.getNickname())) { 
             return "DUPLICATE_nickname"; // 프론트엔드에 닉네임 중복 알림 전달
         }
 
@@ -183,14 +188,20 @@ public class MemberController {
             
          // 히든 인풋으로 넘어온 targetUrl(목적지)이 진짜로 존재한다면?
             if (targetUrl != null && !targetUrl.isEmpty()) {
-                return "redirect:" + targetUrl; // 🚀 그 목적지(/member/edit)로 바로 튕겨줍니다!
+                return "redirect:" + targetUrl; //
             }
             
-            // 만약에 나중에 메인페이지 등에서 로그인해서 targetUrl이 없을 때를 대비한 안전빵 주소
+   
             return "redirect:/"; 
         }
 
         return "redirect:/member/login?error";
+    }
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+    	session.invalidate();
+    	
+    	return "redirect:/";
     }
     
     @GetMapping("/edit")
@@ -209,9 +220,6 @@ public class MemberController {
        return "views/member/edit";
    
     
-        
-        
-        
     }
  // =========================================================
     // 회원정보 수정 최종 처리
@@ -336,7 +344,7 @@ public class MemberController {
      // 알 수 없는 DB 오류 대비 안전빵 튕기기
      return "redirect:/member/withdraw?fail";
  }
- // 괄호 갯수 정돈 완료 (에러 해결)
+
 // 아이디 찾기 페이지 열기
     @GetMapping("/find-id")
     public String findIdPage() {
@@ -421,9 +429,9 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
 //=========================================================
 // 계정 찾기 전용 인증번호 발송 (기존 회원 대상 우회로)
 // =========================================================
-@ResponseBody
-@PostMapping("/find-account/send")
-public String sendAuthCodeForFind(@RequestParam("email") String email, HttpSession session) {
+	@ResponseBody
+	@PostMapping("/find-account/send")
+	public String sendAuthCodeForFind(@RequestParam("email") String email, HttpSession session) {
     
     // 실제로 가입된 이메일이 맞는지 먼저 체크 (없으면 메일 안감)
     boolean isExist = mService.existsByEmail(email); 
@@ -442,11 +450,52 @@ public String sendAuthCodeForFind(@RequestParam("email") String email, HttpSessi
 
     return "SUCCESS";
 }
+	@GetMapping("/mypage")
+	public String mypage(
+	        @RequestParam(value="tab", defaultValue = "schedule") String tab,
+	        @RequestParam(value="page", defaultValue = "1") int page,
+	        Model model) {
+	    
+	    // 현재 어떤 탭이 켜졌는지 타임리프에 알려주기
+	    // (HTML에서 param.tab[0]으로 비교하고 있으므로, 테스트용 list 분기 처리에 사용)
+	    
+	    // 작성 글 보기탭 가짜 글 데이터 생성
+	    if ("posts".equals(tab)) {
+	        List<String> fakePosts = new ArrayList<>();
+	        
+	        // 현재 페이지 번호에 맞춰 글 번호가 다이내믹하게 보이도록 세팅
+	        int startNum = ((page - 1) * 5) + 1; 
+	        for (int i = 0; i < 5; i++) {
+	            fakePosts.add("[" + (startNum + i) + "] 이번에 다녀온 제주도 동쪽 코스 추천합니다!");
+	        }
+	        
+	        // 중요: HTML에 th:each="post : ${list}" 라고 짰으므로 이름을 "list"로 보내야 합니다.
+	        model.addAttribute("list", fakePosts);
+	        
+	        // 하단 페이징 바가 생성되도록 가짜 PageInfo 객체 바인딩 (현재 1페, 총 글 23개, 5개씩 보기)
+	        PageInfo pi = Pagination.getPageInfo(page, 23, 5, 5); 
+	        model.addAttribute("pi", pi);
+	    }
+	    
+	    //  가짜 댓글 데이터 
+	    else if ("comments".equals(tab)) {
+	        List<String> fakeComments = new ArrayList<>();
+	        
+	        int startNum = ((page - 1) * 10) + 1;
+	        for (int i = 0; i < 10; i++) {
+	            fakeComments.add("[" + (startNum + i) + "] 우도 들어가실 때 배 시간표 꼭 확인하고 가세요~");
+	        }
+	        
+	        //  댓글 탭일 때도 동일하게 "list"라는 이름으로 전달
+	        model.addAttribute("list", fakeComments);
+	        
+	        // 댓글은 총 57개, 한 페이지에 10개씩 보이도록 세팅
+	        PageInfo pi = Pagination.getPageInfo(page, 57, 10, 5);
+	        model.addAttribute("pi", pi);
+	    }
+	    
+	    // 일정이나 관심목록일 때는 list가 필요 없으므로 비워
 
-
-
-
-
-
+	    return "views/member/mypage";
+	}
 }
-
