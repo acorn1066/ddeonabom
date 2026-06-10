@@ -29,7 +29,7 @@
 <style> body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing:antialiased; letter-spacing:-0.01em; } </style>
 </head>
 <body class="bg-white text-ink">
-
+<header th:replace="~{views/common/navbar :: navbar}"></header>
 <div th:replace="~{views/common/head::head}"></div>
 
 <main class="mx-auto max-w-2xl px-6 pb-24 pt-16">
@@ -127,43 +127,7 @@
     </div>
   </form>
 </main>
-
-<footer class="mt-24 border-t border-line bg-sunk pb-12 pt-16 text-sm text-muted">
-  <div class="mx-auto flex max-w-7xl items-start justify-between gap-8 px-6">
-    <div class="flex flex-col gap-2">
-      <div class="flex items-center gap-2 text-lg font-extralight">
-        <span class="inline-flex h-6 w-6 items-center justify-center text-brand">
-          <svg viewBox="0 0 32 32" class="h-full w-full" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M6 24 Q 10 8, 16 14 T 26 6"/><circle cx="6" cy="24" r="1.6" fill="currentColor" stroke="none"/><circle cx="26" cy="6" r="1.6" fill="currentColor" stroke="none"/></svg>
-        </span>
-        <span>떠나봄</span>
-      </div>
-      <p class="max-w-xs text-xs leading-relaxed">점이 아니라 길을 그리는 여행 플래너.<br/>관광지를 잇고, 동선을 그리고, 후기를 남깁니다.</p>
-    </div>
-    <div class="flex gap-12">
-      <div class="flex flex-col gap-2">
-        <strong class="text-xs font-semibold text-ink">서비스</strong>
-        <a href="/sites" class="hover:text-brand">관광지</a>
-        <a href="/planner" class="hover:text-brand">일정 플래너</a>
-        <a href="/share-board" class="hover:text-brand">일정 공유</a>
-      </div>
-      <div class="flex flex-col gap-2">
-        <strong class="text-xs font-semibold text-ink">커뮤니티</strong>
-        <a href="/reviews" class="hover:text-brand">여행 후기</a>
-        <a href="/qa-board" class="hover:text-brand">질문 게시판</a>
-      </div>
-      <div class="flex flex-col gap-2">
-        <strong class="text-xs font-semibold text-ink">계정</strong>
-        <a href="/member/login" class="hover:text-brand">로그인</a>
-        <a href="/member/signup" class="hover:text-brand">회원가입</a>
-        <a href="/member/mypage" class="hover:text-brand">마이페이지</a>
-      </div>
-    </div>
-  </div>
-  <div class="mx-auto mt-12 flex max-w-7xl items-center justify-between border-t border-line px-6 pt-6">
-    <span class="text-xs">© 2026 떠나봄 · 패스파인더 팀 프로젝트</span>
-    <span class="text-xs text-faint">v0.1 · UI shell</span>
-  </div>
-</footer>
+<footer th:replace="~{views/common/footer :: footer}"></footer>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script th:src="@{/js/auth.js}"></script>
@@ -202,9 +166,9 @@ $(document).ready(function() {
         }, 100);
     });
 
-    // 정보 수정 폼 서브밋 제어 (여기가 핵심 교정 구역입니다)
+    // 정보 수정 폼 서브밋 제어 (교정 완료 버전)
     $("form").submit(function (e) {
-        e.preventDefault(); // 기본 폼 제출 막기
+        e.preventDefault(); 
 
         let pwd = $("#newPassword").val();
         let pwdCheck = $("#confirmPassword").val();
@@ -235,14 +199,19 @@ $(document).ready(function() {
             return;
         }
 
-        // 데이터를 안전하게 묶어주는 직렬화 코드를 명확히 선언
+        // [교정] 데이터 전송 누락 방지를 위해 이메일 잠금을 순간적으로 해제
+        $("#email").prop("disabled", false).prop("readonly", false);
+        
         let formData = $(this).serialize();
+        
+        // [교정] 전송 직후 다시 화면 보호를 위해 되돌려놓기
+        $("#email").prop("readonly", true);
         
         // AJAX 요청 전송
         $.post("/member/update", formData, function(res){
             if(res === "SUCCESS" || res === "success"){
                 alert("회원정보 수정이 완료되었습니다.");
-                location.href = "index"; 
+                location.href = "/"; // [교정] 안전한 메인 절대경로로 변경
             } else if(res === "WRONG_CURRENT_PASSWORD") {
                 alert("현재 비밀번호가 일치하지 않습니다. 다시 확인해주세요.");
                 $("#currentPassword").val("").focus();
