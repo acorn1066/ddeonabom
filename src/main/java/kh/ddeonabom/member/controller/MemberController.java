@@ -306,44 +306,51 @@ public class MemberController {
         return "/views/member/withdraw"; 
     }
 
- // =========================================================
- // [버그 박멸] 회원 탈퇴 최종 처리 (POST)
- // =========================================================
- @PostMapping("/withdraw")
- public String doWithdraw(@RequestParam("password") String password, HttpSession session) {
-     
-     // 세션에서 현재 로그인한 유저 정보 확인
-     Member loginUser = (Member) session.getAttribute("loginUser");
-     if (loginUser == null) {
-         return "redirect:/member/login"; // 로그인 안 되어 있으면 로그인창으로
-     }
+    @PostMapping("/withdraw")
+    public String doWithdraw(@RequestParam("password") String password, HttpSession session) {
+        
+        // 세션에서 현재 로그인한 유저 정보 확인
+        Member loginUser = (Member) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/member/login";
+        }
 
-     //  [버그 해결의 핵심]: 세션 비밀번호는 변조/오염되었을 수 있으므로
-     // DB에서 실시간으로 해당 회원의 원본 데이터를 새로 조회
-     Member dbUser = mService.selectOneMember(loginUser.getId());
-     if (dbUser == null) {
-         return "redirect:/member/login";
-     }
+        // DB에서 실시간으로 해당 회원의 원본 데이터 조회 (BCrypt 검증용)
+        Member dbUser = mService.selectOneMember(loginUser.getId());
+        if (dbUser == null) {
+            return "redirect:/member/login";
+        }
 
-     //  실시간으로 갓 퍼온 진짜 암호문(dbUser.getPwd())과 화면 입력값(password)
-     if (!bcrypt.matches(password, dbUser.getPwd())) {
-         // ❌ 비밀번호가 틀리면 withdraw.html 화면에 에러 문구를 들고 리다이렉트
-         return "redirect:/member/withdraw?error";
-     }
+        // 비밀번호 일치 여부 검증
+        if (!bcrypt.matches(password, dbUser.getPwd())) {
+            return "redirect:/member/withdraw?error";
+        }
 
-     //비밀번호가 일치하면 서비스-매퍼를 타고 DB 상태 변경 혹은 삭제 수행
-     // 보통 서비스단에서 mMapper.withdrawMember 또는 deleteMember를 호출
-     int result = mService.withdrawMember(loginUser.getId()); 
+        // 기록용 백업아이디가 오염되기 직전의 오리지널 아이디를 기억
+        String originalId = loginUser.getId();
 
-     if (result > 0) {
-         //  탈퇴가 최종 성공했다면 현재 세션을 완전히 파기(로그아웃) 처리
-         session.invalidate(); 
-         return "redirect:/"; // 메인 페이지로 안전하게 튕겨주기
-     }
+        // 탈퇴 서비스 호출 (STATUS='N', MODIFY_DATE=SYSDATE, ID오염 처리 동시 진행
+        int result = mService.withdrawMember(originalId); 
 
-     // 알 수 없는 DB 오류 대비 안전빵 튕기기
-     return "redirect:/member/withdraw?fail";
- }
+        if (result > 0) {
+            // [탈퇴 날짜 조회 및 검증]
+            // 이제 'originalId'로는 조회가 안 되므로, 현재 시점(SYSDATE) 기준으로 
+            // 서비스 단에 "STATUS='N'이 된 유저의 MODIFY_DATE를 뽑아오는 로직"이 있다면 검증이 가능
+            // 여기서는 본인 확인용 콘솔 로그로 기록을 남기기
+            System.out.println("=================================================");
+            System.out.println("🔥 [회원 탈퇴 최종 성공 비즈니스 로그]");
+            System.out.println("ID: " + originalId + " 회원이 서비스를 떠났습니다.");
+            System.out.println("📅 탈퇴 기록 일시: " + java.time.LocalDateTime.now() + " (DB MODIFY_DATE에 저장됨)");
+            System.out.println("=================================================");
+
+            //탈퇴가 최종 성공했다면 현재 세션을 완전히 파기(로그아웃) 처리
+            session.invalidate(); 
+            return "redirect:/"; 
+        }
+
+        //DB 오류 대비 안전빵
+        return "redirect:/member/withdraw?fail";
+    }
 
 // 아이디 찾기 페이지 열기
     @GetMapping("/find-id")
@@ -498,4 +505,5 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
 
 	    return "views/member/mypage";
 	}
+	
 }
