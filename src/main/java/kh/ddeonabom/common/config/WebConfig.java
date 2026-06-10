@@ -7,6 +7,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import kh.ddeonabom.common.interceptor.CheckAdminInterceptor;
 import kh.ddeonabom.common.interceptor.NavbarInterceptor;
 
 @Configuration
@@ -20,6 +21,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(navbarInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/css/**", "/js/**", "/images/**");
+        registry.addInterceptor(new CheckAdminInterceptor())
+        		.addPathPatterns("/admin/**");
     }
     
     @Bean

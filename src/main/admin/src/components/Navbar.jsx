@@ -29,13 +29,6 @@ const Navbar = () => {
             사이트로
           </a>
 
-          {/* 로그아웃 */}
-          <button
-            className="rounded-lg bg-red-600 px-4 py-2 text-sm hover:bg-red-700"
-          >
-            로그아웃
-          </button>
-
         </div>
       </div>
     </header>

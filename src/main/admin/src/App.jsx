@@ -10,29 +10,32 @@ import Notice from "./pages/Notice";
 import Report from "./pages/Report";
 import NoticeWrite from "./pages/NoticeWrite";
 import NoticeEdit from "./pages/NoticeEdit";
+import { AdminProvider } from "./context/AdminContext";
 
 
 const App = () => {
     return (
-        <BrowserRouter>
-            <Routes>
+        <AdminProvider>
+            <BrowserRouter>
+                <Routes>
 
-                <Route path="/" element={<Navigate to="/dashboard" />} />
+                    <Route path="/" element={<Navigate to="/dashboard" />} />
 
-                <Route element={<AdminLayout />}>
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/notice" element={<Notice />} />
-                    <Route path="/members" element={<Members />} />
-                    <Route path="/posts" element={<Posts />} />
-                    <Route path="/report" element={<Report />} />
-                    <Route path="/landmark" element={<Landmark />} />
+                    <Route element={<AdminLayout />}>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/notice" element={<Notice />} />
+                        <Route path="/members" element={<Members />} />
+                        <Route path="/posts" element={<Posts />} />
+                        <Route path="/report" element={<Report />} />
+                        <Route path="/landmark" element={<Landmark />} />
 
-                    <Route path="/notice/write" element={<NoticeWrite />} />
-                    <Route path="/notice/edit/:noticeNo" element={<NoticeEdit />} />
-                </Route>
+                        <Route path="/notice/write" element={<NoticeWrite />} />
+                        <Route path="/notice/edit/:noticeNo" element={<NoticeEdit />} />
+                    </Route>
 
-            </Routes>
-        </BrowserRouter>
+                </Routes>
+            </BrowserRouter>
+        </AdminProvider>
     );
 };
 
