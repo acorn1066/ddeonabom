@@ -29,6 +29,7 @@
 <style> body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing:antialiased; letter-spacing:-0.01em; } </style>
 </head>
 <body class="bg-white text-ink">
+<th:block th:replace="~{views/common/modal :: modal}"></th:block>
 <header th:replace="~{views/common/navbar :: navbar}"></header>
 <div th:replace="~{views/common/head::head}"></div>
 
@@ -133,6 +134,12 @@
 <script th:src="@{/js/auth.js}"></script>
 
 <script>
+//외부 팝업 헬퍼 함수
+function triggerInfoModal(title, text) {
+    if (typeof openInfoModal === "function") openInfoModal(title, text);
+    else alert(text);
+}
+
 $(document).ready(function() {
     
     // 페이지 진입 시 이메일 인증 플래그 리셋
@@ -166,78 +173,94 @@ $(document).ready(function() {
         }, 100);
     });
 
-    // 정보 수정 폼 서브밋 제어 (교정 완료 버전)
+    // 정보 수정 폼 서브밋 제어
     $("form").submit(function (e) {
         e.preventDefault(); 
 
         let pwd = $("#newPassword").val();
         let pwdCheck = $("#confirmPassword").val();
 
-        // 새로운 비밀번호 유효성 검사
+        // 새로운 비밀번호 유효성 검사 -> 모달 전환
         if (pwd.trim() !== "") {
         	let reg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()~_+=\{\}\[\]| \-])[A-Za-z\d!@#$%^&*()~_+=\{\}\[\]| \-]{8,20}$/;
             if(!reg.test(pwd)){
-                alert("새로운 비밀번호 형식을 확인해주세요.");
+                triggerInfoModal("형식 오류", "새로운 비밀번호 형식을 확인해주세요.");
                 return;
             }
             if (pwd !== pwdCheck) {
-                alert("새로운 비밀번호가 일치하지 않습니다.");
+                triggerInfoModal("비밀번호 불일치", "새로운 비밀번호가 일치하지 않습니다.");
                 return;
             }
         }
 
-        //  본인 인증 여부 체크
+        // 본인 인증 여부 체크 -> 모달 전환
         if (sessionStorage.getItem("emailVerified") !== "true") {
-            alert("수정을 완료하려면 이메일 인증이 필수입니다.");
+            triggerInfoModal("인증 필요", "수정을 완료하려면 이메일 인증이 필수입니다.");
             return;
         }
 
-        // 닉네임 공백 검증
+        // 닉네임 공백 검증 -> 모달 전환
         let nickname = $("#nickname").val().trim();
         if(nickname === ""){
-            alert("닉네임을 입력하세요.");
+            triggerInfoModal("입력 오류", "닉네임을 입력하세요.");
             return;
         }
 
-        // [교정] 데이터 전송 누락 방지를 위해 이메일 잠금을 순간적으로 해제
+        // 데이터 전송 누락 방지를 위해 이메일 잠금을 순간적으로 해제
         $("#email").prop("disabled", false).prop("readonly", false);
         
         let formData = $(this).serialize();
         
-        // [교정] 전송 직후 다시 화면 보호를 위해 되돌려놓기
+        // 전송 직후 다시 화면 보호를 위해 되돌려놓기
         $("#email").prop("readonly", true);
         
         // AJAX 요청 전송
         $.post("/member/update", formData, function(res){
             if(res === "SUCCESS" || res === "success"){
-                alert("회원정보 수정이 완료되었습니다.");
-                location.href = "/"; // [교정] 안전한 메인 절대경로로 변경
+                triggerInfoModal("수정 완료", "회원정보 수정이 완료되었습니다.");
+                // 모달 확인 창을 닫거나 일정 시간 후 이동하도록 타이밍 조정
+                setTimeout(function() {
+                    location.href = "/"; 
+                }, 1500);
             } else if(res === "WRONG_CURRENT_PASSWORD") {
-                alert("현재 비밀번호가 일치하지 않습니다. 다시 확인해주세요.");
+                triggerInfoModal("오류", "현재 비밀번호가 일치하지 않습니다. 다시 확인해주세요.");
                 $("#currentPassword").val("").focus();
             } else if(res === "EMAIL_NOT_VERIFIED") {
-                alert("이메일 인증 세션이 만료되었거나 번호가 틀렸습니다. 이메일 인증을 다시 진행해주세요.");
+                triggerInfoModal("오류", "이메일 인증 세션이 만료되었거나 번호가 틀렸습니다. 이메일 인증을 다시 진행해주세요.");
             } else if(res === "NOT_LOGGED_IN") {
-                alert("로그인 세션이 만료되었습니다. 다시 로그인 해주세요.");
-                location.href = "/member/login";
+                triggerInfoModal("세션 만료", "로그인 세션이 만료되었습니다. 다시 로그인 해주세요.");
+                setTimeout(function() {
+                    location.href = "/member/login";
+                }, 1500);
             } else {
-                alert("회원정보 수정 실패. 입력 데이터를 다시 확인해주세요.");
+                triggerInfoModal("실패", "회원정보 수정 실패. 입력 데이터를 다시 확인해주세요.");
             }
         }).fail(function() {
-            alert("서버 통신 중 오류가 발생했습니다. 컨트롤러 상태를 확인해 주세요.");
+            triggerInfoModal("서버 오류", "서버 통신 중 오류가 발생했습니다. 컨트롤러 상태를 확인해 주세요.");
         });
-    }); // form submit 끝
-}); // document ready 끝
+    });
 
-// 탈퇴 재확인
-function confirmWithdraw(event) {
-    event.preventDefault(); 
-    const response = confirm("정말로 탈퇴하시겠습니까?\n탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.");
-    if (response) {
-        const targetUrl = event.target.closest('a').getAttribute('href');
-        window.location.href = targetUrl;
-    }
-}
+    // 회원 탈퇴 버튼 클릭 시 대인저(Danger) 컨펌 모달 구동
+    $("#withdrawBtn").click(function(event) {
+        event.preventDefault(); // 기본 href 이동 막기
+        
+        if (typeof openDangerModal === 'function') {
+            openDangerModal(
+                "정말로 탈퇴하시겠습니까?", 
+                "탈퇴 시 모든 데이터(일정, 후기, 관심 목록)가 영구히 삭제되며 복구할 수 없습니다.", 
+                function() {
+                    // 모달 안의 최종 빨간색 확인 버튼을 눌렀을 때만 탈퇴 페이지 링크로 이동
+                    window.location.href = "/member/withdraw";
+                }
+            );
+        } else {
+            // 백업용 브라우저 confirm
+            if (confirm("정말로 탈퇴하시겠습니까?\n탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.")) {
+                window.location.href = "/member/withdraw";
+            }
+        }
+    });
+});
 </script>
 </body>
 </html>
