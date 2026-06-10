@@ -30,6 +30,8 @@
 	    FETCH NEXT #{boardLimit} ROWS ONLY
 	</select>
 	
+	<insert id=""></insert>
+	
 	
 	
 </mapper>

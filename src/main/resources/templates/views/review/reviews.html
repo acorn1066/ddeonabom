@@ -24,7 +24,7 @@ body {
 		class="sticky top-0 z-50 h-header border-b border-line bg-white/80 backdrop-blur-md backdrop-saturate-150">
 		<div
 			class="mx-auto flex h-full max-w-wide items-center justify-between px-6">
-			<a href="home.html" class="flex items-center gap-2"> <span
+			<a href="/home" class="flex items-center gap-2"> <span
 				class="inline-flex h-6 w-6 items-center justify-center text-brand">
 					<svg viewBox="0 0 32 32" class="h-full w-full" fill="none"
 						stroke="currentColor" stroke-width="1.25" stroke-linecap="round"
@@ -46,7 +46,7 @@ body {
 					후기</a> <a href="qa-board" class="py-2 transition-colors hover:text-ink">질문</a>
 			</nav>
 			<div class="flex items-center gap-3">
-				<a href="review-write"
+				<a href="write"
 					class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">
 					후기 작성하기 </a> <a href="mypage"
 					class="inline-flex h-9 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-sunk">마이페이지</a>
@@ -157,37 +157,32 @@ body {
 
 	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 	<script>
-		let currentPage = 1; // 📌 추가: 현재 페이지를 기억할 변수 (기본 1페이지)
+		let currentPage = 1; 
 		
-		//📌 변경: 처음 켜질 때 1페이지를 로드하도록 매개변수 추가
 		window.onload = () => {
 		loadTravelList(currentPage);
 		};
-		
-		//📌 변경: 호출할 때 몇 페이지를 가져올지 숫자를 받도록 수정
+
 		function loadTravelList(page) {
 			$.ajax({
 			 url: '/selectReviewList', 
 			 type: 'GET',
-			 data: { currentPage: page }, // 📌 추가: 서버에 "나 지금 몇 페이지 데이터가 필요해"라고 알려줌
+			 data: { currentPage: page }, 
 			 dataType: 'json',
-			 success: function(response) { // 📌 변경: 서버가 Map을 주므로 변수명을 response로 인식
-			   
-			   // 📌 중요: 서버가 보낸 묶음(Map) 상자에서 리스트(list)와 페이징(pi)을 쪼개서 꺼냄
+			 success: function(response) { 
+
 			   const data = response.list; 
 			   const pi = response.pi;     
 			
 			   const container = document.getElementById('reviewContainer');
 			   container.innerHTML = ''; 
-			
-			   // 💡 [검증] 기존 코드 완벽 보존: 데이터가 없을 때 처리
+
 			   if(!data || data.length === 0) {
 			     container.innerHTML = '<p class="col-span-3 py-12 text-center text-muted">등록된 여행 후기가 없습니다.</p>';
 			     document.getElementById('paginationContainer').innerHTML = ''; // 번호판 비우기
 			     return;
 			   }
-			
-			   // 💡 [검증] 기존 코드 100% 보존: 목록을 한 땀 한 땀 그리는 반복문
+
 			   data.forEach(travel => {
 			     const displayDate = travel.modifyDate ? travel.modifyDate : travel.createDate;
 			     
@@ -214,8 +209,6 @@ body {
 			     `;
 			     container.insertAdjacentHTML('beforeend', cardHtml);
 			   });
-			
-			   // 📌 추가: 하단에 1, 2, 3 버튼을 그려주는 함수 실행!
 			   drawPagination(pi);
 			 },
 			 error: function(err) {
@@ -224,10 +217,10 @@ body {
 			});
 			}
 			
-			//📌 추가: 하단 페이지네이션 번호판 생성 함수 (한 번만 복사해두면 알아서 일함)
+
 			function drawPagination(pi) {
 			const pContainer = document.getElementById('paginationContainer');
-			if(!pContainer) return; // 자리가 없으면 패스
+			if(!pContainer) return; 
 			
 			pContainer.innerHTML = '';
 			let html = '';
