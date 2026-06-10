@@ -222,13 +222,14 @@ public class LandmarkApiService {
 
         int limit = Math.min(budget, 500); // 한 번에 최대 500건
         List<Integer> contentIds = mapper.selectContentIdsForOverview(log.getLastOverviewId(), limit);
-
+        logger.info("개요 수집 시작: lastOverviewId={}, 예산={}", log.getLastOverviewId(), limit);
         for (int contentId : contentIds) {
             try {
                 String overview = fetchOverview(contentId);
                 mapper.updateOverview(contentId, overview);
                 log.setLastOverviewId(contentId);
                 log.setDailyCalls(log.getDailyCalls() + 1);
+                logger.info("개요 수집 완료: contentId={}, 오늘 사용량={}/{}", contentId, log.getDailyCalls(), DAILY_LIMIT);
             } catch (Exception e) {
             	System.err.println("overview 수집 실패 contentId=" + contentId + " : " + e.getMessage());
             }

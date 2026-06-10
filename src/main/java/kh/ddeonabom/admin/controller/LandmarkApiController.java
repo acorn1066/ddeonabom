@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/react/admin/landmark")
+@RequestMapping("/admin/landmark")
 public class LandmarkApiController {
 
     private final LandmarkApiService landmarkApiService;
