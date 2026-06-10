@@ -4,6 +4,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import jakarta.servlet.http.HttpSession;
+import kh.ddeonabom.member.model.vo.Member;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -14,7 +16,13 @@ public class AdminController {
 	
 	@GetMapping("dash")
 		public String adminDash() {
-		return "views/admin/dash";
+		return "redirect:http://localhost:5173";
+	}
+	
+	@GetMapping("users")
+	public Member getAdmin(HttpSession session) {
+		return (Member)session.getAttribute("loginUser");
+		
 	}
 	
 	@GetMapping("member")
