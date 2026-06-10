@@ -220,7 +220,7 @@ public class LandmarkApiService {
         int budget = DAILY_LIMIT - log.getDailyCalls();
         if (budget <= 0) throw new RuntimeException("오늘 API 호출 한도를 초과했어요.");
 
-        int limit = Math.min(budget, 500); // 한 번에 최대 500건
+        int limit = Math.min(budget, 100); // 한 번에 최대 100건
         List<Integer> contentIds = mapper.selectContentIdsForOverview(log.getLastOverviewId(), limit);
         logger.info("개요 수집 시작: lastOverviewId={}, 예산={}", log.getLastOverviewId(), limit);
         for (int contentId : contentIds) {

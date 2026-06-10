@@ -85,10 +85,10 @@
 				<p class="max-w-xs text-13 leading-relaxed text-muted">
 					관심 관광지에서 장소를 담으면<br />지도 위에 동선이 자동으로 그려져요.
 				</p>
-				<button class="mt-2 inline-flex h-11 items-center gap-2 rounded-lg bg-brand px-6 text-sm font-semibold text-white transition hover:bg-brand-ink">
+				<button class="mt-2 inline-flex h-11 items-center gap-2 rounded-lg bg-brand px-6 text-sm font-semibold text-white transition hover:bg-brand-ink" id="addStopBtn">
 					<span class="text-lg leading-none">＋</span> 장소 추가
 				</button>
-				<a href="sites.html" class="text-13 font-medium text-faint underline-offset-4 transition hover:text-muted hover:underline">
+				<a href="/landmark/list" class="text-13 font-medium text-faint underline-offset-4 transition hover:text-muted hover:underline">
 					관광지 둘러보기
 				</a>
 			</div>
@@ -100,6 +100,5 @@
 	</div>
 	<div th:replace="~{views/common/kakao-map :: kakao-map}"></div>
 	<div th:replace="~{views/common/modal :: modal}"></div>
-	<footer th:replace="~{views/common/footer :: footer}"></footer>
 </body>
 </html>
