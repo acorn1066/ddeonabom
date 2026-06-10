@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="kh.ddeonaboam.landmark.model.mapper.landmarkMapper">
-
-
-
+<mapper namespace="kh.ddeonabom.landmark.model.mapper.LandmarkMapper">
+	<select id="searchLandmarks" resultType="Landmark">
+	    SELECT * FROM LANDMARK
+	    WHERE TITLE LIKE '%' || #{q} || '%'
+	    ORDER BY TITLE
+	    OFFSET #{offset} ROWS FETCH FIRST #{size} ROWS ONLY
+	</select>
+	
+	<select id="countLandmarks" resultType="int">
+	    SELECT COUNT(*) FROM LANDMARK
+	    WHERE TITLE LIKE '%' || #{q} || '%'
+	</select>
 </mapper>

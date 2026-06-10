@@ -185,29 +185,18 @@
         ['검멀레 해변','제주 우도면 · 해변'],
 	];
 
-      // 여기에는 이제 db에서 관광지를 꺼내서 넣어줘야 함...
-	const _REGIONS = ['제주 제주시','서귀포 성산읍','부산 해운대구','강원 속초시','경북 경주시','전북 전주시','인천 중구','경남 통영시'];
-	const _KINDS = ['해변','오름','카페','자연','산책','전망','숲','드라이브'];
-	const _DEMO_TOTAL = 50712;
-	function _demoItem(i) {
-        const r = _REGIONS[i % _REGIONS.length], k = _KINDS[(i >> 1) % _KINDS.length];
-        return [`${k} 명소 ${(i + 1).toLocaleString()}`, `${r} · ${k}`, i % 7 === 0];
-	}
-	function fetchSites(query, page, size) {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            const q = query.trim();
-            if (!q) {
-              const start = page * size, items = [];
-              for (let i = start; i < Math.min(start + size, _DEMO_TOTAL); i++) items.push(_demoItem(i));
-              resolve({ items, total: _DEMO_TOTAL });
-            } else {
-              const total = 137, start = page * size, items = [];
-              for (let i = start; i < Math.min(start + size, total); i++) items.push([`${q} 관련 장소 ${i + 1}`, `${_REGIONS[i % _REGIONS.length]} · 검색결과`, false]);
-              resolve({ items, total });
-            }
-          }, 280);
-        });
+	// 여기에는 이제 db에서 관광지를 꺼내서 넣어줘야 함...
+	async function fetchSites(keyWord, page, size) {
+	    return fetch('/landmark/search?q=' + encodeURIComponent(keyWord) + '&page=' + page + '&size=' + size, {
+	        method: 'GET'
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	        return {
+	            items: data.content.map(function(landmark) { return [landmark.title, landmark.addr1, landmark.wished]; }),
+	            total: data.totalElements
+	        };
+	    });
 	}
 
 	const overlay = document.getElementById('addStopModal');
