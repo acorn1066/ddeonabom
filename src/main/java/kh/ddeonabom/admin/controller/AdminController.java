@@ -3,6 +3,7 @@ package kh.ddeonabom.admin.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.member.model.vo.Member;
@@ -19,6 +20,7 @@ public class AdminController {
 		return "redirect:http://localhost:5173";
 	}
 	
+	@ResponseBody
 	@GetMapping("users")
 	public Member getAdmin(HttpSession session) {
 		return (Member)session.getAttribute("loginUser");
