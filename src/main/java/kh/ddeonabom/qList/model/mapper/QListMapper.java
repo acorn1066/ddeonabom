@@ -1,6 +1,7 @@
 package kh.ddeonabom.qList.model.mapper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -10,9 +11,9 @@ import kh.ddeonabom.qList.model.vo.QList;
 @Mapper
 public interface QListMapper {
 
-	int getListCount();
+	int getListCount(HashMap<String, Object> map);
 
-	ArrayList<QList> selectQList(PageInfo pi);
+	ArrayList<QList> selectQList(HashMap<String, Object> map);
 
 	QList detailQList(int qNo);
 

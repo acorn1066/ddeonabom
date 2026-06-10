@@ -15,21 +15,52 @@
 	    <a href="write" class="inline-flex h-12 items-center rounded-lg bg-brand px-8 text-15 font-semibold text-white transition hover:bg-brand-ink" th:if="${session.loginUser != null}">질문하기</a>
 	  </div>
 	
-	  <div class="flex items-center gap-2 border-b-2 border-ink pb-4">
-	    <span class="inline-flex h-8.5 cursor-pointer items-center rounded-full border border-transparent bg-brand px-3.5 text-13 font-semibold text-white">전체</span>
-	    <span class="inline-flex h-8.5 cursor-pointer items-center rounded-full border border-line bg-white px-3.5 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">교통·이동</span>
-	    <span class="inline-flex h-8.5 cursor-pointer items-center rounded-full border border-line bg-white px-3.5 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">숙소</span>
-	    <span class="inline-flex h-8.5 cursor-pointer items-center rounded-full border border-line bg-white px-3.5 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">맛집</span>
-	    <span class="inline-flex h-8.5 cursor-pointer items-center rounded-full border border-line bg-white px-3.5 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">일정</span>
-	    <span class="inline-flex h-8.5 cursor-pointer items-center rounded-full border border-line bg-white px-3.5 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">기타</span>
-	    
-		<!-- overflow-hidden 제거 → rounded-full만 유지 -->
-		<div class="ml-auto flex h-9 items-center rounded-full border border-line bg-white transition focus-within:border-brand">
+	  <!-- 카테고리 버튼들: data-category 속성 추가, onclick 연결 -->
+		<div class="flex items-center gap-2 border-b-2 border-ink pb-4">
+		
+		  <!-- 
+		  th:classappend: 조건이 true면 해당 클래스 추가
+		  ${category == '전체'} → 컨트롤러에서 mv.addObject("category", category)로 넘긴 값과 비교
+		-->
+		<span data-category="전체" onclick="filterCategory(this)"
+		      class="category-btn inline-flex h-8.5 cursor-pointer items-center rounded-full border px-3.5 text-13 font-semibold transition"
+		      th:classappend="${category == '전체'} ? 'border-transparent bg-brand text-white' : 'border-line bg-white text-muted hover:border-muted hover:text-ink'">
+		  전체
+		</span>
+		<span data-category="교통" onclick="filterCategory(this)"
+		      class="category-btn inline-flex h-8.5 cursor-pointer items-center rounded-full border px-3.5 text-13 font-semibold transition"
+		      th:classappend="${category == '교통'} ? 'border-transparent bg-brand text-white' : 'border-line bg-white text-muted hover:border-muted hover:text-ink'">
+		  교통·이동
+		</span>
+		<span data-category="숙소" onclick="filterCategory(this)"
+		      class="category-btn inline-flex h-8.5 cursor-pointer items-center rounded-full border px-3.5 text-13 font-semibold transition"
+		      th:classappend="${category == '숙소'} ? 'border-transparent bg-brand text-white' : 'border-line bg-white text-muted hover:border-muted hover:text-ink'">
+		  숙소
+		</span>
+		<span data-category="맛집" onclick="filterCategory(this)"
+		      class="category-btn inline-flex h-8.5 cursor-pointer items-center rounded-full border px-3.5 text-13 font-semibold transition"
+		      th:classappend="${category == '맛집'} ? 'border-transparent bg-brand text-white' : 'border-line bg-white text-muted hover:border-muted hover:text-ink'">
+		  맛집
+		</span>
+		<span data-category="일정" onclick="filterCategory(this)"
+		      class="category-btn inline-flex h-8.5 cursor-pointer items-center rounded-full border px-3.5 text-13 font-semibold transition"
+		      th:classappend="${category == '일정'} ? 'border-transparent bg-brand text-white' : 'border-line bg-white text-muted hover:border-muted hover:text-ink'">
+		  일정
+		</span>
+		<span data-category="기타" onclick="filterCategory(this)"
+		      class="category-btn inline-flex h-8.5 cursor-pointer items-center rounded-full border px-3.5 text-13 font-semibold transition"
+		      th:classappend="${category == '기타'} ? 'border-transparent bg-brand text-white' : 'border-line bg-white text-muted hover:border-muted hover:text-ink'">
+		  기타
+		</span>
+
+		<form id="searchForm" method="get" th:action="@{/qList/list}"
+		      class="ml-auto flex h-9 items-center rounded-full border border-line bg-white transition focus-within:border-brand">
 		
 		  <div class="relative flex h-full items-center border-r border-line" id="searchTypeWrapper">
-		    <input type="hidden" name="searchType" id="searchTypeValue" value="title_content" />
 		
-		    <!-- rounded-l-full 추가: 왼쪽 끝 pill 모양 -->
+		    <!-- searchType 기본값도 컨트롤러와 동일하게 titleContent -->
+		    <input type="hidden" name="searchType" id="searchTypeValue" th:value="${searchType}" />
+		
 		    <button type="button"
 		            class="flex h-full items-center gap-1.5 rounded-l-full bg-transparent pl-3.5 pr-7 text-13 text-muted whitespace-nowrap hover:bg-sunk"
 		            id="searchTypeBtn"
@@ -46,7 +77,8 @@
 		
 		    <ul id="searchTypeMenu"
 		        class="absolute left-0 top-full z-50 mt-1.5 hidden min-w-max overflow-hidden rounded-xl border border-line bg-white py-1 shadow-lg">
-		      <li data-value="title_content" data-label="제목+내용"
+		      <!-- data-value를 컨트롤러 defaultValue 형식(camelCase)에 맞춤 -->
+		      <li data-value="titleContent" data-label="제목+내용"
 		          class="search-type-item cursor-pointer whitespace-nowrap px-4 py-2 text-13 text-ink hover:bg-sunk">제목+내용</li>
 		      <li data-value="title" data-label="제목"
 		          class="search-type-item cursor-pointer whitespace-nowrap px-4 py-2 text-13 text-ink hover:bg-sunk">제목</li>
@@ -64,12 +96,23 @@
 		      <circle cx="8" cy="8" r="5.5"/>
 		      <path d="M12.5 12.5L16 16"/>
 		    </svg>
-		    <!-- rounded-r-full 추가: 오른쪽 끝 pill 모양 -->
-		    <input class="h-full w-40 rounded-r-full bg-transparent pl-9 pr-3 text-13 outline-none placeholder:text-faint"
-		           placeholder="검색어 입력" name="keyword" />
+		    <!-- name="searchInput" 으로 수정 + 검색 후 값 유지 th:value="${searchInput}" -->
+		    <input id="searchKeyword"
+		           class="h-full w-40 bg-transparent pl-9 pr-3 text-13 outline-none placeholder:text-faint"
+		           placeholder="검색어 입력"
+		           name="searchInput"
+		           th:value="${searchInput}" />
 		  </div>
 		
-		</div>
+		  <button type="submit"
+		          class="flex h-full items-center rounded-r-full bg-brand px-4 text-13 font-semibold text-white transition hover:bg-brand-ink">
+		    검색
+		  </button>
+		
+		  <!-- 카테고리 hidden input: 컨트롤러 기본값 "전체"에 맞게 -->
+		  <input type="hidden" name="category" id="categoryValue" th:value="${category}" />
+		
+		</form>
 	  </div>
 	
 	  <div class="grid grid-cols-qarow gap-4 px-2 pb-3 pt-3 text-13 font-bold text-muted">
@@ -98,7 +141,6 @@
 	  </div>
 	</main>
 
-	<!-- 페이지 하단 또는 <script> 위치에 추가 -->
 	<script>
 	  function toggleSearchType() {
 	    const menu = document.getElementById('searchTypeMenu');
@@ -137,6 +179,59 @@
 	      document.getElementById('searchTypeArrow').style.transform = 'translateY(-50%) rotate(0deg)';
 	    }
 	  });
+	  
+	  /* ★ Enter 키 → 검색 폼 제출 */
+	  document.getElementById('searchKeyword').addEventListener('keydown', function (e) {
+	    if (e.key === 'Enter') {
+	      e.preventDefault();
+	      document.getElementById('searchForm').submit();
+	    }
+	  });
+
+	  /* ★ 카테고리 클릭 → hidden input 세팅 후 폼 제출 */
+	  function filterCategory(el) {
+	    document.getElementById('categoryValue').value = el.dataset.category;
+	    document.getElementById('searchForm').submit();
+	  }
+
+	  /* ★ 페이지 로드 시 현재 category 파라미터로 버튼 활성 상태 복원 */
+	  // category 버튼에 classapend 추가해서 필요없어진 부분
+// 	  (function initCategoryActive() {
+// 		  // ${param.category} → ${category} 로 수정
+// 		  // 컨트롤러가 model에 "category"로 담아서 뷰에 전달하기 때문
+// 		  const currentCategory = /*[[${category}]]*/ '전체';
+		
+// 		  document.querySelectorAll('.category-btn').forEach(btn => {
+// 		    const isActive = btn.dataset.category === currentCategory;
+		
+// 		    if (isActive) {
+// 		      btn.classList.remove('border-line', 'bg-white', 'text-muted');
+// 		      btn.classList.add('border-transparent', 'bg-brand', 'text-white');
+// 		    } else {
+// 		      btn.classList.remove('border-transparent', 'bg-brand', 'text-white');
+// 		      btn.classList.add('border-line', 'bg-white', 'text-muted');
+// 		    }
+// 		  });
+// 		})();
+	  
+	  /* ★ 페이지 로드 시 searchType 라벨 복원 */
+		(function initSearchTypeLabel() {
+		  // th:value로 이미 올바른 값이 세팅된 hidden input에서 읽기
+		  const currentType = document.getElementById('searchTypeValue').value;
+		
+		  // 해당 value를 가진 드롭다운 항목 찾기
+		  const matchedItem = document.querySelector(
+		    `.search-type-item[data-value="${currentType}"]`
+		  );
+		
+		  if (matchedItem) {
+		    // label 텍스트를 해당 항목의 data-label로 교체
+		    document.getElementById('searchTypeLabel').textContent = matchedItem.dataset.label;
+		
+		    // 기존 스크립트의 선택 항목 강조도 같이 복원
+		    matchedItem.classList.add('text-brand', 'font-semibold');
+		  }
+		})();
 	</script>
 	
 	<div th:replace="~{views/common/modal :: modal}"></div>
