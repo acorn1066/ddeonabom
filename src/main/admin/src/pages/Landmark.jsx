@@ -222,24 +222,12 @@ export default function Landmark() {
 
         {/* 버튼 */}
         <div className="mt-6 flex items-center gap-3">
-          {!done && (
-            <button
-              onClick={collect}
-              disabled={busy}
-              className="inline-flex h-11 items-center gap-2 rounded-lg bg-cobalt px-6 text-sm font-semibold text-white shadow-card transition hover:-translate-y-px hover:bg-cobalt-ink disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
-            >
-              {busy === 'collect'
-                ? <><Icon.refresh className="animate-spin" width="17" height="17" /> 수집 중…</>
-                : <><Icon.download width="17" height="17" /> 이어서 수집</>}
-            </button>
-          )}
-
           <button
             onClick={update}
             disabled={busy}
             className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-white px-6 text-sm font-semibold text-ink transition hover:border-faint hover:bg-sunk disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {busy === 'update'
+            {busy === 'update' 
               ? <><Icon.refresh className="animate-spin" width="17" height="17" /> 갱신 중…</>
               : <><Icon.refresh width="17" height="17" /> 전체 업데이트</>}
           </button>
