@@ -140,10 +140,11 @@
       openModal('modal-confirm');
     }
 
-    function openDangerModal(title, text, onConfirm) {
+    function openDangerModal(title, text, onConfirm,btnText) {
       document.getElementById('danger-title').innerText = title ?? '이 일정을 삭제할까요?';
       document.getElementById('danger-text').innerText  = text  ?? '';
       document.getElementById('danger-ok').onclick = () => { onConfirm?.(); closeModal(); };
+      document.getElementById('danger-ok').innerText = btnText ?? '삭제';
       openModal('modal-danger');
     }
 
