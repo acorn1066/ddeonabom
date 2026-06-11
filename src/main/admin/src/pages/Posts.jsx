@@ -1,13 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Posts = () => {
-
+    const [posts, setPosts] = useState([])
     const [searchType, setSearchType] = useState("전체");
     const [keyword, setKeyword] = useState("");
+    const [boardType, setBoardType] = useState("공유");
 
     const handleSearch = () => {
         console.log(searchType, keyword);
     };
+
+    useEffect(() =>{
+        fetch('/react/admin/posts')
+        .then(res => res.json())
+        .then(data => setPosts(data))
+        .catch(err => console.log(err))
+    },[])
 
     return (
         <section className="flex-1 p-8">
@@ -23,8 +31,28 @@ const Posts = () => {
                 </p>
             </div>
 
+            {/* 게시판 선택 */}
+            <div className="mb-6 flex gap-3">
+
+                {["공유", "후기", "질문"].map((board) => (
+                    <button
+                        key={board}
+                        onClick={() => setBoardType(board)}
+                        className={`cursor-pointer rounded-lg border px-6 py-2 font-semibold shadow-sm transition-all
+                        ${
+                            boardType === board
+                                ? "border-blue-600 bg-blue-600 text-white"
+                                : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                        }`}
+                    >
+                        {board}게시판
+                    </button>
+                ))}
+
+            </div>
+
             {/* 검색 영역 */}
-            <div className="mb-6 rounded-xl border bg-white p-6 shadow-sm">
+            <div className="mb-6 rounded-2xl border bg-white p-6 shadow-sm">
 
                 <h2 className="mb-4 text-lg font-semibold">
                     게시글 검색
@@ -37,7 +65,7 @@ const Posts = () => {
                         onChange={(e) => setSearchType(e.target.value)}
                         className="cursor-pointer rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                        <option >전체</option>
+                        <option>전체</option>
                         <option>제목</option>
                         <option>작성자</option>
                     </select>
@@ -62,44 +90,42 @@ const Posts = () => {
             </div>
 
             {/* 게시글 목록 */}
-            <div className="rounded-xl border bg-white shadow-sm">
+            <div className="overflow-hidden rounded-2xl border bg-white shadow-md">
 
                 {/* 목록 제목 */}
                 <div className="border-b p-4">
                     <h2 className="text-xl font-bold">
-                        게시글 목록
+                        {boardType}게시판 목록
                     </h2>
                 </div>
 
-                {/* 테이블 헤더 */}
-                <div className="grid grid-cols-12 border-b bg-gray-50 p-4 font-semibold">
+                <table className="w-full table-auto">
 
-                    <div className="col-span-1 text-center">
-                        번호
-                    </div>
+                    <thead>
+                        <tr className="border-b bg-gray-100 text-gray-700">
 
-                    <div className="col-span-5 text-center">
-                        제목
-                    </div>
+                            <th className="p-4 text-center font-semibold">제목</th>
+                            <th className="p-4 text-center font-semibold">작성자</th>
+                            <th className="p-4 text-center font-semibold">작성일</th>
+                            <th className="p-4 text-center font-semibold">상태</th>
 
-                    <div className="col-span-2 text-center">
-                        작성자
-                    </div>
+                        </tr>
+                    </thead>
 
-                    <div className="col-span-2 text-center">
-                        작성일
-                    </div>
+                    <tbody>
 
-                    <div className="col-span-2 text-center">
-                        상태
-                    </div>
+                        <tr>
+                            <td
+                                colSpan="4"
+                                className="p-16 text-center text-gray-400"
+                            >
+                                {boardType}게시판 데이터가 표시되는 영역
+                            </td>
+                        </tr>
 
-                </div>
+                    </tbody>
 
-                {/* 데이터 영역 */}
-                <div className="p-16 text-center text-gray-400">
-                    게시글 데이터가 표시되는 영역
-                </div>
+                </table>
 
             </div>
 

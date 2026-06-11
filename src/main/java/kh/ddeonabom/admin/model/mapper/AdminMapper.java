@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.member.model.vo.Member;
 
 @Mapper
@@ -22,8 +23,10 @@ public interface AdminMapper {
 
     int selectReportCount();
 
-	ArrayList<Member> selectMemberList();
+	ArrayList<Member> selectMembers(String id);
 
 	int updateMemberStatus(@Param("memberNo") int memberNo, @Param("status") String status
 	);
+
+	ArrayList<AdminNotice> selectNoticeList();
 }
