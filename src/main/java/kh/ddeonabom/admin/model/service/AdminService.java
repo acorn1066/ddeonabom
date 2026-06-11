@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.springframework.stereotype.Service;
 
 import kh.ddeonabom.admin.model.mapper.AdminMapper;
+import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.member.model.vo.Member;
 import lombok.RequiredArgsConstructor;
 
@@ -38,12 +39,16 @@ public class AdminService {
         return mapper.selectReportCount();
     }
 
-	public ArrayList<Member> selectMemberList() {
-		return mapper.selectMemberList();
+	public ArrayList<Member> selectMembers(String id) {
+		return mapper.selectMembers(id);
 	}
 	
 	public int updateMemberStatus(int memberNo, String status) {
 	    return mapper.updateMemberStatus(memberNo, status);
+	}
+
+	public ArrayList<AdminNotice> selectNoticeList() {
+		return mapper.selectNoticeList();
 	}
 
 	

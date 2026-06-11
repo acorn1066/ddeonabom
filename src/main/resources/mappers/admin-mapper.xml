@@ -39,13 +39,16 @@
         WHERE REPORT_STATUS = 'N'
     </select>
     
-    <select id="selectMemberList" resultType="Member">
+    <select id="selectMembers" resultType="Member">
 	    SELECT
-	        MEMBER_NO,
 	        ID,
-	        ENROLL_DATE
+	        nickname,
+	        email,
+	        phone,
+	        ENROLL_DATE,
+	        status
 	    FROM MEMBER
-	    ORDER BY MEMBER_NO DESC
+	    where id != #{id}
 	</select>
 	
 	<update id="updateMemberStatus">
@@ -53,5 +56,18 @@
 	    SET STATUS = #{status}
 	    WHERE MEMBER_NO = #{memberNo}
 	</update>
+	
+	<select id="selectNoticeList" resultType="kh.ddeonabom.admin.model.vo.AdminNotice">
+	    SELECT
+	        N.NOTICE_NO,
+	        N.TITLE,
+	        M.ID AS MEMBER_NAME,
+	        N.CREATE_DATE,
+	        N.MODIFY_DATE
+	    FROM NOTICE N
+	    JOIN MEMBER M
+	        ON N.MEMBER_NO = M.MEMBER_NO
+	    ORDER BY N.NOTICE_NO DESC
+	</select>
 
 </mapper>
