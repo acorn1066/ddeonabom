@@ -14,4 +14,5 @@ public interface LandmarkMapper {
 
 	ArrayList<Landmark> searchLandmarks(@Param("q") String q, @Param("offset") int offset, @Param("size") int size);
 	int countLandmarks(@Param("q") String q);
+	
 }

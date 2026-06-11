@@ -6,6 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 
 import org.springframework.stereotype.Service;
@@ -13,13 +14,15 @@ import org.springframework.stereotype.Service;
 import kh.ddeonabom.landmark.model.mapper.LandmarkMapper;
 import kh.ddeonabom.landmark.model.vo.Landmark;
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor
 public class LandmarkService {
-	
+	private final LandmarkMapper mapper;
 
-	public String updateLandmark() {
+	public void insertLandmark() {
 		StringBuilder sb = new StringBuilder();
 		try {
 			StringBuilder urlBuilder = new StringBuilder("https://apis.data.go.kr/B551011/KorService2/areaBasedList2"); /*URL*/
@@ -33,7 +36,6 @@ public class LandmarkService {
 			urlBuilder.append("&" + URLEncoder.encode("contentTypeId","UTF-8") + "=" + URLEncoder.encode("12", "UTF-8")); /*관광타입 ID*/
 			urlBuilder.append("&" + URLEncoder.encode("lDongRegnCd","UTF-8") + "=" + URLEncoder.encode("", "UTF-8")); /*법정동 시도 코드*/
 			urlBuilder.append("&" + URLEncoder.encode("lDongSignguCd","UTF-8") + "=" + URLEncoder.encode("", "UTF-8")); /*법정동 시군구 코드*/
-			
 			
 			URL url = (new URI(urlBuilder.toString())).toURL();
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -57,7 +59,23 @@ public class LandmarkService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
-		return sb.toString();
+		
+		String json = sb.toString();
+		ObjectMapper obj = new ObjectMapper();
+		JsonNode items = obj.readTree(json)
+								.path("response")
+								.path("body")
+								.path("items")
+								.path("item");
+		System.out.println(items);
+		ArrayList<Landmark> list = new ArrayList<>();
+		for(JsonNode node : items) {
+			Landmark vo = obj.treeToValue(node, Landmark.class);
+			list.add(vo);
+		}
+		System.out.println(list);
+		
+
 	}
 	
 
