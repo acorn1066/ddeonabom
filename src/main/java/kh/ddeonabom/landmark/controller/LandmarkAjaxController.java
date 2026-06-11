@@ -23,13 +23,14 @@ public class LandmarkAjaxController {
     public Map<String, Object> search(
             @RequestParam(name = "q", defaultValue = "") String q,
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "20") int size) {
+            @RequestParam(name = "size", defaultValue = "20") int size,
+            @RequestParam(name = "region", defaultValue = "") String region) {
         
         Map<String, Object> result = new HashMap<>();
         
-        ArrayList<Landmark> content = lService.searchLandmarks(q, page, size);
+        ArrayList<Landmark> content = lService.searchLandmarks(q, region, page, size);
         
-        int total = lService.countLandmarks(q);
+        int total = lService.countLandmarks(q,region);
         
         result.put("content", content);
         result.put("totalElements", total);
