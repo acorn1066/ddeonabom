@@ -28,7 +28,7 @@ const Notice = () => {
 
                 <button
                     onClick={() => navigate("/notice/write")}
-                    className="rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
+                    className="cursor-pointer rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
                 >
                     공지 등록
                 </button>
@@ -54,7 +54,7 @@ const Notice = () => {
 
                     <button
                         onClick={handleSearch}
-                        className="rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
+                        className="cursor-pointer rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
                     >
                         검색
                     </button>

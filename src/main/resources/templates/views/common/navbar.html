@@ -42,25 +42,18 @@
       <a href="/member/login" class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">로그인</a>
   </th:block>
   
-  <th:block th:if="${session.loginUser != null}">
-    
-    <a th:if="${session.loginUser.isAdmin == 'Y'}" 
-       href="http://localhost:5173" 
-       class="inline-flex h-9 items-center rounded-lg border border-line bg-black px-4 text-sm font-semibold text-white transition hover:bg-gray-800">
-       관리자페이지
-    </a>
-
-    <a th:unless="${session.loginUser.isAdmin == 'Y'}" 
-       href="/member/mypage" 
-       class="inline-flex h-9 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-sunk">
-       마이페이지
-    </a>
-    
-    <a href="/member/logout" class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">
-        로그아웃
-    </a>
-    
-</th:block>
+  <th:block th:unless="${session.loginUser == null}">
+  
+	    <th:block th:if="${session.loginUser.isAdmin == 'Y'}">
+	        <a href="http://localhost:5173" class="inline-flex h-9 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-sunk">관리자 페이지</a>
+	    </th:block>
+  
+      <a href="/member/mypage" class="inline-flex h-9 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-sunk">마이페이지</a>
+      
+      <a href="/member/logout" class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">
+          로그아웃
+      </a>
+  </th:block>
   
 </div>
   </div>
