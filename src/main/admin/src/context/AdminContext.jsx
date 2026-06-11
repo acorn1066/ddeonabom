@@ -3,7 +3,7 @@ import { createContext, useEffect, useRef, useState } from "react";
 export const AdminContext = createContext();
 
 export const AdminProvider = ({ children }) => {
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(null);
     const [admin, setAdmin] = useState();
 
     const calledRef = useRef(false);
@@ -13,24 +13,22 @@ export const AdminProvider = ({ children }) => {
         calledRef.current = true;
 
         fetch('/react/admin/users', {
-            method: 'GET',
+            method: 'get',
             credentials: 'include',
             headers: { fetch: true }
         })
-            .then(async res => {
+            .then(res => {
                 if (res.status === 403) {
-                    alert('접근 권한이 없습니다');
-                    window.location.href = 'http://localhost:8080';
+                    alert('접근 권한이 없습니다.');
+                    location.href = 'http://localhost:8080';
                     return null;
+                } else{
+                    setLoading(true);
                 }
-
-                setLoading(true);
                 return res.json();
             })
-            .then(data => {
-                if (data) setAdmin(data);
-            })
-            .catch(err => console.log(err));
+            .then(data => setAdmin(data))
+            .catch(err => console.log(err))
     }, []);
 
     if (!loading) {

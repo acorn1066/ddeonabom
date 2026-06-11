@@ -1,8 +1,11 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Adminbar from "../components/Adminbar";
+import { useContext } from "react";
+import { AdminContext } from "../context/AdminContext";
 
 const AdminLayout = () => {
+    const {admin} = useContext(AdminContext)
     return (
         <>
             <Navbar />
