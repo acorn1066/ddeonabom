@@ -1,4 +1,6 @@
 package kh.ddeonabom.member.service;
+import java.util.HashMap;
+
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -70,4 +72,5 @@ public class EmailService {
             e.printStackTrace();
         }
     }
-}
+
+	}

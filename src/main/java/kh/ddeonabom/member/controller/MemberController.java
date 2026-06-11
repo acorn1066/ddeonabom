@@ -3,6 +3,7 @@ package kh.ddeonabom.member.controller;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,6 +22,8 @@ import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.member.model.vo.Member;
 import kh.ddeonabom.member.service.EmailService;
 import kh.ddeonabom.member.service.MemberService;
+import kh.ddeonabom.qList.model.vo.QList;
+import kh.ddeonabom.qList.service.QListService;
 import lombok.RequiredArgsConstructor;
 
 
@@ -32,6 +35,9 @@ public class MemberController {
 	private final MemberService mService;
 	private final BCryptPasswordEncoder bcrypt;
 	private final EmailService emailService;
+	private final QListService qListService;
+	
+	
 	
 	@GetMapping("/join")
 	public String joinPage() {
@@ -461,28 +467,61 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
 	public String mypage(
 	        @RequestParam(value="tab", defaultValue = "schedule") String tab,
 	        @RequestParam(value="page", defaultValue = "1") int page,
-	        Model model) {
+	        @RequestParam(value="category", defaultValue = "전체") String category, // 카테고리 추가
+	        Model model, HttpSession session) {
 	    
-	    // 현재 어떤 탭이 켜졌는지 타임리프에 알려주기
-	    // (HTML에서 param.tab[0]으로 비교하고 있으므로, 테스트용 list 분기 처리에 사용)
+	    // 세션에서 로그인 유저 정보 가져오기
+	    Member loginUser = (Member) session.getAttribute("loginUser");
 	    
-	    // 작성 글 보기탭 가짜 글 데이터 생성
-	    if ("posts".equals(tab)) {
-	        List<String> fakePosts = new ArrayList<>();
-	        
-	        // 현재 페이지 번호에 맞춰 글 번호가 다이내믹하게 보이도록 세팅
-	        int startNum = ((page - 1) * 5) + 1; 
-	        for (int i = 0; i < 5; i++) {
-	            fakePosts.add("[" + (startNum + i) + "] 이번에 다녀온 제주도 동쪽 코스 추천합니다!");
-	        }
-	        
-	        // 중요: HTML에 th:each="post : ${list}" 라고 짰으므로 이름을 "list"로 보내야 합니다.
-	        model.addAttribute("list", fakePosts);
-	        
-	        // 하단 페이징 바가 생성되도록 가짜 PageInfo 객체 바인딩 (현재 1페, 총 글 23개, 5개씩 보기)
-	        PageInfo pi = Pagination.getPageInfo(page, 23, 5, 5); 
-	        model.addAttribute("pi", pi);
+	    if (loginUser == null) {
+	        return "redirect:/member/login"; 
 	    }
+	    
+	    if ("posts".equals(tab)) {
+	        // 맵 설정 (검색 조건 + memberNo)
+	        HashMap<String, Object> map = new HashMap<>();
+	        map.put("memberNo", loginUser.getMemberNo()); 
+	        map.put("category", category);
+	        
+	        // 실제 DB에서 카운트 조회 (서비스/매퍼 필요)
+	        int listCount = qListService.getMyListCount(map); 
+	        
+	        // 페이징 객체 생성 (기존 유틸리티 재사용)
+	        PageInfo pi = Pagination.getPageInfo(page, listCount, 8, 8); // 8개씩 출력
+	        
+	        // 페이징 정보 맵에 추가
+	        map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
+	        map.put("listLimit", pi.getBoardLimit());
+	        
+	        //  실제 DB에서 리스트 조회
+	        ArrayList<QList> list = qListService.selectMyBoardList(map);
+	        
+	        model.addAttribute("postlist", list);
+	        model.addAttribute("pi", pi);
+	        model.addAttribute("category", category); // 뷰에서 버튼 활성화용
+	        model.addAttribute("tab", "posts");
+	        /* 
+	    // 댓글 탭 추가
+    else if ("comments".equals(tab)) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("writer", loginUser.getId());
+        
+        // 댓글 개수 조회 (Service/Mapper 신규 생성 필요)
+        int listCount = qListService.getMyCommentCount(map);
+        
+        // 페이징 (댓글은 페이지당 10개씩)
+        PageInfo pi = Pagination.getPageInfo(page, listCount, 5, 10);
+        map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
+        map.put("listLimit", pi.getBoardLimit());
+        
+        //  댓글 리스트 조회
+        ArrayList<Comment> commentList = qListService.selectMyCommentList(map);
+        
+        model.addAttribute("list", commentList); // 이름은 동일하게 'list'로
+        model.addAttribute("pi", pi);
+        model.addAttribute("tab", "comments");
+    } 
+	    */ }
 	    
 	    //  가짜 댓글 데이터 
 	    else if ("comments".equals(tab)) {
@@ -494,7 +533,7 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
 	        }
 	        
 	        //  댓글 탭일 때도 동일하게 "list"라는 이름으로 전달
-	        model.addAttribute("list", fakeComments);
+	        model.addAttribute("commentlist", fakeComments);
 	        
 	        // 댓글은 총 57개, 한 페이지에 10개씩 보이도록 세팅
 	        PageInfo pi = Pagination.getPageInfo(page, 57, 10, 5);
@@ -502,7 +541,7 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
 	    }
 	    
 	    // 일정이나 관심목록일 때는 list가 필요 없으므로 비워
-
+	    
 	    return "views/member/mypage";
 	}
 	
