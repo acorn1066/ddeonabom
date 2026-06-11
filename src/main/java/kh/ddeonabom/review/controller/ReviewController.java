@@ -1,8 +1,11 @@
 package kh.ddeonabom.review.controller;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,10 +16,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.servlet.http.HttpServletRequest;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.review.model.service.ReviewService;
+import kh.ddeonabom.review.model.vo.Image;
 import kh.ddeonabom.review.model.vo.Review;
+import kh.ddeonabom.review.model.vo.ReviewSub;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -58,10 +64,56 @@ public class ReviewController {
 	}
 
 	@PostMapping("/reviews/insert")
-	public String insertReviews(@ModelAttribute Review r,@RequestParam("upfile") MultipartFile upfile) {
-		
-		return "redirect:review/list";
+	public String insertReviews(@ModelAttribute Review r, HttpServletRequest request) {
+
+	    int result = reviewService.insertReview(r);
+
+	    if (result > 0) {
+	        String uploadPath = request.getServletContext().getRealPath("/uploads/reviews");
+	        
+	        File uploadDir = new File(uploadPath);
+	        if (!uploadDir.exists()) {
+	            uploadDir.mkdirs();
+	        }
+	        if (r.getSubList() != null) {
+	            for (int i = 0; i < r.getSubList().size(); i++) {
+	                ReviewSub sub = r.getSubList().get(i);
+	                sub.setTravelNo(r.getTravelNo());   
+	                sub.setTravelSubSeq(i + 1);
+
+	                reviewService.insertReviewSub(sub); 
+
+	                List<MultipartFile> cardFiles = sub.getImageFiles();
+	                if (cardFiles != null) {
+	                    for (MultipartFile file : cardFiles) {
+	                        if (file != null && !file.isEmpty()) {
+	                            String original = file.getOriginalFilename();
+	                            String saved = UUID.randomUUID().toString() + "_" + original;
+	                            
+	                            try {
+	                                file.transferTo(new File(uploadPath + "/" + saved));
+
+	                                Image img = new Image();
+	                                img.setFileName(original);
+	                                img.setRenameFile(saved);
+	                                img.setImagePath("/uploads/reviews");
+	                                img.setTravelSubNo(sub.getTravelSubNo()); 
+	                                reviewService.insertImage(img);
+	                            } catch (Exception e) {
+	                                e.printStackTrace();
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+	        }
+
+	        return "redirect:/reviews/list";
+	    } else {
+	        return "redirect:/reviews/write";
+	    }
 	}
+	
 	
 	
 }

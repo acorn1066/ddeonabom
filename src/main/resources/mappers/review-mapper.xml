@@ -3,6 +3,25 @@
 
 <mapper namespace="kh.ddeonabom.review.model.mappers.ReviewMapper">
 
+	<resultMap id="reviewDetailMap" type="Review">
+	    <id property="travelNo" column="TRAVEL_NO"/>
+	    <result property="travelTitle" column="TRAVEL_TITLE"/>
+	    <result property="status" column="STATUS"/>
+	    <result property="createDate" column="CREATE_DATE"/>
+	    <result property="memberNo" column="MEMBER_NO"/>
+	    
+	    <collection property="subList" ofType="ReviewSub">
+	        <id property="travelSubNo" column="TRAVEL_SUB_NO"/>
+	        <result property="travelSubContent" column="TRAVEL_SUB_CONTENT"/>
+	        <result property="travelSubSeq" column="TRAVEL_SUB_SEQ"/>
+	        <result property="contentId" column="CONTENT_ID"/>
+	        <result property="rating" column="RATING"/>
+	        
+	        <collection property="images" ofType="string">
+	            <result column="RENAME_FILE"/> </collection>
+	    </collection>
+	</resultMap>
+
     <select id="selectListCount" resultType="_int">
 	    SELECT COUNT(*)
 	    FROM TRAVEL_LIST
@@ -30,8 +49,35 @@
 	    FETCH NEXT #{boardLimit} ROWS ONLY
 	</select>
 	
-	<insert id=""></insert>
+	<insert id="insertReview" parameterType="kh.ddeonabom.review.model.vo.Review">
+	    <selectKey keyProperty="travelNo" resultType="int" order="BEFORE">
+	        SELECT SEQ_TRAVEL_NO.NEXTVAL FROM DUAL
+	    </selectKey>
+		    INSERT INTO TRAVEL_LIST (
+		        TRAVEL_NO, 
+		        TRAVEL_TITLE, 
+		        STATUS,           CREATE_DATE, 
+		        MEMBER_NO
+		    ) VALUES (
+		        #{travelNo}, 
+		        #{travelTitle}, 
+		        'Y',              SYSDATE, 
+		        #{memberNo}
+		    )
+	</insert>
 	
+	<insert id="insertReviewSub" parameterType="kh.ddeonabom.review.model.vo.ReviewSub">
+	    <selectKey keyProperty="travelSubNo" resultType="int" order="BEFORE">
+	        SELECT SEQ_TRAVEL_SUB_NO.NEXTVAL FROM DUAL
+	    </selectKey>
+	    INSERT INTO TRAVEL_LIST_SUB (TRAVEL_SUB_NO, TRAVEL_SUB_CONTENT, TRAVEL_SUB_SEQ, TRAVEL_SUB_DATE, TRAVEL_NO, CONTENT_ID, RATING)
+	    VALUES (#{travelSubNo}, #{travelSubContent}, #{travelSubSeq}, SYSDATE, #{travelNo}, #{contentId}, #{rating})
+	</insert>
+	
+	<insert id="insertImage" parameterType="kh.ddeonabom.review.model.vo.Image">
+	    INSERT INTO TB_IMAGE (IMAGE_NO, IMAGE_PATH, FILE_NAME, RENAME_FILE, TRAVEL_SUB_NO)
+	    VALUES (SEQ_IMAGE_NO.NEXTVAL, #{imagePath}, #{fileName}, #{renameFile}, #{travelSubNo})
+	</insert>
 	
 	
 </mapper>
