@@ -4,12 +4,14 @@
 	<select id="searchLandmarks" resultType="Landmark">
 	    SELECT * FROM LANDMARK
 	    WHERE TITLE LIKE '%' || #{q} || '%'
+	    AND (#{region} = '' OR ADDR1 LIKE '%' || #{region} || '%') and content_type_id not in ('15','25','28')
 	    ORDER BY TITLE
 	    OFFSET #{offset} ROWS FETCH FIRST #{size} ROWS ONLY
 	</select>
 	
 	<select id="countLandmarks" resultType="int">
-	    SELECT COUNT(*) FROM LANDMARK
-	    WHERE TITLE LIKE '%' || #{q} || '%'
+	SELECT COUNT(*) FROM LANDMARK
+    WHERE TITLE LIKE '%' || #{q} || '%'
+    AND (#{region} = '' OR ADDR1 LIKE '%' || #{region} || '%') and content_type_id not in ('15','25','28')
 	</select>
 </mapper>

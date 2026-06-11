@@ -2,114 +2,206 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<th:block th:fragment="modal">
+	<th:block th:fragment="modal">
 
-  <!-- 딤 배경 -->
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-5 hidden" id="dim-background" onclick="if(event.target===this) closeModal();">
+		<!-- 딤 배경 -->
+		<div
+			class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-5 hidden"
+			id="dim-background" onclick="if(event.target===this) closeModal();">
 
-    <!-- info 모달 -->
-    <div role="dialog" aria-modal="true" id="modal-info" class="hidden w-96 max-w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
-      <div class="px-7 pb-6 pt-7 text-center">
-        <div class="mx-auto mb-3.5 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
-          <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5">
-            <path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+			<!-- info 모달 -->
+			<div role="dialog" aria-modal="true" id="modal-info"
+				class="hidden w-96 max-w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
+				<div class="px-7 pb-6 pt-7 text-center">
+					<div
+						class="mx-auto mb-3.5 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+						<svg viewBox="0 0 24 24" fill="none" class="h-5 w-5">
+            <path d="M12 11v6M12 7.5v.5" stroke="currentColor"
+								stroke-width="2.2" stroke-linecap="round" />
+            <circle cx="12" cy="12" r="9" stroke="currentColor"
+								stroke-width="1.8" />
           </svg>
-        </div>
-        <h2 class="mb-1.5 text-lg font-extrabold tracking-tight text-slate-900" id="info-title">알림</h2>
-        <p class="text-sm leading-relaxed text-slate-500" id="info-text"></p>
-      </div>
-      <div class="px-5 pb-5">
-        <button class="h-11 w-full rounded-xl bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-700" onclick="closeModal()">확인</button>
-      </div>
-    </div>
+					</div>
+					<h2
+						class="mb-1.5 text-lg font-extrabold tracking-tight text-slate-900"
+						id="info-title">알림</h2>
+					<p class="text-sm leading-relaxed text-slate-500" id="info-text"></p>
+				</div>
+				<div class="px-5 pb-5">
+					<button
+						class="h-11 w-full rounded-xl bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-700"
+						onclick="closeModal()">확인</button>
+				</div>
+			</div>
 
-    <!-- confirm 모달 -->
-    <div role="dialog" aria-modal="true" id="modal-confirm" class="hidden w-96 max-w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
-      <div class="px-7 pb-6 pt-7 text-center">
-        <div class="mx-auto mb-3.5 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
-          <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5">
-            <path d="M9.2 9a2.8 2.8 0 1 1 4.2 2.4c-.9.6-1.4 1-1.4 2M12 17.2v.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+			<!-- confirm 모달 -->
+			<div role="dialog" aria-modal="true" id="modal-confirm"
+				class="hidden w-96 max-w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
+				<div class="px-7 pb-6 pt-7 text-center">
+					<div
+						class="mx-auto mb-3.5 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+						<svg viewBox="0 0 24 24" fill="none" class="h-5 w-5">
+            <path
+								d="M9.2 9a2.8 2.8 0 1 1 4.2 2.4c-.9.6-1.4 1-1.4 2M12 17.2v.3"
+								stroke="currentColor" stroke-width="2" stroke-linecap="round"
+								stroke-linejoin="round" />
+            <circle cx="12" cy="12" r="9" stroke="currentColor"
+								stroke-width="1.8" />
           </svg>
-        </div>
-        <h2 class="mb-1.5 text-lg font-extrabold tracking-tight text-slate-900" id="confirm-title">이 일정을 공유할까요?</h2>
-        <p class="text-sm leading-relaxed text-slate-500" id="confirm-text">공유하면 다른 여행자들이 내 일정을 볼 수 있어요.</p>
-      </div>
-      <div class="flex gap-2 px-5 pb-5">
-        <button class="h-11 flex-1 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-900 hover:bg-slate-100" onclick="closeModal()">취소</button>
-        <button class="h-11 flex-1 rounded-xl bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-700" id="confirm-ok">확인</button>
-      </div>
-    </div>
+					</div>
+					<h2
+						class="mb-1.5 text-lg font-extrabold tracking-tight text-slate-900"
+						id="confirm-title">이 일정을 공유할까요?</h2>
+					<p class="text-sm leading-relaxed text-slate-500" id="confirm-text">공유하면
+						다른 여행자들이 내 일정을 볼 수 있어요.</p>
+				</div>
+				<div class="flex gap-2 px-5 pb-5">
+					<button
+						class="h-11 flex-1 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-900 hover:bg-slate-100"
+						onclick="closeModal()">취소</button>
+					<button
+						class="h-11 flex-1 rounded-xl bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-700"
+						id="confirm-ok">확인</button>
+				</div>
+			</div>
 
-    <!-- danger 모달 -->
-    <div role="dialog" aria-modal="true" id="modal-danger" class="hidden w-96 max-w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
-      <div class="px-7 pb-6 pt-7 text-center">
-        <div class="mx-auto mb-3.5 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
-          <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5">
-            <path d="M12 8.5v5M12 16.7v.3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-            <path d="M10.3 3.9 2.4 18a1.9 1.9 0 0 0 1.7 2.9h15.8A1.9 1.9 0 0 0 21.6 18L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+			<!-- danger 모달 -->
+			<div role="dialog" aria-modal="true" id="modal-danger"
+				class="hidden w-96 max-w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
+				<div class="px-7 pb-6 pt-7 text-center">
+					<div
+						class="mx-auto mb-3.5 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+						<svg viewBox="0 0 24 24" fill="none" class="h-5 w-5">
+            <path d="M12 8.5v5M12 16.7v.3" stroke="currentColor"
+								stroke-width="2.2" stroke-linecap="round" />
+            <path
+								d="M10.3 3.9 2.4 18a1.9 1.9 0 0 0 1.7 2.9h15.8A1.9 1.9 0 0 0 21.6 18L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"
+								stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
           </svg>
-        </div>
-        <h2 class="mb-1.5 text-lg font-extrabold tracking-tight text-slate-900" id="danger-title">이 일정을 삭제할까요?</h2>
-        <p class="text-sm leading-relaxed text-slate-500" id="danger-text">삭제한 일정은 되돌릴 수 없어요.</p>
-      </div>
-      <div class="flex gap-2 px-5 pb-5">
-        <button class="h-11 flex-1 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-900 hover:bg-slate-100" onclick="closeModal()">취소</button>
-        <button class="h-11 flex-1 rounded-xl bg-red-600 text-sm font-semibold text-white hover:brightness-95" id="danger-ok">삭제</button>
-      </div>
-    </div>
+					</div>
+					<h2
+						class="mb-1.5 text-lg font-extrabold tracking-tight text-slate-900"
+						id="danger-title">이 일정을 삭제할까요?</h2>
+					<p class="text-sm leading-relaxed text-slate-500" id="danger-text">삭제한
+						일정은 되돌릴 수 없어요.</p>
+				</div>
+				<div class="flex gap-2 px-5 pb-5">
+					<button
+						class="h-11 flex-1 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-900 hover:bg-slate-100"
+						onclick="closeModal()">취소</button>
+					<button
+						class="h-11 flex-1 rounded-xl bg-red-600 text-sm font-semibold text-white hover:brightness-95"
+						id="danger-ok">삭제</button>
+				</div>
+			</div>
 
-  </div>
+		</div>
 
-  <!-- 장소 추가 모달 -->
-  <div id="addStopModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-ink/50 p-5">
-    <div class="flex max-h-[80vh] w-[460px] max-w-full flex-col overflow-hidden rounded-2xl bg-white shadow-2xl" role="dialog" aria-modal="true" style="animation:modalIn .18s ease">
-      <div class="border-b border-line px-6 pt-5">
-        <div class="flex items-start justify-between gap-3">
-          <div>
-            <h2 class="text-lg font-bold tracking-tight text-ink">장소 추가</h2>
-            <p class="mt-0.5 text-13 text-muted">관심 관광지에서 고르거나, 전체 관광지를 검색해 담을 수 있어요</p>
-          </div>
-          <button id="modalClose" aria-label="닫기" class="flex h-8 w-8 flex-none items-center justify-center rounded-lg text-faint transition hover:bg-sunk hover:text-ink">✕</button>
-        </div>
-        <div class="mt-4 flex gap-5">
-          <button data-tab="wish" class="tab relative pb-3 text-sm font-semibold text-ink">관심 관광지</button>
-          <button data-tab="all" class="tab relative pb-3 text-sm font-semibold text-faint">전체 검색</button>
-        </div>
-      </div>
-      <div class="px-6 py-4">
-        <div class="flex h-10 items-center gap-2 rounded-lg border border-line bg-sunk px-3 text-faint focus-within:border-brand focus-within:bg-white">
-          <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.5"/><path d="M12.5 12.5L16 16"/></svg>
-          <input id="modalSearch" placeholder="관심 관광지 검색" class="h-full w-full bg-transparent text-sm text-ink outline-none placeholder:text-faint" />
-        </div>
-      </div>
-      <div id="wishOpts" class="flex-1 overflow-y-auto px-3 pb-2"></div>
-      <div id="modalPager" class="hidden items-center justify-between border-t border-line px-6 py-3">
-        <span class="text-13 text-faint">총 <b id="pgTotal" class="tabular-nums text-muted">0</b>곳</span>
-        <div class="flex items-center gap-1.5">
-          <button id="pgPrev" class="flex h-8 w-8 items-center justify-center rounded-lg border border-line text-muted transition hover:bg-sunk disabled:cursor-not-allowed disabled:opacity-40" aria-label="이전">‹</button>
-          <span class="px-1 text-13 tabular-nums text-muted"><b id="pgCur" class="text-ink">1</b> / <span id="pgMax">1</span></span>
-          <button id="pgNext" class="flex h-8 w-8 items-center justify-center rounded-lg border border-line text-muted transition hover:bg-sunk disabled:cursor-not-allowed disabled:opacity-40" aria-label="다음">›</button>
-        </div>
-      </div>
-      <div class="flex items-center justify-between border-t border-line px-6 py-4">
-        <span class="text-13 text-muted"><b id="selCount" class="font-bold text-ink">0</b>곳 선택됨</span>
-        <div class="flex gap-2">
-          <button id="modalCancel" class="inline-flex h-10 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-sunk">취소</button>
-          <button id="modalAdd" class="inline-flex h-10 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">일정에 추가</button>
-        </div>
-      </div>
+		<!-- 장소 추가 모달 -->
+		<div id="addStopModal"
+			class="fixed inset-0 z-[100] hidden items-center justify-center bg-ink/50 p-5">
+			<div
+				class="flex max-h-[80vh] w-[460px] max-w-full flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+				role="dialog" aria-modal="true" style="animation: modalIn .18s ease">
+				<div class="border-b border-line px-6 pt-5">
+					<div class="flex items-start justify-between gap-3">
+						<div>
+							<h2 class="text-lg font-bold tracking-tight text-ink">장소 추가</h2>
+							<p class="mt-0.5 text-13 text-muted">관심 관광지에서 고르거나, 전체 관광지를
+								검색해 담을 수 있어요</p>
+						</div>
+						<button id="modalClose" aria-label="닫기"
+							class="flex h-8 w-8 flex-none items-center justify-center rounded-lg text-faint transition hover:bg-sunk hover:text-ink">✕</button>
+					</div>
+					<div class="mt-4 flex gap-5">
+						<button data-tab="wish"
+							class="tab relative pb-3 text-sm font-semibold text-ink">관심
+							관광지</button>
+						<button data-tab="all"
+							class="tab relative pb-3 text-sm font-semibold text-faint">전체
+							검색</button>
+					</div>
+				</div>
+				<div class="flex gap-2 px-6 py-4">
+					<select id="modalRegion"
+						class="h-10 flex-none rounded-lg border border-line bg-sunk px-3 text-sm text-ink outline-none focus:border-brand focus:bg-white">
+						<option value="">전체 지역</option>
+						<option value="서울">서울</option>
+						<option value="부산">부산</option>
+						<option value="대구">대구</option>
+						<option value="인천">인천</option>
+						<option value="광주">광주</option>
+						<option value="대전">대전</option>
+						<option value="울산">울산</option>
+						<option value="세종">세종</option>
+						<option value="경기">경기</option>
+						<option value="강원">강원</option>
+						<option value="충북">충북</option>
+						<option value="충남">충남</option>
+						<option value="전북">전북</option>
+						<option value="전남">전남</option>
+						<option value="경북">경북</option>
+						<option value="경남">경남</option>
+						<option value="제주">제주</option>
+					</select>
+					<div
+						class="flex h-10 flex-1 items-center gap-2 rounded-lg border border-line bg-sunk px-3 text-faint focus-within:border-brand focus-within:bg-white">
+						<svg width="16" height="16" viewBox="0 0 18 18" fill="none"
+							stroke="currentColor" stroke-width="1.6">
+							<circle cx="8" cy="8" r="5.5" />
+							<path d="M12.5 12.5L16 16" /></svg>
+						<input id="modalSearch" placeholder="관심 관광지 검색"
+							class="h-full w-full bg-transparent text-sm text-ink outline-none placeholder:text-faint" />
+					</div>
+				</div>
+				<div id="wishOpts" class="flex-1 overflow-y-auto px-3 pb-2 min-h-[300px]"></div>
+				<div id="modalPager"
+					class="hidden items-center justify-between border-t border-line px-6 py-3">
+					<span class="text-13 text-faint">총 <b id="pgTotal"
+						class="tabular-nums text-muted">0</b>곳
+					</span>
+					<div class="flex items-center gap-1.5">
+						<button id="pgPrev"
+							class="flex h-8 w-8 items-center justify-center rounded-lg border border-line text-muted transition hover:bg-sunk disabled:cursor-not-allowed disabled:opacity-40"
+							aria-label="이전">‹</button>
+						<span class="px-1 text-13 tabular-nums text-muted"><b
+							id="pgCur" class="text-ink">1</b> / <span id="pgMax">1</span></span>
+						<button id="pgNext"
+							class="flex h-8 w-8 items-center justify-center rounded-lg border border-line text-muted transition hover:bg-sunk disabled:cursor-not-allowed disabled:opacity-40"
+							aria-label="다음">›</button>
+					</div>
+				</div>
+				<div
+					class="flex items-center justify-between border-t border-line px-6 py-4">
+					<span class="text-13 text-muted"><b id="selCount"
+						class="font-bold text-ink">0</b>곳 선택됨</span>
+					<div class="flex gap-2">
+						<button id="modalCancel"
+							class="inline-flex h-10 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-sunk">취소</button>
+						<button id="modalAdd"
+							class="inline-flex h-10 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">일정에
+							추가</button>
+					</div>
+				</div>
 
-    </div>
-  </div>
+			</div>
+		</div>
 
-  <!-- 토스트 컨테이너 -->
-  <div id="toast-container" class="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex flex-col items-center gap-2"></div>
+		<!-- 토스트 컨테이너 -->
+		<div id="toast-container"
+			class="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex flex-col items-center gap-2"></div>
 
-  <style>
-    @keyframes modalIn { from { opacity:0; transform:translateY(8px) scale(.98); } to { opacity:1; transform:none; } }
-  </style>
+<style>
+	@keyframes modalIn {from { opacity:0;
+		transform: translateY(8px) scale(.98);
+	}
+	
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+</style>
 
 <script>
     let currentModal = null;
@@ -176,35 +268,29 @@
 (function () {
 	const PAGE_SIZE = 20;
 
-		// 여기에는 이제 db에서 관광지를 꺼내서 넣어줘야 함...
-	const wishlist = [
-		['우도','제주 제주시 · 섬'],
-        ['광치기 해변','서귀포 성산읍 · 해변'],
-        ['아부오름 커피','제주 구좌읍 · 카페'],
-        ['용눈이 오름','제주 구좌읍 · 오름'],
-        ['종달리 수국길','제주 구좌읍 · 전망'],
-        ['검멀레 해변','제주 우도면 · 해변'],
-	];
-
-	// 여기에는 이제 db에서 관광지를 꺼내서 넣어줘야 함...
-	async function fetchSites(keyWord, page, size) {
-	    return fetch('/landmark/search?q=' + encodeURIComponent(keyWord) + '&page=' + page + '&size=' + size, {
-	        method: 'GET'
-	    })
-	    .then(response => response.json())
-	    .then(data => {
-	        return {
-	            items: data.content.map(function(landmark) { return [landmark.title, landmark.addr1, landmark.wished]; }),
-	            total: data.totalElements
-	        };
-	    });
+	async function fetchSites(query, region, page, size) {
+		return fetch('/landmark/search?wished=false&q=' + encodeURIComponent(query) + '&region=' + encodeURIComponent(region) + '&page=' + page + '&size=' + size)
+        .then(response => response.json())
+        .then(d => ({
+            items: d.content,
+            total: d.totalElements
+        }));
 	}
 
+	async function fetchWishlist(query, region, page, size) {
+	    return fetch('/landmark/search?wished=true&q=' + encodeURIComponent(query)
+	            + '&region=' + encodeURIComponent(region)
+	            + '&page=' + page + '&size=' + size)
+	        .then(r => r.json())
+	        .then(d => ({ items: d.content, total: d.totalElements }));
+	}
+	
 	const overlay = document.getElementById('addStopModal');
 	if (!overlay) return;
 	const body = document.getElementById('wishOpts');
 	const selCount = document.getElementById('selCount');
 	const searchInput = document.getElementById('modalSearch');
+	const regionSel   = document.getElementById('modalRegion');
 	const tabs = overlay.querySelectorAll('.tab');
 	const pager = document.getElementById('modalPager');
 	const pgPrev = document.getElementById('pgPrev');
@@ -213,35 +299,43 @@
 	const pgMax = document.getElementById('pgMax');
 	const pgTotal = document.getElementById('pgTotal');
 
-	const sel = new Set();
+	const sel = new Map();
 	let tab = 'wish';
 	let page = 0;
 	let totalPages = 1;
 	let reqId = 0;
-      
+	let debounce;
+	
+	
 	//아고통스러워
-	function rowEl(name, region, wished) {
-		const on = sel.has(name);
-        const flag = wished ? '<span class="ml-1.5 rounded-full bg-brand-soft px-1.5 py-0.5 text-[11px] font-semibold text-brand-ink align-middle">♡ 관심</span>' : '';
-        const row = document.createElement('div');
-        row.className = 'flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition hover:bg-sunk ' + (on ? 'bg-brand-soft/50' : '');
-        row.innerHTML =
-          '<div class="h-11 w-11 flex-none rounded-lg bg-sunk"></div>' +
-          '<div class="min-w-0 flex-1">' +
-            '<div class="truncate text-sm font-bold text-ink">' + name + flag + '</div>' +
-            '<div class="truncate text-xs text-muted">' + region + '</div>' +
-          '</div>' +
-          '<span class="check flex h-6 w-6 flex-none items-center justify-center rounded-full text-sm transition ' +
-            (on ? 'bg-brand text-white' : 'border border-line text-transparent') + '">✓</span>';
-        row.addEventListener('click', () => {
-          const nowOn = !sel.has(name);
-          nowOn ? sel.add(name) : sel.delete(name);
-          selCount.textContent = sel.size;
-          row.classList.toggle('bg-brand-soft/50', nowOn);
-          const c = row.querySelector('.check');
-          c.className = 'check flex h-6 w-6 flex-none items-center justify-center rounded-full text-sm transition ' + (nowOn ? 'bg-brand text-white' : 'border border-line text-transparent');
-        });
-        return row;
+	function rowEl(item) {
+		const { contentId, title, addr1, firstimage, mapx, mapy } = item;
+	    const wished = item.wished;
+	    const on = sel.has(contentId);
+
+	    const flag = wished ? '<span class="ml-1.5 rounded-full bg-brand-soft px-1.5 py-0.5 text-[11px] font-semibold text-brand-ink align-middle">♡ 관심</span>' : '';
+	    const row = document.createElement('div');
+	    row.className = 'flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition hover:bg-sunk ' + (on ? 'bg-brand-soft/50' : '');
+	    row.innerHTML =
+	        '<div class="h-11 w-11 flex-none rounded-lg bg-sunk overflow-hidden">' +
+	            (firstimage ? `<img src="${firstimage}" class="h-full w-full object-cover" />` : '') +
+	        '</div>' +
+	        '<div class="min-w-0 flex-1">' +
+	            '<div class="truncate text-sm font-bold text-ink">' + title + flag + '</div>' +
+	            '<div class="truncate text-xs text-muted">' + addr1 + '</div>' +
+	        '</div>' +
+	        '<span class="check flex h-6 w-6 flex-none items-center justify-center rounded-full text-sm transition ' +
+	            (on ? 'bg-brand text-white' : 'border border-line text-transparent') + '">✓</span>';
+
+	    row.addEventListener('click', () => {
+	        const nowOn = !sel.has(contentId);
+	        nowOn ? sel.set(contentId, { contentId, title, addr1, firstimage, mapx, mapy }) : sel.delete(contentId);
+	        selCount.textContent = sel.size;
+	        row.classList.toggle('bg-brand-soft/50', nowOn);
+	        const c = row.querySelector('.check');
+	        c.className = 'check flex h-6 w-6 flex-none items-center justify-center rounded-full text-sm transition ' + (nowOn ? 'bg-brand text-white' : 'border border-line text-transparent');
+	    });
+	    return row;
 	}
 
 	function showLoading() {
@@ -251,37 +345,56 @@
         body.innerHTML = '<div class="px-5 py-12 text-center text-13 text-faint">' + msg + '</div>';
 	}
 
-	function renderWish() {
-        pager.classList.add('hidden'); pager.classList.remove('flex');
-        const filter = searchInput.value.trim();
-        const list = wishlist.filter(w => w[0].includes(filter) || w[1].includes(filter));
-        body.innerHTML = '';
-        if (!list.length) { showEmpty("관심 관광지가 없어요. '전체 검색'에서 찾아보세요."); return; }
-        list.forEach(w => body.appendChild(rowEl(w[0], w[1], false)));
+	async function renderWish() {
+		if (clearSel) {
+	        sel.clear();
+	        selCount.textContent = '0';
+	    }
+		pager.classList.remove('hidden'); pager.classList.add('flex');
+	    const my = ++reqId;
+	    showLoading();
+	    const { items, total } = await fetchWishlist(searchInput.value, regionSel.value, page, PAGE_SIZE);
+	    if (my !== reqId) return;
+	    totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+	    pgTotal.textContent = total.toLocaleString();
+	    pgCur.textContent = (page + 1).toLocaleString();
+	    pgMax.textContent = totalPages.toLocaleString();
+	    pgPrev.disabled = page <= 0;
+	    pgNext.disabled = page >= totalPages - 1;
+	    body.innerHTML = '';
+	    if (!items.length) { showEmpty('검색 결과가 없습니다.'); return; }
+	    items.forEach(it => body.appendChild(rowEl(it)));
+	    body.scrollTop = 0;
 	}
 
-	async function renderAll() {
-        pager.classList.remove('hidden'); pager.classList.add('flex');
-        const my = ++reqId;
-        showLoading();
-        const { items, total } = await fetchSites(searchInput.value, page, PAGE_SIZE);
-        if (my !== reqId) return;
-        totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-        pgTotal.textContent = total.toLocaleString();
-        pgCur.textContent = (page + 1).toLocaleString();
-        pgMax.textContent = totalPages.toLocaleString();
-        pgPrev.disabled = page <= 0;
-        pgNext.disabled = page >= totalPages - 1;
-        body.innerHTML = '';
-        if (!items.length) { showEmpty('검색 결과가 없습니다.'); return; }
-        items.forEach(it => body.appendChild(rowEl(it[0], it[1], it[2])));
-        body.scrollTop = 0;
+	async function renderAll(clearSel) {
+		if (clearSel) {
+	        sel.clear();
+	        selCount.textContent = '0';
+	    }
+		pager.classList.remove('hidden'); pager.classList.add('flex');
+	    const my = ++reqId;
+	    showLoading();
+	    const { items, total } = await fetchSites(searchInput.value, regionSel.value, page, PAGE_SIZE);
+	    if (my !== reqId) return;
+	    totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+	    pgTotal.textContent = total.toLocaleString();
+	    pgCur.textContent = (page + 1).toLocaleString();
+	    pgMax.textContent = totalPages.toLocaleString();
+	    pgPrev.disabled = page <= 0;
+	    pgNext.disabled = page >= totalPages - 1;
+	    body.innerHTML = '';
+	    if (!items.length) { showEmpty('검색 결과가 없습니다.'); return; }
+	    items.forEach(it => body.appendChild(rowEl(it)));
+	    body.scrollTop = 0;
 	}
 
-	function render() { tab === 'wish' ? renderWish() : renderAll(); }
+	function render(clearSel = false) { tab === 'wish' ? renderWish() : renderAll(clearSel); }
 
 	function switchTab(t) {
-        tab = t;
+		sel.clear();
+	    selCount.textContent = '0';
+		tab = t;
         tabs.forEach(b => {
           const active = b.dataset.tab === t;
           b.classList.toggle('text-ink', active);
@@ -292,34 +405,44 @@
         });
         searchInput.placeholder = t === 'wish' ? '관심 관광지 검색' : '전체 관광지 · 지역 검색';
         page = 0;
-        render();
+        render(true);
 	}
 
-	let debounce;
-      searchInput.addEventListener('input', () => {
-        clearTimeout(debounce);
-        debounce = setTimeout(() => { page = 0; render(); }, 300);
+	searchInput.addEventListener('input', () => {
+	    clearTimeout(debounce);
+	    debounce = setTimeout(() => { page = 0; render(true); }, 300);
 	});
 
-	pgPrev.addEventListener('click', () => { if (page > 0) { page--; renderAll(); } });
-	pgNext.addEventListener('click', () => { if (page < totalPages - 1) { page++; renderAll(); } });
 
-	function openAddStopModal() { tab = 'wish'; searchInput.value = ''; page = 0; switchTab('wish'); overlay.classList.remove('hidden'); overlay.classList.add('flex'); }
-	function closeAddStopModal() { sel.clear(); selCount.textContent = '0'; searchInput.value = ''; overlay.classList.add('hidden'); overlay.classList.remove('flex'); }
+	function openAddStopModal() { tab='wish'; searchInput.value=''; regionSel.value=''; page=0; switchTab('wish'); overlay.classList.remove('hidden'); overlay.classList.add('flex'); }
+	function closeAddStopModal() { sel.clear(); selCount.textContent='0'; searchInput.value=''; regionSel.value=''; overlay.classList.add('hidden'); overlay.classList.remove('flex'); }
 
 	tabs.forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
 	document.getElementById('addStopBtn')?.addEventListener('click', openAddStopModal);
 	document.getElementById('modalClose').addEventListener('click', closeAddStopModal);
 	document.getElementById('modalCancel').addEventListener('click', closeAddStopModal);
 	document.getElementById('modalAdd').addEventListener('click', () => {
-		// 여기에 이제 선택된 관광지를 일정에 추가하는걸 해야 돼... 
-		closeAddStopModal();
+	    if (sel.size === 0) {
+	        showToast('장소를 선택해 주세요.', false);
+	        return;
+	    }
+
+	    sel.forEach((place, key) => {
+	        addPlaceToDate(place);
+	    });
+
+	    showToast(`${sel.size}곳을 일정에 추가했어요.`);
+	    closeAddStopModal();
 	});
+	
+	regionSel.addEventListener('change', () => { page = 0; render(); });
 	overlay.addEventListener('click', e => { if (e.target === overlay) closeAddStopModal(); });
 	document.addEventListener('keydown', e => { if (e.key === 'Escape' && !overlay.classList.contains('hidden')) closeAddStopModal(); });
+	pgPrev.addEventListener('click', () => { if (page > 0) { page--; renderAll(); } });
+	pgNext.addEventListener('click', () => { if (page < totalPages - 1) { page++; renderAll(); } });
 })();
 </script>
 
-</th:block>
+	</th:block>
 </body>
 </html>

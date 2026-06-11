@@ -69,33 +69,25 @@ body {
 			</div>
 		</div>
 
-		<div class="flex items-center gap-2 border-b border-line pb-5">
-			<span
-				class="inline-flex h-9 cursor-pointer items-center rounded-full border border-ink bg-ink px-4 text-13 font-semibold text-white">전체</span>
-			<span
-				class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">제주</span>
-			<span
-				class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">수도권</span>
-			<span
-				class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">강원</span>
-			<span
-				class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">경상</span>
-			<span
-				class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">전라</span>
-			<div class="relative ml-auto">
-				<svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-faint"
-					width="16" height="16" viewBox="0 0 18 18" fill="none"
-					stroke="currentColor" stroke-width="1.6">
-					<circle cx="8" cy="8" r="5.5" />
-					<path d="M12.5 12.5L16 16" /></svg>
-				<input
-					class="h-9 w-56 rounded-full border border-line bg-white pl-9 pr-3 text-13 outline-none transition placeholder:text-faint focus:border-brand"
-					placeholder="여행·관광지 검색" />
-			</div>
-			<select
-				class="ml-2 h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none"><option>최신순</option>
-				<option>추천 많은 순</option>
-				<option>평점 높은 순</option></select>
+		<div id="regionTabContainer" class="flex items-center gap-2 border-b border-line pb-5">
+		    <span data-region="" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-ink bg-ink px-4 text-13 font-semibold text-white">전체</span>
+		    <span data-region="제주" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">제주</span>
+		    <span data-region="수도권" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">수도권</span>
+		    <span data-region="강원" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">강원</span>
+		    <span data-region="경상" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">경상</span>
+		    <span data-region="전라" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">전라</span>
+		    
+		    <div class="relative ml-auto">
+		        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-faint" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6">
+		            <circle cx="8" cy="8" r="5.5" /><path d="M12.5 12.5L16 16" />
+		        </svg>
+		        <input class="h-9 w-56 rounded-full border border-line bg-white pl-9 pr-3 text-13 outline-none transition placeholder:text-faint focus:border-brand" placeholder="여행·관광지 검색" />
+		    </div>
+		    <select class="ml-2 h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none">
+		        <option>최신순</option>
+		        <option>추천 많은 순</option>
+		        <option>평점 높은 순</option>
+		    </select>
 		</div>
 
 		<div id="reviewContainer" class="grid grid-cols-3 gap-5 py-6">
@@ -158,16 +150,40 @@ body {
 	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 	<script>
 		let currentPage = 1; 
+		let currentRegion = "";
 		
 		window.onload = () => {
 		loadTravelList(currentPage);
+		bindRegionTabEvents();
 		};
+		
+		function bindRegionTabEvents() {
+		    const tabs = document.querySelectorAll('.region-tab');
+		    tabs.forEach(tab => {
+		        tab.addEventListener('click', function() {
+
+		            tabs.forEach(t => {
+		                t.className = "region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink";
+		            });
+		            
+		            this.className = "region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-ink bg-ink px-4 text-13 font-semibold text-white";
+		            
+		            currentRegion = this.getAttribute('data-region');
+		            
+		            currentPage = 1;
+		            loadTravelList(currentPage);
+		        });
+		    });
+		}
 
 		function loadTravelList(page) {
 			$.ajax({
 			 url: '/selectReviewList', 
 			 type: 'GET',
-			 data: { currentPage: page }, 
+			 data: { 
+	             currentPage: page,
+	             region: currentRegion 
+	         },
 			 dataType: 'json',
 			 success: function(response) { 
 

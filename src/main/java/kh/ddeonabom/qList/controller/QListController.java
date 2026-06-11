@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.qList.model.vo.QList;
@@ -63,12 +64,17 @@ public class QListController {
 	}
 	
 	@GetMapping("detail")
-	public ModelAndView detailQList(@RequestParam("qNo") int qNo, ModelAndView mv) {
+	public ModelAndView detailQList(@RequestParam("qNo") int qNo, HttpSession session, ModelAndView mv) {
 	    
-	    QList q = qListService.detailQList(1);  // 단건 조회 서비스 호출
-	    System.out.println(q);
+	    QList q = qListService.detailQList(qNo);  // 단건 조회 서비스 호출
+	    
+	    // 회원 공개 글인데 비로그인 상태라면 모달 트리거 플래그 전달
+	    boolean loginRequired = "MEMBER".equals(q.getVisibility())
+	                            && session.getAttribute("loginUser") == null;
+	    
 	    mv.addObject("q", q)
-	      .setViewName("views/qList/detail");
+	    	.addObject("loginRequired", loginRequired)
+	    	.setViewName("views/qList/detail");
 	    
 	    return mv;
 	}

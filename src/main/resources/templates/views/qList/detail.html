@@ -75,6 +75,20 @@
 	  </section>
 	</main>
 
+	<!-- </body> 바로 위, 기존 script 없으면 새로 추가 -->
+	<script th:inline="javascript">
+	  // 서버에서 loginRequired=true 로 넘어오면 즉시 모달 오픈
+	  window.addEventListener('DOMContentLoaded', function () {
+	    const loginRequired = /*[[${loginRequired}]]*/ false;
+	    if (loginRequired) {
+	      openInfoModal(
+	        '회원 전용 글입니다',
+	        '로그인 후 이용하실 수 있어요.'
+	      );
+	    }
+	  });
+	</script>
+
 	<div th:replace="~{views/common/modal :: modal}"></div>
 	<footer th:replace="~{views/common/footer :: footer}"></footer>
 </body>

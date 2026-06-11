@@ -27,4 +27,16 @@ public class QListService {
 	public QList detailQList(int qNo) {
 		return qMapper.detailQList(qNo);
 	}
+
+	public int getMyListCount(HashMap<String, Object> map) {
+		return qMapper.getMyListCount(map);
+	}
+
+	public ArrayList<QList> selectMyBoardList(HashMap<String, Object> map) {
+		return qMapper.selectMyBoardList(map);
+	}
+
+	
+
+	
 }

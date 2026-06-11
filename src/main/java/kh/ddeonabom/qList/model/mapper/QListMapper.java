@@ -17,4 +17,8 @@ public interface QListMapper {
 
 	QList detailQList(int qNo);
 
+	int getMyListCount(HashMap<String, Object> map);
+
+	ArrayList<QList> selectMyBoardList(HashMap<String, Object> map);
+
 }
