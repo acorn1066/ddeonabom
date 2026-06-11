@@ -12,4 +12,14 @@
 	    SELECT COUNT(*) FROM LANDMARK
 	    WHERE TITLE LIKE '%' || #{q} || '%'
 	</select>
+	
+	<select id="getListCount" resultType="_int">
+		select count(*)
+		from landmark
+	</select>
+	
+	<select id="selectLandmarkList">
+		select *
+		from landmark
+	</select>
 </mapper>

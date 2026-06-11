@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.session.RowBounds;
 
 import kh.ddeonabom.landmark.model.vo.Landmark;
 
@@ -13,5 +14,11 @@ public interface LandmarkMapper {
 
 
 	ArrayList<Landmark> searchLandmarks(@Param("q") String q, @Param("offset") int offset, @Param("size") int size);
+	
 	int countLandmarks(@Param("q") String q);
+	
+	// 관광지 개수 가져오기
+	int getListCount();
+
+	ArrayList<Landmark> selectLandmarkList(RowBounds rowBounds);
 }
