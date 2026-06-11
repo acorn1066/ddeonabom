@@ -12,6 +12,6 @@ import kh.ddeonabom.landmark.model.vo.Landmark;
 public interface LandmarkMapper {
 
 
-	ArrayList<Landmark> searchLandmarks(@Param("q") String q, @Param("offset") int offset, @Param("size") int size);
-	int countLandmarks(@Param("q") String q);
+	ArrayList<Landmark> searchLandmarks(@Param("q") String q, @Param("region") String region, @Param("offset") int offset, @Param("size") int size);
+	int countLandmarks(@Param("q") String q, @Param("region") String region);
 }
