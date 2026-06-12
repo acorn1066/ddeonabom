@@ -3,6 +3,56 @@
 
 <mapper namespace="kh.ddeonabom.schedule.model.mappers.ScheduleMapper">
 	<select id="selectMainAll" resultType="ScheduleMain">
-		select * from schedule_main where member_no = #{member_no}
+	    select m.schedule_no,
+	           m.schedule_title,
+	           m.schedule_status,
+	           to_char(m.schedule_startdate, 'yyyy.mm.dd') as scheduleStartdate,
+	           to_char(m.schedule_enddate, 'yyyy.mm.dd') as scheduleEnddate,
+	           m.schedule_visibility,
+	           m.member_no,
+	           (select count(*) from schedule_sub s where s.schedule_no = m.schedule_no) as placeCount,
+	           (select listagg(l.mapx || ',' || l.mapy, ';')
+	                       within group (order by s.schedule_sub_date, s.schedule_sub_seq)
+	              from schedule_sub s
+	              join landmark l on l.content_id = s.content_id
+	             where s.schedule_no = m.schedule_no
+	               and l.mapx is not null
+	               and l.mapy is not null
+	           ) as coords
+	    from schedule_main m
+	    where m.member_no = #{member_no}
+	    order by m.create_date desc
 	</select>
+	
+	<insert id="insertScheduleMain" parameterType="ScheduleMain">
+	    <selectKey keyProperty="scheduleNo" resultType="int" order="BEFORE">
+	        select SEQ_SMAIN.nextval from dual
+	    </selectKey>
+	    insert into schedule_main (
+	        schedule_no, schedule_title, schedule_status,
+	        create_date, schedule_startdate, schedule_enddate,
+	        schedule_visibility, member_no
+	    ) values (
+	        #{scheduleNo}, #{scheduleTitle}, 'Y',
+	        sysdate, to_date(#{scheduleStartdate}, 'yyyy-mm-dd'), to_date(#{scheduleEnddate}, 'yyyy-mm-dd'),
+	        'N', #{memberNo}
+	    )
+	</insert>
+	
+	<insert id="insertScheduleSub" parameterType="ScheduleSub">
+	    insert into schedule_sub (
+	        schedule_sub_no, schedule_sub_date, schedule_sub_seq,
+	        schedule_no, content_id
+	    ) values (
+	        SEQ_SSUB.nextval, to_date(#{scheduleSubDate}, 'yyyy-mm-dd'), #{scheduleSubSeq},
+	        #{scheduleNo}, #{contentId}
+	    )
+	</insert>
+	
+	<update id="updateScheduleStatus">
+	    update schedule_main
+	       set schedule_status = 'N'
+	     where schedule_no = #{scheduleNo}
+	       and member_no = #{memberNo}
+	</update>
 </mapper>

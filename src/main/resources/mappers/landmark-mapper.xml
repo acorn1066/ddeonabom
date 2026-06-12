@@ -5,7 +5,7 @@
 	    SELECT * FROM LANDMARK
 	    WHERE TITLE LIKE '%' || #{q} || '%'
 	    AND (#{region} = '' OR ADDR1 LIKE '%' || #{region} || '%') and content_type_id not in ('15','25','28')
-	    ORDER BY TITLE
+	    ORDER BY CONTENT_ID
 	    OFFSET #{offset} ROWS FETCH FIRST #{size} ROWS ONLY
 	</select>
 	
