@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.admin.model.service.AdminService;
 import kh.ddeonabom.admin.model.vo.AdminNotice;
+import kh.ddeonabom.admin.model.vo.AdminPost;
 import kh.ddeonabom.member.model.vo.Member;
+import kh.ddeonabom.qList.model.vo.QList;
+import kh.ddeonabom.review.model.vo.Review;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -67,37 +70,40 @@ public class AdminController {
 	@ResponseBody
 	@PutMapping("members")
 	public int updateMemberStatus(@RequestBody HashMap<String, String> map) {
-
 	    map.put("col", "status");
-
 	    return aService.updateMemberStatus(map);
 	}
 	
 	
 	
-	
-//	@PostMapping("/member/status")
-//	public ResponseEntity<?> updateMemberStatus(
-//	        @RequestParam("memberNo") int memberNo,
-//	        @RequestParam("status") String status) {
-//
-//	    AdminService.updateMemberStatus(memberNo, status);
-//
-//	    return ResponseEntity.ok().build();
-//	}
-	
-	
 	@ResponseBody
-	@GetMapping("/notice")
+	@GetMapping("notice")
 	public ArrayList<AdminNotice> selectNoticeList() {
 	    return aService.selectNoticeList();
 	}
 	
-	
-	@GetMapping("post")
-	public String adminPost() {
-		return "views/admin/post";
-	}
+		@ResponseBody
+		@GetMapping("/posts/schedule")
+	    public ArrayList<AdminPost> shareList() {
+	        return aService.selectSchedulePosts();
+	    }
+		@ResponseBody
+	    @GetMapping("/posts/review")
+	    public ArrayList<AdminPost> reviewList() {
+	        return aService.selectReviewPosts();
+	    }
+		@ResponseBody
+	    @GetMapping("/posts/question")
+	    public ArrayList<AdminPost> questionList() {
+	        return aService.selectQuestionPosts();
+	    }
+		
+		@ResponseBody
+		@PutMapping("/posts/status")
+	    public int updatePostStatus(@RequestBody AdminPost post) {
+	        return aService.updatePostStatus(post);
+	    }
+		
 	
 	@GetMapping("report")
 		public String adminReport() {

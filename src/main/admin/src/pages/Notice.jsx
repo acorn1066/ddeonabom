@@ -14,7 +14,7 @@ const Notice = () => {
         fetch('/react/admin/notice')
             .then(data => setMembers(data))
             .catch(err => console.log(err))
-    },[])
+    }, [])
 
     return (
         <section className="flex-1 p-8">
@@ -96,7 +96,7 @@ const Notice = () => {
 
                     <tbody>
                         {notice.map((notice) => (
-                            <tr key={notice.noticeNo}className="border-b hover:bg-gray-50">
+                            <tr key={notice.noticeNo} className="border-b hover:bg-gray-50">
 
                                 <td className="p-4 text-center">{notice.noticeNo}</td>
                                 <td className="p-4">{notice.title}</td>
@@ -104,7 +104,7 @@ const Notice = () => {
                                 <td className="p-4 text-center">{notice.createDate?.split("T")[0]}</td>
                                 <td className="p-4 text-center">{notice.modifyDate?.split("T")[0]}</td>
                                 <td className="p-4 text-center">수정 / 삭제</td>
-                            </tr>   
+                            </tr>
                         ))}
                     </tbody>
 
