@@ -4,16 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.admin.model.service.AdminService;
+import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.member.model.vo.Member;
 import lombok.RequiredArgsConstructor;
 
@@ -59,33 +57,32 @@ public class AdminController {
 	
 	@ResponseBody
 	@GetMapping("/members")
-	public ArrayList<Member> selectMemberList() {
-	    return AdminService.selectMemberList();
+	public ArrayList<Member> selectMembers(HttpSession session) {
+		String id = ((Member)session.getAttribute("loginUser")).getId();
+	    return AdminService.selectMembers(id);
 	}
 	
-	@PostMapping("/member/status")
-	public ResponseEntity<?> updateMemberStatus(
-	        @RequestParam("memberNo") int memberNo,
-	        @RequestParam("status") String status) {
-
-	    AdminService.updateMemberStatus(memberNo, status);
-
-	    return ResponseEntity.ok().build();
+//	@PostMapping("/member/status")
+//	public ResponseEntity<?> updateMemberStatus(
+//	        @RequestParam("memberNo") int memberNo,
+//	        @RequestParam("status") String status) {
+//
+//	    AdminService.updateMemberStatus(memberNo, status);
+//
+//	    return ResponseEntity.ok().build();
+//	}
+	
+	
+	@ResponseBody
+	@GetMapping("/notice")
+	public ArrayList<AdminNotice> selectNoticeList() {
+	    return AdminService.selectNoticeList();
 	}
-	
-	
-	
-	
 	
 	
 	@GetMapping("post")
-		public String adminPost() {
+	public String adminPost() {
 		return "views/admin/post";
-	}
-	
-	@GetMapping("notice")
-		public String adminNotice() {
-		return "views/admin/notice";
 	}
 	
 	@GetMapping("report")
