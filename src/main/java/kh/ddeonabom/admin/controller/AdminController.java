@@ -16,8 +16,6 @@ import kh.ddeonabom.admin.model.service.AdminService;
 import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.admin.model.vo.AdminPost;
 import kh.ddeonabom.member.model.vo.Member;
-import kh.ddeonabom.qList.model.vo.QList;
-import kh.ddeonabom.review.model.vo.Review;
 import lombok.RequiredArgsConstructor;
 
 @Controller
