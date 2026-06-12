@@ -46,12 +46,21 @@ body {
 					후기</a> <a href="qa-board" class="py-2 transition-colors hover:text-ink">질문</a>
 			</nav>
 			<div class="flex items-center gap-3">
-				<a href="write"
-					class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">
-					후기 작성하기 </a> <a href="mypage"
-					class="inline-flex h-9 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-sunk">마이페이지</a>
-				<a href="login"
-					class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">로그인</a>
+			    <!-- 로그인 상태일 때만 후기 작성하기 버튼 표시 -->
+			    <a th:if="${session.loginUser != null}" href="/reviews/write"
+			        class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">
+			        후기 작성하기
+			    </a>
+			    <a href="/mypage"
+			        class="inline-flex h-9 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-sunk">마이페이지</a>
+			
+			    <!-- 로그아웃 버튼 (로그인 상태) -->
+			    <a th:if="${session.loginUser != null}" href="/member/logout"
+			        class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">로그아웃</a>
+			
+			    <!-- 로그인 버튼 (비로그인 상태) -->
+			    <a th:if="${session.loginUser == null}" href="/member/login?targetUrl=/reviews"
+			        class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">로그인</a>
 			</div>
 		</div>
 	</header>
@@ -74,6 +83,7 @@ body {
 		    <span data-region="제주" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">제주</span>
 		    <span data-region="수도권" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">수도권</span>
 		    <span data-region="강원" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">강원</span>
+		    <span data-region="충청" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">충청</span>
 		    <span data-region="경상" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">경상</span>
 		    <span data-region="전라" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">전라</span>
 		    
@@ -81,7 +91,7 @@ body {
 		        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-faint" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6">
 		            <circle cx="8" cy="8" r="5.5" /><path d="M12.5 12.5L16 16" />
 		        </svg>
-		        <input class="h-9 w-56 rounded-full border border-line bg-white pl-9 pr-3 text-13 outline-none transition placeholder:text-faint focus:border-brand" placeholder="여행·관광지 검색" />
+		        <input class="h-9 w-56 rounded-full border border-line bg-white pl-9 pr-3 text-13 outline-none transition placeholder:text-faint focus:border-brand" placeholder="여행·관광지 검색" id="searchInput"/>
 		    </div>
 		    <select class="ml-2 h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none">
 		        <option>최신순</option>
@@ -148,121 +158,127 @@ body {
 	</footer>
 
 	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-	<script>
-		let currentPage = 1; 
-		let currentRegion = "";
-		
-		window.onload = () => {
-		loadTravelList(currentPage);
-		bindRegionTabEvents();
-		};
-		
-		function bindRegionTabEvents() {
-		    const tabs = document.querySelectorAll('.region-tab');
-		    tabs.forEach(tab => {
-		        tab.addEventListener('click', function() {
+<script>
+	let currentPage = 1;
+	let currentRegion = "";
+	let currentKeyword = "";  
 
-		            tabs.forEach(t => {
-		                t.className = "region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink";
-		            });
-		            
-		            this.className = "region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-ink bg-ink px-4 text-13 font-semibold text-white";
-		            
-		            currentRegion = this.getAttribute('data-region');
-		            
-		            currentPage = 1;
-		            loadTravelList(currentPage);
-		        });
-		    });
-		}
+	window.onload = () => {
+	    loadTravelList(currentPage);
+	    bindRegionTabEvents();
+	    bindSearchEvent();  
+	};
 
-		function loadTravelList(page) {
-			$.ajax({
-			 url: '/selectReviewList', 
-			 type: 'GET',
-			 data: { 
-	             currentPage: page,
-	             region: currentRegion 
-	         },
-			 dataType: 'json',
-			 success: function(response) { 
+	function bindRegionTabEvents() {
+	    const tabs = document.querySelectorAll('.region-tab');
+	    tabs.forEach(tab => {
+	        tab.addEventListener('click', function() {
+	            tabs.forEach(t => {
+	                t.className = "region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink";
+	            });
+	            this.className = "region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-ink bg-ink px-4 text-13 font-semibold text-white";
 
-			   const data = response.list; 
-			   const pi = response.pi;     
-			
-			   const container = document.getElementById('reviewContainer');
-			   container.innerHTML = ''; 
+	            currentRegion = this.getAttribute('data-region');
+	            currentPage = 1;
+	            loadTravelList(currentPage);
+	        });
+	    });
+	}
 
-			   if(!data || data.length === 0) {
-			     container.innerHTML = '<p class="col-span-3 py-12 text-center text-muted">등록된 여행 후기가 없습니다.</p>';
-			     document.getElementById('paginationContainer').innerHTML = ''; // 번호판 비우기
-			     return;
-			   }
+	// 검색 이벤트 바인딩 함수 추가
+	function bindSearchEvent() {
+    const searchInput = document.getElementById('searchInput');
 
-			   data.forEach(travel => {
-			     const displayDate = travel.modifyDate ? travel.modifyDate : travel.createDate;
-			     
-			     // 작성해주신 카드 UI 그대로 복사본 유지
-			     const cardHtml = `
-			       <a href="/review/detail?no=${travel.travelNo}" class="flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card">
-			         
-			         <div class="flex flex-1 flex-col gap-2 p-4">
-			           <div class="flex items-center gap-1.5 text-xs font-bold text-brand">
-			             <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
-			               <path d="M8 14s5-4.5 5-8A5 5 0 0 0 3 6c0 3.5 5 8 5 8Z"/><circle cx="8" cy="6" r="1.6"/>
-			             </svg>
-			             No. ${travel.travelNo}
-			           </div>
-			           <div class="text-lg font-bold tracking-tight text-ink line-clamp-1">${travel.travelTitle}</div>
-			           <div class="text-13 text-faint">등록일: ${displayDate}</div>
-			           <div class="mt-auto flex items-center gap-2 border-t border-line pt-3 text-13">
-			             <span class="flex h-6 w-6 items-center justify-center rounded-full bg-brand-soft text-11 font-bold text-brand-ink">M</span>
-			             <span class="font-semibold text-muted">회원 ${travel.memberNo} 번</span>
-			             <span class="ml-auto text-muted text-xs">조회수 <span class="font-bold text-ink">${travel.count}</span></span>
-			           </div>
-			         </div>
-			       </a>
-			     `;
-			     container.insertAdjacentHTML('beforeend', cardHtml);
-			   });
-			   drawPagination(pi);
-			 },
-			 error: function(err) {
-			   console.error("데이터 로딩 실패", err);
-			 }
-			});
-			}
-			
+    // 엔터 입력 시 검색
+    searchInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            currentKeyword = this.value.trim();
+            currentPage = 1;
+            loadTravelList(currentPage);
+        	}
+    	});
+	}
 
-			function drawPagination(pi) {
-			const pContainer = document.getElementById('paginationContainer');
-			if(!pContainer) return; 
-			
-			pContainer.innerHTML = '';
-			let html = '';
-			
-			// [이전] 버튼 생성
-			if(pi.currentPage > 1) {
-			 html += `<button onclick="loadTravelList(${pi.currentPage - 1})" class="px-3 py-1 border rounded hover:bg-slate-100">이전</button>`;
-			}
-			
-			// 1, 2, 3... 페이지 번호 생성
-			for(let i = pi.startPage; i <= pi.endPage; i++) {
-			 if(i === pi.currentPage) {
-			   html += `<button class="px-3 py-1 border rounded bg-brand text-white font-bold">${i}</button>`;
-			 } else {
-			   html += `<button onclick="loadTravelList(${i})" class="px-3 py-1 border rounded hover:bg-slate-100">${i}</button>`;
-			 }
-			}
-			
-			// [다음] 버튼 생성
-			if(pi.currentPage < pi.maxPage) {
-			 html += `<button onclick="loadTravelList(${pi.currentPage + 1})" class="px-3 py-1 border rounded hover:bg-slate-100">다음</button>`;
-			}
-			
-			pContainer.innerHTML = html;
-			}
-		</script>
+	function loadTravelList(page) {
+	    $.ajax({
+	        url: '/selectReviewList',
+	        type: 'GET',
+	        data: {
+	            currentPage: page,
+	            region: currentRegion,
+	            keyword: currentKeyword 
+	        },
+	        dataType: 'json',
+	        success: function(response) {
+	            const data = response.list;
+	            const pi = response.pi;
+
+	            const container = document.getElementById('reviewContainer');
+	            container.innerHTML = '';
+
+	            if (!data || data.length === 0) {
+	                container.innerHTML = '<p class="col-span-3 py-12 text-center text-muted">등록된 여행 후기가 없습니다.</p>';
+	                document.getElementById('paginationContainer').innerHTML = '';
+	                return;
+	            }
+
+	            data.forEach(travel => {
+	                const displayDate = travel.modifyDate ? travel.modifyDate : travel.createDate;
+	                const cardHtml = `
+	                  <a href="/review/detail?no=${travel.travelNo}" class="flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card">
+	                    <div class="flex flex-1 flex-col gap-2 p-4">
+	                      <div class="flex items-center gap-1.5 text-xs font-bold text-brand">
+	                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+	                          <path d="M8 14s5-4.5 5-8A5 5 0 0 0 3 6c0 3.5 5 8 5 8Z"/><circle cx="8" cy="6" r="1.6"/>
+	                        </svg>
+	                        No. ${travel.travelNo}
+	                      </div>
+	                      <div class="text-lg font-bold tracking-tight text-ink line-clamp-1">${travel.travelTitle}</div>
+	                      <div class="text-13 text-faint">등록일: ${displayDate}</div>
+	                      <div class="mt-auto flex items-center gap-2 border-t border-line pt-3 text-13">
+	                        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-brand-soft text-11 font-bold text-brand-ink">M</span>
+	                        <span class="font-semibold text-muted">회원 ${travel.memberNo} 번</span>
+	                        <span class="ml-auto text-muted text-xs">조회수 <span class="font-bold text-ink">${travel.count}</span></span>
+	                      </div>
+	                    </div>
+	                  </a>
+	                `;
+	                container.insertAdjacentHTML('beforeend', cardHtml);
+	            });
+	            drawPagination(pi);
+	        },
+	        error: function(err) {
+	            console.error("데이터 로딩 실패", err);
+	        }
+	    });
+	}
+
+	function drawPagination(pi) {
+	    const pContainer = document.getElementById('paginationContainer');
+	    if (!pContainer) return;
+
+	    pContainer.innerHTML = '';
+	    let html = '';
+
+	    if (pi.currentPage > 1) {
+	        html += `<button onclick="loadTravelList(${pi.currentPage - 1})" class="px-3 py-1 border rounded hover:bg-slate-100">이전</button>`;
+	    }
+
+	    for (let i = pi.startPage; i <= pi.endPage; i++) {
+	        if (i === pi.currentPage) {
+	            html += `<button class="px-3 py-1 border rounded bg-brand text-white font-bold">${i}</button>`;
+	        } else {
+	            html += `<button onclick="loadTravelList(${i})" class="px-3 py-1 border rounded hover:bg-slate-100">${i}</button>`;
+	        }
+	    }
+
+	    if (pi.currentPage < pi.maxPage) {
+	        html += `<button onclick="loadTravelList(${pi.currentPage + 1})" class="px-3 py-1 border rounded hover:bg-slate-100">다음</button>`;
+	    }
+
+	    pContainer.innerHTML = html;
+	}
+</script>
 
 </body>
 </html>
