@@ -24,6 +24,8 @@ import kh.ddeonabom.member.service.EmailService;
 import kh.ddeonabom.member.service.MemberService;
 import kh.ddeonabom.qList.model.vo.QList;
 import kh.ddeonabom.qList.service.QListService;
+import kh.ddeonabom.review.model.service.ReviewService;
+import kh.ddeonabom.review.model.vo.Review;
 import lombok.RequiredArgsConstructor;
 
 
@@ -36,6 +38,7 @@ public class MemberController {
 	private final BCryptPasswordEncoder bcrypt;
 	private final EmailService emailService;
 	private final QListService qListService;
+	private final ReviewService rListService;
 	
 	
 	
@@ -496,7 +499,11 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
 	        //  실제 DB에서 리스트 조회
 	        ArrayList<QList> list = qListService.selectMyBoardList(map);
 	        
+	        ArrayList<Review> rlist = rListService.selectMyReviewList(loginUser.getMemberNo());
+	        
+	        
 	        model.addAttribute("postlist", list);
+	        model.addAttribute("reviewlist", rlist);
 	        model.addAttribute("pi", pi);
 	        model.addAttribute("category", category); // 뷰에서 버튼 활성화용
 	        model.addAttribute("tab", "posts");
