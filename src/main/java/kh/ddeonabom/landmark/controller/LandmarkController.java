@@ -35,6 +35,7 @@ public class LandmarkController {
 		model.addAttribute("list", list).addAttribute("pi", pi);
 		return "views/landmark/list";
 		
+	
 	} 
 	
 	

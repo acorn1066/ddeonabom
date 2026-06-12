@@ -12,9 +12,6 @@ import kh.ddeonabom.landmark.model.vo.Landmark;
 @Mapper
 public interface LandmarkMapper {
 
-
-	
-	
 	// 관광지 개수 가져오기
 	int getListCount();
 	
