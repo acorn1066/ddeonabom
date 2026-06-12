@@ -58,6 +58,20 @@ body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing
           <label class="text-13 font-semibold">여행 제목</label>
           <input id="travelTitle" class="h-13 rounded-lg border border-line bg-white px-4 text-17 font-semibold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft" placeholder="예) 제주 동쪽 3박 4일" />
         </div>
+        <div class="flex flex-col gap-2">
+		  <label class="text-13 font-semibold">지역</label>
+		  <select name="region" id="region"
+		    class="h-12 rounded-lg border border-line bg-white px-4 text-sm outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft">
+		    <option value="">지역 선택</option>
+		    <option value="제주">제주</option>
+		    <option value="수도권">수도권</option>
+		    <option value="강원">강원</option>
+		    <option value="충청">충청</option>
+		    <option value="경상">경상</option>
+		    <option value="전라">전라</option>
+		    
+		  </select>
+		</div>
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-2">
             <label class="text-13 font-semibold">여행 시작일</label>
@@ -96,26 +110,18 @@ body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing
 
     <!-- 2. 관광지별 후기 -->
     <div class="mb-5 rounded-xl border border-line bg-white p-6 shadow-soft">
-      <h2 class="mb-5 flex items-center gap-2 text-base font-bold">
-        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-13 font-bold text-white">2</span>
-        관광지별 후기
-      </h2>
-      <div id="spotList" class="flex flex-col gap-4">
-        <!-- 카드는 JS로 동적 생성 -->
-        
-        <p id="spotEmpty" class="py-6 text-center text-sm text-muted">지도에서 장소를 추가하거나 아래 버튼을 눌러 직접 입력하세요.</p>
-      </div>
-      <button type="button" id="addSpotBtn"
-        class="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line bg-sunk text-sm font-bold text-muted transition hover:border-brand hover:bg-brand-soft hover:text-brand">
-        <input
-			  type="file"
-			  name="upfiles"
-			  accept="image/*"
-			  class="hidden"
-			  multiple />
-        <span class="text-lg">＋</span> 관광지 직접 추가
-      </button>
-    </div>
+	  <h2 class="mb-5 flex items-center gap-2 text-base font-bold">
+	    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-13 font-bold text-white">2</span>
+	    관광지별 후기
+	  </h2>
+	  <div id="spotList" class="flex flex-col gap-4">
+	    <p id="spotEmpty" class="py-6 text-center text-sm text-muted">지도에서 장소를 추가하거나 아래 버튼을 눌러 직접 입력하세요.</p>
+	  </div>
+	  <button type="button" id="addSpotBtn"
+	    class="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line bg-sunk text-sm font-bold text-muted transition hover:border-brand hover:bg-brand-soft hover:text-brand">
+	    <span class="text-lg">＋</span> 관광지 직접 추가
+	  </button>
+	</div>
 
     <!-- 3. 공개 설정 -->
     <div class="mb-5 rounded-xl border border-line bg-white p-6 shadow-soft">
@@ -124,9 +130,15 @@ body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing
         공개 설정
       </h2>
       <div class="flex flex-col gap-3">
-        <label class="flex items-center gap-2.5 text-sm text-muted"><input type="radio" name="vis" class="accent-brand" checked /><span><b class="text-ink">전체 공개</b> · 누구나 볼 수 있고 관광지 상세에 후기가 노출됩니다</span></label>
-        <label class="flex items-center gap-2.5 text-sm text-muted"><input type="radio" name="vis" class="accent-brand" /><span><b class="text-ink">회원 공개</b> · 로그인한 떠나봄 회원만 볼 수 있습니다</span></label>
-      </div>
+	    <label class="flex items-center gap-2.5 text-sm text-muted">
+	        <input type="radio" name="visibility" value="PUBLIC" class="accent-brand" checked />
+	        <span><b class="text-ink">전체 공개</b> · 누구나 볼 수 있고 관광지 상세에 후기가 노출됩니다</span>
+	    </label>
+	    <label class="flex items-center gap-2.5 text-sm text-muted">
+	        <input type="radio" name="visibility" value="MEMBER" class="accent-brand" />
+	        <span><b class="text-ink">회원 공개</b> · 로그인한 떠나봄 회원만 볼 수 있습니다</span>
+	    </label>
+	  </div>
     </div>
 
     <div class="flex justify-end gap-2">
@@ -331,6 +343,7 @@ function addSpotCard(name = '', address = '', index) {
 
   const list = document.getElementById('spotList');
   const num  = index ?? list.querySelectorAll('.spot-card').length + 1;
+  const idx  = num - 1; // 0부터 시작하는 인덱스
 
   const div = document.createElement('div');
   div.className = 'spot-card rounded-xl border border-line p-5';
@@ -338,6 +351,7 @@ function addSpotCard(name = '', address = '', index) {
     <div class="mb-4 flex items-center gap-3">
       <span class="spot-num flex h-7 w-7 flex-none items-center justify-center rounded-full bg-brand-soft text-13 font-bold text-brand-ink">${num}</span>
       <input
+        name="subList[${idx}].spotName"
         class="spot-name-input flex-1 rounded-lg border border-line bg-white px-3 py-2 text-base font-bold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft"
         placeholder="관광지 이름을 입력하세요"
         value="${name}"
@@ -354,15 +368,19 @@ function addSpotCard(name = '', address = '', index) {
         <span class="star-btn select-none cursor-pointer" data-val="5">★</span>
       </div>
       <span class="rating-label text-13 font-semibold text-muted">별점을 선택해주세요</span>
-      <input type="hidden" class="rating-value" value="0" />
+      <input type="hidden" class="rating-value" name="subList[${idx}].rating" value="0" />
     </div>
-    <textarea class="min-h-24 w-full rounded-lg border border-line bg-white p-3 text-sm leading-relaxed outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft" placeholder="관광지에 대한 후기를 작성해주세요."></textarea>
-    <div class="mt-3 flex gap-2">
+    <textarea
+      name="subList[${idx}].content"
+      class="min-h-24 w-full rounded-lg border border-line bg-white p-3 text-sm leading-relaxed outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft"
+      placeholder="관광지에 대한 후기를 작성해주세요."></textarea>
+      <div class="mt-3 flex flex-col gap-2">
       <label class="flex h-18 w-18 flex-col items-center justify-center gap-0.5 rounded-lg border border-dashed border-line bg-sunk text-faint transition hover:border-brand hover:text-brand cursor-pointer">
         <span class="text-lg">＋</span>
         <span class="text-xs">사진</span>
-        <input type="file" accept="image/*" class="hidden" multiple />
+        <input type="file" name="subList[${idx}].imageFiles" accept="image/*" class="hidden" multiple />
       </label>
+      <div class="file-name-list text-xs text-muted flex flex-col gap-1"></div>
     </div>
   `;
 
@@ -376,17 +394,30 @@ function addSpotCard(name = '', address = '', index) {
       updatePolyline();
     }
     div.remove();
-    reindexCards();
-    if (!list.querySelector('.spot-card')) {
-      const empty = document.createElement('p');
-      empty.id = 'spotEmpty';
-      empty.className = 'py-6 text-center text-sm text-muted';
-      empty.textContent = '지도에서 장소를 추가하거나 아래 버튼을 눌러 직접 입력하세요.';
-      list.prepend(empty);
-    }
+    function reindexCards() {
+    	  document.querySelectorAll('.spot-card').forEach((c, i) => {
+    	    c.querySelector('.spot-num').textContent = i + 1;
+    	    // name 속성 재정렬
+    	    c.querySelector('.spot-name-input').name = `subList[${i}].spotName`;
+    	    c.querySelector('.rating-value').name = `subList[${i}].rating`;
+    	    c.querySelector('textarea').name = `subList[${i}].content`;
+    	    c.querySelector('input[type="file"]').name = `subList[${i}].imageFiles`;
+    	  });
+    	}
   });
 
   initStars(div);
+	//파일명 표시
+  const fileInput = div.querySelector('input[type="file"]');
+  const fileNameList = div.querySelector('.file-name-list');
+  fileInput.addEventListener('change', function() {
+      fileNameList.innerHTML = '';
+      Array.from(this.files).forEach(file => {
+          const p = document.createElement('p');
+          p.textContent = '📎 ' + file.name;
+          fileNameList.appendChild(p);
+      });
+  });
   list.appendChild(div);
   div.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }

@@ -7,14 +7,14 @@
 		<section class="flex items-start justify-between gap-5 border-b border-line py-8">
 			<div>
 				<div class="flex items-center gap-2">
-					<span class="inline-flex h-7.5 items-center rounded-full border border-dashed border-line bg-white px-3 text-13 font-medium text-faint">
+					<span id="region_badge" class="inline-flex h-7.5 items-center rounded-full border border-dashed border-line bg-white px-3 text-13 font-medium text-faint">
 						지역 미정
 					</span>
 				</div>
 				<div class="my-2 flex items-center gap-2">
 				    <h1 class="text-3xl font-extrabold tracking-tight text-faint" id="schedule_title">제목 없는 일정</h1>
 				    <input type="text" id="schedule_title_input" class="hidden text-3xl font-extrabold tracking-tight text-faint bg-transparent border-b border-faint outline-none"
-				           value="제목 없는 일정" onblur="changeTitle();" />
+				           value="제목 없는 일정" onblur="changeTitle();" onkeydown="if(event.key==='Enter'){ event.preventDefault(); this.blur(); }"/>
 				    <svg class="text-faint cursor-pointer" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" onclick="changeTitle();">
 				        <path d="M11 2l3 3-8 8H3v-3z" />
 				    </svg>
@@ -58,7 +58,7 @@
 					</svg>
 					공유 게시판에 게시
 				</button>
-				<button class="inline-flex h-11 items-center rounded-lg bg-brand px-5 text-sm font-semibold text-white transition hover:bg-brand-ink">저장</button>
+				<button onclick="saveSchedule()" class="inline-flex h-11 items-center rounded-lg bg-brand px-5 text-sm font-semibold text-white transition hover:bg-brand-ink">저장</button>
 			</div>
 		</section>
 	</div>
@@ -161,7 +161,8 @@ const changeTitle = () => {
         title.classList.remove('hidden');
         input.classList.add('hidden');
     } else {
-        input.value = title.textContent;
+        const current = title.textContent.trim();
+        input.value = (current === '제목 없는 일정') ? '' : current;
         title.classList.add('hidden');
         input.classList.remove('hidden');
         input.focus();
@@ -209,6 +210,7 @@ const selectDay = (div, date) => {
     div.querySelector('span').className = 'text-xs text-white/75 tabular-nums';
     
     updateEmptyState();
+    updateRegionBadge();
 }
 
 const renderDayTabs = () => {
@@ -253,6 +255,11 @@ const renderDayTabs = () => {
         }
     }
 
+    if (!selectedDate) {
+        selectedDate = new Date(start);
+        activeIndex = 0;
+    }
+
     for (let i = 0; i < dayCount; i++) {
         const date = new Date(start);
         date.setDate(start.getDate() + i);
@@ -285,6 +292,8 @@ const renderDayTabs = () => {
         prev.classList.add('hidden');
         next.classList.add('hidden');
     }
+    
+    updateEmptyState();
 }
 
 const placesByDate = {};
@@ -323,6 +332,7 @@ const updateEmptyState=()=>{
         noDate.classList.remove('hidden');
         emptyState.classList.add('hidden');
         placeList.classList.add('hidden');
+        updateRegionBadge();
         return;
     }
 
@@ -341,6 +351,8 @@ const updateEmptyState=()=>{
         placeList.classList.remove('hidden');
         renderPlaceList(places, key);
     }
+    
+    updateRegionBadge();
 }
 
 const renderPlaceList = (places, dateKey) => {
@@ -377,27 +389,47 @@ const renderPlaceList = (places, dateKey) => {
             </div>
             <div class="flex-1 min-w-0 rounded-xl border border-line bg-white shadow-soft">
                 <div class="flex items-center gap-3 px-4 py-3">
-                    <div class="h-13 w-13 flex-none overflow-hidden rounded-lg border border-line bg-sunk">
-                        ${place.firstimage ? `<img src="${place.firstimage}" class="h-full w-full object-cover" />` : ''}
-                    </div>
+                    <div class="h-13 w-13 flex-none overflow-hidden rounded-lg border border-line bg-sunk thumb"></div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-15 font-bold truncate">${place.title}</div>
-                        <div class="mt-0.5 text-xs text-muted truncate">${place.addr1 || ''}</div>
+                        <div class="text-15 font-bold truncate title"></div>
+                        <div class="mt-0.5 text-xs text-muted truncate addr"></div>
                     </div>
-                    <div class="flex flex-none flex-col gap-0.5">
-                        <button onclick="movePlaceUp('${dateKey}', ${idx})" class="flex h-5 w-6 items-center justify-center rounded border border-line bg-white text-muted transition hover:border-brand hover:text-brand" ${idx === 0 ? 'disabled' : ''}>
-                            <svg viewBox="0 0 16 16" class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 11.5V5M5 8l3-3 3 3"/></svg>
-                        </button>
-                        <button onclick="movePlaceDown('${dateKey}', ${idx})" class="flex h-5 w-6 items-center justify-center rounded border border-line bg-white text-muted transition hover:border-brand hover:text-brand" ${idx === places.length - 1 ? 'disabled' : ''}>
-                            <svg viewBox="0 0 16 16" class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 4.5V11M5 8l3 3 3-3"/></svg>
-                        </button>
-                        <button onclick="removePlace('${dateKey}', ${idx})" class="flex h-5 w-6 items-center justify-center rounded border border-line bg-white text-muted transition hover:border-err hover:text-err">
-                            <svg viewBox="0 0 16 16" class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg>
-                        </button>
-                    </div>
+                    <div class="flex flex-none flex-col gap-0.5 actions"></div>
                 </div>
             </div>
         `;
+
+        row.querySelector('.title').textContent = place.title;
+        row.querySelector('.addr').textContent = place.addr1 || '';
+
+        if (place.firstimage) {
+            const img = document.createElement('img');
+            img.src = place.firstimage;
+            img.className = 'h-full w-full object-cover';
+            row.querySelector('.thumb').appendChild(img);
+        }
+
+        const actions = row.querySelector('.actions');
+
+        const upBtn = document.createElement('button');
+        upBtn.className = 'flex h-5 w-6 items-center justify-center rounded border border-line bg-white text-muted transition hover:border-brand hover:text-brand';
+        upBtn.innerHTML = '<svg viewBox="0 0 16 16" class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 11.5V5M5 8l3-3 3 3"/></svg>';
+        upBtn.disabled = idx === 0;
+        upBtn.addEventListener('click', () => movePlaceUp(dateKey, idx));
+
+        const downBtn = document.createElement('button');
+        downBtn.className = 'flex h-5 w-6 items-center justify-center rounded border border-line bg-white text-muted transition hover:border-brand hover:text-brand';
+        downBtn.innerHTML = '<svg viewBox="0 0 16 16" class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 4.5V11M5 8l3 3 3-3"/></svg>';
+        downBtn.disabled = idx === places.length - 1;
+        downBtn.addEventListener('click', () => movePlaceDown(dateKey, idx));
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'flex h-5 w-6 items-center justify-center rounded border border-line bg-white text-muted transition hover:border-err hover:text-err';
+        delBtn.innerHTML = '<svg viewBox="0 0 16 16" class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg>';
+        delBtn.addEventListener('click', () => removePlace(dateKey, idx));
+
+        actions.append(upBtn, downBtn, delBtn);
+
         timeline.appendChild(row);
     });
 
@@ -446,6 +478,115 @@ document.getElementById('day_tabs').addEventListener('wheel', (e) => {
     e.preventDefault();
     document.getElementById('day_tabs').scrollLeft += e.deltaY;
 });
+
+
+const REGION_MAP = {
+	    '서울': '서울', '부산': '부산', '대구': '대구', '인천': '인천',
+	    '광주': '광주', '대전': '대전', '울산': '울산', '세종': '세종',
+	    '경기': '경기', '강원': '강원', '제주': '제주',
+	    '충청북도': '충북', '충청남도': '충남',
+	    '전라북도': '전북', '전라남도': '전남',
+	    '경상북도': '경북', '경상남도': '경남',
+	    '충북': '충북', '충남': '충남', '전북': '전북', '전남': '전남',
+	    '경북': '경북', '경남': '경남', '강원특별자치도': '강원',
+	    '제주특별자치도': '제주', '전북특별자치도': '전북'
+};
+
+const extractRegion = (addr1) => {
+    if (!addr1) return null;
+    const head = addr1.trim().split(' ')[0];
+
+    const keys = Object.keys(REGION_MAP).sort((a, b) => b.length - a.length);
+    for (const key of keys) {
+        if (head.startsWith(key)) return REGION_MAP[key];
+    }
+    return null;
+};
+
+const updateRegionBadge = () => {
+    const badge = document.getElementById('region_badge');
+
+    const MISO = 'inline-flex h-7.5 items-center rounded-full border border-dashed border-line bg-white px-3 text-13 font-medium text-faint';
+    const DONE = 'inline-flex h-7.5 items-center rounded-full border border-brand bg-brand-soft px-3 text-13 font-semibold text-brand-ink';
+
+    const regions = new Set();
+    Object.values(placesByDate).forEach(places => {
+        places.forEach(p => {
+            const r = extractRegion(p.addr1);
+            if (r) regions.add(r);
+        });
+    });
+
+    if (regions.size === 0) {
+        badge.textContent = '지역 미정';
+        badge.className = MISO;
+    } else if (regions.size === 1) {
+        badge.textContent = [...regions][0];
+        badge.className = DONE;
+    } else {
+        badge.textContent = `${[...regions][0]} 외 ${regions.size - 1}곳`;
+        badge.className = DONE;
+    }
+};
+
+
+
+
+
+////////////저장
+
+const saveSchedule = async () => {
+    const title = document.getElementById('schedule_title').textContent.trim();
+    const startDate = document.getElementById('start_date_input').value;
+    const endDate = document.getElementById('end_date_input').value;
+
+    if (!startDate || !endDate) {
+        showToast('여행 날짜를 선택해 주세요.', false);
+        return;
+    }
+
+    const places = [];
+    Object.keys(placesByDate).forEach(dateKey => {
+        placesByDate[dateKey].forEach((place, idx) => {
+            places.push({
+                scheduleSubDate: dateKey,
+                scheduleSubSeq: idx + 1,
+                contentId: place.contentId
+            });
+        });
+    });
+
+    if (places.length === 0) {
+        showToast('장소를 한 곳 이상 담아 주세요.', false);
+        return;
+    }
+
+    const payload = {
+        scheduleTitle: title,
+        scheduleStartdate: startDate,
+        scheduleEnddate: endDate,
+        places: places
+    };
+
+    try {
+    	console.log(payload);
+        const res = await fetch('/schedule/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            showToast('일정이 저장되었어요.');
+            location.href = '/schedule/list';
+        } else {
+            showToast(data.message || '저장에 실패했어요.', false);
+        }
+    } catch (e) {
+        showToast('저장 중 오류가 발생했어요.', false);
+    }
+};
 
 </script>
 

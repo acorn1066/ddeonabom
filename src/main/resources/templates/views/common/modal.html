@@ -3,12 +3,10 @@
 <body>
 
 	<th:block th:fragment="modal">
-
 		<!-- 딤 배경 -->
-		<div
-			class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-5 hidden"
+		<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-5 hidden"
 			id="dim-background" onclick="if(event.target===this) closeModal();">
-
+			
 			<!-- info 모달 -->
 			<div role="dialog" aria-modal="true" id="modal-info"
 				class="hidden w-96 max-w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
@@ -33,7 +31,7 @@
 						onclick="closeModal()">확인</button>
 				</div>
 			</div>
-
+			
 			<!-- confirm 모달 -->
 			<div role="dialog" aria-modal="true" id="modal-confirm"
 				class="hidden w-96 max-w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
@@ -64,7 +62,8 @@
 						id="confirm-ok">확인</button>
 				</div>
 			</div>
-
+			
+			
 			<!-- danger 모달 -->
 			<div role="dialog" aria-modal="true" id="modal-danger"
 				class="hidden w-96 max-w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
@@ -94,7 +93,6 @@
 						id="danger-ok">삭제</button>
 				</div>
 			</div>
-
 		</div>
 
 		<!-- 장소 추가 모달 -->
@@ -189,7 +187,7 @@
 
 		<!-- 토스트 컨테이너 -->
 		<div id="toast-container"
-			class="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex flex-col items-center gap-2"></div>
+			class="pointer-events-none fixed inset-x-0 bottom-6 z-[9999] flex flex-col items-center gap-2"></div>
 
 <style>
 	@keyframes modalIn {from { opacity:0;
@@ -245,24 +243,33 @@
     });
 
     /* ── 토스트 ── */
-    function showToast(message, showIcon = true, duration = 3000) {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      toast.className = 'pointer-events-auto inline-flex items-center gap-2.5 rounded-full bg-slate-900 py-3 px-4 text-sm font-semibold text-white shadow-lg transition-all duration-300 opacity-0 translate-y-2';
-      toast.innerHTML = showIcon
+   function showToast(message, showIcon = true, duration = 3000) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'pointer-events-auto inline-flex items-center gap-2.5 rounded-full bg-slate-900 py-3 px-4 text-sm font-semibold text-white shadow-lg';
+    toast.style.transition = 'opacity .3s, transform .3s';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(8px)';
+    toast.innerHTML = showIcon
         ? `<span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-600">
              <svg viewBox="0 0 14 14" fill="none" class="h-3 w-3">
                <path d="M3 7.2 5.8 10 11 4.2" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
              </svg>
            </span><span>${message}</span>`
         : `<span>${message}</span>`;
-      container.appendChild(toast);
-      requestAnimationFrame(() => toast.classList.remove('opacity-0', 'translate-y-2'));
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-2');
+    container.appendChild(toast);
+
+    requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+    });
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
         toast.addEventListener('transitionend', () => toast.remove(), { once: true });
-      }, duration);
-    }
+    }, duration);
+}
 
     /* ── 장소 추가 모달 ── */
 (function () {
@@ -345,7 +352,7 @@
         body.innerHTML = '<div class="px-5 py-12 text-center text-13 text-faint">' + msg + '</div>';
 	}
 
-	async function renderWish() {
+	async function renderWish(clearSel) {
 		if (clearSel) {
 	        sel.clear();
 	        selCount.textContent = '0';
@@ -389,7 +396,7 @@
 	    body.scrollTop = 0;
 	}
 
-	function render(clearSel = false) { tab === 'wish' ? renderWish() : renderAll(clearSel); }
+	function render(clearSel = false) { tab === 'wish' ? renderWish(clearSel) : renderAll(clearSel); }
 
 	function switchTab(t) {
 		sel.clear();
@@ -427,6 +434,11 @@
 	        return;
 	    }
 
+	    if (!selectedDate) {
+	        showToast('날짜 탭을 먼저 선택해 주세요.', false);
+	        return;
+	    }
+	    
 	    sel.forEach((place, key) => {
 	        addPlaceToDate(place);
 	    });

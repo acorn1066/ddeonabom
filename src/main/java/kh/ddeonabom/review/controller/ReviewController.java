@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
+import kh.ddeonabom.member.model.vo.Member;
 import kh.ddeonabom.review.model.service.ReviewService;
 import kh.ddeonabom.review.model.vo.Image;
 import kh.ddeonabom.review.model.vo.Review;
@@ -41,14 +43,20 @@ public class ReviewController {
 	
 	@GetMapping("/selectReviewList")
     @ResponseBody 
-    public Map<String, Object> selectReviewList(@RequestParam(value="currentPage", defaultValue="1") int currentPage) {
+    public Map<String, Object> selectReviewList(@RequestParam(value="currentPage", defaultValue="1") int currentPage,
+    											@RequestParam(value="region", defaultValue="") String region,
+            									@RequestParam(value="keyword", defaultValue="") String keyword,
+            									HttpSession session) {
         
-        int listCount = reviewService.selectListCount(); 
+		Member loginUser = (Member) session.getAttribute("loginUser");
+	    Integer loginUserNo = (loginUser != null) ? loginUser.getMemberNo() : null;
+	    
+        int listCount = reviewService.selectListCount(keyword, region, loginUserNo); 
         int pageLimit = 5;   
         int boardLimit = 9;  
 
         PageInfo pi = Pagination.getPageInfo(currentPage, listCount, pageLimit, boardLimit);
-        ArrayList<Review> list = reviewService.selectReviewList(pi);
+        ArrayList<Review> list = reviewService.selectReviewList(pi, keyword, region, loginUserNo);
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("list", list);
         responseData.put("pi", pi);
@@ -57,8 +65,12 @@ public class ReviewController {
     }
 	
 	@GetMapping("/reviews/write")
-	public String reviewWrite(Model model) {
-		 model.addAttribute("kakaoApiKey", "77218df82558088a0b690733061ba6f2");
+	public String reviewWrite(Model model, HttpSession session) {
+		Member loginUser = (Member) session.getAttribute("loginUser");
+		if (loginUser == null) {
+	        return "redirect:/member/login?targetUrl=/reviews/write";
+	    }
+		model.addAttribute("kakaoApiKey", "77218df82558088a0b690733061ba6f2");
 		 
 	    return "views/review/write"; 
 	}
@@ -113,6 +125,8 @@ public class ReviewController {
 	        return "redirect:/reviews/write";
 	    }
 	}
+	
+	
 	
 	
 	
