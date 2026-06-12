@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -21,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 public class AdminController {
 	
-	 private final AdminService AdminService;
+	 private final AdminService aService;
 	
 	@GetMapping("dash")
 		public String adminDash() {
@@ -34,16 +36,16 @@ public class AdminController {
 
 	    Map<String, Object> map = new HashMap<>();
 
-	    map.put("memberCount", AdminService.selectMemberCount());
+	    map.put("memberCount", aService.selectMemberCount());
 
 	    map.put("boardCount",
-	            AdminService.selectQlistCount()
-	          + AdminService.selectTravelCount()
-	          + AdminService.selectScheduleCount());
+	            aService.selectQlistCount()
+	          + aService.selectTravelCount()
+	          + aService.selectScheduleCount());
 
-	    map.put("replyCount", AdminService.selectReplyCount());
+	    map.put("replyCount", aService.selectReplyCount());
 
-	    map.put("reportCount", AdminService.selectReportCount());
+	    map.put("reportCount", aService.selectReportCount());
 
 	    return map;
 	}
@@ -59,8 +61,20 @@ public class AdminController {
 	@GetMapping("/members")
 	public ArrayList<Member> selectMembers(HttpSession session) {
 		String id = ((Member)session.getAttribute("loginUser")).getId();
-	    return AdminService.selectMembers(id);
+	    return aService.selectMembers(id);
 	}
+	
+	@ResponseBody
+	@PutMapping("members")
+	public int updateMemberStatus(@RequestBody HashMap<String, String> map) {
+
+	    map.put("col", "status");
+
+	    return aService.updateMemberStatus(map);
+	}
+	
+	
+	
 	
 //	@PostMapping("/member/status")
 //	public ResponseEntity<?> updateMemberStatus(
@@ -76,7 +90,7 @@ public class AdminController {
 	@ResponseBody
 	@GetMapping("/notice")
 	public ArrayList<AdminNotice> selectNoticeList() {
-	    return AdminService.selectNoticeList();
+	    return aService.selectNoticeList();
 	}
 	
 	

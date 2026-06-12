@@ -1,6 +1,7 @@
 package kh.ddeonabom.admin.model.mapper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -25,8 +26,7 @@ public interface AdminMapper {
 
 	ArrayList<Member> selectMembers(String id);
 
-	int updateMemberStatus(@Param("memberNo") int memberNo, @Param("status") String status
-	);
-
 	ArrayList<AdminNotice> selectNoticeList();
+
+	int updateMemberStatus(HashMap<String, String> map);
 }

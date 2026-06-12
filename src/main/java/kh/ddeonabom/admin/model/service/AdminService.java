@@ -1,6 +1,7 @@
 package kh.ddeonabom.admin.model.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.springframework.stereotype.Service;
 
@@ -43,12 +44,13 @@ public class AdminService {
 		return mapper.selectMembers(id);
 	}
 	
-	public int updateMemberStatus(int memberNo, String status) {
-	    return mapper.updateMemberStatus(memberNo, status);
-	}
 
 	public ArrayList<AdminNotice> selectNoticeList() {
 		return mapper.selectNoticeList();
+	}
+
+	public int updateMemberStatus(HashMap<String, String> map) {
+		return mapper.updateMemberStatus(map);
 	}
 
 	

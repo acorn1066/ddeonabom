@@ -51,10 +51,8 @@
 	    where id != #{id}
 	</select>
 	
-	<update id="updateMemberStatus">
-	    UPDATE MEMBER
-	    SET STATUS = #{status}
-	    WHERE MEMBER_NO = #{memberNo}
+	<update id="updateMemberStatus" parameterType="hashmap">
+	   update member set ${col} = #{val} where id = #{id}
 	</update>
 	
 	<select id="selectNoticeList" resultType="kh.ddeonabom.admin.model.vo.AdminNotice">
