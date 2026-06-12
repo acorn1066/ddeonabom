@@ -36,7 +36,11 @@ public class QListService {
 		return qMapper.selectMyBoardList(map);
 	}
 
-	
+	public int insertQList(QList q) {
+		return qMapper.insertQList(q);
+	}
 
-	
+	public int updateCount(int qNo) {
+		return qMapper.updateCount(qNo);
+	}
 }
