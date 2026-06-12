@@ -10,12 +10,45 @@ const Posts = () => {
         console.log(searchType, keyword);
     };
 
-    useEffect(() =>{
-        fetch('/react/admin/posts')
-        .then(res => res.json())
-        .then(data => setPosts(data))
-        .catch(err => console.log(err))
-    },[])
+    const changeStatus = (post, newStatus) => {
+
+        fetch("/react/admin/posts/status", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json;charset=UTF-8"
+            },
+            body: JSON.stringify({
+                postNo: post.postNo,
+                boardType: post.boardType,
+                status: newStatus
+            })
+        })
+            .then(() => {
+                setPosts(prev =>
+                    prev.map(p =>
+                        p.postNo === post.postNo
+                            ? { ...p, status: newStatus }
+                            : p
+                    )
+                );
+            })
+            .catch(console.error);
+    };
+
+    useEffect(() => {
+
+        const urlMap = {
+            공유: "/react/admin/posts/schedule",
+            후기: "/react/admin/posts/review",
+            질문: "/react/admin/posts/question"
+        };
+
+        fetch(urlMap[boardType])
+            .then(res => res.json())
+            .then(data => setPosts(data))
+            .catch(console.error);
+
+    }, [boardType]);
 
     return (
         <section className="flex-1 p-8">
@@ -39,11 +72,10 @@ const Posts = () => {
                         key={board}
                         onClick={() => setBoardType(board)}
                         className={`cursor-pointer rounded-lg border px-6 py-2 font-semibold shadow-sm transition-all
-                        ${
-                            boardType === board
+                        ${boardType === board
                                 ? "border-blue-600 bg-blue-600 text-white"
                                 : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-                        }`}
+                            }`}
                     >
                         {board}게시판
                     </button>
@@ -113,16 +145,43 @@ const Posts = () => {
                     </thead>
 
                     <tbody>
+                        {posts.length > 0 ? (
+                            posts.map((post, index) => (
 
-                        <tr>
-                            <td
-                                colSpan="4"
-                                className="p-16 text-center text-gray-400"
-                            >
-                                {boardType}게시판 데이터가 표시되는 영역
-                            </td>
-                        </tr>
+                                <tr key={index} className="border-b hover:bg-gray-50">
+                                    <td className="p-4 text-center">{post.title}</td>
+                                    <td className="p-4 text-center">{post.nickname}</td>
+                                    <td className="p-4 text-center">{post.createDate.split('T')[0]}</td>
+                                    <td className="p-4">
+                                        <div className="flex justify-center gap-2">
 
+                                            <button onClick={() =>
+                                                    post.status === "N"
+                                                        ? changeStatus(post, "Y")
+                                                        : null
+                                                }
+                                                className={`rounded-lg px-4 py-1 text-sm font-semibold border transition cursor-pointer ${post.status === "Y" ? "border-green-500 bg-green-500 text-white" : "border-gray-300 bg-white text-gray-500"}`}>게시
+                                            </button>
+
+                                            <button onClick={() =>
+                                                    post.status === "Y"
+                                                        ? changeStatus(post, "N")
+                                                        : null
+                                                }
+                                                className={`rounded-lg px-4 py-1 text-sm font-semibold border transition cursor-pointer ${post.status === "N" ? "border-red-500 bg-red-500 text-white" : "border-gray-300 bg-white text-gray-500"}`}>삭제
+                                            </button>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="4" className="p-16 text-center text-gray-400">
+                                    게시글이 없습니다.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
 
                 </table>

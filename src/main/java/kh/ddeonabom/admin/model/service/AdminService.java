@@ -1,11 +1,13 @@
 package kh.ddeonabom.admin.model.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.springframework.stereotype.Service;
 
 import kh.ddeonabom.admin.model.mapper.AdminMapper;
 import kh.ddeonabom.admin.model.vo.AdminNotice;
+import kh.ddeonabom.admin.model.vo.AdminPost;
 import kh.ddeonabom.member.model.vo.Member;
 import lombok.RequiredArgsConstructor;
 
@@ -43,13 +45,38 @@ public class AdminService {
 		return mapper.selectMembers(id);
 	}
 	
-	public int updateMemberStatus(int memberNo, String status) {
-	    return mapper.updateMemberStatus(memberNo, status);
-	}
 
 	public ArrayList<AdminNotice> selectNoticeList() {
 		return mapper.selectNoticeList();
 	}
 
+	public int updateMemberStatus(HashMap<String, String> map) {
+		return mapper.updateMemberStatus(map);
+	}
+
+	public ArrayList<AdminPost> selectSchedulePosts() {
+		return mapper.selectSchedulePosts();
+	}
+
+	public ArrayList<AdminPost> selectReviewPosts() {
+		return mapper.selectReviewPosts();
+	}
+
+	public ArrayList<AdminPost> selectQuestionPosts() {
+		return mapper.selectQuestionPosts();
+	}
+
+	public int updatePostStatus(AdminPost post) {
+		 switch (post.getBoardType()) {
+	        case "공유":
+	            return mapper.updateScheduleStatus(post);
+	        case "후기":
+	            return mapper.updateReviewStatus(post);
+	        case "질문":
+	            return mapper.updateQuestionStatus(post);
+	        default:
+	            return 0;
+	    }
+	}
 	
 }

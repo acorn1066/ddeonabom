@@ -6,13 +6,18 @@ import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.admin.model.service.AdminService;
 import kh.ddeonabom.admin.model.vo.AdminNotice;
+import kh.ddeonabom.admin.model.vo.AdminPost;
 import kh.ddeonabom.member.model.vo.Member;
+import kh.ddeonabom.qList.model.vo.QList;
+import kh.ddeonabom.review.model.vo.Review;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -21,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 
 public class AdminController {
 	
-	 private final AdminService AdminService;
+	 private final AdminService aService;
 	
 	@GetMapping("dash")
 		public String adminDash() {
@@ -34,16 +39,16 @@ public class AdminController {
 
 	    Map<String, Object> map = new HashMap<>();
 
-	    map.put("memberCount", AdminService.selectMemberCount());
+	    map.put("memberCount", aService.selectMemberCount());
 
 	    map.put("boardCount",
-	            AdminService.selectQlistCount()
-	          + AdminService.selectTravelCount()
-	          + AdminService.selectScheduleCount());
+	            aService.selectQlistCount()
+	          + aService.selectTravelCount()
+	          + aService.selectScheduleCount());
 
-	    map.put("replyCount", AdminService.selectReplyCount());
+	    map.put("replyCount", aService.selectReplyCount());
 
-	    map.put("reportCount", AdminService.selectReportCount());
+	    map.put("reportCount", aService.selectReportCount());
 
 	    return map;
 	}
@@ -59,31 +64,46 @@ public class AdminController {
 	@GetMapping("/members")
 	public ArrayList<Member> selectMembers(HttpSession session) {
 		String id = ((Member)session.getAttribute("loginUser")).getId();
-	    return AdminService.selectMembers(id);
+	    return aService.selectMembers(id);
 	}
 	
-//	@PostMapping("/member/status")
-//	public ResponseEntity<?> updateMemberStatus(
-//	        @RequestParam("memberNo") int memberNo,
-//	        @RequestParam("status") String status) {
-//
-//	    AdminService.updateMemberStatus(memberNo, status);
-//
-//	    return ResponseEntity.ok().build();
-//	}
+	@ResponseBody
+	@PutMapping("members")
+	public int updateMemberStatus(@RequestBody HashMap<String, String> map) {
+	    map.put("col", "status");
+	    return aService.updateMemberStatus(map);
+	}
+	
 	
 	
 	@ResponseBody
-	@GetMapping("/notice")
+	@GetMapping("notice")
 	public ArrayList<AdminNotice> selectNoticeList() {
-	    return AdminService.selectNoticeList();
+	    return aService.selectNoticeList();
 	}
 	
-	
-	@GetMapping("post")
-	public String adminPost() {
-		return "views/admin/post";
-	}
+		@ResponseBody
+		@GetMapping("/posts/schedule")
+	    public ArrayList<AdminPost> shareList() {
+	        return aService.selectSchedulePosts();
+	    }
+		@ResponseBody
+	    @GetMapping("/posts/review")
+	    public ArrayList<AdminPost> reviewList() {
+	        return aService.selectReviewPosts();
+	    }
+		@ResponseBody
+	    @GetMapping("/posts/question")
+	    public ArrayList<AdminPost> questionList() {
+	        return aService.selectQuestionPosts();
+	    }
+		
+		@ResponseBody
+		@PutMapping("/posts/status")
+	    public int updatePostStatus(@RequestBody AdminPost post) {
+	        return aService.updatePostStatus(post);
+	    }
+		
 	
 	@GetMapping("report")
 		public String adminReport() {

@@ -15,6 +15,29 @@ const Members = () => {
             .catch((err) => console.log(err));
     }, []);
 
+    const handleStatusToggle = (member, newStatus) => {
+        fetch("/react/admin/members", {
+            method: "put",
+            headers: { "Content-Type": "application/json ; charset=UTF-8" },
+            body: JSON.stringify({
+                id: member.id,
+                val: newStatus
+            }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data === 1) {
+                    setMembers((prev) =>
+                        prev.map((m) =>
+                            m.id === member.id
+                                ? { ...m, status: newStatus }
+                                : m
+                        )
+                    );
+                }
+            });
+    };
+
     return (
         <section className="flex-1 p-8">
 
@@ -93,10 +116,32 @@ const Members = () => {
                                     <div className="flex justify-center gap-2">
 
                                         <button
-                                            className={`rounded-lg px-4 py-1 text-sm font-semibold border transition ${item.status === "Y" ? "border-green-500 bg-green-500 text-white" : "border-gray-300 bg-white text-gray-500"}`}>활동</button>
+                                            onClick={() =>
+                                                item.status === "N"
+                                                    ? handleStatusToggle(item, "Y")
+                                                    : null
+                                            }
+                                            className={`rounded-lg px-4 py-1 text-sm font-semibold border transition cursor-pointer ${item.status === "Y"
+                                                ? "border-green-500 bg-green-500 text-white"
+                                                : "border-gray-300 bg-white text-gray-500"
+                                                }`}
+                                        >
+                                            활동
+                                        </button>
 
                                         <button
-                                            className={`rounded-lg px-4 py-1 text-sm font-semibold border transition${item.status === "N" ? "border-red-500 bg-red-500 text-white" : "border-gray-300 bg-white text-gray-500"}`}>정지</button>
+                                            onClick={() =>
+                                                item.status === "Y"
+                                                    ? handleStatusToggle(item, "N")
+                                                    : null
+                                            }
+                                            className={`rounded-lg px-4 py-1 text-sm font-semibold border transition cursor-pointer ${item.status === "N"
+                                                ? "border-red-500 bg-red-500 text-white"
+                                                : "border-gray-300 bg-white text-gray-500"
+                                                }`}
+                                        >
+                                            정지
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
