@@ -1,6 +1,7 @@
 package kh.ddeonabom.schedule.model.vo;
 
 import java.sql.Date;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,8 +21,13 @@ public class ScheduleMain {
 	private String scheduleStatus;
 	private Date createDate;
 	private Date modifyDate;
-	private Date scheduleStartdate;
-	private Date scheduleEnddate;
+	private String scheduleStartdate;
+	private String scheduleEnddate;
 	private String scheduleVisibility;
 	private int memberNo;
+	
+	private List<ScheduleSub> places;
+	private Integer placeCount;
+	private String coords;
+
 }

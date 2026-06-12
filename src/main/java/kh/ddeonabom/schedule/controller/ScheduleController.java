@@ -26,18 +26,21 @@ public class ScheduleController {
 		int mainNum = 0;
 		int showNum = 0;
 		int hideNum = 0;
+		ArrayList<ScheduleMain> sMain = null;
+		
 		
 		if(member!=null) {
-			ArrayList<ScheduleMain> sMain = scheduleService.selectMainAll(member.getMemberNo());
-			mainNum = sMain.size();
-			if (mainNum>0) {
-				for(ScheduleMain main : sMain) {
-					if(main.getScheduleVisibility().equals("N")) hideNum++;
-					else showNum++;
-				}
-			}
+			sMain = scheduleService.selectMainAll(member.getMemberNo());
+	        mainNum = sMain.size();
+	        if (mainNum > 0) {
+	            for(ScheduleMain main : sMain) {
+	                if(main.getScheduleVisibility().equals("N")) hideNum++;
+	                else showNum++;
+	            }
+	        }
 		}
 		
+		model.addAttribute("scheduleList", sMain);
 		model.addAttribute("mainNum", mainNum);
 		model.addAttribute("showNum", showNum);
 		model.addAttribute("hideNum", hideNum);
