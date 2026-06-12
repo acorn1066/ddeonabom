@@ -35,8 +35,15 @@
 	    <div class="flex flex-col gap-2">
 	      <label class="text-13 font-semibold">공개 설정</label>
 	      <div class="flex flex-col gap-3">
-	        <label class="flex items-center gap-2.5 text-sm text-muted"><input type="radio" name="vis" class="accent-brand" checked /><span><b class="text-ink">전체 공개</b> · 누구나 질문과 답변을 볼 수 있습니다</span></label>
-	        <label class="flex items-center gap-2.5 text-sm text-muted"><input type="radio" name="vis" class="accent-brand" /><span><b class="text-ink">회원 공개</b> · 로그인한 떠나봄 회원만 볼 수 있습니다</span></label>
+	        <!-- 기존 radio 에 value 추가 -->
+			<label class="flex items-center gap-2.5 text-sm text-muted">
+			  <input type="radio" name="visibility" value="ALL" class="accent-brand" checked />
+			  <span><b class="text-ink">전체 공개</b> · 누구나 질문과 답변을 볼 수 있습니다</span>
+			</label>
+			<label class="flex items-center gap-2.5 text-sm text-muted">
+			  <input type="radio" name="visibility" value="MEMBER" class="accent-brand" />
+			  <span><b class="text-ink">회원 공개</b> · 로그인한 떠나봄 회원만 볼 수 있습니다</span>
+			</label>
 	      </div>
 	    </div>
 	

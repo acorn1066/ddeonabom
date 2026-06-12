@@ -24,7 +24,6 @@ public interface ReviewMapper {
 
 	int insertImage(Image img);
 
-	
-
+	ArrayList<Review> selectMyReviewList(int memberNo);
 
 }

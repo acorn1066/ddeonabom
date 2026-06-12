@@ -92,6 +92,19 @@
 	    VALUES (SEQ_IMAGE_NO.NEXTVAL, #{imagePath}, #{fileName}, #{renameFile}, #{travelSubNo})
 	</insert>
 	
+	<select id="selectMyReviewList" parameterType="int" resultType="Review">
+    SELECT 
+        TRAVEL_NO, 
+        TRAVEL_TITLE, 
+        CREATE_DATE, 
+        COUNT, 
+        REGION,
+        MEMBER_NO
+    FROM TRAVEL_LIST
+    WHERE MEMBER_NO = #{memberNo}
+      AND STATUS = 'Y'
+    ORDER BY TRAVEL_NO DESC
+</select>
 	
 	
 	

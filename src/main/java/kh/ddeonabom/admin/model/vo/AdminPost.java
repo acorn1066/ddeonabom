@@ -1,4 +1,4 @@
-package kh.ddeonabom.qList.model.vo;
+package kh.ddeonabom.admin.model.vo;
 
 import java.sql.Date;
 
@@ -13,16 +13,14 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class QList {
-	private int qNo;
+
+public class AdminPost {
 	private String title;
-	private String content;
+	private String nickname;
 	private Date createDate;
-	private Date modifyDate;
-	private int count;
 	private String status;
-	private int memberNo;
-	private String writer;
-	private String category;
-	private String visibility;
+	
+    private int postNo;     
+    private String boardType;
+
 }

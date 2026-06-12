@@ -16,13 +16,13 @@
 			<span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-ink bg-ink px-4 text-13 font-semibold text-white">
 				전체 [[${mainNum}]]
 			</span> 
-			<span th:if="${showNum}>0" class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">
+			<span th:if="${showNum > 0}" class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">
 				공유됨 [[${showNum}]]
 			</span> 
-			<span th:if="${hideNum}>0" class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">
+			<span th:if="${hideNum > 0}" class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">
 				비공개 [[${hideNum}]]
 			</span>
-			<div th:if="${showNum}>0" class="ml-auto">
+			<div th:if="${showNum > 0}" class="ml-auto">
 				<select class="h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none">
 					<option>최근수정순</option>
 					<option>여행일순</option>
@@ -67,98 +67,155 @@
 		</div>
 		
 		<!-- 일정 있을때 -->
-		<div class="grid grid-cols-3 gap-5 py-6" th:if="${isLogin eq 'Y' && mainNum>0}"> <!-- th:if="${isLogin eq 'Y' && mainNum==0}" --> 
-			<a href="/schedule/new" class="flex min-h-72 flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-line bg-sunk text-center text-muted transition hover:border-brand hover:bg-brand-soft hover:text-brand">
-				<span class="flex h-13 w-13 items-center justify-center rounded-full bg-white text-2xl shadow-soft">＋</span>
-				<b class="text-base font-bold">새 일정 만들기</b> <span class="text-13">관심 관광지를 끌어와 동선을 그려보세요</span>
-			</a>
+		<div class="grid grid-cols-3 gap-5 py-6" th:if="${isLogin eq 'Y' && mainNum > 0}">
 
-			<div class="flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-soft">
-				<a href="itinerary.html" class="relative block aspect-video overflow-hidden">
-					<div class="absolute inset-0" style="background: linear-gradient(to right, #E1E5EE 1px, transparent 1px) 0 0/26px 26px, linear-gradient(to bottom, #E1E5EE 1px, transparent 1px) 0 0/26px 26px, #EEF1F6;"></div>
-						<svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" class="absolute inset-0 h-full w-full text-brand">
-					        <path d="M22 28.2 L53.1 78 L87.1 59.3 L121 22 L138 71.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
-					        <circle cx="22" cy="28.2" r="4.2" fill="currentColor" />
-					        <circle cx="53.1" cy="78" r="3" fill="#fff" stroke="currentColor" stroke-width="1.7" />
-					        <circle cx="87.1" cy="59.3" r="3" fill="#fff" stroke="currentColor" stroke-width="1.7" />
-					        <circle cx="121" cy="22" r="3" fill="#fff" stroke="currentColor" stroke-width="1.7" />
-					        <circle cx="138" cy="71.8" r="4.2" fill="currentColor" />
-				      </svg> 
-			    	<span class="absolute bottom-2 left-2 rounded-full bg-white/85 px-2.5 py-0.5 text-[11.5px] font-semibold text-muted backdrop-blur-sm">
-			    		제주 동쪽
-			    	</span> 
-					<span class="absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-brand text-white px-3 text-xs font-medium">공유됨</span>
-				</a> 
-				<a href="itinerary.html" class="block p-4">
-					<div class="text-17 font-bold">제주 동쪽 한 바퀴</div>
-					<div class="mt-1 text-13 text-muted tabular-nums">2026.04.10 — 04.13 · 3박 4일</div>
-					<div class="mt-3 flex gap-4 text-13 text-muted">
-						<span><b class="font-bold text-ink tabular-nums">12</b>곳</span>
-						<span>♥<b class="font-bold text-ink tabular-nums">184</b></span>
-					</div>
-				</a>
-				<div class="mt-auto flex border-t border-line">
-					<button class="flex h-11 flex-1 items-center justify-center gap-1.5 text-13 font-semibold text-muted transition hover:bg-sunk hover:text-ink">
-						<svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5">
-							<circle cx="4" cy="8" r="1.6" />
-							<circle cx="12" cy="4" r="1.6" />
-							<circle cx="12" cy="12" r="1.6" />
-							<path d="M5.4 7.2 10.6 4.6 M5.4 8.8 10.6 11.4" />
-						</svg>
-						공유
-					</button>
-					<button class="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-line text-13 font-semibold text-muted transition hover:bg-sunk hover:text-ink">
-						<svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"> <path d="M3 3h10v7H8l-3 3v-3H3z" /></svg>
-						후기
-					</button>
-					<button class="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-line text-13 font-semibold text-muted transition hover:bg-red-50 hover:text-err">
-						<svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"> <path d="M3 5h10M6.5 5V3.5h3V5M5 5l.6 8h4.8L11 5" /></svg>
-						삭제
-					</button>
-				</div>
-			</div>
-			<!-- 빈 일정 (0곳) — 사진·동선 없는 상태 -->
-			<div class="flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-soft">
-				<a href="itinerary.html" class="relative block aspect-video overflow-hidden">
-					<div class="absolute inset-0" style="background: linear-gradient(to right, #E9ECF3 1px, transparent 1px) 0 0/26px 26px, linear-gradient(to bottom, #E9ECF3 1px, transparent 1px) 0 0/26px 26px, #F4F6FA;"></div>
-					<svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" class="absolute inset-0 h-full w-full">
-				        <path d="M34 70 Q 80 30 126 52" fill="none" stroke="#C5CBD8" stroke-width="2" stroke-linecap="round" stroke-dasharray="1.5 8" />
-				        <circle cx="34" cy="70" r="3.6" fill="#F4F6FA" stroke="#C5CBD8" stroke-width="1.6" />
-				        <circle cx="126" cy="52" r="3.6" fill="#F4F6FA" stroke="#C5CBD8" stroke-width="1.6" />
-					</svg>
-					<div class="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
-						<b class="text-13 font-bold text-muted">아직 동선이 없어요</b> 
-						<span class="text-[11.5px] text-faint">관광지를 끌어와 길을 그려보세요</span>
-					</div> 
-					<span class="absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full border border-line bg-white text-muted px-3 text-xs font-medium">
-						작성 중
-					</span>
-					<!-- <span class="absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-ink text-white px-3 text-xs font-medium">비공개</span> -->
-				</a> 
-				<a href="itinerary.html" class="block p-4">
-					<div class="text-17 font-bold">남해 가을 드라이브</div>
-					<div class="mt-1 text-13 text-muted tabular-nums">날짜 미정</div>
-					<div class="mt-3 flex gap-4 text-13 text-muted">
-						<span><b class="font-bold text-ink tabular-nums">0</b>곳</span>
-					</div>
-				</a>
-				<div class="mt-auto flex border-t border-line">
-					<button class="flex h-11 flex-1 items-center justify-center gap-1.5 border-line text-13 font-semibold text-muted transition hover:bg-red-50 hover:text-err">
-						<svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5">
-							<path d="M3 5h10M6.5 5V3.5h3V5M5 5l.6 8h4.8L11 5" />
-						</svg>
-						삭제
-					</button>
-				</div>
-			</div>
-		</div>
+	    <a href="/schedule/new" class="flex min-h-72 flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-line bg-sunk text-center text-muted transition hover:border-brand hover:bg-brand-soft hover:text-brand">
+	        <span class="flex h-13 w-13 items-center justify-center rounded-full bg-white text-2xl shadow-soft">＋</span>
+	        <b class="text-base font-bold">새 일정 만들기</b>
+	        <span class="text-13">관심 관광지를 끌어와 동선을 그려보세요</span>
+	    </a>
+	
+	    <div th:each="schedule : ${scheduleList}" class="flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-soft">
+	
+	        <a th:href="@{/schedule/detail/{no}(no=${schedule.scheduleNo})}" class="relative block aspect-video overflow-hidden">
+	            <div class="absolute inset-0" style="background: linear-gradient(to right, rgba(120,140,90,0.07) 1px, transparent 1px) 0 0/22px 22px, linear-gradient(to bottom, rgba(120,140,90,0.07) 1px, transparent 1px) 0 0/22px 22px, #EEF3E9;"></div>
+	            <svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" class="route-svg absolute inset-0 h-full w-full text-brand" th:attr="data-coords=${schedule.coords}">
+				    <path class="route-line" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+	
+	            <!-- 공유/비공개 뱃지 -->
+				<span th:if="${schedule.scheduleVisibility == 'N'}"
+				      class="absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-ink text-white px-3 text-xs font-medium">비공개</span>
+				<span th:unless="${schedule.scheduleVisibility == 'N'}"
+				      class="absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-brand text-white px-3 text-xs font-medium">공유됨</span>
+	        </a>
+	
+	        <a th:href="@{/schedule/detail/{no}(no=${schedule.scheduleNo})}" class="block p-4">
+	            <div class="text-17 font-bold" th:text="${schedule.scheduleTitle}">제목</div>
+	            <div class="mt-1 text-13 text-muted tabular-nums" th:text="${schedule.scheduleStartdate} + ' — ' + ${schedule.scheduleEnddate}">날짜</div>
+	            <div class="mt-3 flex gap-4 text-13 text-muted">
+	                <span><b class="font-bold text-ink tabular-nums" th:text="${schedule.placeCount}">0</b>곳</span>
+	                <!-- 좋아요: 공유 기능 구현 후 활성화
+				    	<span>♥<b class="font-bold text-ink tabular-nums">184</b></span>
+				    -->
+	            </div>
+	        </a>
+	
+	        <div class="mt-auto flex border-t border-line">
+	            <!-- 공유·후기 버튼: 공유 게시판/후기 기능 구현 후 살리기 -->
+			    <!--
+			    <button class="flex h-11 flex-1 items-center justify-center gap-1.5 text-13 font-semibold text-muted transition hover:bg-sunk hover:text-ink">
+			        <svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5">
+			            <circle cx="4" cy="8" r="1.6" />
+			            <circle cx="12" cy="4" r="1.6" />
+			            <circle cx="12" cy="12" r="1.6" />
+			            <path d="M5.4 7.2 10.6 4.6 M5.4 8.8 10.6 11.4" />
+			        </svg>
+			        공유
+			    </button>
+			    <button class="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-line text-13 font-semibold text-muted transition hover:bg-sunk hover:text-ink">
+			        <svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v7H8l-3 3v-3H3z" /></svg>
+			        후기
+			    </button>
+			    -->
+	            <button th:onclick="|deleteSchedule(${schedule.scheduleNo})|" class="flex h-11 flex-1 items-center justify-center gap-1.5 text-13 font-semibold text-muted transition hover:bg-red-50 hover:text-err">
+				    <svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5">
+				        <path d="M3 5h10M6.5 5V3.5h3V5M5 5l.6 8h4.8L11 5" />
+				    </svg>
+				    삭제
+				</button>
+	        </div>
+	    </div>
+	
+	</div>
 	</main>
-
-
-
-
 
 	<div th:replace="~{views/common/modal :: modal}"></div>
 	<footer th:replace="~{views/common/footer :: footer}"></footer>
+	
+<script>
+const deleteSchedule = (scheduleNo) => {
+    openDangerModal(
+        '이 일정을 삭제할까요?',
+        '삭제한 일정은 목록에서 사라져요.',
+        async () => {
+            try {
+                const res = await fetch('/schedule/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'scheduleNo=' + scheduleNo
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast('일정이 삭제되었어요.');
+                    // 새로고침으로 목록 갱신 (가장 간단)
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    showToast(data.message || '삭제에 실패했어요.', false);
+                }
+            } catch (e) {
+                showToast('삭제 중 오류가 발생했어요.', false);
+            }
+        },
+        '삭제'
+    );
+};
+
+
+const drawRoutes = () => {
+    document.querySelectorAll('.route-svg').forEach(svg => {
+        const raw = svg.dataset.coords;
+        if (!raw) return;
+
+        const points = raw.split(';').map(pair => {
+            const [x, y] = pair.split(',').map(Number);
+            return [x, y];
+        }).filter(p => !isNaN(p[0]) && !isNaN(p[1]));
+
+        if (points.length === 0) return;
+
+        const xs = points.map(p => p[0]);
+        const ys = points.map(p => p[1]);
+        const minX = Math.min(...xs), maxX = Math.max(...xs);
+        const minY = Math.min(...ys), maxY = Math.max(...ys);
+
+        const PAD = 20, W = 160, H = 100;
+        const rangeX = maxX - minX || 1;   // 0 division 방지
+        const rangeY = maxY - minY || 1;
+
+        const scaled = points.map(([x, y]) => {
+            const sx = (maxX === minX) ? W / 2 : PAD + ((x - minX) / rangeX) * (W - PAD * 2);
+            const sy = (maxY === minY) ? H / 2 : PAD + (1 - (y - minY) / rangeY) * (H - PAD * 2);
+            return [sx, sy];
+        });
+
+        const d = scaled.map((p, i) =>
+            (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)
+        ).join(' ');
+
+        const line = svg.querySelector('.route-line');
+        if (line) line.setAttribute('d', d);
+
+        scaled.forEach(([x, y], i) => {
+            const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            c.setAttribute('cx', x.toFixed(1));
+            c.setAttribute('cy', y.toFixed(1));
+            const isEnd = (i === 0 || i === scaled.length - 1);
+            c.setAttribute('r', isEnd ? '4.2' : '3');
+            if (isEnd) {
+                c.setAttribute('fill', 'currentColor');
+            } else {
+                c.setAttribute('fill', '#fff');
+                c.setAttribute('stroke', 'currentColor');
+                c.setAttribute('stroke-width', '1.7');
+            }
+            svg.appendChild(c);
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', drawRoutes);
+</script>
 </body>
 </html>

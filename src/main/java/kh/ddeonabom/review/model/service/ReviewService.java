@@ -45,6 +45,10 @@ public class ReviewService {
 
 	
 
+	public ArrayList<Review> selectMyReviewList(int memberNo) {
+		return reviewMapper.selectMyReviewList(memberNo);
+	}
+
 
 
 }
