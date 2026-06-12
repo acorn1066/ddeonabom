@@ -13,12 +13,14 @@ import kh.ddeonabom.landmark.model.vo.Landmark;
 public interface LandmarkMapper {
 
 
-	ArrayList<Landmark> searchLandmarks(@Param("q") String q, @Param("offset") int offset, @Param("size") int size);
 	
-	int countLandmarks(@Param("q") String q);
 	
 	// 관광지 개수 가져오기
 	int getListCount();
-
+	
+	// 관광지 리스트 가져오기
 	ArrayList<Landmark> selectLandmarkList(RowBounds rowBounds);
+	
+	ArrayList<Landmark> searchLandmarks(@Param("q") String q, @Param("region") String region, @Param("offset") int offset, @Param("size") int size);
+	int countLandmarks(@Param("q") String q, @Param("region") String region);
 }

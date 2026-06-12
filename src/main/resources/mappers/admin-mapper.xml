@@ -39,19 +39,93 @@
         WHERE REPORT_STATUS = 'N'
     </select>
     
-    <select id="selectMemberList" resultType="Member">
+    <select id="selectMembers" resultType="Member">
 	    SELECT
-	        MEMBER_NO,
 	        ID,
-	        ENROLL_DATE
+	        nickname,
+	        email,
+	        phone,
+	        ENROLL_DATE,
+	        status
 	    FROM MEMBER
-	    ORDER BY MEMBER_NO DESC
+	    where id != #{id}
 	</select>
 	
-	<update id="updateMemberStatus">
-	    UPDATE MEMBER
-	    SET STATUS = #{status}
-	    WHERE MEMBER_NO = #{memberNo}
+	<update id="updateMemberStatus" parameterType="hashmap">
+	   update member set ${col} = #{val} where id = #{id}
 	</update>
+	
+	<select id="selectNoticeList" resultType="kh.ddeonabom.admin.model.vo.AdminNotice">
+	    SELECT
+	        N.NOTICE_NO,
+	        N.TITLE,
+	        M.ID AS MEMBER_NAME,
+	        N.CREATE_DATE,
+	        N.MODIFY_DATE
+	    FROM NOTICE N
+	    JOIN MEMBER M
+	        ON N.MEMBER_NO = M.MEMBER_NO
+	    ORDER BY N.NOTICE_NO DESC
+	</select>
+	
+	<select id="selectSchedulePosts" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
+	    SELECT
+		    S.SCHEDULE_NO AS postNo,
+	        '공유' AS boardType,
+	        S.SCHEDULE_TITLE AS title,
+	        M.NICKNAME AS nickname,
+	        S.CREATE_DATE AS createDate,
+	        S.SCHEDULE_STATUS AS status
+	    FROM SCHEDULE_MAIN S
+	    JOIN MEMBER M
+	        ON S.MEMBER_NO = M.MEMBER_NO
+	    WHERE S.SCHEDULE_VISIBILITY IN ('Y', 'M')
+	</select>
+	
+	<select id="selectReviewPosts" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
+	    SELECT
+		    T.TRAVEL_NO AS postNo,
+	  		'후기' AS boardType,
+	        T.TRAVEL_TITLE AS title,
+	        M.NICKNAME AS nickname,
+	        T.CREATE_DATE AS createDate,
+	        T.STATUS AS status
+	    FROM TRAVEL_LIST T
+	    JOIN MEMBER M
+	        ON T.MEMBER_NO = M.MEMBER_NO
+	</select>
+	
+	<select id="selectQuestionPosts" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
+	    SELECT
+	   		Q.Q_NO AS postNo,
+    		'질문' AS boardType,
+	        Q.TITLE AS title,
+	        M.NICKNAME AS nickname,
+	        Q.CREATE_DATE AS createDate,
+	        Q.STATUS AS status
+	    FROM QLIST Q
+	    JOIN MEMBER M
+	        ON Q.MEMBER_NO = M.MEMBER_NO
+	</select>
+	
+	<update id="updateScheduleStatus">
+	    UPDATE SCHEDULE_MAIN
+	    SET SCHEDULE_STATUS = #{status}
+	    WHERE SCHEDULE_NO = #{postNo}
+	</update>
+
+	<update id="updateReviewStatus">
+	    UPDATE TRAVEL_LIST
+	    SET STATUS = #{status}
+	    WHERE TRAVEL_NO = #{postNo}
+	</update>
+
+	<update id="updateQuestionStatus">
+	    UPDATE QLIST
+	    SET STATUS = #{status}
+	    WHERE Q_NO = #{postNo}
+	</update>
+	
+	
 
 </mapper>

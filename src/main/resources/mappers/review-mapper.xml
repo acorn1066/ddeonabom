@@ -3,34 +3,108 @@
 
 <mapper namespace="kh.ddeonabom.review.model.mappers.ReviewMapper">
 
-    <select id="selectListCount" resultType="_int">
-	    SELECT COUNT(*)
-	    FROM TRAVEL_LIST
-	    WHERE STATUS = 'Y'
-	</select>
-	
-	<select id="selectReviewList" parameterType="kh.ddeonabom.common.paging.PageInfo" resultType="kh.ddeonabom.review.model.vo.Review">
+	<resultMap id="reviewDetailMap" type="Review">
+	    <id property="travelNo" column="TRAVEL_NO"/>
+	    <result property="travelTitle" column="TRAVEL_TITLE"/>
+	    <result property="status" column="STATUS"/>
+	    <result property="createDate" column="CREATE_DATE"/>
+	    <result property="memberNo" column="MEMBER_NO"/>
 	    
-	    SELECT 
-	        T.TRAVEL_NO,
-	        T.TRAVEL_TITLE,
-	        T.STATUS,
-	        T.CREATE_DATE,
-	        T.MODIFY_DATE,
-	        T.COUNT,
-	        T.MEMBER_NO,
-	        T.SCHEDULE_NO,
-	        (SELECT COUNT(*) 
-	         FROM NICE N 
-	         WHERE N.POST_NO = T.TRAVEL_NO) AS LIKE_COUNT
+	    <collection property="subList" ofType="ReviewSub">
+	        <id property="travelSubNo" column="TRAVEL_SUB_NO"/>
+	        <result property="travelSubContent" column="TRAVEL_SUB_CONTENT"/>
+	        <result property="travelSubSeq" column="TRAVEL_SUB_SEQ"/>
+	        <result property="contentId" column="CONTENT_ID"/>
+	        <result property="rating" column="RATING"/>
+	        
+	        <collection property="images" ofType="string">
+	            <result column="RENAME_FILE"/> </collection>
+	    </collection>
+	</resultMap>
+
+    <!-- 목록 조회 -->
+	<select id="selectReviewList" resultType="kh.ddeonabom.review.model.vo.Review">
+	    SELECT
+	        T.TRAVEL_NO, T.TRAVEL_TITLE, T.STATUS,
+	        T.CREATE_DATE, T.MODIFY_DATE, T.COUNT,
+	        T.MEMBER_NO, T.SCHEDULE_NO,
+	        (SELECT COUNT(*) FROM NICE N WHERE N.POST_NO = T.TRAVEL_NO) AS LIKE_COUNT
 	    FROM TRAVEL_LIST T
 	    WHERE T.STATUS = 'Y'
+	    AND (
+	        T.VISIBILITY = 'PUBLIC'
+	        OR (T.VISIBILITY = 'MEMBER' AND #{loginUserNo} IS NOT NULL)
+	    )
+	    <if test="keyword != null and keyword != ''">
+	        AND T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
+	    </if>
+	    <if test="region != null and region != ''">
+	        AND T.REGION = #{region}
+	    </if>
 	    ORDER BY T.TRAVEL_NO DESC
-	    OFFSET (#{currentPage} - 1) * #{boardLimit} ROWS
-	    FETCH NEXT #{boardLimit} ROWS ONLY
+	    OFFSET (#{pi.currentPage} - 1) * #{pi.boardLimit} ROWS
+	    FETCH NEXT #{pi.boardLimit} ROWS ONLY
 	</select>
 	
-	<insert id=""></insert>
+	<select id="selectListCount" resultType="int">
+	    SELECT COUNT(*)
+	    FROM TRAVEL_LIST T
+	    WHERE T.STATUS = 'Y'
+	    AND (
+	        T.VISIBILITY = 'PUBLIC'
+	        OR (T.VISIBILITY = 'MEMBER' AND #{loginUserNo} IS NOT NULL)
+	    )
+	    <if test="keyword != null and keyword != ''">
+	        AND T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
+	    </if>
+	    <if test="region != null and region != ''">
+	        AND T.REGION = #{region}
+	    </if>
+	</select>
+	
+	<insert id="insertReview" parameterType="kh.ddeonabom.review.model.vo.Review">
+	    <selectKey keyProperty="travelNo" resultType="int" order="BEFORE">
+	        SELECT SEQ_TRAVEL_NO.NEXTVAL FROM DUAL
+	    </selectKey>
+		    INSERT INTO TRAVEL_LIST (
+		        TRAVEL_NO, 
+		        TRAVEL_TITLE, 
+		        STATUS,           CREATE_DATE, 
+		        MEMBER_NO
+		    ) VALUES (
+		        #{travelNo}, 
+		        #{travelTitle}, 
+		        'Y',              SYSDATE, 
+		        #{memberNo}
+		    )
+	</insert>
+	
+	<insert id="insertReviewSub" parameterType="kh.ddeonabom.review.model.vo.ReviewSub">
+	    <selectKey keyProperty="travelSubNo" resultType="int" order="BEFORE">
+	        SELECT SEQ_TRAVEL_SUB_NO.NEXTVAL FROM DUAL
+	    </selectKey>
+	    INSERT INTO TRAVEL_LIST_SUB (TRAVEL_SUB_NO, TRAVEL_SUB_CONTENT, TRAVEL_SUB_SEQ, TRAVEL_SUB_DATE, TRAVEL_NO, CONTENT_ID, RATING)
+	    VALUES (#{travelSubNo}, #{travelSubContent}, #{travelSubSeq}, SYSDATE, #{travelNo}, #{contentId}, #{rating})
+	</insert>
+	
+	<insert id="insertImage" parameterType="kh.ddeonabom.review.model.vo.Image">
+	    INSERT INTO TB_IMAGE (IMAGE_NO, IMAGE_PATH, FILE_NAME, RENAME_FILE, TRAVEL_SUB_NO)
+	    VALUES (SEQ_IMAGE_NO.NEXTVAL, #{imagePath}, #{fileName}, #{renameFile}, #{travelSubNo})
+	</insert>
+	
+	<select id="selectMyReviewList" parameterType="int" resultType="Review">
+    SELECT 
+        TRAVEL_NO, 
+        TRAVEL_TITLE, 
+        CREATE_DATE, 
+        COUNT, 
+        REGION,
+        MEMBER_NO
+    FROM TRAVEL_LIST
+    WHERE MEMBER_NO = #{memberNo}
+      AND STATUS = 'Y'
+    ORDER BY TRAVEL_NO DESC
+</select>
 	
 	
 	

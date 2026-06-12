@@ -1,14 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Notice = () => {
-
+    const [notice, setNotice] = useState([])
     const navigate = useNavigate();
     const [keyword, setKeyword] = useState("");
 
     const handleSearch = () => {
         console.log("검색:", keyword);
     };
+
+    useEffect(() => {
+        fetch('/react/admin/notice')
+            .then(data => setMembers(data))
+            .catch(err => console.log(err))
+    }, [])
 
     return (
         <section className="flex-1 p-8">
@@ -28,7 +34,7 @@ const Notice = () => {
 
                 <button
                     onClick={() => navigate("/notice/write")}
-                    className="cursor-pointer rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
+                    className="cursor-pointer rounded-lg bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                 >
                     공지 등록
                 </button>
@@ -36,7 +42,7 @@ const Notice = () => {
             </div>
 
             {/* 검색 영역 */}
-            <div className="mb-6 rounded-xl border bg-white p-6 shadow-sm">
+            <div className="mb-6 rounded-2xl border bg-white p-6 shadow-sm">
 
                 <h2 className="mb-4 text-lg font-semibold">
                     공지사항 검색
@@ -54,7 +60,7 @@ const Notice = () => {
 
                     <button
                         onClick={handleSearch}
-                        className="cursor-pointer rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
+                        className="cursor-pointer rounded-lg bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                     >
                         검색
                     </button>
@@ -64,7 +70,7 @@ const Notice = () => {
             </div>
 
             {/* 공지사항 목록 */}
-            <div className="rounded-xl border bg-white shadow-sm">
+            <div className="overflow-hidden rounded-2xl border bg-white shadow-md">
 
                 {/* 목록 제목 */}
                 <div className="border-b p-4">
@@ -73,35 +79,36 @@ const Notice = () => {
                     </h2>
                 </div>
 
-                {/* 헤더 */}
-                <div className="grid grid-cols-12 border-b bg-gray-50 p-4 font-semibold">
+                <table className="w-full table-auto">
 
-                    <div className="col-span-1 text-center">
-                        번호
-                    </div>
+                    <thead>
+                        <tr className="border-b bg-gray-100 text-gray-700">
 
-                    <div className="col-span-5 text-center">
-                        제목
-                    </div>
+                            <th className="p-4 text-center font-semibold">번호</th>
+                            <th className="p-4 text-center font-semibold">제목</th>
+                            <th className="p-4 text-center font-semibold">작성자</th>
+                            <th className="p-4 text-center font-semibold">작성일</th>
+                            <th className="p-4 text-center font-semibold">수정일</th>
+                            <th className="p-4 text-center font-semibold">관리</th>
 
-                    <div className="col-span-2 text-center">
-                        작성일
-                    </div>
+                        </tr>
+                    </thead>
 
-                    <div className="col-span-2 text-center">
-                        상태
-                    </div>
+                    <tbody>
+                        {notice.map((notice) => (
+                            <tr key={notice.noticeNo} className="border-b hover:bg-gray-50">
 
-                    <div className="col-span-2 text-center">
-                        관리
-                    </div>
+                                <td className="p-4 text-center">{notice.noticeNo}</td>
+                                <td className="p-4">{notice.title}</td>
+                                <td className="p-4 text-center">{notice.memberName}</td>
+                                <td className="p-4 text-center">{notice.createDate?.split("T")[0]}</td>
+                                <td className="p-4 text-center">{notice.modifyDate?.split("T")[0]}</td>
+                                <td className="p-4 text-center">수정 / 삭제</td>
+                            </tr>
+                        ))}
+                    </tbody>
 
-                </div>
-
-                {/* 데이터 영역 */}
-                <div className="p-16 text-center text-gray-400">
-                    공지사항 데이터가 표시되는 영역
-                </div>
+                </table>
 
             </div>
 

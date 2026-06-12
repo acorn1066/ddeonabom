@@ -119,27 +119,79 @@
 	    <span>제목</span><span>작성자</span><span>작성일</span><span class="text-right">조회</span>
 	  </div>
 	  <div>
-	    <a href="detail" th:each="q:${qList}" class="grid grid-cols-qarow items-center gap-4 border-b border-line px-2 py-4 transition hover:bg-sunk">
-	      <span class="text-15 font-semibold"><span class="mr-1.5 text-13 font-bold text-brand" th:text="|[${q.category}]|"></span>[[${q.title}]]<span class="ml-2 text-13 font-bold text-faint">· 댓글 ~</span></span>
-	      <span class="text-13 text-muted">[[${q.writer}]]</span>
-	      <span class="text-13 text-muted tabular-nums">[[${q.createDate}]]</span>
-	      <span class="text-right text-13 text-muted tabular-nums">[[${q.count}]]</span>
-	    </a>
+	    <a th:href="@{/qList/detail(qNo=${q.qNo})}"
+		   th:data-visibility="${q.visibility}"
+		   th:each="q:${qList}"
+		   onclick="return checkAccess(this)"
+		   class="grid grid-cols-qarow items-center gap-4 border-b border-line px-2 py-4 transition hover:bg-sunk">
+		
+		  <span class="text-15 font-semibold">
+		    <span class="mr-1.5 text-13 font-bold text-brand" th:text="|[${q.category}]|"></span>
+		    [[${q.title}]]
+		    <!-- 회원 공개 배지 -->
+		    <span th:if="${q.visibility == 'MEMBER'}"
+		          class="ml-1.5 inline-flex h-5 items-center rounded-full bg-slate-100 px-2 text-11 font-semibold text-muted">
+		      <i class='fas fa-lock'></i>&nbsp; 회원
+		    </span>
+		    <span class="ml-2 text-13 font-bold text-faint">· 댓글 ~</span>
+		  </span>
+		  <span class="text-13 text-muted">[[${q.writer}]]</span>
+		  <span class="text-13 text-muted tabular-nums">[[${q.createDate}]]</span>
+		  <span class="text-right text-13 text-muted tabular-nums">[[${q.count}]]</span>
+		</a>
    	  </div>
 	
 	  <div class="flex justify-center gap-1 py-6">
-	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">‹</a>
-	    <span class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg bg-brand px-2 text-sm font-medium text-white">1</span>
-	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">2</a>
-	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">3</a>
-	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">4</a>
-	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">5</a>
-	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">6</a>
-	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">7</a>
-	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">8</a>
-	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">›</a>
-	  </div>
+
+		  <!-- ‹ 이전 버튼: 현재가 1페이지면 비활성 -->
+		  <a th:if="${pi.currentPage > 1}"
+		     th:href="@{/qList/list(page=${pi.currentPage - 1},
+		                            category=${category},
+		                            searchType=${searchType},
+		                            searchInput=${searchInput})}"
+		     class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">‹</a>
+		  <span th:unless="${pi.currentPage > 1}"
+		        class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-faint cursor-not-allowed opacity-40">‹</span>
+		
+		  <!-- 페이지 번호들: pi.startPage ~ pi.endPage 범위만 표시 -->
+		  <th:block th:each="pageNum : ${#numbers.sequence(pi.startPage, pi.endPage)}">
+		
+		    <!-- 현재 페이지는 brand 색상으로 강조 (span, 클릭 불가) -->
+		    <span th:if="${pageNum == pi.currentPage}"
+		          th:text="${pageNum}"
+		          class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg bg-brand px-2 text-sm font-medium text-white">
+		    </span>
+		
+		    <!-- 다른 페이지는 a 태그로 클릭 가능 -->
+		    <!-- @{} 안의 () 파라미터는 자동으로 ?page=2&category=전체&... 형태로 조립됨 -->
+		    <a th:unless="${pageNum == pi.currentPage}"
+		       th:href="@{/qList/list(page=${pageNum},
+		                              category=${category},
+		                              searchType=${searchType},
+		                              searchInput=${searchInput})}"
+		       th:text="${pageNum}"
+		       class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">
+		    </a>
+		
+		  </th:block>
+		
+		  <!-- › 다음 버튼: 현재가 마지막 페이지면 비활성 -->
+		  <a th:if="${pi.currentPage < pi.maxPage}"
+		     th:href="@{/qList/list(page=${pi.currentPage + 1},
+		                            category=${category},
+		                            searchType=${searchType},
+		                            searchInput=${searchInput})}"
+		     class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">›</a>
+		  <span th:unless="${pi.currentPage < pi.maxPage}"
+		        class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-faint cursor-not-allowed opacity-40">›</span>
+		
+		</div>
 	</main>
+
+	<!-- 로그인 여부를 JS 변수로 주입 (th:inline="javascript") -->
+	<script th:inline="javascript">
+	  const isLoggedIn = /*[[${session.loginUser != null}]]*/ false;
+	</script>
 
 	<script>
 	  function toggleSearchType() {
@@ -232,6 +284,19 @@
 		    matchedItem.classList.add('text-brand', 'font-semibold');
 		  }
 		})();
+	  
+		/* ★ 회원 공개 글 접근 차단 */
+		function checkAccess(el) {
+		  if (!isLoggedIn && el.dataset.visibility === 'MEMBER') {
+		    // 기존 modal.html의 openInfoModal 재활용
+		    openInfoModal(
+		      '회원 전용 글입니다',
+		      '로그인 후 이용하실 수 있어요.\n회원가입하면 더 많은 정보를 볼 수 있습니다.'
+		    );
+		    return false; // a 태그 이동 차단
+		  }
+		  return true;
+		}
 	</script>
 	
 	<div th:replace="~{views/common/modal :: modal}"></div>
