@@ -4,7 +4,7 @@
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <head th:replace="~{views/common/head :: head}">
     </head>
-<body class="bg-white text-ink font-[system-ui]">
+<body class="bg-slate-50 text-ink font-[system-ui]">
 
 <header th:replace="~{views/common/navbar :: navbar}"></header>
 
@@ -111,7 +111,9 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     
     <div class="space-y-3 min-h-[300px]">
         
-        <div th:each="post : ${postlist}" class="p-4 border border-line rounded-xl hover:border-brand transition cursor-pointer bg-white flex justify-between items-center">
+        <a th:each="post : ${postlist}" 
+		th:href="@{/qList/detail(qNo=${post.qNo})}"
+   		class="p-4 border border-line rounded-xl hover:border-brand transition cursor-pointer bg-white flex justify-between items-center">
             <div>
                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded mr-2"
                       th:text="${post.category}"
@@ -122,8 +124,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
                                       'text-slate-600 bg-slate-100')))"></span>
                 <p class="text-sm font-semibold text-ink inline" th:text="${post.title}">게시글 제목</p>
                 <span class="text-xs text-faint block mt-1">질문 게시판</span>
+                
             </div>
             <span class="text-xs text-muted" th:text="${#dates.format(post.createDate, 'yyyy-MM-dd')}"></span>
+        </a>
         </div>
 
         <div th:each="review : ${reviewlist}" class="p-4 border border-line rounded-xl hover:border-brand transition cursor-pointer bg-white flex justify-between items-center">
