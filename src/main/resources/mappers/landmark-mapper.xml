@@ -14,4 +14,14 @@
     WHERE TITLE LIKE '%' || #{q} || '%'
     AND (#{region} = '' OR ADDR1 LIKE '%' || #{region} || '%') and content_type_id not in ('15','25','28')
 	</select>
+	
+	<select id="getListCount" resultType="_int">
+		select count(*)
+		from landmark
+	</select>
+	
+	<select id="selectLandmarkList">
+		select *
+		from landmark
+	</select>
 </mapper>

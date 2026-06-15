@@ -48,15 +48,15 @@
 				</div>
 			</div>
 			<div class="flex gap-2">
-				<button class="inline-flex h-11 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-err transition hover:border-err hover:bg-err hover:text-white">삭제</button>
-				<button class="inline-flex h-11 cursor-not-allowed items-center gap-2 rounded-lg border border-line bg-white px-4 text-sm font-semibold text-faint" disabled>
-					<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-						<circle cx="4" cy="8" r="1.6" />
-						<circle cx="12" cy="4" r="1.6" />
-						<circle cx="12" cy="12" r="1.6" />
-						<path d="M5.4 7.2 10.6 4.6 M5.4 8.8 10.6 11.4" />
-					</svg>
-					공유 게시판에 게시
+				<button id="deleteBtn" onclick="confirmDelete()" class="inline-flex h-11 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-err transition hover:border-err hover:bg-err hover:text-white">삭제</button>
+				<button id="shareBtn" onclick="toggleShare()" class="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-white px-4 text-sm font-semibold text-faint transition hover:border-brand hover:text-brand">
+				    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+				        <circle cx="4" cy="8" r="1.6" />
+				        <circle cx="12" cy="4" r="1.6" />
+				        <circle cx="12" cy="12" r="1.6" />
+				        <path d="M5.4 7.2 10.6 4.6 M5.4 8.8 10.6 11.4" />
+				    </svg>
+				    <span id="shareBtnText">공유 게시판에 게시</span>
 				</button>
 				<button onclick="saveSchedule()" class="inline-flex h-11 items-center rounded-lg bg-brand px-5 text-sm font-semibold text-white transition hover:bg-brand-ink">저장</button>
 			</div>
@@ -139,7 +139,10 @@
 	<div th:replace="~{views/common/kakao-map :: kakao-map}"></div>
 	<div th:replace="~{views/common/modal :: modal}"></div>
 
-<script>
+<script th:inline="javascript">
+const initialRaw = /*[[${scheduleJson}]]*/ null;
+const initialData = initialRaw ? (typeof initialRaw === 'string' ? JSON.parse(initialRaw) : initialRaw) : null;
+
 let selectedDate = null;
 
 const changeTitle = () => {
@@ -353,6 +356,7 @@ const updateEmptyState=()=>{
     }
     
     updateRegionBadge();
+    drawRoute();
 }
 
 const renderPlaceList = (places, dateKey) => {
@@ -562,21 +566,26 @@ const saveSchedule = async () => {
     }
 
     const payload = {
-        scheduleTitle: title,
-        scheduleStartdate: startDate,
-        scheduleEnddate: endDate,
-        places: places
-    };
-
+   	    scheduleTitle: title,
+   	    scheduleStartdate: startDate,
+   	    scheduleEnddate: endDate,
+   	    places: places
+   	};
+    
+    if (initialData && initialData.scheduleNo) {
+        payload.scheduleNo = initialData.scheduleNo;
+    }
+    
+    
     try {
-    	console.log(payload);
+    	//console.log(payload);
         const res = await fetch('/schedule/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
         const data = await res.json();
-
+        if (handleNeedLogin(data)) return;
         if (data.success) {
             showToast('일정이 저장되었어요.');
             location.href = '/schedule/list';
@@ -588,6 +597,267 @@ const saveSchedule = async () => {
     }
 };
 
+
+
+////////불러오기
+
+const restoreSchedule = (data) => {
+    const title = document.getElementById('schedule_title');
+    if (data.scheduleTitle && data.scheduleTitle !== '제목 없는 일정') {
+        title.textContent = data.scheduleTitle;
+        title.classList.remove('text-faint');
+        title.classList.add('text-ink');
+    }
+
+    const startInput = document.getElementById('start_date_input');
+    const endInput = document.getElementById('end_date_input');
+    startInput.value = data.scheduleStartdate;
+    endInput.value = data.scheduleEnddate;
+
+    const startLabel = document.getElementById('start_date_label');
+    startLabel.textContent = data.scheduleStartdate;
+    startLabel.classList.remove('text-faint');
+    startLabel.classList.add('text-ink');
+
+    const endLabel = document.getElementById('end_date_label');
+    endLabel.textContent = data.scheduleEnddate;
+    endLabel.classList.remove('text-faint');
+    endLabel.classList.add('text-ink');
+
+    Object.keys(data.placesByDate).forEach(dateKey => {
+        placesByDate[dateKey] = data.placesByDate[dateKey];
+    });
+
+    renderDayTabs();
+
+    updateEmptyState();
+
+};
+
+////////////지도 렌더링
+
+//기존 마커/폴리라인 제거
+const clearMap = () => {
+ markers.forEach(m => m.setMap(null));
+ polylines.forEach(p => p.setMap(null));
+ markers = [];
+ polylines = [];
+};
+
+//선택된 날짜의 장소들을 마커 + 실도로 경로로 그림
+const drawRoute = async () => {
+ if (!mapReady || !map) return;   // 지도 준비 전이면 대기
+ clearMap();
+
+ const key = selectedDate ? toDateKey(selectedDate) : null;
+ const places = key ? (placesByDate[key] || []) : [];
+
+ if (places.length === 0) return;
+
+ const bounds = new kakao.maps.LatLngBounds();
+
+ // 1) 마커 + 순번 라벨
+ places.forEach((place, idx) => {
+     const lat = parseFloat(place.mapy);   // 위도
+     const lng = parseFloat(place.mapx);   // 경도
+     if (isNaN(lat) || isNaN(lng)) return;
+
+     const pos = new kakao.maps.LatLng(lat, lng);
+
+     const marker = new kakao.maps.Marker({ position: pos, map });
+     markers.push(marker);
+
+     // 순번 표시용 커스텀 오버레이
+     const overlay = new kakao.maps.CustomOverlay({
+         position: pos,
+         yAnchor: 2.1,
+         content: `<div style="background:#2563eb;color:#fff;width:22px;height:22px;`
+                + `border-radius:50%;display:flex;align-items:center;justify-content:center;`
+                + `font-size:12px;font-weight:700;border:2px solid #fff;`
+                + `box-shadow:0 1px 3px rgba(0,0,0,.3)">${idx + 1}</div>`
+     });
+     overlay.setMap(map);
+     markers.push(overlay);   // 같이 정리되도록 markers에 넣음
+
+     bounds.extend(pos);
+ });
+
+ map.setBounds(bounds);
+
+ // 2) 장소 2곳 이상이면 실도로 경로
+ if (places.length >= 2) {
+     await drawRoadPath(places);
+ }
+};
+
+//실도로 경로: 서버 프록시 호출 → vertexes로 폴리라인
+const drawRoadPath = async (places) => {
+ // 좌표 유효한 것만 추림
+ const points = places
+     .map(p => ({ lat: parseFloat(p.mapy), lng: parseFloat(p.mapx) }))
+     .filter(p => !isNaN(p.lat) && !isNaN(p.lng));
+
+ if (points.length < 2) return;
+
+ // 경유지 최대 5개 → 한 호출에 최대 7개 지점. 초과 시 구간 분할.
+ const MAX_POINTS_PER_CALL = 7;
+ const segments = [];
+ for (let i = 0; i < points.length - 1; i += (MAX_POINTS_PER_CALL - 1)) {
+     const slice = points.slice(i, i + MAX_POINTS_PER_CALL);
+     if (slice.length >= 2) segments.push(slice);
+ }
+
+ for (const seg of segments) {
+     try {
+         const res = await fetch('/schedule/route', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ points: seg })
+         });
+         if (!res.ok) throw new Error('route ' + res.status);
+         const data = await res.json();
+		
+         const linePath = (data.path || []).map(
+             c => new kakao.maps.LatLng(c.lat, c.lng)
+         );
+         if (linePath.length < 2) continue;
+
+         const polyline = new kakao.maps.Polyline({
+             path: linePath,
+             strokeWeight: 5,
+             strokeColor: '#2563eb',
+             strokeOpacity: 0.85,
+             strokeStyle: 'solid'
+         });
+         polyline.setMap(map);
+         polylines.push(polyline);
+     } catch (e) {
+         console.error('경로 표시 실패', e);
+         // 실패한 구간은 직선 fallback (이게 없으면 동선이 끊겨 보임)
+         const fallback = new kakao.maps.Polyline({
+             path: seg.map(p => new kakao.maps.LatLng(p.lat, p.lng)),
+             strokeWeight: 4,
+             strokeColor: '#94a3b8',
+             strokeOpacity: 0.7,
+             strokeStyle: 'shortdash'
+         });
+         fallback.setMap(map);
+         polylines.push(fallback);
+     }
+ }
+};
+
+const confirmDelete = () => {
+    // 새 일정(저장 전)이면 삭제할 게 없음
+    if (!initialData || !initialData.scheduleNo) {
+        showToast('아직 저장되지 않은 일정이에요.', false);
+        return;
+    }
+
+    openDangerModal(
+        '이 일정을 삭제할까요?',
+        '삭제한 일정은 되돌릴 수 없어요.',
+        async () => {
+            try {
+                const res = await fetch('/schedule/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'scheduleNo=' + initialData.scheduleNo
+                });
+                const data = await res.json();
+                if (handleNeedLogin(data)) return;
+                if (data.success) {
+                    showToast('일정이 삭제되었어요.');
+                    location.href = '/schedule/list';
+                } else {
+                    showToast('삭제에 실패했어요.', false);
+                }
+            } catch (e) {
+                showToast('삭제 중 오류가 발생했어요.', false);
+            }
+        }
+    );
+};
+
+
+
+////////////공유 토글
+
+//현재 공유 상태 (initialData에서 가져옴)
+let currentVisibility = (initialData && initialData.scheduleVisibility) || 'N';
+
+const updateShareButton = () => {
+    const btn = document.getElementById('shareBtn');
+    const text = document.getElementById('shareBtnText');
+    if (!btn || !text) return;
+
+    if (currentVisibility === 'Y') {
+        text.textContent = '공유 해제';
+        btn.className = 'inline-flex h-11 items-center gap-2 rounded-lg border border-brand bg-brand-soft px-4 text-sm font-semibold text-brand-ink transition hover:border-brand hover:bg-brand hover:text-white';
+    } else {
+        text.textContent = '공유 게시판에 게시';
+        btn.className = 'inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand';
+    }
+};
+
+const toggleShare = () => {
+	if (!initialData || !initialData.scheduleNo) {
+		showToast('먼저 일정을 저장해 주세요.', false);
+		return;
+	}
+
+	const sharing = (currentVisibility !== 'Y');   // 지금 'N'이면 공유하려는 것
+	const title = sharing ? '이 일정을 공유할까요?' : '공유를 해제할까요?';
+	const text = sharing ? '공유하면 다른 여행자들이 내 일정을 볼 수 있어요.' : '공유를 해제하면 게시판에서 내려가요.';
+	
+	openConfirmModal(title, text, async () => {
+		try {
+			const res = await fetch('/schedule/visibility', {
+	             method: 'POST',
+	             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+	             body: 'scheduleNo=' + initialData.scheduleNo
+			});
+			const data = await res.json();
+			if (handleNeedLogin(data)) return;
+			if (data.success) {
+				currentVisibility = data.visibility;
+				updateShareButton();
+				showToast(data.visibility === 'Y' ? '일정을 공유했어요.' : '공유를 해제했어요.');
+			} else {
+				showToast(data.message || '변경에 실패했어요.', false);
+			}
+		} catch (e) {
+			showToast('변경 중 오류가 발생했어요.', false);
+		}
+	});
+};
+
+
+const handleNeedLogin = (data) => {
+    if (data && data.needLogin) {
+        const back = encodeURIComponent(location.pathname + location.search);
+        showToast('로그인이 필요해요. 로그인 페이지로 이동할게요.', false);
+        setTimeout(() => {
+            location.href = '/member/login?targetUrl=' + back;
+        }, 800);
+        return true;
+    }
+    return false;
+};
+
+if (initialData) {
+    restoreSchedule(initialData);
+}
+
+if (!initialData || !initialData.scheduleNo) {
+    const delBtn = document.getElementById('deleteBtn');
+    if (delBtn) {
+        delBtn.disabled = true;
+        delBtn.classList.add('cursor-not-allowed', 'opacity-40');
+    }
+}
+
+updateShareButton();
 </script>
 
 </body>

@@ -11,16 +11,29 @@
 	           m.schedule_visibility,
 	           m.member_no,
 	           (select count(*) from schedule_sub s where s.schedule_no = m.schedule_no) as placeCount,
+	           (select l.addr1
+	              from schedule_sub s
+	              join landmark l on l.content_id = s.content_id
+	             where s.schedule_no = m.schedule_no
+	             order by s.schedule_sub_date, s.schedule_sub_seq
+	             fetch first 1 rows only
+	           ) as firstAddr,
 	           (select listagg(l.mapx || ',' || l.mapy, ';')
-	                       within group (order by s.schedule_sub_date, s.schedule_sub_seq)
+	                       within group (order by s.schedule_sub_seq)
 	              from schedule_sub s
 	              join landmark l on l.content_id = s.content_id
 	             where s.schedule_no = m.schedule_no
 	               and l.mapx is not null
 	               and l.mapy is not null
+	               and s.schedule_sub_date = (
+	                   select min(schedule_sub_date)
+	                     from schedule_sub
+	                    where schedule_no = m.schedule_no
+	               )
 	           ) as coords
 	    from schedule_main m
 	    where m.member_no = #{member_no}
+	      and m.schedule_status = 'Y'
 	    order by m.create_date desc
 	</select>
 	
@@ -54,5 +67,54 @@
 	       set schedule_status = 'N'
 	     where schedule_no = #{scheduleNo}
 	       and member_no = #{memberNo}
+	</update>
+	
+	<select id="selectScheduleDetail" resultType="ScheduleMain">
+	    select schedule_no,
+	           schedule_title,
+	           to_char(schedule_startdate, 'yyyy-mm-dd') as scheduleStartdate,
+	           to_char(schedule_enddate, 'yyyy-mm-dd') as scheduleEnddate,
+	           schedule_visibility,
+	           member_no
+	    from schedule_main
+	    where schedule_no = #{scheduleNo}
+	      and schedule_status = 'Y'
+	</select>
+	<select id="selectScheduleSubList" resultType="ScheduleSub">
+	    select to_char(s.schedule_sub_date, 'yyyy-mm-dd') as scheduleSubDate,
+	           s.schedule_sub_seq,
+	           s.content_id,
+	           l.title,
+	           l.addr1,
+	           l.firstimage,
+	           l.mapx,
+	           l.mapy
+	    from schedule_sub s
+	    join landmark l on l.content_id = s.content_id
+	    where s.schedule_no = #{scheduleNo}
+	    order by s.schedule_sub_date, s.schedule_sub_seq
+	</select>
+	
+	<update id="updateScheduleMain" parameterType="ScheduleMain">
+	    update schedule_main
+	       set schedule_title = #{scheduleTitle},
+	           schedule_startdate = to_date(#{scheduleStartdate}, 'yyyy-mm-dd'),
+	           schedule_enddate = to_date(#{scheduleEnddate}, 'yyyy-mm-dd')
+	     where schedule_no = #{scheduleNo}
+	       and member_no = #{memberNo}
+	       and schedule_status = 'Y'
+	</update>
+	
+	<delete id="deleteScheduleSubAll">
+	    delete from schedule_sub
+	     where schedule_no = #{scheduleNo}
+	</delete>
+	
+	<update id="updateScheduleVisibility">
+	    update schedule_main
+	       set schedule_visibility = #{visibility}
+	     where schedule_no = #{scheduleNo}
+	       and member_no = #{memberNo}
+	       and schedule_status = 'Y'
 	</update>
 </mapper>
