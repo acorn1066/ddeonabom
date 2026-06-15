@@ -19,11 +19,7 @@ export const AdminProvider = ({ children }) => {
         })
             .then(res => {
                 if (res.status === 403) {
-<<<<<<< Updated upstream
                     alert('접근 권한이 없습니다.');
-=======
-                    alert('접근 권한이 없습니다');
->>>>>>> Stashed changes
                     location.href = 'http://localhost:8080';
                     return null;
                 } else{
