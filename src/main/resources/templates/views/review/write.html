@@ -56,7 +56,7 @@ body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing
       <div class="flex flex-col gap-5">
         <div class="flex flex-col gap-2">
           <label class="text-13 font-semibold">여행 제목</label>
-          <input id="travelTitle" class="h-13 rounded-lg border border-line bg-white px-4 text-17 font-semibold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft" placeholder="예) 제주 동쪽 3박 4일" />
+          <input id="travelTitle" name="travelTitle" class="h-13 rounded-lg border border-line bg-white px-4 text-17 font-semibold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft" placeholder="예) 제주 동쪽 3박 4일" />
         </div>
         <div class="flex flex-col gap-2">
 		  <label class="text-13 font-semibold">지역</label>
@@ -143,8 +143,7 @@ body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing
 
     <div class="flex justify-end gap-2">
       <a href="list" class="inline-flex h-11 items-center rounded-lg border border-line bg-white px-5 text-sm font-semibold text-ink transition hover:bg-sunk">취소</a>
-      <button type="button" class="inline-flex h-11 items-center rounded-lg border border-line bg-white px-5 text-sm font-semibold text-ink transition hover:bg-sunk">후기 등록</button>
-      
+      <button type="button" id="submitBtn" class="inline-flex h-11 items-center rounded-lg border border-line bg-white px-5 text-sm font-semibold text-ink transition hover:bg-sunk">후기 등록</button>
     </div>
   </form>
 </main>
@@ -188,6 +187,7 @@ body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing
 </footer>
 
 <script>
+
 // ════════════════════════════════════════
 //  카카오맵 초기화
 // ════════════════════════════════════════
@@ -351,7 +351,7 @@ function addSpotCard(name = '', address = '', index) {
     <div class="mb-4 flex items-center gap-3">
       <span class="spot-num flex h-7 w-7 flex-none items-center justify-center rounded-full bg-brand-soft text-13 font-bold text-brand-ink">${num}</span>
       <input
-        name="subList[${idx}].spotName"
+        name="subList[${idx}].contentId"
         class="spot-name-input flex-1 rounded-lg border border-line bg-white px-3 py-2 text-base font-bold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft"
         placeholder="관광지 이름을 입력하세요"
         value="${name}"
@@ -371,7 +371,7 @@ function addSpotCard(name = '', address = '', index) {
       <input type="hidden" class="rating-value" name="subList[${idx}].rating" value="0" />
     </div>
     <textarea
-      name="subList[${idx}].content"
+      name="subList[${idx}].travelSubContent"
       class="min-h-24 w-full rounded-lg border border-line bg-white p-3 text-sm leading-relaxed outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft"
       placeholder="관광지에 대한 후기를 작성해주세요."></textarea>
       <div class="mt-3 flex flex-col gap-2">
@@ -410,16 +410,51 @@ function addSpotCard(name = '', address = '', index) {
 	//파일명 표시
   const fileInput = div.querySelector('input[type="file"]');
   const fileNameList = div.querySelector('.file-name-list');
+  let allFiles = []; // 누적 파일 저장
+
   fileInput.addEventListener('change', function() {
-      fileNameList.innerHTML = '';
+      // 새로 선택한 파일 누적
       Array.from(this.files).forEach(file => {
+          // 중복 파일 제외
+          if (!allFiles.find(f => f.name === file.name && f.size === file.size)) {
+              allFiles.push(file);
+          }
+      });
+
+      // DataTransfer로 input에 누적 파일 반영
+      const dt = new DataTransfer();
+      allFiles.forEach(file => dt.items.add(file));
+      fileInput.files = dt.files;
+
+      // 파일명 표시
+      fileNameList.innerHTML = '';
+      allFiles.forEach((file, i) => {
           const p = document.createElement('p');
-          p.textContent = '📎 ' + file.name;
+          p.className = 'flex items-center gap-1';
+          p.innerHTML = `📎 ${file.name} <button type="button" class="text-red-400 text-xs ml-1" data-index="${i}">✕</button>`;
           fileNameList.appendChild(p);
+      });
+
+      // 개별 파일 삭제
+      fileNameList.querySelectorAll('button').forEach(btn => {
+          btn.addEventListener('click', function() {
+              const idx = parseInt(this.dataset.index);
+              allFiles.splice(idx, 1);
+              const dt = new DataTransfer();
+              allFiles.forEach(file => dt.items.add(file));
+              fileInput.files = dt.files;
+              // 파일명 다시 렌더링
+              fileNameList.innerHTML = '';
+              allFiles.forEach((file, i) => {
+                  const p = document.createElement('p');
+                  p.className = 'flex items-center gap-1';
+                  p.innerHTML = `📎 ${file.name} <button type="button" class="text-red-400 text-xs ml-1" data-index="${i}">✕</button>`;
+                  fileNameList.appendChild(p);
+              });
+          });
       });
   });
   list.appendChild(div);
-  div.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function reindexCards() {
@@ -430,6 +465,13 @@ function reindexCards() {
 
 // ── 관광지 직접 추가 버튼 ─────────────────
 document.getElementById('addSpotBtn').addEventListener('click', () => addSpotCard());
+
+document.getElementById('submitBtn').addEventListener('click', () => {
+	  console.log('버튼 클릭됨');
+	  const form = document.querySelector('form');
+	  console.log('form:', form);
+	  form.submit();
+	});
 </script>
 
 </body>
