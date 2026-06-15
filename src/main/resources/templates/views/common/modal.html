@@ -3,12 +3,10 @@
 <body>
 
 	<th:block th:fragment="modal">
-
 		<!-- 딤 배경 -->
-		<div
-			class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-5 hidden"
+		<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-5 hidden"
 			id="dim-background" onclick="if(event.target===this) closeModal();">
-
+			
 			<!-- info 모달 -->
 			<div role="dialog" aria-modal="true" id="modal-info"
 				class="hidden w-96 max-w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
@@ -28,7 +26,7 @@
 						onclick="closeModal()">확인</button>
 				</div>
 			</div>
-
+			
 			<!-- confirm 모달 -->
 			<div role="dialog" aria-modal="true" id="modal-confirm"
 				class="hidden w-96 max-w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
@@ -59,7 +57,8 @@
 						id="confirm-ok">확인</button>
 				</div>
 			</div>
-
+			
+			
 			<!-- danger 모달 -->
 			<div role="dialog" aria-modal="true" id="modal-danger"
 				class="hidden w-96 max-w-full overflow-hidden rounded-2xl bg-white shadow-2xl">
@@ -89,7 +88,6 @@
 						id="danger-ok">삭제</button>
 				</div>
 			</div>
-
 		</div>
 
 		<!-- 장소 추가 모달 -->

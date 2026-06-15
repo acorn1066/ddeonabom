@@ -76,11 +76,39 @@
 	    WHERE q.q_no = #{qNo}
 	    AND q.status = 'Y'
 	</select>
+
+	<update id="updateCount" parameterType="_int">
+		UPDATE QLIST
+		SET COUNT = COUNT + 1
+		WHERE Q_NO = #{qNo}
+	</update>
 	
 	
-	<insert id="">
-		
+	<insert id="insertQList" parameterType="QList">
+		<selectKey keyProperty="qNo" resultType="int" order="BEFORE">
+			SELECT SEQ_QNO.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO QLIST (
+			Q_NO,
+			TITLE,
+			CONTENT,
+			CREATE_DATE,
+			STATUS,
+			MEMBER_NO,
+			CATEGORY,
+			VISIBILITY
+		) VALUES (
+			#{qNo},
+			#{title},
+			#{content},
+			SYSDATE,
+			'Y',
+			#{memberNo},
+			#{category},
+			#{visibility}
+		)
 	</insert>
+	
 	<select id="getMyListCount" resultType="_int" parameterType="map">
    	 SELECT COUNT(*) 
     	FROM QLIST
@@ -90,15 +118,11 @@
     </if>
 	</select>
 	
-	<select id="selectMyBoardList" resultType="QList" parameterType="map">
-   	 SELECT Q.*, M.ID 
-   	 FROM QLIST Q
-     JOIN MEMBER M ON Q.MEMBER_NO = M.MEMBER_NO
-   	 WHERE Q.MEMBER_NO = #{memberNo}
-   	 <if test="category != '전체'">
-        AND Q.CATEGORY = #{category}
-    </if>
-    	ORDER BY Q.Q_NO DESC
-    	OFFSET #{startRow} ROWS FETCH NEXT #{listLimit} ROWS ONLY
+	<select id="selectMyBoardList" resultType="QList" parameterType="int">
+    SELECT Q.*, M.ID, Q.CREATE_DATE AS createDate, Q.CATEGORY
+    FROM QLIST Q
+    JOIN MEMBER M ON Q.MEMBER_NO = M.MEMBER_NO
+    WHERE Q.MEMBER_NO = #{memberNo}
+    ORDER BY Q.Q_NO DESC
 </select>
 </mapper>
