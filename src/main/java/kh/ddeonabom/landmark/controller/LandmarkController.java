@@ -28,7 +28,7 @@ public class LandmarkController {
 								Model model, HttpServletRequest request) {
 		
 		int listCount = lService.getListCount();
-		PageInfo pi = Pagination.getPageInfo(currentPage, listCount, 5, 20);
+		PageInfo pi = Pagination.getPageInfo(currentPage, listCount, 10, 20);
 		ArrayList<Landmark> list = lService.selectLandmarkList(pi);
 		
 		model.addAttribute("loc", request.getRequestURI());
