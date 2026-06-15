@@ -22,4 +22,13 @@ public interface ScheduleMapper {
 
 	int updateScheduleStatus(Map<String, Object> param);
 
+	List<ScheduleSub> selectScheduleSubList(int scheduleNo);
+
+	ScheduleMain selectScheduleDetail(int scheduleNo);
+	
+	int updateScheduleMain(ScheduleMain schedule);
+	
+	int deleteScheduleSubAll(int scheduleNo);
+	
+	int updateScheduleVisibility(Map<String, Object> param);
 }
