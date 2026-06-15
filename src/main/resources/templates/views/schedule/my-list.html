@@ -13,13 +13,16 @@
 		</div>
 
 		<div class="flex items-center gap-2 border-b border-line pb-5">
-			<span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-ink bg-ink px-4 text-13 font-semibold text-white">
+			<span data-filter="all" onclick="filterSchedules(this)"
+			      class="filter-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-ink bg-ink px-4 text-13 font-semibold text-white">
 				전체 [[${mainNum}]]
 			</span> 
-			<span th:if="${showNum > 0}" class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">
+			<span th:if="${showNum > 0}" data-filter="Y" onclick="filterSchedules(this)"
+			      class="filter-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">
 				공유됨 [[${showNum}]]
 			</span> 
-			<span th:if="${hideNum > 0}" class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">
+			<span th:if="${hideNum > 0}" data-filter="N" onclick="filterSchedules(this)"
+			      class="filter-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">
 				비공개 [[${hideNum}]]
 			</span>
 			<div th:if="${showNum > 0}" class="ml-auto">
@@ -75,19 +78,23 @@
 	        <span class="text-13">관심 관광지를 끌어와 동선을 그려보세요</span>
 	    </a>
 	
-	    <div th:each="schedule : ${scheduleList}" class="flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-soft">
+	    <div th:each="schedule : ${scheduleList}"
+	         th:attr="data-visibility=${schedule.scheduleVisibility}"
+	         class="schedule-card flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-soft">
 	
 	        <a th:href="@{/schedule/detail/{no}(no=${schedule.scheduleNo})}" class="relative block aspect-video overflow-hidden">
 	            <div class="absolute inset-0" style="background: linear-gradient(to right, rgba(120,140,90,0.07) 1px, transparent 1px) 0 0/22px 22px, linear-gradient(to bottom, rgba(120,140,90,0.07) 1px, transparent 1px) 0 0/22px 22px, #EEF3E9;"></div>
 	            <svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" class="route-svg absolute inset-0 h-full w-full text-brand" th:attr="data-coords=${schedule.coords}">
 				    <path class="route-line" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
 				</svg>
-	
+
+	            <!-- 지역 배지 (첫 장소 주소 기반) -->
+	            <span th:if="${schedule.firstAddr != null}" class="region-badge absolute bottom-2 left-2 rounded-full bg-white/85 px-2.5 py-0.5 text-[11.5px] font-semibold text-muted backdrop-blur-sm" th:attr="data-addr=${schedule.firstAddr}">지역</span>
 	            <!-- 공유/비공개 뱃지 -->
 				<span th:if="${schedule.scheduleVisibility == 'N'}"
-				      class="absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-ink text-white px-3 text-xs font-medium">비공개</span>
+				      class="vis-badge absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-ink text-white px-3 text-xs font-medium">비공개</span>
 				<span th:unless="${schedule.scheduleVisibility == 'N'}"
-				      class="absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-brand text-white px-3 text-xs font-medium">공유됨</span>
+				      class="vis-badge absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-brand text-white px-3 text-xs font-medium">공유됨</span>
 	        </a>
 	
 	        <a th:href="@{/schedule/detail/{no}(no=${schedule.scheduleNo})}" class="block p-4">
@@ -95,36 +102,34 @@
 	            <div class="mt-1 text-13 text-muted tabular-nums" th:text="${schedule.scheduleStartdate} + ' — ' + ${schedule.scheduleEnddate}">날짜</div>
 	            <div class="mt-3 flex gap-4 text-13 text-muted">
 	                <span><b class="font-bold text-ink tabular-nums" th:text="${schedule.placeCount}">0</b>곳</span>
-	                <!-- 좋아요: 공유 기능 구현 후 활성화
-				    	<span>♥<b class="font-bold text-ink tabular-nums">184</b></span>
-				    -->
+	                <!-- 좋아요: 공유된 일정만 표시 (좋아요 테이블 생기면 매퍼 likeCount 한 줄 살리면 실값) -->
+	                <span th:if="${schedule.scheduleVisibility == 'Y'}">♥ <b class="font-bold text-ink tabular-nums" th:text="${schedule.likeCount}">0</b></span>
 	            </div>
 	        </a>
 	
 	        <div class="mt-auto flex border-t border-line">
-	            <!-- 공유·후기 버튼: 공유 게시판/후기 기능 구현 후 살리기 -->
-			    <!--
-			    <button class="flex h-11 flex-1 items-center justify-center gap-1.5 text-13 font-semibold text-muted transition hover:bg-sunk hover:text-ink">
+			    <button th:onclick="|toggleShare(${schedule.scheduleNo}, this)|"
+			            th:attr="data-visibility=${schedule.scheduleVisibility}"
+			            class="share-btn flex h-11 flex-1 items-center justify-center gap-1.5 text-13 font-semibold text-muted transition hover:bg-sunk hover:text-ink">
 			        <svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5">
 			            <circle cx="4" cy="8" r="1.6" />
 			            <circle cx="12" cy="4" r="1.6" />
 			            <circle cx="12" cy="12" r="1.6" />
 			            <path d="M5.4 7.2 10.6 4.6 M5.4 8.8 10.6 11.4" />
 			        </svg>
-			        공유
+			        <span class="share-btn-text">공유</span>
 			    </button>
-			    <button class="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-line text-13 font-semibold text-muted transition hover:bg-sunk hover:text-ink">
+			    <button onclick="reviewComingSoon()" class="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-line text-13 font-semibold text-muted transition hover:bg-sunk hover:text-ink">
 			        <svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v7H8l-3 3v-3H3z" /></svg>
 			        후기
 			    </button>
-			    -->
-	            <button th:onclick="|deleteSchedule(${schedule.scheduleNo})|" class="flex h-11 flex-1 items-center justify-center gap-1.5 text-13 font-semibold text-muted transition hover:bg-red-50 hover:text-err">
-				    <svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5">
-				        <path d="M3 5h10M6.5 5V3.5h3V5M5 5l.6 8h4.8L11 5" />
-				    </svg>
-				    삭제
-				</button>
-	        </div>
+			    <button th:onclick="|deleteSchedule(${schedule.scheduleNo})|" class="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-line text-13 font-semibold text-muted transition hover:bg-red-50 hover:text-err">
+			        <svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5">
+			            <path d="M3 5h10M6.5 5V3.5h3V5M5 5l.6 8h4.8L11 5" />
+			        </svg>
+			        삭제
+			    </button>
+			</div>
 	    </div>
 	
 	</div>
@@ -146,10 +151,9 @@ const deleteSchedule = (scheduleNo) => {
                     body: 'scheduleNo=' + scheduleNo
                 });
                 const data = await res.json();
-
+                if (handleNeedLogin(data)) return;
                 if (data.success) {
                     showToast('일정이 삭제되었어요.');
-                    // 새로고침으로 목록 갱신 (가장 간단)
                     setTimeout(() => location.reload(), 800);
                 } else {
                     showToast(data.message || '삭제에 실패했어요.', false);
@@ -163,6 +167,60 @@ const deleteSchedule = (scheduleNo) => {
 };
 
 
+// 필터 탭: 공유됨/비공개/전체 전환 (JS show-hide)
+const filterSchedules = (tab) => {
+    const filter = tab.dataset.filter;
+
+    document.querySelectorAll('.filter-tab').forEach(t => {
+        const active = t === tab;
+        t.className = active
+            ? 'filter-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-ink bg-ink px-4 text-13 font-semibold text-white'
+            : 'filter-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink';
+    });
+
+    document.querySelectorAll('.schedule-card').forEach(card => {
+        const vis = card.dataset.visibility;
+        const show = (filter === 'all') || (vis === filter);
+        card.style.display = show ? '' : 'none';
+    });
+};
+
+const REGION_MAP = {
+    '서울': '서울', '부산': '부산', '대구': '대구', '인천': '인천',
+    '광주': '광주', '대전': '대전', '울산': '울산', '세종': '세종',
+    '경기': '경기', '강원': '강원', '제주': '제주',
+    '충청북도': '충북', '충청남도': '충남',
+    '전라북도': '전북', '전라남도': '전남',
+    '경상북도': '경북', '경상남도': '경남',
+    '충북': '충북', '충남': '충남', '전북': '전북', '전남': '전남',
+    '경북': '경북', '경남': '경남', '강원특별자치도': '강원',
+    '제주특별자치도': '제주', '전북특별자치도': '전북'
+};
+
+const extractRegion = (addr1) => {
+    if (!addr1) return null;
+    const head = addr1.trim().split(' ')[0];
+    const keys = Object.keys(REGION_MAP).sort((a, b) => b.length - a.length);
+    for (const key of keys) {
+        if (head.startsWith(key)) return REGION_MAP[key];
+    }
+    return null;
+};
+
+const shortenRegionBadges = () => {
+    document.querySelectorAll('.region-badge').forEach(badge => {
+        const addr = badge.dataset.addr;
+        const region = extractRegion(addr);
+        if (region) {
+            badge.textContent = region;
+        } else {
+            // 매핑 못 찾으면 첫 단어라도 (혹은 숨김)
+            badge.textContent = addr ? addr.split(' ')[0] : '';
+        }
+    });
+};
+	
+	
 const drawRoutes = () => {
     document.querySelectorAll('.route-svg').forEach(svg => {
         const raw = svg.dataset.coords;
@@ -181,7 +239,7 @@ const drawRoutes = () => {
         const minY = Math.min(...ys), maxY = Math.max(...ys);
 
         const PAD = 20, W = 160, H = 100;
-        const rangeX = maxX - minX || 1;   // 0 division 방지
+        const rangeX = maxX - minX || 1;
         const rangeY = maxY - minY || 1;
 
         const scaled = points.map(([x, y]) => {
@@ -215,6 +273,83 @@ const drawRoutes = () => {
     });
 }
 
+// 목록 카드에서 공유 토글
+const toggleShare = (scheduleNo, btn) => {
+    const card = btn.closest('.schedule-card');
+    const cur = btn.dataset.visibility;   // 현재 'Y'/'N'
+    const sharing = (cur !== 'Y');
+
+    const title = sharing ? '이 일정을 공유할까요?' : '공유를 해제할까요?';
+    const text = sharing ? '공유하면 다른 여행자들이 내 일정을 볼 수 있어요.' : '공유를 해제하면 게시판에서 내려가요.';
+
+    openConfirmModal(title, text, async () => {
+        try {
+            const res = await fetch('/schedule/visibility', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'scheduleNo=' + scheduleNo
+            });
+            const data = await res.json();
+            if (handleNeedLogin(data)) return;
+            if (data.success) {
+                const vis = data.visibility;
+
+                // 버튼 상태 갱신
+                btn.dataset.visibility = vis;
+                btn.querySelector('.share-btn-text').textContent = (vis === 'Y') ? '공유 해제' : '공유';
+
+                // 카드 뱃지 갱신
+                updateCardBadge(card, vis);
+                // 필터용 카드 상태도 갱신
+                card.dataset.visibility = vis;
+
+                showToast(vis === 'Y' ? '일정을 공유했어요.' : '공유를 해제했어요.');
+            } else {
+                showToast(data.message || '변경에 실패했어요.', false);
+            }
+        } catch (e) {
+            showToast('변경 중 오류가 발생했어요.', false);
+        }
+    });
+};
+
+const updateCardBadge = (card, vis) => {
+    const badge = card.querySelector('.vis-badge');
+    if (!badge) return;
+    if (vis === 'Y') {
+        badge.textContent = '공유됨';
+        badge.className = 'vis-badge absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-brand text-white px-3 text-xs font-medium';
+    } else {
+        badge.textContent = '비공개';
+        badge.className = 'vis-badge absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-ink text-white px-3 text-xs font-medium';
+    }
+};
+
+const reviewComingSoon = () => {
+    showToast('후기 기능은 준비 중이에요.', false);
+};
+
+const initShareButtons = () => {
+    document.querySelectorAll('.share-btn').forEach(btn => {
+        const vis = btn.dataset.visibility;
+        btn.querySelector('.share-btn-text').textContent = (vis === 'Y') ? '공유 해제' : '공유';
+    });
+};
+
+const handleNeedLogin = (data) => {
+    if (data && data.needLogin) {
+        const back = encodeURIComponent(location.pathname + location.search);
+        showToast('로그인이 필요해요. 로그인 페이지로 이동할게요.', false);
+        setTimeout(() => {
+            location.href = '/member/login?targetUrl=' + back;
+        }, 800);
+        return true;
+    }
+    return false;
+};
+
+document.addEventListener('DOMContentLoaded', initShareButtons);
+document.addEventListener('DOMContentLoaded', shortenRegionBadges);
 document.addEventListener('DOMContentLoaded', drawRoutes);
 </script>
 </body>

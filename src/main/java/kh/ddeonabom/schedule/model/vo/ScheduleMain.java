@@ -29,5 +29,8 @@ public class ScheduleMain {
 	private List<ScheduleSub> places;
 	private Integer placeCount;
 	private String coords;
+	
+	private String firstAddr;
+	private int likeCount;
 
 }

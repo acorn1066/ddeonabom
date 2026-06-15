@@ -168,10 +168,11 @@ public class MemberController {
 
         return "FAIL";
     }
-	@GetMapping("/login")
-	public String loginPage() {
-		return "views/member/login";
-	}
+    @GetMapping("/login")
+    public String loginPage(@RequestParam(value="targetUrl", required=false) String targetUrl, Model model) {
+        model.addAttribute("targetUrl", targetUrl);
+        return "views/member/login";
+    }
 	 // =========================================================
     // 로그인 처리
     // =========================================================
@@ -192,13 +193,10 @@ public class MemberController {
                 return "redirect:/admin/dash";
             }
             
-         // 히든 인풋으로 넘어온 targetUrl(목적지)이 진짜로 존재한다면?
-            if (targetUrl != null && !targetUrl.isEmpty()) {
-                return "redirect:" + targetUrl; //
+            if (targetUrl != null && targetUrl.startsWith("/") && !targetUrl.startsWith("//")) {
+                return "redirect:" + targetUrl;
             }
-            
-   
-            return "redirect:/"; 
+            return "redirect:/";
         }
 
         return "redirect:/member/login?error";
