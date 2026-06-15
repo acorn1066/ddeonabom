@@ -43,4 +43,9 @@ public class QListService {
 	public int updateCount(int qNo) {
 		return qMapper.updateCount(qNo);
 	}
+
+	// Mapper로 soft delete 위임
+	public int deleteQList(int qNo) {
+		return qMapper.deleteQList(qNo);
+	}
 }
