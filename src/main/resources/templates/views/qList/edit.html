@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{views/common/head :: head}"></head>
+<body>
+	<div th:replace="~{views/common/navbar :: navbar}"></div>
+
+	<!-- ════════════ MAIN ════════════ -->
+	<main class="mx-auto max-w-3xl px-6 pb-24 pt-16">
+	  <h1 class="mb-2 text-3xl font-extrabold tracking-tight">질문 수정</h1>
+	  <p class="mb-12 text-15 text-muted">내용을 수정한 후 저장하세요.</p>
+
+	  <form th:action="@{/qList/update}" method="post" class="flex flex-col gap-6">
+	    <!-- ★ 수정 대상 qNo 전송용 hidden input -->
+	    <input type="hidden" name="qNo" th:value="${q.qNo}" />
+
+	    <div class="flex flex-col gap-2">
+	      <label class="text-13 font-semibold">카테고리</label>
+	      <div class="flex flex-wrap gap-2" id="categoryBtns">
+	        <span data-category="교통" onclick="selectCategory(this)"
+	              class="category-btn inline-flex h-9 cursor-pointer items-center rounded-full border border-transparent bg-brand px-4 text-sm font-semibold text-white">교통·이동</span>
+	        <span data-category="숙소" onclick="selectCategory(this)"
+	              class="category-btn inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-sm font-semibold text-muted transition hover:border-muted hover:text-ink">숙소</span>
+	        <span data-category="맛집" onclick="selectCategory(this)"
+	              class="category-btn inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-sm font-semibold text-muted transition hover:border-muted hover:text-ink">맛집</span>
+	        <span data-category="일정" onclick="selectCategory(this)"
+	              class="category-btn inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-sm font-semibold text-muted transition hover:border-muted hover:text-ink">일정</span>
+
+	        <span data-category="기타" onclick="selectCategory(this)"
+	              class="category-btn inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-sm font-semibold text-muted transition hover:border-muted hover:text-ink">기타</span>
+	      </div>
+	      <!-- ★ 기존 카테고리 초기값 바인딩 -->
+	      <input type="hidden" name="category" id="categoryInput" th:value="${q.category}" />
+	    </div>
+
+	    <div class="flex flex-col gap-2">
+	      <label class="text-13 font-semibold">제목</label>
+	      <!-- ★ 기존 제목 바인딩 -->
+	      <input name="title" th:value="${q.title}"
+	             class="h-14 rounded-lg border border-line bg-white px-4 text-17 font-semibold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft"
+	             placeholder="질문을 한 줄로 요약해주세요" />
+	    </div>
+
+	    <div class="flex flex-col gap-2">
+	      <label class="text-13 font-semibold">내용</label>
+	      <!-- ★ 기존 내용 바인딩: textarea는 value 속성이 없으므로 th:text 사용 -->
+	      <textarea name="content"
+	                class="min-h-56 rounded-lg border border-line bg-white p-4 text-sm leading-relaxed outline-none transition placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft"
+	                placeholder="여행 시기, 동행 인원, 이동 수단 등 상황을 함께 적어주시면 더 정확한 답변을 받을 수 있어요."
+	                th:text="${q.content}"></textarea>
+	    </div>
+
+	    <div class="flex flex-col gap-2">
+	      <label class="text-13 font-semibold">공개 설정</label>
+	      <div class="flex flex-col gap-3">
+	        <!-- ★ 기존 공개 설정 체크 상태 바인딩 -->
+	        <label class="flex items-center gap-2.5 text-sm text-muted">
+	          <input type="radio" name="visibility" value="ALL" class="accent-brand"
+	                 th:checked="${q.visibility == 'ALL'}" />
+	          <span><b class="text-ink">전체 공개</b> · 누구나 질문과 답변을 볼 수 있습니다</span>
+	        </label>
+	        <label class="flex items-center gap-2.5 text-sm text-muted">
+	          <input type="radio" name="visibility" value="MEMBER" class="accent-brand"
+	                 th:checked="${q.visibility == 'MEMBER'}" />
+	          <span><b class="text-ink">회원 공개</b> · 로그인한 떠나봄 회원만 볼 수 있습니다</span>
+	        </label>
+	      </div>
+	    </div>
+
+	    <div class="flex items-center justify-between gap-2">
+	      <!-- ★ 삭제 버튼: detail과 동일하게 danger 모달 트리거 -->
+	      <button type="button" class="text-sm font-semibold text-err"
+	              th:onclick="|openDeleteModal([[${q.qNo}]])|">질문 삭제</button>
+
+	      <div class="flex gap-2">
+	        <!-- ★ 취소 시 목록이 아닌 해당 글 상세로 복귀 -->
+	        <a th:href="@{/qList/detail(qNo=${q.qNo})}"
+	           class="inline-flex h-11 items-center rounded-lg border border-line bg-white px-5 text-sm font-semibold text-ink transition hover:bg-sunk">취소</a>
+	        <button class="inline-flex h-11 items-center rounded-lg bg-brand px-5 text-sm font-semibold text-white transition hover:bg-brand-ink">수정 완료</button>
+	      </div>
+	    </div>
+	  </form>
+	</main>
+
+	<!-- ★ 삭제용 hidden form: edit 페이지에서도 삭제 가능 -->
+	<form id="delete-form" th:action="@{/qList/delete}" method="post" style="display:none">
+	  <input type="hidden" id="delete-qNo" name="qNo" />
+	</form>
+
+	<script>
+	  // ★ danger 모달 열기 → 확인 시 hidden form POST 제출 (detail.html과 동일 패턴)
+	  function openDeleteModal(qNo) {
+	    openDangerModal(
+	      '질문을 삭제할까요?',
+	      '삭제한 글은 되돌릴 수 없어요.',
+	      function () {
+	        document.getElementById('delete-qNo').value = qNo;
+	        document.getElementById('delete-form').submit();
+	      }
+	    );
+	  }
+
+	  function selectCategory(el) {
+	    // 모든 버튼 비활성 스타일로 초기화
+	    document.querySelectorAll('.category-btn').forEach(btn => {
+	      btn.classList.remove('border-transparent', 'bg-brand', 'text-white');
+	      btn.classList.add('border-line', 'bg-white', 'text-muted');
+	    });
+	    // 클릭된 버튼 활성 스타일 적용
+	    el.classList.remove('border-line', 'bg-white', 'text-muted');
+	    el.classList.add('border-transparent', 'bg-brand', 'text-white');
+	    // hidden input 값 업데이트 → 서버로 전송될 category 값
+	    document.getElementById('categoryInput').value = el.dataset.category;
+	  }
+
+	  // ★ 페이지 로드 시 기존 카테고리 버튼 활성화
+	  window.addEventListener('DOMContentLoaded', function () {
+	    const saved = document.getElementById('categoryInput').value;
+	    document.querySelectorAll('.category-btn').forEach(btn => {
+	      if (btn.dataset.category === saved) selectCategory(btn);
+	    });
+	  });
+	</script>
+
+	<div th:replace="~{views/common/modal :: modal}"></div>
+	<footer th:replace="~{views/common/footer :: footer}"></footer>
+</body>
+</html>

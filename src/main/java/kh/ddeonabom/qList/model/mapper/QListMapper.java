@@ -28,4 +28,7 @@ public interface QListMapper {
 	// soft delete: STATUS = 'N' 처리
 	int deleteQList(int qNo);
 
+	// 글 수정
+	int updateQList(QList q);
+
 }
