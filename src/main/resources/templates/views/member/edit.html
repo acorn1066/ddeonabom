@@ -26,7 +26,17 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
-<style> body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing:antialiased; letter-spacing:-0.01em; } </style>
+<style>
+  body {
+    font-family:'Noto Sans KR', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    letter-spacing:-0.01em;
+    /* 배경색을 살짝 회색조로 바꾸고, 도트 패턴 추가 */
+    background-color: #f9fafb;
+    background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+</style>
 </head>
 <body class="bg-white text-ink">
 <th:block th:replace="~{views/common/modal :: modal}"></th:block>
