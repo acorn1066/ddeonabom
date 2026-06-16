@@ -35,7 +35,7 @@
 	    <div class="flex flex-col gap-2">
 	      <label class="text-13 font-semibold">제목</label>
 	      <!-- ★ 기존 제목 바인딩 -->
-	      <input name="title" th:value="${q.title}"
+	      <input name="title" required th:value="${q.title}"
 	             class="h-14 rounded-lg border border-line bg-white px-4 text-17 font-semibold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft"
 	             placeholder="질문을 한 줄로 요약해주세요" />
 	    </div>
@@ -43,7 +43,7 @@
 	    <div class="flex flex-col gap-2">
 	      <label class="text-13 font-semibold">내용</label>
 	      <!-- ★ 기존 내용 바인딩: textarea는 value 속성이 없으므로 th:text 사용 -->
-	      <textarea name="content"
+	      <textarea name="content" required
 	                class="min-h-56 rounded-lg border border-line bg-white p-4 text-sm leading-relaxed outline-none transition placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft"
 	                placeholder="여행 시기, 동행 인원, 이동 수단 등 상황을 함께 적어주시면 더 정확한 답변을 받을 수 있어요."
 	                th:text="${q.content}"></textarea>
