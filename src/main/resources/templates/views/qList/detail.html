@@ -34,15 +34,20 @@
           <!-- ★ 작성자명: q.writer 동적으로 -->
           <div class="text-sm font-bold" th:text="${q.writer}"></div>
 
-          <!-- ★ 날짜/조회수: java.sql.Date이므로 #dates.format 사용 (#temporals 아님) -->
-          <div class="text-13 text-muted tabular-nums"
-               th:text="${#dates.format(q.createDate, 'yyyy.MM.dd')} + ' · 조회 ' + ${q.count}"></div>
+          <!-- ★ 날짜/조회수: span 3개로 분리 (정렬 기준점 확보) -->
+          <div class="flex items-center gap-1 text-13 text-muted tabular-nums">
+            <span th:text="${#dates.format(q.createDate, 'yyyy.MM.dd')}"></span>
+            <span>·</span>
+            <span th:text="'조회 ' + ${q.count}"></span>
+          </div>
 
-          <!-- ★ 수정일: null 아닐 때만 노출, #dates.format 사용 -->
-          <th:block th:if="${q.modifyDate != null}">
-            · <span class="edited-info"
-                    th:text="'수정됨 ' + ${#dates.format(q.modifyDate, 'yyyy.MM.dd')}"></span>
-          </th:block>
+          <!-- ★ 수정일: ·는 조회 줄과 세로 정렬용 invisible spacer -->
+          <div th:if="${q.modifyDate != null}"
+               class="flex items-center gap-1 text-13 text-muted tabular-nums">
+            <span th:text="${#dates.format(q.modifyDate, 'yyyy.MM.dd')}"></span>
+            <span class="invisible">·</span>
+            <span>수정됨</span>
+          </div>
         </div>
 
         <!-- ★ 수정/삭제: 로그인한 사용자가 작성자 본인일 때만 노출 -->

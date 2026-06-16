@@ -9,15 +9,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.admin.model.service.AdminService;
 import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.admin.model.vo.AdminPost;
+import kh.ddeonabom.common.paging.PageInfo;
+import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.member.model.vo.Member;
-import kh.ddeonabom.qList.model.vo.QList;
-import kh.ddeonabom.review.model.vo.Review;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -40,14 +41,12 @@ public class AdminController {
 	    Map<String, Object> map = new HashMap<>();
 
 	    map.put("memberCount", aService.selectMemberCount());
-
 	    map.put("boardCount",
 	            aService.selectQlistCount()
 	          + aService.selectTravelCount()
 	          + aService.selectScheduleCount());
 
 	    map.put("replyCount", aService.selectReplyCount());
-
 	    map.put("reportCount", aService.selectReportCount());
 
 	    return map;
@@ -60,11 +59,30 @@ public class AdminController {
 		
 	}
 	
+//	@ResponseBody
+//	@GetMapping("/members")
+//	public ArrayList<Member> selectMembers(HttpSession session) {
+//		String id = ((Member)session.getAttribute("loginUser")).getId();
+//	    return aService.selectMembers(id);
+//	}
+	
 	@ResponseBody
 	@GetMapping("/members")
-	public ArrayList<Member> selectMembers(HttpSession session) {
-		String id = ((Member)session.getAttribute("loginUser")).getId();
-	    return aService.selectMembers(id);
+	public HashMap<String, Object> members(
+	        @RequestParam(value = "page", defaultValue = "1") int page, HttpSession session) {
+
+	    Member loginUser = (Member)session.getAttribute("loginUser");
+	    int listCount = aService.selectMemberCountList(loginUser.getId());
+	    PageInfo pi = Pagination.getPageInfo(page, listCount, 10, 7);
+
+	    ArrayList<Member> list = aService.selectMembers(loginUser.getId(), pi);
+
+	    HashMap<String, Object> data = new HashMap<>();
+
+	    data.put("list", list);
+	    data.put("pi", pi);
+
+	    return data;
 	}
 	
 	@ResponseBody
@@ -82,21 +100,22 @@ public class AdminController {
 	    return aService.selectNoticeList();
 	}
 	
-		@ResponseBody
-		@GetMapping("/posts/schedule")
-	    public ArrayList<AdminPost> shareList() {
-	        return aService.selectSchedulePosts();
-	    }
-		@ResponseBody
-	    @GetMapping("/posts/review")
-	    public ArrayList<AdminPost> reviewList() {
-	        return aService.selectReviewPosts();
-	    }
-		@ResponseBody
-	    @GetMapping("/posts/question")
-	    public ArrayList<AdminPost> questionList() {
-	        return aService.selectQuestionPosts();
-	    }
+	@ResponseBody
+	@GetMapping("/posts")
+	public HashMap<String, Object> postList(@RequestParam("category") String category, @RequestParam(value = "page", defaultValue = "1") int page) {
+
+	    int listCount = aService.getPostCount(category);
+	    
+//	    System.out.println("category = " + category);
+//	    System.out.println("listCount = " + listCount);
+	    PageInfo pi = Pagination.getPageInfo(page, listCount, 10, 7);
+	    ArrayList<AdminPost> list = aService.selectPostList(category, pi);
+	    HashMap<String, Object> data = new HashMap<>();
+
+	    data.put("list", list);
+	    data.put("pi", pi);
+	    return data;
+	}
 		
 		@ResponseBody
 		@PutMapping("/posts/status")

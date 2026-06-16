@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import kh.ddeonabom.common.interceptor.CheckAdminInterceptor;
@@ -23,6 +24,12 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/css/**", "/js/**", "/images/**");
         registry.addInterceptor(new CheckAdminInterceptor())
         		.addPathPatterns("/admin/**");
+    }
+    
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:///C:/reviews/");
     }
     
     @Bean
