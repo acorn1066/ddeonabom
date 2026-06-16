@@ -48,4 +48,9 @@ public class QListService {
 	public int deleteQList(int qNo) {
 		return qMapper.deleteQList(qNo);
 	}
+
+	// Mapper로 글 수정 위임
+	public int updateQList(QList q) {
+		return qMapper.updateQList(q);
+	}
 }
