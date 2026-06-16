@@ -67,11 +67,12 @@ public class ReviewController {
 	@GetMapping("/reviews/write")
 	public String reviewWrite(Model model, HttpSession session) {
 		Member loginUser = (Member) session.getAttribute("loginUser");
+		System.out.println("loginUser: " + session.getAttribute("loginUser"));
 		if (loginUser == null) {
 	        return "redirect:/member/login?targetUrl=/reviews/write";
 	    }
 		model.addAttribute("kakaoApiKey", "77218df82558088a0b690733061ba6f2");
-		 
+		
 	    return "views/review/write"; 
 	}
 
@@ -118,6 +119,7 @@ public class ReviewController {
 	                    }
 	                }
 	            }
+	            
 	        }
 
 	        return "redirect:/reviews/list";
@@ -125,6 +127,8 @@ public class ReviewController {
 	        return "redirect:/reviews/write";
 	    }
 	}
+	
+	
 	
 	
 	

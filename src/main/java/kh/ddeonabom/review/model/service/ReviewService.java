@@ -26,24 +26,18 @@ public class ReviewService {
 		return reviewMapper.selectListCount(keyword, region, loginUserNo);
 	}
 
-	
+	public int insertReview(Review r) {
+		return reviewMapper.insertReview(r);
+	}
+
 
 	public void insertReviewSub(ReviewSub sub) {
-		
+		reviewMapper.insertReviewSub(sub);
 	}
 
 	public void insertImage(Image img) {
-		
+		reviewMapper.insertImage(img);
 	}
-
-	public int insertReview(Review r) {
-		return 0;
-	}
-
-
-	
-
-	
 
 	public ArrayList<Review> selectMyReviewList(int memberNo) {
 		return reviewMapper.selectMyReviewList(memberNo);
