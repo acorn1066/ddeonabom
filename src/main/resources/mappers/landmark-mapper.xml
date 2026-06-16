@@ -24,4 +24,10 @@
 		select *
 		from landmark
 	</select>
+	
+	<select id="landmarkDetail">
+		select *
+		from landmark
+		where content_id = #{contentId}
+	</select>
 </mapper>
