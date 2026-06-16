@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{views/common/head :: head}"></head>
+<style>
+	.overflow-hidden{cursor: pointer;}
+</style>
 <body>
 	<div th:replace="~{views/common/navbar :: navbar}"></div>
 	<main class="mx-auto max-w-wide px-6">
@@ -54,173 +57,30 @@
 	      	<div class="absolute inset-0 flex items-center justify-center bg-sunk"><span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">[[${l.title}]]</span></div>
 	      </th:block>
 	        <span class="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-brand"><svg width="17" height="17" viewBox="0 0 18 18" fill="currentColor" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span>
-	        <span class="absolute bottom-2.5> left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">자연</span>
+	        <span class="absolute bottom-2.5> left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">[[${contentType[l.contentTypeId]}]]</span>
 	      </div>
 	      <div class="px-0.5 pb-1 pt-3" >
 	        <div class="text-base font-bold">[[${l.title}]]</div>
 	        <div class="mt-1 flex items-center justify-between">
-	          <span class="text-13 text-muted">[[${l.addr1}]]</span>
+	        <th:block th:if="${l.addr1 != null and !#strings.isEmpty(l.addr1)}">
+	          <span class="text-13 text-muted">
+	          [[${l.addr1}]]</span>
+	        </th:block>
+	          <div class="id" style="display: none">[[${l.contentId}]]</div>
 	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">4.6</span></span>
 	        </div>
 	      </div>
 	    </div>
-<!-- 	    <a href="site-detail.html" class="overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card"> -->
-<!-- 	      <div class="relative aspect-card"> -->
-<!-- 	        <div class="absolute inset-0 flex items-center justify-center bg-sunk"><span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">경복궁</span></div> -->
-<!-- 	        <span class="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-muted"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span> -->
-<!-- 	        <span class="absolute bottom-2.5 left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">문화·역사</span> -->
-<!-- 	      </div> -->
-<!-- 	      <div class="px-0.5 pb-1 pt-3"> -->
-<!-- 	        <div class="text-base font-bold">경복궁</div> -->
-<!-- 	        <div class="mt-1 flex items-center justify-between"> -->
-<!-- 	          <span class="text-13 text-muted">서울 종로구</span> -->
-<!-- 	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">4.5</span></span> -->
-<!-- 	        </div> -->
-<!-- 	      </div> -->
-<!-- 	    </a> -->
-<!-- 	    <a href="site-detail.html" class="overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card"> -->
-<!-- 	      <div class="relative aspect-card"> -->
-<!-- 	        <div class="absolute inset-0 flex items-center justify-center bg-sunk"><span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">감천문화마을</span></div> -->
-<!-- 	        <span class="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-muted"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span> -->
-<!-- 	        <span class="absolute bottom-2.5 left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">문화·역사</span> -->
-<!-- 	      </div> -->
-<!-- 	      <div class="px-0.5 pb-1 pt-3"> -->
-<!-- 	        <div class="text-base font-bold">감천문화마을</div> -->
-<!-- 	        <div class="mt-1 flex items-center justify-between"> -->
-<!-- 	          <span class="text-13 text-muted">부산 사하구</span> -->
-<!-- 	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">4.3</span></span> -->
-<!-- 	        </div> -->
-<!-- 	      </div> -->
-<!-- 	    </a> -->
-<!-- 	    <a href="site-detail.html" class="overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card"> -->
-<!-- 	      <div class="relative aspect-card"> -->
-<!-- 	        <div class="absolute inset-0 flex items-center justify-center bg-sunk"><span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">한라산 영실</span></div> -->
-<!-- 	        <span class="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-muted"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span> -->
-<!-- 	        <span class="absolute bottom-2.5 left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">자연</span> -->
-<!-- 	      </div> -->
-<!-- 	      <div class="px-0.5 pb-1 pt-3"> -->
-<!-- 	        <div class="text-base font-bold">한라산 영실</div> -->
-<!-- 	        <div class="mt-1 flex items-center justify-between"> -->
-<!-- 	          <span class="text-13 text-muted">제주 서귀포시</span> -->
-<!-- 	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">4.8</span></span> -->
-<!-- 	        </div> -->
-<!-- 	      </div> -->
-<!-- 	    </a> -->
-<!-- 	    <a href="site-detail.html" class="overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card"> -->
-<!-- 	      <div class="relative aspect-card"> -->
-<!-- 	        <div class="absolute inset-0 flex items-center justify-center bg-sunk"><span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">오대산 월정사</span></div> -->
-<!-- 	        <span class="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-brand"><svg width="17" height="17" viewBox="0 0 18 18" fill="currentColor" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span> -->
-<!-- 	        <span class="absolute bottom-2.5 left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">문화·역사</span> -->
-<!-- 	      </div> -->
-<!-- 	      <div class="px-0.5 pb-1 pt-3"> -->
-<!-- 	        <div class="text-base font-bold">오대산 월정사</div> -->
-<!-- 	        <div class="mt-1 flex items-center justify-between"> -->
-<!-- 	          <span class="text-13 text-muted">강원 평창군</span> -->
-<!-- 	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">4.4</span></span> -->
-<!-- 	        </div> -->
-<!-- 	      </div> -->
-<!-- 	    </a> -->
-<!-- 	    <a href="site-detail.html" class="overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card"> -->
-<!-- 	      <div class="relative aspect-card"> -->
-<!-- 	        <div class="absolute inset-0 flex items-center justify-center bg-sunk"><span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">광안리 해수욕장</span></div> -->
-<!-- 	        <span class="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-muted"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span> -->
-<!-- 	        <span class="absolute bottom-2.5 left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">자연</span> -->
-<!-- 	      </div> -->
-<!-- 	      <div class="px-0.5 pb-1 pt-3"> -->
-<!-- 	        <div class="text-base font-bold">광안리 해수욕장</div> -->
-<!-- 	        <div class="mt-1 flex items-center justify-between"> -->
-<!-- 	          <span class="text-13 text-muted">부산 수영구</span> -->
-<!-- 	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">4.5</span></span> -->
-<!-- 	        </div> -->
-<!-- 	      </div> -->
-<!-- 	    </a> -->
-<!-- 	    <a href="site-detail.html" class="overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card"> -->
-<!-- 	      <div class="relative aspect-card"> -->
-<!-- 	        <div class="absolute inset-0 flex items-center justify-center bg-sunk"><span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">전주 한옥마을</span></div> -->
-<!-- 	        <span class="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-muted"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span> -->
-<!-- 	        <span class="absolute bottom-2.5 left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">문화·역사</span> -->
-<!-- 	      </div> -->
-<!-- 	      <div class="px-0.5 pb-1 pt-3"> -->
-<!-- 	        <div class="text-base font-bold">전주 한옥마을</div> -->
-<!-- 	        <div class="mt-1 flex items-center justify-between"> -->
-<!-- 	          <span class="text-13 text-muted">전북 전주시</span> -->
-<!-- 	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">4.2</span></span> -->
-<!-- 	        </div> -->
-<!-- 	      </div> -->
-<!-- 	    </a> -->
-<!-- 	    <a href="site-detail.html" class="overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card"> -->
-<!-- 	      <div class="relative aspect-card"> -->
-<!-- 	        <div class="absolute inset-0 flex items-center justify-center bg-sunk"><span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">우도</span></div> -->
-<!-- 	        <span class="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-muted"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span> -->
-<!-- 	        <span class="absolute bottom-2.5 left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">자연</span> -->
-<!-- 	      </div> -->
-<!-- 	      <div class="px-0.5 pb-1 pt-3"> -->
-<!-- 	        <div class="text-base font-bold">우도</div> -->
-<!-- 	        <div class="mt-1 flex items-center justify-between"> -->
-<!-- 	          <span class="text-13 text-muted">제주 제주시</span> -->
-<!-- 	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">4.7</span></span> -->
-<!-- 	        </div> -->
-<!-- 	      </div> -->
-<!-- 	    </a> -->
-<!-- 	    <a href="site-detail.html" class="overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card"> -->
-<!-- 	      <div class="relative aspect-card"> -->
-<!-- 	        <div class="absolute inset-0 flex items-center justify-center bg-sunk"><span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">남이섬</span></div> -->
-<!-- 	        <span class="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-brand"><svg width="17" height="17" viewBox="0 0 18 18" fill="currentColor" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span> -->
-<!-- 	        <span class="absolute bottom-2.5 left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">자연</span> -->
-<!-- 	      </div> -->
-<!-- 	      <div class="px-0.5 pb-1 pt-3"> -->
-<!-- 	        <div class="text-base font-bold">남이섬</div> -->
-<!-- 	        <div class="mt-1 flex items-center justify-between"> -->
-<!-- 	          <span class="text-13 text-muted">강원 춘천시</span> -->
-<!-- 	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">4.3</span></span> -->
-<!-- 	        </div> -->
-<!-- 	      </div> -->
-<!-- 	    </a> -->
-<!-- 	    <a href="site-detail.html" class="overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card"> -->
-<!-- 	      <div class="relative aspect-card"> -->
-<!-- 	        <div class="absolute inset-0 flex items-center justify-center bg-sunk"><span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">해운대 해수욕장</span></div> -->
-<!-- 	        <span class="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-muted"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span> -->
-<!-- 	        <span class="absolute bottom-2.5 left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">자연</span> -->
-<!-- 	      </div> -->
-<!-- 	      <div class="px-0.5 pb-1 pt-3"> -->
-<!-- 	        <div class="text-base font-bold">해운대 해수욕장</div> -->
-<!-- 	        <div class="mt-1 flex items-center justify-between"> -->
-<!-- 	          <span class="text-13 text-muted">부산 해운대구</span> -->
-<!-- 	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">4.6</span></span> -->
-<!-- 	        </div> -->
-<!-- 	      </div> -->
-<!-- 	    </a> -->
-<!-- 	    <a href="site-detail.html" class="overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card"> -->
-<!-- 	      <div class="relative aspect-card"> -->
-<!-- 	        <div class="absolute inset-0 flex items-center justify-center bg-sunk"><span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">불국사</span></div> -->
-<!-- 	        <span class="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-muted"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span> -->
-<!-- 	        <span class="absolute bottom-2.5 left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">문화·역사</span> -->
-<!-- 	      </div> -->
-<!-- 	      <div class="px-0.5 pb-1 pt-3"> -->
-<!-- 	        <div class="text-base font-bold">불국사</div> -->
-<!-- 	        <div class="mt-1 flex items-center justify-between"> -->
-<!-- 	          <span class="text-13 text-muted">경북 경주시</span> -->
-<!-- 	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">4.7</span></span> -->
-<!-- 	        </div> -->
-<!-- 	      </div> -->
-<!-- 	    </a> -->
-<!-- 	    <a href="site-detail.html" class="overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card"> -->
-<!-- 	      <div class="relative aspect-card"> -->
-<!-- 	        <div class="absolute inset-0 flex items-center justify-center bg-sunk"><span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">섭지코지</span></div> -->
-<!-- 	        <span class="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-muted"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span> -->
-<!-- 	        <span class="absolute bottom-2.5 left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">자연</span> -->
-<!-- 	      </div> -->
-<!-- 	      <div class="px-0.5 pb-1 pt-3"> -->
-<!-- 	        <div class="text-base font-bold">섭지코지</div> -->
-<!-- 	        <div class="mt-1 flex items-center justify-between"> -->
-<!-- 	          <span class="text-13 text-muted">제주 서귀포시</span> -->
-<!-- 	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">4.5</span></span> -->
-<!-- 	        </div> -->
-<!-- 	      </div> -->
-<!-- 	    </a> -->
 	  </div>
 		<!-- 페이징 처리 -->
 	  <div class="flex justify-center gap-1 py-6">
+	  
+	  	<a th:if="${pi.currentPage > 1}"
+	  		th:href="@{${loc}(page=1)}"
+	  		class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">
+	  	‹‹
+	  	</a>
+	  	
 	  	<a th:if="${pi.currentPage > 1}"
 	  		th:href="@{${loc}(page=${pi.currentPage - 1})}"
 	  		class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">
@@ -244,20 +104,12 @@
 	  		class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">
 	  	›	
 	  	</a>
-
-<!-- 	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">‹</a> -->
-<!-- 	    <span class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg bg-brand px-2 text-sm font-medium text-white">1</span> -->
-<!-- 	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">2</a> -->
-<!-- 	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">3</a> -->
-<!-- 	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">4</a> -->
-<!-- 	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">5</a> -->
-<!-- 	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">6</a> -->
-<!-- 	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">7</a> -->
-<!-- 	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">8</a> -->
-<!-- 	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">9</a> -->
-<!-- 	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">10</a> -->
-<!-- 	    <a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">››</a> -->
-	    
+	  	
+	  	<a th:if="${pi.currentPage < pi.maxPage}"
+	  		th:href="@{${loc}(page=${pi.maxPage})}"
+	  		class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">
+	  	››	
+	  	</a>
 	  </div>
 		
 	</main>
@@ -270,13 +122,14 @@
 			for(list of lists) {
 // 				console.log(list);
 				list.addEventListener('click', (e) => {
-// 					console.log(e.target);
-					const parent = e.target.parentElement.querySelectorAll('list');
-					console.log(parent);
+					console.log(e.target);
+					const div = e.target.closest('.overflow-hidden');
+					console.log(div);
+					const contentId = div.querySelector('.overflow-hidden .id').innerText
+					console.log(contentId);
+					location.href = '/landmark/' + contentId + "/" + /*[[${pi.currentPage}]]*/0;
 				});
 			}
-			
-			
 		}
 	</script>
 </body>
