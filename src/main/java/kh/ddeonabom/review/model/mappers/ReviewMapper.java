@@ -26,4 +26,10 @@ public interface ReviewMapper {
 
 	ArrayList<Review> selectMyReviewList(int memberNo);
 
+	Review getReviewDetail(int travelNo);
+
+	List<ReviewSub> getReviewSubList(int travelNo);
+
+	List<Image> getImageListBySubNo(int travelSubNo);
+
 }

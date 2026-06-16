@@ -22,11 +22,11 @@ public class ReviewSub {
     private int travelSubSeq;
     private Date travelSubDate;
     private int travelNo;
-    private String contentId;
+    private int contentId;
     private List<String> images;
-    private int rating;
-    
+    private int rating;    
     private List<MultipartFile> imageFiles;
-
+    private double lat;
+    private double lng;
 
 }

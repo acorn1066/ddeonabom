@@ -25,6 +25,7 @@ public class Review {
     private int memberNo;        
     private Integer scheduleNo;
     private int likeCount;
+    private String region;
     private List<ReviewSub> subList; 
     private String keyword;
     private String visibility;

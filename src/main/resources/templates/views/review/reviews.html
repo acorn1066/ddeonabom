@@ -22,6 +22,7 @@ body {
 
 	<div th:replace="~{views/common/navbar :: navbar}"></div>
 	<div th:replace="~{views/common/modal :: modal}"></div>
+	
 
 	<main class="mx-auto max-w-wide px-6">
 	  <div class="flex items-end justify-between pb-5 pt-12">
@@ -76,53 +77,7 @@ body {
 		</div>
 	</main>
 
-	<footer
-		class="mt-24 border-t border-line bg-sunk pb-12 pt-16 text-sm text-muted">
-		<div
-			class="mx-auto flex max-w-wide items-start justify-between gap-8 px-6">
-			<div class="flex flex-col gap-2">
-				<div class="flex items-center gap-2 text-lg font-extralight">
-					<span
-						class="inline-flex h-6 w-6 items-center justify-center text-brand">
-						<svg viewBox="0 0 32 32" class="h-full w-full" fill="none"
-							stroke="currentColor" stroke-width="1.25" stroke-linecap="round"
-							stroke-linejoin="round">
-							<path d="M6 24 Q 10 8, 16 14 T 26 6" />
-							<circle cx="6" cy="24" r="1.6" fill="currentColor" stroke="none" />
-							<circle cx="26" cy="6" r="1.6" fill="currentColor" stroke="none" /></svg>
-					</span> <span>떠나봄</span>
-				</div>
-				<p class="max-w-xs text-xs leading-relaxed">
-					점이 아니라 길을 그리는 여행 플래너.<br />관광지를 잇고, 동선을 그리고, 후기를 남깁니다.
-				</p>
-			</div>
-			<div class="flex gap-12">
-				<div class="flex flex-col gap-2">
-					<strong class="text-13 font-semibold text-ink">서비스</strong> <a
-						href="sites" class="hover:text-brand">관광지</a> <a href="planner"
-						class="hover:text-brand">일정 플래너</a> <a href="share-board"
-						class="hover:text-brand">일정 공유</a>
-				</div>
-				<div class="flex flex-col gap-2">
-					<strong class="text-13 font-semibold text-ink">커뮤니티</strong> <a
-						href="reviews" class="hover:text-brand">여행 후기</a> <a
-						href="qa-board" class="hover:text-brand">질문 게시판</a>
-				</div>
-				<div class="flex flex-col gap-2">
-					<strong class="text-13 font-semibold text-ink">계정</strong> <a
-						href="login" class="hover:text-brand">로그인</a> <a href="signup"
-						class="hover:text-brand">회원가입</a> <a href="mypage"
-						class="hover:text-brand">마이페이지</a>
-				</div>
-			</div>
-		</div>
-		<div
-			class="mx-auto mt-12 flex max-w-wide items-center justify-between border-t border-line px-6 pt-6">
-			<span class="text-xs">© 2026 떠나봄 · 패스파인더 팀 프로젝트</span> <span
-				class="text-xs text-faint">v0.1 · UI shell</span>
-		</div>
-	</footer>
-
+	<footer th:replace="~{views/common/footer :: footer}"></footer>
 	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 <script>
 	let currentPage = 1;
@@ -191,7 +146,7 @@ body {
 	            data.forEach(travel => {
 	                const displayDate = travel.modifyDate ? travel.modifyDate : travel.createDate;
 	                const cardHtml = `
-	                  <a href="/review/detail?no=${travel.travelNo}" class="flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card">
+	                  <a href="/reviews/detail?travelNo=${travel.travelNo}" class="flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card">
 	                    <div class="flex flex-1 flex-col gap-2 p-4">
 	                      <div class="flex items-center gap-1.5 text-xs font-bold text-brand">
 	                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
