@@ -130,6 +130,7 @@
     FROM QLIST Q
     JOIN MEMBER M ON Q.MEMBER_NO = M.MEMBER_NO
     WHERE Q.MEMBER_NO = #{memberNo}
+    	and Q.STATUS='Y'
     ORDER BY Q.Q_NO DESC
 </select>
 </mapper>
