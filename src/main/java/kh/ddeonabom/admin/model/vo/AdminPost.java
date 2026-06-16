@@ -19,6 +19,7 @@ public class AdminPost {
 	private String nickname;
 	private Date createDate;
 	private String status;
+	private String content;
 	
     private int postNo;     
     private String boardType;
