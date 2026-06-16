@@ -20,4 +20,6 @@ public interface LandmarkMapper {
 	
 	ArrayList<Landmark> searchLandmarks(@Param("q") String q, @Param("region") String region, @Param("offset") int offset, @Param("size") int size);
 	int countLandmarks(@Param("q") String q, @Param("region") String region);
+
+	Landmark landmarkDetail(int contentId);
 }
