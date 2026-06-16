@@ -16,8 +16,14 @@ import lombok.ToString;
 
 public class ScheduleSub {
 	private int scheduleSubNo;
-	private Date scheduleSubDate;
+	private String scheduleSubDate;
 	private int scheduleSubSeq;
 	private int scheduleNo;
 	private int contentId;
+	
+	private String title;
+    private String addr1;
+    private String firstimage;
+    private String mapx;
+    private String mapy;
 }

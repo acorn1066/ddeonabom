@@ -1,19 +1,34 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom"
+import "./Page.css";
 
 const Members = () => {
     const [members, setMembers] = useState([]);
     const [keyword, setKeyword] = useState("");
 
+    const [searchParams, setSearchParams] = useSearchParams()
+    const currentPage = parseInt(searchParams.get('page') || '1')
+
+    const [pageInfo, setPageInfo] = useState(null)
+
     const handleSearch = () => {
         console.log("검색:", keyword);
     };
 
+
+
     useEffect(() => {
-        fetch("/react/admin/members")
-            .then((res) => res.json())
-            .then((data) => setMembers(data))
-            .catch((err) => console.log(err));
-    }, []);
+        fetch(`/react/admin/members?page=${currentPage}`)
+            .then(res => res.json())
+            .then(data => {
+                setMembers(data.list);
+                setPageInfo(data.pi);
+            });
+    }, [currentPage]);
+
+    const changePage = page => {
+        setSearchParams({ page: page.toString() })
+    }
 
     const handleStatusToggle = (member, newStatus) => {
         fetch("/react/admin/members", {
@@ -161,6 +176,46 @@ const Members = () => {
 
                 </table>
             </div>
+
+            {pageInfo && (
+                <div className="pagination-container">
+
+                    <button
+                        className="pagination-btn"
+                        onClick={() => currentPage > 1 && changePage(currentPage - 1)}
+                        disabled={currentPage <= 1}
+                    >
+                        ‹
+                    </button>
+
+                    {Array.from(
+                        { length: pageInfo.endPage - pageInfo.startPage + 1 },
+                        (_, i) => pageInfo.startPage + i
+                    ).map(pageNum => (
+                        <button
+                            key={pageNum}
+                            onClick={() => changePage(pageNum)}
+                            className={`pagination-page ${currentPage === pageNum ? "active" : ""
+                                }`}
+                        >
+                            {pageNum}
+                        </button>
+                    ))}
+
+                    <button
+                        className="pagination-btn"
+                        onClick={() =>
+                            currentPage < pageInfo.maxPage &&
+                            changePage(currentPage + 1)
+                        }
+                        disabled={currentPage >= pageInfo.maxPage}
+                    >
+                        ›
+                    </button>
+
+                </div>
+            )}
+
 
         </section>
     );

@@ -5,6 +5,8 @@ import java.util.HashMap;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -12,6 +14,8 @@ import org.springframework.web.servlet.ModelAndView;
 import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
+import kh.ddeonabom.member.model.vo.Member;
+import kh.ddeonabom.qList.model.exception.QListException;
 import kh.ddeonabom.qList.model.vo.QList;
 import kh.ddeonabom.qList.service.QListService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/qList")
 public class QListController {
 	private final QListService qListService;
-	
+	// 목록 보기
 	@GetMapping("list")
 	public ModelAndView selectQList(
 	        @RequestParam(value="page", defaultValue="1") int currentPage,
@@ -63,9 +67,25 @@ public class QListController {
 		return "views/qList/write";
 	}
 	
+	@PostMapping("insert")
+	public String insertQList(@ModelAttribute QList q, HttpSession session) {
+		int writerNo = ((Member)session.getAttribute("loginUser")).getMemberNo();
+		q.setMemberNo(writerNo);
+		
+		int result = qListService.insertQList(q);
+		if(result > 0) {
+			return "redirect:/qList/list";
+		} else {
+			throw new QListException("글 작성을 실패하였습니다.");
+		}
+	}
+	
 	@GetMapping("detail")
 	public ModelAndView detailQList(@RequestParam("qNo") int qNo, HttpSession session, ModelAndView mv) {
 	    
+		if (session.getAttribute("loginUser") != null) {
+			qListService.updateCount(qNo);  // 로그인 회원만 조회수 +1
+		}
 	    QList q = qListService.detailQList(qNo);  // 단건 조회 서비스 호출
 	    
 	    // 회원 공개 글인데 비로그인 상태라면 모달 트리거 플래그 전달
@@ -77,5 +97,29 @@ public class QListController {
 	    	.setViewName("views/qList/detail");
 	    
 	    return mv;
+	}
+
+	@PostMapping("delete")
+	public String deleteQList(@RequestParam("qNo") int qNo, HttpSession session) {
+	    Member loginUser = (Member) session.getAttribute("loginUser");
+
+	    // 비로그인 상태에서 URL 직접 접근 시 차단
+	    if (loginUser == null) {
+	        throw new QListException("로그인이 필요합니다.");
+	    }
+
+	    // DB에서 사용자 정보 재조회 후 본인 확인 (프론트 th:if만 짰는 것만으론 부족)
+	    QList q = qListService.detailQList(qNo);
+	    if (q.getMemberNo() != loginUser.getMemberNo()) {
+	        throw new QListException("삭제 권한이 없습니다.");
+	    }
+
+	    // soft delete: STATUS = 'N' 처리
+	    int result = qListService.deleteQList(qNo);
+	    if (result > 0) {
+	        return "redirect:/qList/list";
+	    } else {
+	        throw new QListException("글 삭제를 실패하였습니다.");
+	    }
 	}
 }

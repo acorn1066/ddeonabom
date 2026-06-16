@@ -36,7 +36,16 @@ public class QListService {
 		return qMapper.selectMyBoardList(map);
 	}
 
-	
+	public int insertQList(QList q) {
+		return qMapper.insertQList(q);
+	}
 
-	
+	public int updateCount(int qNo) {
+		return qMapper.updateCount(qNo);
+	}
+
+	// Mapper로 soft delete 위임
+	public int deleteQList(int qNo) {
+		return qMapper.deleteQList(qNo);
+	}
 }

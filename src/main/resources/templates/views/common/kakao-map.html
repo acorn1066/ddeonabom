@@ -1,13 +1,22 @@
 <div th:fragment="kakao-map">
-
-<script>
+	<script>
+	let map = null;          // 전역
+	let mapReady = false;
+	let markers = [];        // 현재 그려진 마커들
+	let polylines = [];      // 현재 그려진 폴리라인들
+	
 	kakao.maps.load(function() {
-	    var container = document.getElementById('map');
-	    var options = {
+	    const container = document.getElementById('map');
+	    const options = {
 	        center: new kakao.maps.LatLng(33.450701, 126.570667),
 	        level: 3
 	    };
-	    var map = new kakao.maps.Map(container, options);
+	    map = new kakao.maps.Map(container, options);
+	    mapReady = true;
+	
+	    if (typeof drawRoute === 'function') {
+	        drawRoute();
+	    }
 	});
-</script>
+	</script>
 </div>

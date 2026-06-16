@@ -21,4 +21,11 @@ public interface QListMapper {
 
 	ArrayList<QList> selectMyBoardList(HashMap<String, Object> map);
 
+	int insertQList(QList q);
+
+	int updateCount(int qNo);
+
+	// soft delete: STATUS = 'N' 처리
+	int deleteQList(int qNo);
+
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{views/common/head :: head}"></head>
 <body>
 	<div th:replace="~{views/common/navbar :: navbar}"></div>
@@ -7,7 +7,7 @@
 	  <div class="pb-6 pt-12">
 	    <span class="inline-flex items-center gap-2 text-sm font-semibold text-brand before:h-0.5 before:w-4 before:rounded before:bg-brand">관광지 탐색</span>
 	    <h1 class="my-2 text-h2 font-extrabold tracking-tight">어디로 떠나볼까요</h1>
-	    <p class="text-15 text-muted">전국 1,284개 관광지에서 가고 싶은 곳을 찜하고, 일정에 담아보세요.</p>
+	    <p class="text-15 text-muted">전국 [[${pi.listCount}]]개 관광지에서 가고 싶은 곳을 찜하고, 일정에 담아보세요.</p>
 	  </div>
 	
 	  <div class="my-5 flex gap-3">
@@ -41,7 +41,7 @@
 	  </div>
 	
 	  <div class="flex items-center justify-between py-5">
-	    <div class="text-sm text-muted">총 <b class="font-bold text-ink tabular-nums">1,284</b>개 관광지</div>
+	    <div class="text-sm text-muted">총 <b class="font-bold text-ink tabular-nums">[[${pi.listCount}]]</b>개 관광지</div>
 	  </div>
 	
 	  <div class="grid grid-cols-4 gap-5 pb-7">
