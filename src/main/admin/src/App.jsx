@@ -11,6 +11,7 @@ import Report from "./pages/Report";
 import NoticeWrite from "./pages/NoticeWrite";
 import NoticeEdit from "./pages/NoticeEdit";
 import { AdminProvider } from "./context/AdminContext";
+import NoticeDetail from "./pages/NoticeDetail";
 
 
 const App = () => {
@@ -24,6 +25,7 @@ const App = () => {
                     <Route element={<AdminLayout />}>
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/notice" element={<Notice />} />
+                        <Route path="/notice/detail/:noticeNo" element={<NoticeDetail />} />
                         <Route path="/members" element={<Members />} />
                         <Route path="/posts" element={<Posts />} />
                         <Route path="/report" element={<Report />} />

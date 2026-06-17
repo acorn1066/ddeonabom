@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,13 +61,6 @@ public class AdminController {
 		
 	}
 	
-//	@ResponseBody
-//	@GetMapping("/members")
-//	public ArrayList<Member> selectMembers(HttpSession session) {
-//		String id = ((Member)session.getAttribute("loginUser")).getId();
-//	    return aService.selectMembers(id);
-//	}
-	
 	@ResponseBody
 	@GetMapping("/members")
 	public HashMap<String, Object> members(
@@ -73,7 +68,7 @@ public class AdminController {
 
 	    Member loginUser = (Member)session.getAttribute("loginUser");
 	    int listCount = aService.selectMemberCountList(loginUser.getId());
-	    PageInfo pi = Pagination.getPageInfo(page, listCount, 10, 7);
+	    PageInfo pi = Pagination.getPageInfo(page, listCount, 10, 10);
 
 	    ArrayList<Member> list = aService.selectMembers(loginUser.getId(), pi);
 
@@ -93,12 +88,40 @@ public class AdminController {
 	}
 	
 	
+	@ResponseBody
+	@PostMapping("write/notice")
+	public int insertNotice(@RequestBody AdminNotice notice, HttpSession session) {
+
+	    Member loginUser = (Member) session.getAttribute("loginUser");
+
+	    if (loginUser == null || !"Y".equals(loginUser.getIsAdmin())) {
+	        return 0;
+	    }
+
+	    notice.setMemberNo(loginUser.getMemberNo());
+
+	    return aService.insertNotice(notice);
+	}
+	
 	
 	@ResponseBody
 	@GetMapping("notice")
-	public ArrayList<AdminNotice> selectNoticeList() {
-	    return aService.selectNoticeList();
+	public HashMap<String, Object> noticeList(@RequestParam(value = "page", defaultValue = "1") int page) {
+
+	    int listCount = aService.getNoticeCount();
+	    
+//	    System.out.println("listCount = " + listCount);
+
+	    PageInfo pi = Pagination.getPageInfo(page, listCount, 10, 10);
+	    ArrayList<AdminNotice> list = aService.selectNoticeList(pi);
+	    HashMap<String, Object> data = new HashMap<>();
+
+	    data.put("list", list);
+	    data.put("pi", pi);
+	    return data;
 	}
+	
+	
 	
 	@ResponseBody
 	@GetMapping("/posts")
@@ -108,7 +131,7 @@ public class AdminController {
 	    
 //	    System.out.println("category = " + category);
 //	    System.out.println("listCount = " + listCount);
-	    PageInfo pi = Pagination.getPageInfo(page, listCount, 10, 7);
+	    PageInfo pi = Pagination.getPageInfo(page, listCount, 10, 10);
 	    ArrayList<AdminPost> list = aService.selectPostList(category, pi);
 	    HashMap<String, Object> data = new HashMap<>();
 
@@ -122,6 +145,12 @@ public class AdminController {
 	    public int updatePostStatus(@RequestBody AdminPost post) {
 	        return aService.updatePostStatus(post);
 	    }
+		
+		@ResponseBody
+		@PatchMapping("/notice/status")
+		public int updateNoticeStatus(@RequestBody AdminNotice notice) {
+		    return aService.updateNoticeStatus(notice);
+		}
 		
 	
 	@GetMapping("report")
