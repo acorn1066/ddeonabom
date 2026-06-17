@@ -61,13 +61,6 @@ public class AdminController {
 		
 	}
 	
-//	@ResponseBody
-//	@GetMapping("/members")
-//	public ArrayList<Member> selectMembers(HttpSession session) {
-//		String id = ((Member)session.getAttribute("loginUser")).getId();
-//	    return aService.selectMembers(id);
-//	}
-	
 	@ResponseBody
 	@GetMapping("/members")
 	public HashMap<String, Object> members(
@@ -94,13 +87,6 @@ public class AdminController {
 	    return aService.updateMemberStatus(map);
 	}
 	
-	
-	
-//	@ResponseBody
-//	@GetMapping("notice")
-//	public ArrayList<AdminNotice> selectNoticeList() {
-//	    return aService.selectNoticeList();
-//	}
 	
 	@ResponseBody
 	@PostMapping("write/notice")
@@ -134,7 +120,6 @@ public class AdminController {
 	    data.put("pi", pi);
 	    return data;
 	}
-	
 	
 	
 	

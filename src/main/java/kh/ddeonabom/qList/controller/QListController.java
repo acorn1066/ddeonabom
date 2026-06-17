@@ -72,6 +72,14 @@ public class QListController {
 		int writerNo = ((Member)session.getAttribute("loginUser")).getMemberNo();
 		q.setMemberNo(writerNo);
 		
+		// 제목/내용 NOT NULL 제약 대응: 클라이언트 검증 우회 시 500 에러 방지
+		if (q.getTitle() == null || q.getTitle().isBlank()) {
+			throw new QListException("제목을 입력해주세요.");
+		}
+		if (q.getContent() == null || q.getContent().isBlank()) {
+			throw new QListException("내용을 입력해주세요.");
+		}
+		
 		int result = qListService.insertQList(q);
 		if(result > 0) {
 			return "redirect:/qList/list";
@@ -153,6 +161,14 @@ public class QListController {
 	    QList existing = qListService.detailQList(q.getQNo());
 	    if (existing.getMemberNo() != loginUser.getMemberNo()) {
 	        throw new QListException("수정 권한이 없습니다.");
+	    }
+
+	    // 제목/내용 NOT NULL 제약 대응: 클라이언트 검증 우회 시 500 에러 방지
+	    if (q.getTitle() == null || q.getTitle().isBlank()) {
+	        throw new QListException("제목을 입력해주세요.");
+	    }
+	    if (q.getContent() == null || q.getContent().isBlank()) {
+	        throw new QListException("내용을 입력해주세요.");
 	    }
 
 	    int result = qListService.updateQList(q);

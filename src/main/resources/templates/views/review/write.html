@@ -17,29 +17,7 @@ body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing
 </head>
 <body class="bg-white text-ink">
 
-<!-- ════════════ HEADER ════════════ -->
-<header class="sticky top-0 z-50 h-header border-b border-line bg-white/80 backdrop-blur-md backdrop-saturate-150">
-  <div class="mx-auto flex h-full max-w-wide items-center justify-between px-6">
-    <a href="/home" class="flex items-center gap-2">
-      <span class="inline-flex h-6 w-6 items-center justify-center text-brand">
-        <svg viewBox="0 0 32 32" class="h-full w-full" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M6 24 Q 10 8, 16 14 T 26 6"/><circle cx="6" cy="24" r="1.6" fill="currentColor" stroke="none"/><circle cx="26" cy="6" r="1.6" fill="currentColor" stroke="none"/></svg>
-      </span>
-      <span class="text-xl font-extralight tracking-wide">떠나봄</span>
-      <span class="ml-1 border-l border-line pl-3 text-xs font-medium text-faint">여행 플래너</span>
-    </a>
-    <nav class="flex items-center gap-8 text-sm font-medium text-muted">
-      <a href="/sites" class="py-2 transition-colors hover:text-ink">관광지</a>
-      <a href="/planner" class="py-2 transition-colors hover:text-ink">일정 플래너</a>
-      <a href="/share-board" class="py-2 transition-colors hover:text-ink">일정 공유</a>
-      <a href="/reviews" class="relative py-2 font-semibold text-ink after:absolute after:-bottom-0.5 after:left-0 after:right-0 after:h-0.5 after:rounded after:bg-brand">여행 후기</a>
-      <a href="/qa-board" class="py-2 transition-colors hover:text-ink">질문</a>
-    </nav>
-    <div class="flex items-center gap-3">
-      <a href="/mypage" class="inline-flex h-9 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-sunk">마이페이지</a>
-      <a href="/login" class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">로그인</a>
-    </div>
-  </div>
-</header>
+<div th:replace="~{views/common/navbar :: navbar}"></div>
 
 <!-- ════════════ MAIN ════════════ -->
 <main class="mx-auto max-w-3xl px-6 pb-24 pt-16">
@@ -129,7 +107,7 @@ body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing
         <span class="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-13 font-bold text-white">3</span>
         공개 설정
       </h2>
-      <div class="flex flex-col gap-3">
+      <div id="visibility-group" class="flex flex-col gap-3">
 	    <label class="flex items-center gap-2.5 text-sm text-muted">
 	        <input type="radio" name="visibility" value="PUBLIC" class="accent-brand" checked />
 	        <span><b class="text-ink">전체 공개</b> · 누구나 볼 수 있고 관광지 상세에 후기가 노출됩니다</span>
@@ -148,43 +126,7 @@ body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing
   </form>
 </main>
 
-<!-- ════════════ FOOTER ════════════ -->
-<footer class="mt-24 border-t border-line bg-sunk pb-12 pt-16 text-sm text-muted">
-  <div class="mx-auto flex max-w-wide items-start justify-between gap-8 px-6">
-    <div class="flex flex-col gap-2">
-      <div class="flex items-center gap-2 text-lg font-extralight">
-        <span class="inline-flex h-6 w-6 items-center justify-center text-brand">
-          <svg viewBox="0 0 32 32" class="h-full w-full" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M6 24 Q 10 8, 16 14 T 26 6"/><circle cx="6" cy="24" r="1.6" fill="currentColor" stroke="none"/><circle cx="26" cy="6" r="1.6" fill="currentColor" stroke="none"/></svg>
-        </span>
-        <span>떠나봄</span>
-      </div>
-      <p class="max-w-xs text-xs leading-relaxed">점이 아니라 길을 그리는 여행 플래너.<br/>관광지를 잇고, 동선을 그리고, 후기를 남깁니다.</p>
-    </div>
-    <div class="flex gap-12">
-      <div class="flex flex-col gap-2">
-        <strong class="text-13 font-semibold text-ink">서비스</strong>
-        <a href="sites.html" class="hover:text-brand">관광지</a>
-        <a href="planner.html" class="hover:text-brand">일정 플래너</a>
-        <a href="share-board.html" class="hover:text-brand">일정 공유</a>
-      </div>
-      <div class="flex flex-col gap-2">
-        <strong class="text-13 font-semibold text-ink">커뮤니티</strong>
-        <a href="reviews.html" class="hover:text-brand">여행 후기</a>
-        <a href="qa-board.html" class="hover:text-brand">질문 게시판</a>
-      </div>
-      <div class="flex flex-col gap-2">
-        <strong class="text-13 font-semibold text-ink">계정</strong>
-        <a href="login.html" class="hover:text-brand">로그인</a>
-        <a href="signup.html" class="hover:text-brand">회원가입</a>
-        <a href="mypage.html" class="hover:text-brand">마이페이지</a>
-      </div>
-    </div>
-  </div>
-  <div class="mx-auto mt-12 flex max-w-wide items-center justify-between border-t border-line px-6 pt-6">
-    <span class="text-xs">© 2026 떠나봄 · 패스파인더 팀 프로젝트</span>
-    <span class="text-xs text-faint">v0.1 · UI shell</span>
-  </div>
-</footer>
+<footer th:replace="~{views/common/footer :: footer}"></footer>
 
 <script>
 
@@ -335,26 +277,55 @@ function initStars(card) {
   });
 }
 
+function addPlaceToMap(place) {
+	  const latlng = new kakao.maps.LatLng(place.y, place.x);
+	  const index  = markers.length + 1;
+
+	  const marker = new kakao.maps.Marker({
+	    map,
+	    position: latlng,
+	    image: makeMarkerImage(index)
+	  });
+	  markers.push(marker);
+	  map.panTo(latlng);
+	  updatePolyline();
+
+	  addSpotCard(
+			  place.place_name,   
+			  place.address_name,
+			  index,
+			  place.y,
+			  place.x,
+			  place.id           
+			);
+	}
+
 // ════════════════════════════════════════
 //  관광지 카드 생성
 // ════════════════════════════════════════
-function addSpotCard(name = '', address = '', index) {
+function addSpotCard(name = '', address = '', index, lat = '', lng = '', contentId = '') {
   document.getElementById('spotEmpty')?.remove();
 
   const list = document.getElementById('spotList');
   const num  = index ?? list.querySelectorAll('.spot-card').length + 1;
-  const idx  = num - 1; // 0부터 시작하는 인덱스
+  const idx  = num - 1;
 
   const div = document.createElement('div');
   div.className = 'spot-card rounded-xl border border-line p-5';
   div.innerHTML = `
+    <input type="hidden" name="subList[${idx}].lat" value="${lat}" />
+    <input type="hidden" name="subList[${idx}].lng" value="${lng}" />
     <div class="mb-4 flex items-center gap-3">
       <span class="spot-num flex h-7 w-7 flex-none items-center justify-center rounded-full bg-brand-soft text-13 font-bold text-brand-ink">${num}</span>
-      <input
-        name="subList[${idx}].contentId"
+      
+      <div class="spot-name font-bold">
+        ${name}
+      </div>
+      <input type="hidden"
+             name="subList[${idx}].contentId"
         class="spot-name-input flex-1 rounded-lg border border-line bg-white px-3 py-2 text-base font-bold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft"
         placeholder="관광지 이름을 입력하세요"
-        value="${name}"
+        	value="${contentId}"
       />
       <button type="button" class="remove-spot ml-2 text-xl text-faint transition hover:text-red-400" title="삭제">✕</button>
     </div>
@@ -394,16 +365,7 @@ function addSpotCard(name = '', address = '', index) {
       updatePolyline();
     }
     div.remove();
-    function reindexCards() {
-    	  document.querySelectorAll('.spot-card').forEach((c, i) => {
-    	    c.querySelector('.spot-num').textContent = i + 1;
-    	    // name 속성 재정렬
-    	    c.querySelector('.spot-name-input').name = `subList[${i}].spotName`;
-    	    c.querySelector('.rating-value').name = `subList[${i}].rating`;
-    	    c.querySelector('textarea').name = `subList[${i}].content`;
-    	    c.querySelector('input[type="file"]').name = `subList[${i}].imageFiles`;
-    	  });
-    	}
+    reindexCards();   // 전역에 있는 완전한 버전 호출
   });
 
   initStars(div);
@@ -456,13 +418,17 @@ function addSpotCard(name = '', address = '', index) {
   });
   list.appendChild(div);
 }
-
 function reindexCards() {
-  document.querySelectorAll('.spot-card').forEach((c, i) => {
-    c.querySelector('.spot-num').textContent = i + 1;
-  });
-}
-
+	  document.querySelectorAll('.spot-card').forEach((c, i) => {
+	    c.querySelector('.spot-num').textContent = i + 1;
+	    c.querySelector('.spot-name-input').name = `subList[${i}].contentId`;
+	    c.querySelector('.rating-value').name = `subList[${i}].rating`;
+	    c.querySelector('textarea').name = `subList[${i}].travelSubContent`;
+	    c.querySelector('input[type="file"]').name = `subList[${i}].imageFiles`;
+	    c.querySelectorAll('input[type="hidden"]')[0].name = `subList[${i}].lat`;
+	    c.querySelectorAll('input[type="hidden"]')[1].name = `subList[${i}].lng`;
+	  });
+	}
 // ── 관광지 직접 추가 버튼 ─────────────────
 document.getElementById('addSpotBtn').addEventListener('click', () => addSpotCard());
 
@@ -471,6 +437,27 @@ document.getElementById('submitBtn').addEventListener('click', () => {
 	  const form = document.querySelector('form');
 	  console.log('form:', form);
 	  form.submit();
+	});
+
+
+document.getElementById('save-btn').addEventListener('click', async () => {
+	  const selectedVisibility = document.querySelector('input[name="visibility"]:checked').value;
+
+	  const response = await fetch('/api/review/save', {
+	    method: 'POST',
+	    headers: { 'Content-Type': 'application/json' },
+	    body: JSON.stringify({
+	      visibility: selectedVisibility,
+	      content: document.getElementById('review-content').value,
+	      // 다른 필드들도 같이
+	    })
+	  });
+
+	  if (response.ok) {
+	    alert('저장되었습니다.');
+	  } else {
+	    alert('저장에 실패했습니다.');
+	  }
 	});
 </script>
 
