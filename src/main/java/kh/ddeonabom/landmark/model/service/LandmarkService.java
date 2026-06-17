@@ -35,5 +35,10 @@ public class LandmarkService {
 		RowBounds rowBounds = new RowBounds(offset, pi.getBoardLimit());
 		return mapper.selectLandmarkList(rowBounds);
 	}
+	
+	//관광지 세부 가져오기
+	public Landmark landmarkDetail(int contentId) {
+		return mapper.landmarkDetail(contentId);
+	}
 
 }

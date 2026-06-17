@@ -82,6 +82,25 @@
 		SET COUNT = COUNT + 1
 		WHERE Q_NO = #{qNo}
 	</update>
+
+	<!-- soft delete: 실제 행 삭제 대신 STATUS를 'N'으로 변경 -->
+	<update id="deleteQList" parameterType="_int">
+		UPDATE QLIST
+		SET STATUS = 'N'
+		WHERE Q_NO = #{qNo}
+	</update>
+
+	<!-- 글 수정: 제목·내용·카테고리·공개 설정 + MODIFY_DATE 갱신 -->
+	<update id="updateQList" parameterType="QList">
+		UPDATE QLIST
+		SET TITLE      = #{title},
+		    CONTENT    = #{content},
+		    CATEGORY   = #{category},
+		    VISIBILITY = #{visibility},
+		    MODIFY_DATE = SYSDATE
+		WHERE Q_NO = #{qNo}
+		AND STATUS = 'Y'
+	</update>
 	
 	
 	<insert id="insertQList" parameterType="QList">
@@ -123,6 +142,7 @@
     FROM QLIST Q
     JOIN MEMBER M ON Q.MEMBER_NO = M.MEMBER_NO
     WHERE Q.MEMBER_NO = #{memberNo}
+    	and Q.STATUS='Y'
     ORDER BY Q.Q_NO DESC
 </select>
 </mapper>

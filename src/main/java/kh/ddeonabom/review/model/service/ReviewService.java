@@ -2,6 +2,7 @@ package kh.ddeonabom.review.model.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -26,27 +27,34 @@ public class ReviewService {
 		return reviewMapper.selectListCount(keyword, region, loginUserNo);
 	}
 
-	
+	public int insertReview(Review r) {
+		return reviewMapper.insertReview(r);
+	}
+
 
 	public void insertReviewSub(ReviewSub sub) {
-		
+		reviewMapper.insertReviewSub(sub);
 	}
 
 	public void insertImage(Image img) {
-		
+		reviewMapper.insertImage(img);
 	}
-
-	public int insertReview(Review r) {
-		return 0;
-	}
-
-
-	
-
-	
 
 	public ArrayList<Review> selectMyReviewList(int memberNo) {
 		return reviewMapper.selectMyReviewList(memberNo);
+	}
+
+	public Review getReviewDetail(int travelNo) {
+		Review review = reviewMapper.getReviewDetail(travelNo);      
+	    List<ReviewSub> subList = reviewMapper.getReviewSubList(travelNo); 
+	    for (ReviewSub sub : subList) {
+	        List<Image> images = reviewMapper.getImageListBySubNo(sub.getTravelSubNo());
+	        sub.setImages(images.stream()
+	                            .map(img -> img.getImagePath() + "/" + img.getRenameFile())
+	                            .collect(Collectors.toList()));
+	    }
+	    review.setSubList(subList); 
+	    return review; 
 	}
 
 

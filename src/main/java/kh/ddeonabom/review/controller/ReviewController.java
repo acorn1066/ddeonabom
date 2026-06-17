@@ -67,21 +67,27 @@ public class ReviewController {
 	@GetMapping("/reviews/write")
 	public String reviewWrite(Model model, HttpSession session) {
 		Member loginUser = (Member) session.getAttribute("loginUser");
+		System.out.println("loginUser: " + session.getAttribute("loginUser"));
 		if (loginUser == null) {
 	        return "redirect:/member/login?targetUrl=/reviews/write";
 	    }
 		model.addAttribute("kakaoApiKey", "77218df82558088a0b690733061ba6f2");
-		 
+		
 	    return "views/review/write"; 
 	}
 
 	@PostMapping("/reviews/insert")
-	public String insertReviews(@ModelAttribute Review r, HttpServletRequest request) {
+	public String insertReviews(@ModelAttribute Review r, HttpServletRequest request, HttpSession session) {
 
+		Member loginUser = (Member) session.getAttribute("loginUser");
+	    if (loginUser != null) {
+	        r.setMemberNo(loginUser.getMemberNo());
+	    }
+		
 	    int result = reviewService.insertReview(r);
 
 	    if (result > 0) {
-	        String uploadPath = request.getServletContext().getRealPath("/uploads/reviews");
+	    	String uploadPath = "C:/reviews"; 
 	        
 	        File uploadDir = new File(uploadPath);
 	        if (!uploadDir.exists()) {
@@ -90,6 +96,10 @@ public class ReviewController {
 	        if (r.getSubList() != null) {
 	            for (int i = 0; i < r.getSubList().size(); i++) {
 	                ReviewSub sub = r.getSubList().get(i);
+	                System.out.println("===== SUB DEBUG =====");
+	                System.out.println("contentId = " + sub.getContentId());
+	                System.out.println("rating = " + sub.getRating());
+	                System.out.println("content = " + sub.getTravelSubContent());
 	                sub.setTravelNo(r.getTravelNo());   
 	                sub.setTravelSubSeq(i + 1);
 
@@ -108,7 +118,7 @@ public class ReviewController {
 	                                Image img = new Image();
 	                                img.setFileName(original);
 	                                img.setRenameFile(saved);
-	                                img.setImagePath("/uploads/reviews");
+	                                img.setImagePath("/uploads");
 	                                img.setTravelSubNo(sub.getTravelSubNo()); 
 	                                reviewService.insertImage(img);
 	                            } catch (Exception e) {
@@ -118,12 +128,21 @@ public class ReviewController {
 	                    }
 	                }
 	            }
+	            
 	        }
 
 	        return "redirect:/reviews/list";
 	    } else {
 	        return "redirect:/reviews/write";
 	    }
+	}
+	
+	@GetMapping("/reviews/detail")
+	public String reviewDetail(@RequestParam("travelNo") int travelNo, Model model) {
+	    Review review = reviewService.getReviewDetail(travelNo);
+	    model.addAttribute("review", review);
+	    model.addAttribute("kakaoApiKey", "77218df82558088a0b690733061ba6f2");
+	    return "views/review/detail";
 	}
 	
 	

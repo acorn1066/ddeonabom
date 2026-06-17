@@ -69,12 +69,12 @@
 		    INSERT INTO TRAVEL_LIST (
 		        TRAVEL_NO, 
 		        TRAVEL_TITLE, 
-		        STATUS,           CREATE_DATE, 
+		        STATUS,CREATE_DATE,REGION,
 		        MEMBER_NO
 		    ) VALUES (
 		        #{travelNo}, 
 		        #{travelTitle}, 
-		        'Y',              SYSDATE, 
+		        'Y', SYSDATE,#{region},
 		        #{memberNo}
 		    )
 	</insert>
@@ -83,8 +83,8 @@
 	    <selectKey keyProperty="travelSubNo" resultType="int" order="BEFORE">
 	        SELECT SEQ_TRAVEL_SUB_NO.NEXTVAL FROM DUAL
 	    </selectKey>
-	    INSERT INTO TRAVEL_LIST_SUB (TRAVEL_SUB_NO, TRAVEL_SUB_CONTENT, TRAVEL_SUB_SEQ, TRAVEL_SUB_DATE, TRAVEL_NO, CONTENT_ID, RATING)
-	    VALUES (#{travelSubNo}, #{travelSubContent}, #{travelSubSeq}, SYSDATE, #{travelNo}, #{contentId}, #{rating})
+	    INSERT INTO TRAVEL_LIST_SUB (TRAVEL_SUB_NO, TRAVEL_SUB_CONTENT, TRAVEL_SUB_SEQ, TRAVEL_SUB_DATE, TRAVEL_NO, CONTENT_ID, RATING, LAT, LNG)
+		VALUES (#{travelSubNo}, #{travelSubContent}, #{travelSubSeq}, SYSDATE, #{travelNo}, #{contentId}, #{rating, jdbcType=INTEGER}, #{lat}, #{lng})
 	</insert>
 	
 	<insert id="insertImage" parameterType="kh.ddeonabom.review.model.vo.Image">
@@ -93,19 +93,40 @@
 	</insert>
 	
 	<select id="selectMyReviewList" parameterType="int" resultType="Review">
-    SELECT 
-        TRAVEL_NO, 
-        TRAVEL_TITLE, 
-        CREATE_DATE, 
-        COUNT, 
-        REGION,
-        MEMBER_NO
-    FROM TRAVEL_LIST
-    WHERE MEMBER_NO = #{memberNo}
-      AND STATUS = 'Y'
-    ORDER BY TRAVEL_NO DESC
-</select>
+	    SELECT 
+	        TRAVEL_NO, 
+	        TRAVEL_TITLE, 
+	        CREATE_DATE, 
+	        COUNT, 
+	        REGION,
+	        MEMBER_NO
+	    FROM TRAVEL_LIST
+	    WHERE MEMBER_NO = #{memberNo}
+	      AND STATUS = 'Y'
+	    ORDER BY TRAVEL_NO DESC
+	</select>
 	
+	<select id="getReviewDetail" parameterType="int" resultType="kh.ddeonabom.review.model.vo.Review">
+	    SELECT * FROM TRAVEL_LIST WHERE TRAVEL_NO = #{travelNo}
+	</select>
 	
+	<select id="getReviewSubList" parameterType="int" resultType="kh.ddeonabom.review.model.vo.ReviewSub">
+	    SELECT 
+	        TRAVEL_SUB_NO,
+	        TRAVEL_SUB_CONTENT,
+	        TRAVEL_SUB_SEQ,
+	        TRAVEL_SUB_DATE,
+	        TRAVEL_NO,
+	        CONTENT_ID,
+	        RATING
+	    FROM TRAVEL_LIST_SUB 
+	    WHERE TRAVEL_NO = #{travelNo} 
+	    ORDER BY TRAVEL_SUB_SEQ
+	</select>
 	
+	<select id="getImageListBySubNo" parameterType="int" resultType="kh.ddeonabom.review.model.vo.Image">
+	    SELECT IMAGE_NO, IMAGE_PATH, FILE_NAME, RENAME_FILE, TRAVEL_SUB_NO
+	    FROM TB_IMAGE
+	    WHERE TRAVEL_SUB_NO = #{travelSubNo}
+	</select>
 </mapper>
