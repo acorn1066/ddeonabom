@@ -107,7 +107,7 @@ body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing
         <span class="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-13 font-bold text-white">3</span>
         공개 설정
       </h2>
-      <div class="flex flex-col gap-3">
+      <div id="visibility-group" class="flex flex-col gap-3">
 	    <label class="flex items-center gap-2.5 text-sm text-muted">
 	        <input type="radio" name="visibility" value="PUBLIC" class="accent-brand" checked />
 	        <span><b class="text-ink">전체 공개</b> · 누구나 볼 수 있고 관광지 상세에 후기가 노출됩니다</span>
@@ -437,6 +437,27 @@ document.getElementById('submitBtn').addEventListener('click', () => {
 	  const form = document.querySelector('form');
 	  console.log('form:', form);
 	  form.submit();
+	});
+
+
+document.getElementById('save-btn').addEventListener('click', async () => {
+	  const selectedVisibility = document.querySelector('input[name="visibility"]:checked').value;
+
+	  const response = await fetch('/api/review/save', {
+	    method: 'POST',
+	    headers: { 'Content-Type': 'application/json' },
+	    body: JSON.stringify({
+	      visibility: selectedVisibility,
+	      content: document.getElementById('review-content').value,
+	      // 다른 필드들도 같이
+	    })
+	  });
+
+	  if (response.ok) {
+	    alert('저장되었습니다.');
+	  } else {
+	    alert('저장에 실패했습니다.');
+	  }
 	});
 </script>
 
