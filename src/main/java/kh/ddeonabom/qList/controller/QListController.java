@@ -72,6 +72,14 @@ public class QListController {
 		int writerNo = ((Member)session.getAttribute("loginUser")).getMemberNo();
 		q.setMemberNo(writerNo);
 		
+		// 제목/내용 NOT NULL 제약 대응: 클라이언트 검증 우회 시 500 에러 방지
+		if (q.getTitle() == null || q.getTitle().isBlank()) {
+			throw new QListException("제목을 입력해주세요.");
+		}
+		if (q.getContent() == null || q.getContent().isBlank()) {
+			throw new QListException("내용을 입력해주세요.");
+		}
+		
 		int result = qListService.insertQList(q);
 		if(result > 0) {
 			return "redirect:/qList/list";
@@ -120,6 +128,54 @@ public class QListController {
 	        return "redirect:/qList/list";
 	    } else {
 	        throw new QListException("글 삭제를 실패하였습니다.");
+	    }
+	}
+
+	@GetMapping("edit")
+	public ModelAndView editQList(@RequestParam("qNo") int qNo, HttpSession session, ModelAndView mv) {
+	    Member loginUser = (Member) session.getAttribute("loginUser");
+
+	    if (loginUser == null) {
+	        throw new QListException("로그인이 필요합니다.");
+	    }
+
+	    QList q = qListService.detailQList(qNo);
+	    if (q.getMemberNo() != loginUser.getMemberNo()) {
+	        throw new QListException("수정 권한이 없습니다.");
+	    }
+
+	    mv.addObject("q", q)
+	      .setViewName("views/qList/edit");
+
+	    return mv;
+	}
+
+	@PostMapping("update")
+	public String updateQList(@ModelAttribute QList q, HttpSession session) {
+	    Member loginUser = (Member) session.getAttribute("loginUser");
+
+	    if (loginUser == null) {
+	        throw new QListException("로그인이 필요합니다.");
+	    }
+
+	    QList existing = qListService.detailQList(q.getQNo());
+	    if (existing.getMemberNo() != loginUser.getMemberNo()) {
+	        throw new QListException("수정 권한이 없습니다.");
+	    }
+
+	    // 제목/내용 NOT NULL 제약 대응: 클라이언트 검증 우회 시 500 에러 방지
+	    if (q.getTitle() == null || q.getTitle().isBlank()) {
+	        throw new QListException("제목을 입력해주세요.");
+	    }
+	    if (q.getContent() == null || q.getContent().isBlank()) {
+	        throw new QListException("내용을 입력해주세요.");
+	    }
+
+	    int result = qListService.updateQList(q);
+	    if (result > 0) {
+	        return "redirect:/qList/detail?qNo=" + q.getQNo();
+	    } else {
+	        throw new QListException("글 수정을 실패하였습니다.");
 	    }
 	}
 }

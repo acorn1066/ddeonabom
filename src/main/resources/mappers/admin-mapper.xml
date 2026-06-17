@@ -26,6 +26,28 @@
         FROM QLIST
         WHERE STATUS = 'Y'
     </select>
+    
+     <select id="selectMemberCountList" resultType="int">
+        SELECT COUNT(*)
+        FROM MEMBER
+    </select>
+    
+        <select id="selectTravelCountList" resultType="int">
+        SELECT COUNT(*)
+        FROM TRAVEL_LIST
+    </select>
+
+    <select id="selectScheduleCountList" resultType="int">
+        SELECT COUNT(*)
+        FROM SCHEDULE_MAIN
+        WHERE SCHEDULE_VISIBILITY = 'Y' and SCHEDULE_VISIBILITY = 'M'
+    </select>
+
+    <select id="selectQlistCountList" resultType="int">
+        SELECT COUNT(*)
+        FROM QLIST
+    </select>
+    
 
     <select id="selectReplyCount" resultType="int">
         SELECT COUNT(*)
@@ -39,17 +61,19 @@
         WHERE REPORT_STATUS = 'N'
     </select>
     
-    <select id="selectMembers" resultType="Member">
-	    SELECT
-	        ID,
-	        nickname,
-	        email,
-	        phone,
-	        ENROLL_DATE,
-	        status
-	    FROM MEMBER
-	    where id != #{id}
-	</select>
+   <select id="selectMembers" resultType="Member">
+    SELECT
+        ID,
+        NICKNAME,
+        EMAIL,
+        PHONE,
+        ENROLL_DATE,
+        STATUS
+    FROM MEMBER
+    WHERE ID != #{id}
+    OFFSET #{startRow} ROWS
+    FETCH NEXT #{listLimit} ROWS ONLY
+</select>
 	
 	<update id="updateMemberStatus" parameterType="hashmap">
 	   update member set ${col} = #{val} where id = #{id}
@@ -68,9 +92,9 @@
 	    ORDER BY N.NOTICE_NO DESC
 	</select>
 	
-	<select id="selectSchedulePosts" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
+	<select id="selectSchedulePosts" parameterType="hashmap" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
 	    SELECT
-		    S.SCHEDULE_NO AS postNo,
+	        S.SCHEDULE_NO AS postNo,
 	        '공유' AS boardType,
 	        S.SCHEDULE_TITLE AS title,
 	        M.NICKNAME AS nickname,
@@ -80,32 +104,45 @@
 	    JOIN MEMBER M
 	        ON S.MEMBER_NO = M.MEMBER_NO
 	    WHERE S.SCHEDULE_VISIBILITY IN ('Y', 'M')
+	    ORDER BY S.CREATE_DATE DESC
+	    OFFSET #{startRow} ROWS
+	    FETCH NEXT #{listLimit} ROWS ONLY
 	</select>
 	
-	<select id="selectReviewPosts" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
-	    SELECT
-		    T.TRAVEL_NO AS postNo,
-	  		'후기' AS boardType,
-	        T.TRAVEL_TITLE AS title,
-	        M.NICKNAME AS nickname,
-	        T.CREATE_DATE AS createDate,
-	        T.STATUS AS status
-	    FROM TRAVEL_LIST T
-	    JOIN MEMBER M
-	        ON T.MEMBER_NO = M.MEMBER_NO
-	</select>
+	<select id="selectReviewPosts" parameterType="hashmap" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
+    SELECT
+        T.TRAVEL_NO AS postNo,
+        '후기' AS boardType,
+        T.TRAVEL_TITLE AS title,
+        M.NICKNAME AS nickname,
+        T.CREATE_DATE AS createDate,
+        T.STATUS AS status,
+        S.TRAVEL_SUB_CONTENT AS content
+    FROM TRAVEL_LIST T
+    JOIN MEMBER M
+        ON T.MEMBER_NO = M.MEMBER_NO
+    LEFT JOIN TRAVEL_LIST_SUB S
+        ON T.TRAVEL_NO = S.TRAVEL_NO
+    ORDER BY T.CREATE_DATE DESC
+    OFFSET #{startRow} ROWS
+    FETCH NEXT #{listLimit} ROWS ONLY
+</select>
 	
-	<select id="selectQuestionPosts" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
+	<select id="selectQuestionPosts" parameterType="hashmap" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
 	    SELECT
-	   		Q.Q_NO AS postNo,
-    		'질문' AS boardType,
+	        Q.Q_NO AS postNo,
+	        '질문' AS boardType,
 	        Q.TITLE AS title,
+	        Q.CONTENT AS CONTENT,
 	        M.NICKNAME AS nickname,
 	        Q.CREATE_DATE AS createDate,
 	        Q.STATUS AS status
 	    FROM QLIST Q
 	    JOIN MEMBER M
 	        ON Q.MEMBER_NO = M.MEMBER_NO
+	    ORDER BY Q.CREATE_DATE DESC
+	    OFFSET #{startRow} ROWS
+	    FETCH NEXT #{listLimit} ROWS ONLY
 	</select>
 	
 	<update id="updateScheduleStatus">
