@@ -32,9 +32,10 @@
         FROM MEMBER
     </select>
     
-        <select id="selectTravelCountList" resultType="int">
+     <select id="selectTravelCountList" resultType="int">
         SELECT COUNT(*)
         FROM TRAVEL_LIST
+        WHERE VISIBILITY = 'PUBLIC'
     </select>
 
     <select id="selectScheduleCountList" resultType="int">
@@ -79,18 +80,18 @@
 	   update member set ${col} = #{val} where id = #{id}
 	</update>
 	
-	<select id="selectNoticeList" resultType="kh.ddeonabom.admin.model.vo.AdminNotice">
-	    SELECT
-	        N.NOTICE_NO,
-	        N.TITLE,
-	        M.ID AS MEMBER_NAME,
-	        N.CREATE_DATE,
-	        N.MODIFY_DATE
-	    FROM NOTICE N
-	    JOIN MEMBER M
-	        ON N.MEMBER_NO = M.MEMBER_NO
-	    ORDER BY N.NOTICE_NO DESC
-	</select>
+<!-- 	<select id="selectNoticeList" resultType="kh.ddeonabom.admin.model.vo.AdminNotice"> -->
+<!-- 	    SELECT -->
+<!-- 	        N.NOTICE_NO, -->
+<!-- 	        N.TITLE, -->
+<!-- 	        M.ID AS MEMBER_NAME, -->
+<!-- 	        N.CREATE_DATE, -->
+<!-- 	        N.MODIFY_DATE -->
+<!-- 	    FROM NOTICE N -->
+<!-- 	    JOIN MEMBER M -->
+<!-- 	        ON N.MEMBER_NO = M.MEMBER_NO -->
+<!-- 	    ORDER BY N.NOTICE_NO DESC -->
+<!-- 	</select> -->
 	
 	<select id="selectSchedulePosts" parameterType="hashmap" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
 	    SELECT
@@ -110,23 +111,23 @@
 	</select>
 	
 	<select id="selectReviewPosts" parameterType="hashmap" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
-    SELECT
-        T.TRAVEL_NO AS postNo,
-        '후기' AS boardType,
-        T.TRAVEL_TITLE AS title,
-        M.NICKNAME AS nickname,
-        T.CREATE_DATE AS createDate,
-        T.STATUS AS status,
-        S.TRAVEL_SUB_CONTENT AS content
-    FROM TRAVEL_LIST T
-    JOIN MEMBER M
-        ON T.MEMBER_NO = M.MEMBER_NO
-    LEFT JOIN TRAVEL_LIST_SUB S
-        ON T.TRAVEL_NO = S.TRAVEL_NO
-    ORDER BY T.CREATE_DATE DESC
-    OFFSET #{startRow} ROWS
-    FETCH NEXT #{listLimit} ROWS ONLY
-</select>
+	    SELECT
+	        T.TRAVEL_NO AS postNo,
+	        '후기' AS boardType,
+	        T.TRAVEL_TITLE AS title,
+	        M.NICKNAME AS nickname,
+	        T.CREATE_DATE AS createDate,
+	        T.STATUS AS status,
+	        S.TRAVEL_SUB_CONTENT AS content
+	    FROM TRAVEL_LIST T
+	    JOIN MEMBER M
+	        ON T.MEMBER_NO = M.MEMBER_NO
+	    LEFT JOIN TRAVEL_LIST_SUB S
+	        ON T.TRAVEL_NO = S.TRAVEL_NO
+	    ORDER BY T.CREATE_DATE DESC
+	    OFFSET #{startRow} ROWS
+	    FETCH NEXT #{listLimit} ROWS ONLY
+	</select>
 	
 	<select id="selectQuestionPosts" parameterType="hashmap" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
 	    SELECT
@@ -163,6 +164,37 @@
 	    WHERE Q_NO = #{postNo}
 	</update>
 	
+	<select id="getNoticeCount" resultType="_int">
+	    SELECT COUNT(*)
+	    FROM notice
+	</select>
+	
+	<select id="selectNoticeList" parameterType="hashmap" resultType="kh.ddeonabom.admin.model.vo.AdminNotice">
+	    SELECT
+	        N.NOTICE_NO AS noticeNo,
+	        N.TITLE AS title,
+	        M.NICKNAME AS memberName,
+	        N.CREATE_DATE AS createDate,
+	        N.MODIFY_DATE AS modifyDate,
+	        N.STATUS AS status
+	    FROM NOTICE N
+	    JOIN MEMBER M
+	        ON N.MEMBER_NO = M.MEMBER_NO
+	    ORDER BY N.CREATE_DATE DESC
+	    OFFSET #{startRow} ROWS
+	    FETCH NEXT #{listLimit} ROWS ONLY
+	</select>
+	
+	<update id="updateNoticeStatus" parameterType="kh.ddeonabom.admin.model.vo.AdminNotice">
+	    UPDATE NOTICE
+	    SET STATUS = #{status}
+	    WHERE NOTICE_NO = #{noticeNo}
+	</update>
+	
+	<insert id="insertNotice" parameterType="kh.ddeonabom.admin.model.vo.AdminNotice">
+	    INSERT INTO NOTICE (NOTICE_NO, TITLE, CONTENT, MEMBER_NO, CREATE_DATE, STATUS)
+	    VALUES (SEQ_NOTICE.NEXTVAL, #{title}, #{content}, #{memberNo}, SYSDATE, 'Y')
+	</insert>
 	
 
 </mapper>
