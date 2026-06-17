@@ -21,7 +21,7 @@ const NoticeWrite = () => {
         e.preventDefault();
 
         try {
-            const res = await fetch("/react/admin/notice", {
+            const res = await fetch("/react/admin/write/notice", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

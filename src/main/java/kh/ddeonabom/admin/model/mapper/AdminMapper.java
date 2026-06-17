@@ -50,6 +50,14 @@ public interface AdminMapper {
 	int selectQlistCountList();
 
 	int selectMemberCountList(String id);
+
+	int getNoticeCount();
+
+	ArrayList<AdminNotice> selectNoticeList(HashMap<String, Object> map);
+
+	int updateNoticeStatus(AdminNotice notice);
+
+	int insertNotice(AdminNotice notice);
 	
 	
 }
