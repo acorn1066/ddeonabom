@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.member.model.vo.Member;
-import kh.ddeonabom.qList.model.exception.QListException;
 import kh.ddeonabom.qList.model.vo.QList;
 import kh.ddeonabom.qList.service.QListService;
 import lombok.RequiredArgsConstructor;
@@ -68,23 +69,29 @@ public class QListController {
 	}
 	
 	@PostMapping("insert")
-	public String insertQList(@ModelAttribute QList q, HttpSession session) {
+	public String insertQList(@ModelAttribute QList q, HttpSession session, Model model) {
 		int writerNo = ((Member)session.getAttribute("loginUser")).getMemberNo();
 		q.setMemberNo(writerNo);
 		
-		// 제목/내용 NOT NULL 제약 대응: 클라이언트 검증 우회 시 500 에러 방지
+		// 제목/내용 NOT NULL 제약 대응: 클라이언트 검증 우회 시 에러 페이지 대신 알림 모달로 안내
 		if (q.getTitle() == null || q.getTitle().isBlank()) {
-			throw new QListException("제목을 입력해주세요.");
+			model.addAttribute("q", q);
+			model.addAttribute("errorMessage", "제목을 입력해주세요.");
+			return "views/qList/write";
 		}
 		if (q.getContent() == null || q.getContent().isBlank()) {
-			throw new QListException("내용을 입력해주세요.");
+			model.addAttribute("q", q);
+			model.addAttribute("errorMessage", "내용을 입력해주세요.");
+			return "views/qList/write";
 		}
 		
 		int result = qListService.insertQList(q);
 		if(result > 0) {
 			return "redirect:/qList/list";
 		} else {
-			throw new QListException("글 작성을 실패하였습니다.");
+			model.addAttribute("q", q);
+			model.addAttribute("errorMessage", "글 작성을 실패하였습니다.");
+			return "views/qList/write";
 		}
 	}
 	
@@ -108,18 +115,20 @@ public class QListController {
 	}
 
 	@PostMapping("delete")
-	public String deleteQList(@RequestParam("qNo") int qNo, HttpSession session) {
+	public String deleteQList(@RequestParam("qNo") int qNo, HttpSession session, RedirectAttributes redirectAttrs) {
 	    Member loginUser = (Member) session.getAttribute("loginUser");
 
-	    // 비로그인 상태에서 URL 직접 접근 시 차단
+	    // 비로그인 상태에서 URL 직접 접근 시 차단 → 에러 페이지 대신 상세로 돌려보내고 모달 안내
 	    if (loginUser == null) {
-	        throw new QListException("로그인이 필요합니다.");
+	        redirectAttrs.addFlashAttribute("errorMessage", "로그인이 필요합니다.");
+	        return "redirect:/qList/detail?qNo=" + qNo;
 	    }
 
 	    // DB에서 사용자 정보 재조회 후 본인 확인 (프론트 th:if만 짰는 것만으론 부족)
 	    QList q = qListService.detailQList(qNo);
 	    if (q.getMemberNo() != loginUser.getMemberNo()) {
-	        throw new QListException("삭제 권한이 없습니다.");
+	        redirectAttrs.addFlashAttribute("errorMessage", "삭제 권한이 없습니다.");
+	        return "redirect:/qList/detail?qNo=" + qNo;
 	    }
 
 	    // soft delete: STATUS = 'N' 처리
@@ -127,21 +136,26 @@ public class QListController {
 	    if (result > 0) {
 	        return "redirect:/qList/list";
 	    } else {
-	        throw new QListException("글 삭제를 실패하였습니다.");
+	        redirectAttrs.addFlashAttribute("errorMessage", "글 삭제를 실패하였습니다.");
+	        return "redirect:/qList/detail?qNo=" + qNo;
 	    }
 	}
 
 	@GetMapping("edit")
-	public ModelAndView editQList(@RequestParam("qNo") int qNo, HttpSession session, ModelAndView mv) {
+	public ModelAndView editQList(@RequestParam("qNo") int qNo, HttpSession session, ModelAndView mv, RedirectAttributes redirectAttrs) {
 	    Member loginUser = (Member) session.getAttribute("loginUser");
 
 	    if (loginUser == null) {
-	        throw new QListException("로그인이 필요합니다.");
+	        redirectAttrs.addFlashAttribute("errorMessage", "로그인이 필요합니다.");
+	        mv.setViewName("redirect:/qList/detail?qNo=" + qNo);
+	        return mv;
 	    }
 
 	    QList q = qListService.detailQList(qNo);
 	    if (q.getMemberNo() != loginUser.getMemberNo()) {
-	        throw new QListException("수정 권한이 없습니다.");
+	        redirectAttrs.addFlashAttribute("errorMessage", "수정 권한이 없습니다.");
+	        mv.setViewName("redirect:/qList/detail?qNo=" + qNo);
+	        return mv;
 	    }
 
 	    mv.addObject("q", q)
@@ -151,31 +165,39 @@ public class QListController {
 	}
 
 	@PostMapping("update")
-	public String updateQList(@ModelAttribute QList q, HttpSession session) {
+	public String updateQList(@ModelAttribute QList q, HttpSession session, Model model, RedirectAttributes redirectAttrs) {
 	    Member loginUser = (Member) session.getAttribute("loginUser");
 
 	    if (loginUser == null) {
-	        throw new QListException("로그인이 필요합니다.");
+	        redirectAttrs.addFlashAttribute("errorMessage", "로그인이 필요합니다.");
+	        return "redirect:/qList/detail?qNo=" + q.getQNo();
 	    }
 
 	    QList existing = qListService.detailQList(q.getQNo());
 	    if (existing.getMemberNo() != loginUser.getMemberNo()) {
-	        throw new QListException("수정 권한이 없습니다.");
+	        redirectAttrs.addFlashAttribute("errorMessage", "수정 권한이 없습니다.");
+	        return "redirect:/qList/detail?qNo=" + q.getQNo();
 	    }
 
-	    // 제목/내용 NOT NULL 제약 대응: 클라이언트 검증 우회 시 500 에러 방지
+	    // 제목/내용 NOT NULL 제약 대응: 클라이언트 검증 우회 시 에러 페이지 대신 알림 모달로 안내
 	    if (q.getTitle() == null || q.getTitle().isBlank()) {
-	        throw new QListException("제목을 입력해주세요.");
+	        model.addAttribute("q", q);
+	        model.addAttribute("errorMessage", "제목을 입력해주세요.");
+	        return "views/qList/edit";
 	    }
 	    if (q.getContent() == null || q.getContent().isBlank()) {
-	        throw new QListException("내용을 입력해주세요.");
+	        model.addAttribute("q", q);
+	        model.addAttribute("errorMessage", "내용을 입력해주세요.");
+	        return "views/qList/edit";
 	    }
 
 	    int result = qListService.updateQList(q);
 	    if (result > 0) {
 	        return "redirect:/qList/detail?qNo=" + q.getQNo();
 	    } else {
-	        throw new QListException("글 수정을 실패하였습니다.");
+	        model.addAttribute("q", q);
+	        model.addAttribute("errorMessage", "글 수정을 실패하였습니다.");
+	        return "views/qList/edit";
 	    }
 	}
 }

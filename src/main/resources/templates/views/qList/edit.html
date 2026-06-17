@@ -86,7 +86,7 @@
 	  <input type="hidden" id="delete-qNo" name="qNo" />
 	</form>
 
-	<script>
+	<script th:inline="javascript">
 	  // ★ danger 모달 열기 → 확인 시 hidden form POST 제출 (detail.html과 동일 패턴)
 	  function openDeleteModal(qNo) {
 	    openDangerModal(
@@ -118,6 +118,14 @@
 	    document.querySelectorAll('.category-btn').forEach(btn => {
 	      if (btn.dataset.category === saved) selectCategory(btn);
 	    });
+	  });
+
+	  // ★ 검증/권한/DB 실패 시 컨트롤러가 돌려보낸 알림 모달
+	  window.addEventListener('DOMContentLoaded', function () {
+	    const errorMessage = /*[[${errorMessage}]]*/ null;
+	    if (errorMessage) {
+	      openInfoModal('알림', errorMessage);
+	    }
 	  });
 	</script>
 
