@@ -134,20 +134,27 @@
 	</insert>
 	
 	<select id="getMyListCount" resultType="_int" parameterType="map">
-   	 SELECT COUNT(*) 
-    	FROM QLIST
-    	WHERE MEMBER_NO = #{memberNo}
-    <if test="category != '전체'">
-        AND CATEGORY = #{category}
-    </if>
+
+    SELECT COUNT(*)
+    FROM QLIST
+    WHERE MEMBER_NO = #{memberNo}
+      AND STATUS = 'Y'
+
 	</select>
 	
-	<select id="selectMyBoardList" resultType="QList" parameterType="int">
-    SELECT Q.*, M.ID, Q.CREATE_DATE AS createDate, Q.CATEGORY
+	<select id="selectMyBoardList" resultType="QList" parameterType="map">
+
+    SELECT Q.*,
+           M.ID,
+           Q.CREATE_DATE AS createDate
     FROM QLIST Q
-    JOIN MEMBER M ON Q.MEMBER_NO = M.MEMBER_NO
+    JOIN MEMBER M
+      ON Q.MEMBER_NO = M.MEMBER_NO
     WHERE Q.MEMBER_NO = #{memberNo}
-    	and Q.STATUS='Y'
+      AND Q.STATUS = 'Y'
     ORDER BY Q.Q_NO DESC
-</select>
+    OFFSET #{startRow} ROWS
+    FETCH NEXT #{listLimit} ROWS ONLY
+
+	</select>
 </mapper>

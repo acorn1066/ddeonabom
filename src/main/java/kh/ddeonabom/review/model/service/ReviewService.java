@@ -1,6 +1,7 @@
 package kh.ddeonabom.review.model.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,6 +57,18 @@ public class ReviewService {
 	    review.setSubList(subList); 
 	    return review; 
 	}
+
+	public ArrayList<Review> selectMyReviewList(HashMap<String, Object> reviewMap) {
+		return reviewMapper.selectMyReviewList(reviewMap);
+	}
+
+	public int getMyReviewCount(int memberNo) {
+		
+		return reviewMapper.getMyReviewCount(memberNo);
+	}
+
+	
+	
 
 
 

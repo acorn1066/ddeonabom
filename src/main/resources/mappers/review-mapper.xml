@@ -92,19 +92,29 @@
 	    VALUES (SEQ_IMAGE_NO.NEXTVAL, #{imagePath}, #{fileName}, #{renameFile}, #{travelSubNo})
 	</insert>
 	
-	<select id="selectMyReviewList" parameterType="int" resultType="Review">
-	    SELECT 
-	        TRAVEL_NO, 
-	        TRAVEL_TITLE, 
-	        CREATE_DATE, 
-	        COUNT, 
-	        REGION,
-	        MEMBER_NO
-	    FROM TRAVEL_LIST
-	    WHERE MEMBER_NO = #{memberNo}
-	      AND STATUS = 'Y'
-	    ORDER BY TRAVEL_NO DESC
-	</select>
+	<select id="getMyReviewCount"
+        parameterType="int"
+        resultType="_int">
+
+    SELECT COUNT(*)
+    FROM TRAVEL_LIST
+    WHERE MEMBER_NO = #{value}
+      AND STATUS = 'Y'
+
+</select>
+	<select id="selectMyReviewList"
+        parameterType="map"
+        resultType="Review">
+
+    SELECT *
+    FROM TRAVEL_LIST
+    WHERE MEMBER_NO = #{memberNo}
+      AND STATUS='Y'
+    ORDER BY TRAVEL_NO DESC
+    OFFSET #{startRow} ROWS
+    FETCH NEXT #{listLimit} ROWS ONLY
+
+</select>
 	
 	<select id="getReviewDetail" parameterType="int" resultType="kh.ddeonabom.review.model.vo.Review">
 	    SELECT * FROM TRAVEL_LIST WHERE TRAVEL_NO = #{travelNo}

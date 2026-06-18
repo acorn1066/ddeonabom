@@ -1,6 +1,7 @@
 package kh.ddeonabom.review.model.mappers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -31,5 +32,11 @@ public interface ReviewMapper {
 	List<ReviewSub> getReviewSubList(int travelNo);
 
 	List<Image> getImageListBySubNo(int travelSubNo);
+
+	ArrayList<Review> selectMyReviewList(HashMap<String, Object> reviewMap);
+
+	int getMyReviewCount(int memberNo);
+
+	
 
 }
