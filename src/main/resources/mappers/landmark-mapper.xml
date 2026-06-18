@@ -30,4 +30,20 @@
 		from landmark
 		where content_id = #{contentId}
 	</select>
+	
+	<select id="landmarkNice">
+		select count(*)
+		from nice
+		where member_no = #{memberNo} and post_no = #{lNumber} and post_board_fx = 'LJ'
+	</select>
+	
+	<delete id="deleteNice">
+		delete from nice
+		where member_no = #{memberNo} and post_no = #{lNumber} and post_board_fx = 'LJ'
+	</delete>
+	
+	<insert id="insertNice">
+		insert into nice
+		values(seq_nice_no.nextval, 'LJ', #{lNumber}, #{memberNo})
+	</insert>
 </mapper>
