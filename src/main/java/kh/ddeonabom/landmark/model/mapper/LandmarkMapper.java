@@ -21,5 +21,13 @@ public interface LandmarkMapper {
 	ArrayList<Landmark> searchLandmarks(@Param("q") String q, @Param("region") String region, @Param("offset") int offset, @Param("size") int size);
 	int countLandmarks(@Param("q") String q, @Param("region") String region);
 
+	// 관광지 세부사항 가져오기
 	Landmark landmarkDetail(int contentId);
+
+	// 관광지 찜 여부확인
+	int landmarkNice(@Param("lNumber") int lNumber,@Param("memberNo") int memberNo);
+
+	void deleteNice(@Param("lNumber") int lNumber,@Param("memberNo") int memberNo);
+
+	void insertNice(@Param("lNumber") int lNumber,@Param("memberNo") int memberNo);
 }

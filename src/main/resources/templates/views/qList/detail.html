@@ -78,35 +78,13 @@
     <!-- ════ 댓글 섹션 ════ -->
     <section class="mt-6">
 
-      <!-- ★ 댓글 수: reply 테이블 미구현 → 0 고정 (DB 연동 후 ${replyCount}로 교체 예정) -->
+      <!-- 댓글 수 -->
       <div class="mb-5 text-lg font-bold">
-        댓글 <span class="text-brand tabular-nums">0</span>
+        댓글 <span class="text-brand tabular-nums" th:text="${replyCount}">0</span>
       </div>
 
-      <!-- ★ 하드코딩 댓글 3개 제거 (reply DB 구현 후 th:each로 동적 렌더링 예정) -->
-      <!--
-        TODO: reply 테이블 + 더미데이터 삽입 후 아래 구조로 구현
-        <div th:each="reply : ${replyList}" class="flex gap-4 border-t border-line py-5">
-          <span class="flex h-10.5 w-10.5 flex-none items-center justify-center rounded-full bg-sunk font-bold text-muted"
-                th:text="${#strings.substring(reply.writer, 0, 1)}"></span>
-          <div class="flex-1">
-            <div class="mb-1.5 flex items-center gap-2">
-              <span class="text-sm font-bold" th:text="${reply.writer}"></span>
-              <span class="text-xs text-faint tabular-nums"
-                    th:text="${#dates.format(reply.createDate, 'yyyy.MM.dd')}"></span>
-              <span th:if="${session.loginUser != null and session.loginUser.memberNo == reply.memberNo}"
-                    class="ml-auto flex gap-2.5 text-xs text-muted">
-                <a href="#" class="hover:text-brand">수정</a>
-                <a href="#" class="hover:text-brand">삭제</a>
-              </span>
-            </div>
-            <p class="text-15 leading-relaxed text-ink/85" th:text="${reply.content}"></p>
-          </div>
-        </div>
-      -->
-
-      <!-- 댓글 작성 폼 -->
-      <div class="mt-7 border-t-2 border-ink pt-6">
+      <!-- 댓글 작성 폼 (목록 상단 고정) -->
+      <div class="mb-6 border-t-2 border-ink pt-6">
         <h3 class="mb-4 text-base font-bold">댓글 작성</h3>
         <div class="overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
           <textarea class="block min-h-composer w-full resize-none border-none bg-transparent px-4 py-3 text-sm leading-relaxed outline-none placeholder:text-faint"
@@ -117,6 +95,25 @@
               댓글 등록
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- 댓글 목록 -->
+      <div th:each="reply : ${replyList}" class="flex gap-4 border-t border-line py-5">
+        <span class="flex h-10.5 w-10.5 flex-none items-center justify-center rounded-full bg-sunk font-bold text-muted"
+              th:text="${#strings.substring(reply.writer, 0, 1)}"></span>
+        <div class="flex-1">
+          <div class="mb-1.5 flex items-center gap-2">
+            <span class="text-sm font-bold" th:text="${reply.writer}"></span>
+            <span class="text-xs text-faint tabular-nums"
+                  th:text="${#dates.format(reply.createDate, 'yyyy.MM.dd')}"></span>
+            <span th:if="${session.loginUser != null and session.loginUser.memberNo == reply.memberNo}"
+                  class="ml-auto flex gap-2.5 text-xs text-muted">
+              <a href="#" class="hover:text-brand">수정</a>
+              <a href="#" class="hover:text-brand">삭제</a>
+            </span>
+          </div>
+          <p class="text-15 leading-relaxed text-ink/85" th:text="${reply.content}"></p>
         </div>
       </div>
 
@@ -132,6 +129,7 @@
   <script th:inline="javascript">
     window.addEventListener('DOMContentLoaded', function () {
       const loginRequired = /*[[${loginRequired}]]*/ false;
+      const errorMessage  = /*[[${errorMessage}]]*/ null;
       if (loginRequired) {
         openInfoModal(
           '회원 전용 글입니다',
@@ -141,6 +139,9 @@
         document.querySelector('#modal-info button').onclick = function () {
           location.href = '/qList/list';
         };
+      } else if (errorMessage) {
+        // delete/edit/update 실패 시 컨트롤러가 redirect로 넘긴 알림
+        openInfoModal('알림', errorMessage);
       }
     });
 

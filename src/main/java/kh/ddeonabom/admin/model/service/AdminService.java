@@ -101,9 +101,7 @@ public class AdminService {
 	public ArrayList<AdminPost> selectPostList(String category, PageInfo pi) {
 		
 	    HashMap<String, Object> map = new HashMap<>();
-
 	    map.put("startRow",(pi.getCurrentPage() - 1) * pi.getBoardLimit());
-
 	    map.put("listLimit", pi.getBoardLimit());
 
 	    switch(category) {
@@ -125,5 +123,38 @@ public class AdminService {
 	public int selectMemberCountList(String id) {
 		return mapper.selectMemberCountList(id);
 	}
-	
+
+	public int getNoticeCount() {
+		return mapper.getNoticeCount();
+	}
+
+	public ArrayList<AdminNotice> selectNoticeList(PageInfo pi) {
+
+	    HashMap<String, Object> map = new HashMap<>();
+	    map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
+	    map.put("listLimit", pi.getBoardLimit());
+
+	    return mapper.selectNoticeList(map);
+	}
+
+	public int updateNoticeStatus(AdminNotice notice) {
+		return mapper.updateNoticeStatus(notice);
+	}
+
+	public int insertNotice(AdminNotice notice) {
+		return mapper.insertNotice(notice);
+	}
+
+	public AdminNotice selectNotice(int noticeNo) {
+		return mapper.selectNotice(noticeNo);
+	}
+
+	public int updateNotice(AdminNotice notice) {
+		return mapper.updateNotice(notice);
+	}
+
+	public ArrayList<AdminNotice> selectTopNotice() {
+		return mapper.selectTopNotice();
+	}
 }
+	
