@@ -29,4 +29,5 @@ public class Review {
     private List<ReviewSub> subList; 
     private String keyword;
     private String visibility;
+    private String nickname;
 }
