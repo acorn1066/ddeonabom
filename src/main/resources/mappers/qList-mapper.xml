@@ -37,7 +37,12 @@
 	
 	<!-- 목록 조회: 위와 동일한 조건 + 페이징 -->
 	<select id="selectQList" parameterType="hashmap" resultType="QList">
-	    SELECT q.*, m.nickname AS writer
+	    SELECT q.*, m.nickname AS writer,
+	           (SELECT COUNT(*)
+	              FROM reply r
+	             WHERE r.post_no    = q.q_no
+	               AND r.post_board = 'Q'
+	               AND r.status     = 'Y') AS replyCount
 	    FROM qlist q
 	        JOIN member m ON q.member_no = m.member_no
 	    WHERE q.status = 'Y'

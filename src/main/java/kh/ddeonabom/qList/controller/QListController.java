@@ -19,6 +19,8 @@ import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.member.model.vo.Member;
 import kh.ddeonabom.qList.model.vo.QList;
 import kh.ddeonabom.qList.service.QListService;
+import kh.ddeonabom.reply.model.vo.Reply;
+import kh.ddeonabom.reply.service.ReplyService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -26,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/qList")
 public class QListController {
 	private final QListService qListService;
+	private final ReplyService replyService;
+
 	// 목록 보기
 	@GetMapping("list")
 	public ModelAndView selectQList(
@@ -106,8 +110,12 @@ public class QListController {
 	    // 회원 공개 글인데 비로그인 상태라면 모달 트리거 플래그 전달
 	    boolean loginRequired = "MEMBER".equals(q.getVisibility())
 	                            && session.getAttribute("loginUser") == null;
-	    
+
+	    ArrayList<Reply> replyList = replyService.getReplyList(qNo, "Q");
+
 	    mv.addObject("q", q)
+	    	.addObject("replyList",  replyList)
+	    	.addObject("replyCount", replyList.size())
 	    	.addObject("loginRequired", loginRequired)
 	    	.setViewName("views/qList/detail");
 	    
