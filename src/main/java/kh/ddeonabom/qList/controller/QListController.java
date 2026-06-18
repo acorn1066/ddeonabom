@@ -14,6 +14,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
+import kh.ddeonabom.admin.model.service.AdminService;
+import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.member.model.vo.Member;
@@ -29,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class QListController {
 	private final QListService qListService;
 	private final ReplyService replyService;
+	private final AdminService aService;
 
 	// 목록 보기
 	@GetMapping("list")
@@ -55,6 +58,7 @@ public class QListController {
 
 	    // 3) map을 같이 넘겨야 필터링 + 페이징이 적용됨
 	    ArrayList<QList> qList = qListService.selectQList(map);
+	    ArrayList<AdminNotice> noticeList = aService.selectTopNotice();
 
 	    mv.addObject("qList",      qList)
 	      .addObject("pi",         pi)
@@ -62,6 +66,7 @@ public class QListController {
 	      .addObject("category",   category)
 	      .addObject("searchType", searchType)
 	      .addObject("searchInput",searchInput)
+	      .addObject("noticeList", noticeList)
 	      .setViewName("views/qList/list");
 
 	    return mv;
