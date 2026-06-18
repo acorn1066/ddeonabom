@@ -466,87 +466,117 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
 }
 	@GetMapping("/mypage")
 	public String mypage(
-	        @RequestParam(value="tab", defaultValue = "schedule") String tab,
-	        @RequestParam(value="page", defaultValue = "1") int page,
-	        @RequestParam(value="category", defaultValue = "전체") String category, // 카테고리 추가
-	        Model model, HttpSession session) {
-	    
-	    // 세션에서 로그인 유저 정보 가져오기
-	    Member loginUser = (Member) session.getAttribute("loginUser");
-	    
-	    if (loginUser == null) {
-	        return "redirect:/member/login"; 
+	        @RequestParam(value="tab", defaultValue="schedule") String tab,
+	        @RequestParam(value="type", defaultValue="qna") String type,
+	        @RequestParam(value="page", defaultValue="1") int page,
+	        Model model,
+	        HttpSession session) {
+
+	    Member loginUser =
+	            (Member)session.getAttribute("loginUser");
+
+	    if(loginUser == null) {
+	        return "redirect:/member/login";
 	    }
-	    
-	    if ("posts".equals(tab)) {
-	        // 맵 설정 (검색 조건 + memberNo)
-	        HashMap<String, Object> map = new HashMap<>();
-	        map.put("memberNo", loginUser.getMemberNo()); 
-	        map.put("category", category);
-	        
-	        // 실제 DB에서 카운트 조회 (서비스/매퍼 필요)
-	        int listCount = qListService.getMyListCount(map); 
-	        
-	        // 페이징 객체 생성 (기존 유틸리티 재사용)
-	        PageInfo pi = Pagination.getPageInfo(page, listCount, 8, 8); // 8개씩 출력
-	        
-	        // 페이징 정보 맵에 추가
-	        map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
-	        map.put("listLimit", pi.getBoardLimit());
-	        
-	        //  실제 DB에서 리스트 조회
-	        ArrayList<QList> list = qListService.selectMyBoardList(map);
-	        
-	        ArrayList<Review> rlist = rListService.selectMyReviewList(loginUser.getMemberNo());
-	        
-	        
-	        model.addAttribute("postlist", list);
-	        model.addAttribute("reviewlist", rlist);
-	        model.addAttribute("pi", pi);
-	        model.addAttribute("category", category); // 뷰에서 버튼 활성화용
-	        model.addAttribute("tab", "posts");
-	        /* 
-	    // 댓글 탭 추가
-    else if ("comments".equals(tab)) {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("writer", loginUser.getId());
-        
-        // 댓글 개수 조회 (Service/Mapper 신규 생성 필요)
-        int listCount = qListService.getMyCommentCount(map);
-        
-        // 페이징 (댓글은 페이지당 10개씩)
-        PageInfo pi = Pagination.getPageInfo(page, listCount, 5, 10);
-        map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
-        map.put("listLimit", pi.getBoardLimit());
-        
-        //  댓글 리스트 조회
-        ArrayList<Comment> commentList = qListService.selectMyCommentList(map);
-        
-        model.addAttribute("list", commentList); // 이름은 동일하게 'list'로
-        model.addAttribute("pi", pi);
-        model.addAttribute("tab", "comments");
-    } 
-	    */ }
-	    
-	    //  가짜 댓글 데이터 
-	    else if ("comments".equals(tab)) {
-	        List<String> fakeComments = new ArrayList<>();
-	        
-	        int startNum = ((page - 1) * 10) + 1;
-	        for (int i = 0; i < 10; i++) {
-	            fakeComments.add("[" + (startNum + i) + "] 우도 들어가실 때 배 시간표 꼭 확인하고 가세요~");
+
+	    if("posts".equals(tab)) {
+
+	        model.addAttribute("type", type);
+
+	        // 질문글
+	        if("qna".equals(type)) {
+
+	            HashMap<String,Object> map = new HashMap<>();
+
+	            map.put("memberNo", loginUser.getMemberNo());
+	            	
+	            int listCount =qListService.getMyListCount(map);
+
+	            PageInfo pi =Pagination.getPageInfo(page,listCount,5,8);
+
+	            map.put("startRow",
+	                    (pi.getCurrentPage()-1)
+	                    * pi.getBoardLimit());
+
+	            map.put("listLimit",
+	                    pi.getBoardLimit());
+
+	            ArrayList<QList> postlist =
+	                    qListService.selectMyBoardList(map);
+
+	            model.addAttribute("postlist", postlist);
+	            model.addAttribute("pi", pi);
+	            System.out.println("listCount = " + listCount);
+	            System.out.println("pi = " + pi);
 	        }
-	        
-	        //  댓글 탭일 때도 동일하게 "list"라는 이름으로 전달
-	        model.addAttribute("commentlist", fakeComments);
-	        
-	        // 댓글은 총 57개, 한 페이지에 10개씩 보이도록 세팅
-	        PageInfo pi = Pagination.getPageInfo(page, 57, 10, 5);
+
+	        // 리뷰글
+	        else if("review".equals(type)) {
+
+	            int listCount =
+	                    rListService.getMyReviewCount(
+	                            loginUser.getMemberNo());
+
+	            PageInfo pi =
+	                    Pagination.getPageInfo(
+	                            page,
+	                            listCount,
+	                            5,
+	                            8);
+
+	            HashMap<String,Object> map =
+	                    new HashMap<>();
+
+	            map.put("memberNo",
+	                    loginUser.getMemberNo());
+
+	            map.put("startRow",
+	                    (pi.getCurrentPage()-1)
+	                    * pi.getBoardLimit());
+
+	            map.put("listLimit",
+	                    pi.getBoardLimit());
+
+	            ArrayList<Review> reviewlist =
+	                    rListService.selectMyReviewList(map);
+
+	            model.addAttribute("reviewlist", reviewlist);
+	            model.addAttribute("pi", pi);
+	        }
+	    }
+/*
+	    else if("comments".equals(tab)) {
+
+	        HashMap<String,Object> map =
+	                new HashMap<>();
+
+	        map.put("memberNo",
+	                loginUser.getMemberNo());
+
+	        int listCount =
+	                commentService.getMyCommentCount(map);
+
+	        PageInfo pi =
+	                Pagination.getPageInfo(
+	                        page,
+	                        listCount,
+	                        5,
+	                        8);
+
+	        map.put("startRow",
+	                (pi.getCurrentPage()-1)
+	                * pi.getBoardLimit());
+
+	        map.put("listLimit",
+	                pi.getBoardLimit());
+
+	        ArrayList<Comment> commentlist =
+	                commentService.selectMyCommentList(map);
+
+	        model.addAttribute("commentlist", commentlist);
 	        model.addAttribute("pi", pi);
 	    }
-	    
-	    // 일정이나 관심목록일 때는 list가 필요 없으므로 비워
-	    
+*/
 	    return "views/member/mypage";
 	}
 	
