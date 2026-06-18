@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,6 +62,8 @@ public class AdminController {
 		
 	}
 	
+//	============================================================ 회원 =================================================================
+	
 	@ResponseBody
 	@GetMapping("/members")
 	public HashMap<String, Object> members(
@@ -81,15 +84,16 @@ public class AdminController {
 	}
 	
 	@ResponseBody
-	@PutMapping("members")
+	@PatchMapping("members")
 	public int updateMemberStatus(@RequestBody HashMap<String, String> map) {
 	    map.put("col", "status");
 	    return aService.updateMemberStatus(map);
 	}
 	
+//	============================================================ 공지사항 =================================================================
 	
 	@ResponseBody
-	@PostMapping("write/notice")
+	@PostMapping("write")
 	public int insertNotice(@RequestBody AdminNotice notice, HttpSession session) {
 
 	    Member loginUser = (Member) session.getAttribute("loginUser");
@@ -103,7 +107,13 @@ public class AdminController {
 	    return aService.insertNotice(notice);
 	}
 	
-	
+	@ResponseBody
+	@GetMapping("notice/{noticeNo}")
+	public AdminNotice selectNotice(@PathVariable("noticeNo") int noticeNo) {
+	    return aService.selectNotice(noticeNo);
+
+	}
+
 	@ResponseBody
 	@GetMapping("notice")
 	public HashMap<String, Object> noticeList(@RequestParam(value = "page", defaultValue = "1") int page) {
@@ -121,7 +131,31 @@ public class AdminController {
 	    return data;
 	}
 	
+	@ResponseBody
+	@PatchMapping("notice")
+	public int updateNoticeStatus(@RequestBody AdminNotice notice) {
+		return aService.updateNoticeStatus(notice);
+	}
 	
+	@ResponseBody
+	@PutMapping("notice/{noticeNo}")
+	public int updateNotice(@PathVariable("noticeNo") int noticeNo, @RequestBody AdminNotice notice) {
+	    notice.setNoticeNo(noticeNo);
+	    return aService.updateNotice(notice);
+	}
+	
+	@ResponseBody
+	@GetMapping("notice/top")
+	public ArrayList<AdminNotice> selectTopNotice() {
+
+	    return aService.selectTopNotice();
+
+	}
+	
+	
+	
+	
+//	============================================================ 게시글 =================================================================
 	
 	@ResponseBody
 	@GetMapping("/posts")
@@ -141,30 +175,19 @@ public class AdminController {
 	}
 		
 		@ResponseBody
-		@PutMapping("/posts/status")
+		@PatchMapping("posts")
 	    public int updatePostStatus(@RequestBody AdminPost post) {
 	        return aService.updatePostStatus(post);
 	    }
 		
-		@ResponseBody
-		@PatchMapping("/notice/status")
-		public int updateNoticeStatus(@RequestBody AdminNotice notice) {
-		    return aService.updateNoticeStatus(notice);
-		}
+		
+//		============================================================ 신고 =================================================================
 		
 	
 	@GetMapping("report")
 		public String adminReport() {
 		return "views/admin/report";
 	}
-	@GetMapping("nwrite")
-		public String adminNoticeWirte() {
-		return "views/admin/nwrite";
-	}
-	
-	@GetMapping("nedit")
-		public String adminNoticeEdit() {
-		return "views/admin/nedit";
-	}
+
 	
 }
