@@ -132,6 +132,7 @@
   <script th:inline="javascript">
     window.addEventListener('DOMContentLoaded', function () {
       const loginRequired = /*[[${loginRequired}]]*/ false;
+      const errorMessage  = /*[[${errorMessage}]]*/ null;
       if (loginRequired) {
         openInfoModal(
           '회원 전용 글입니다',
@@ -141,6 +142,9 @@
         document.querySelector('#modal-info button').onclick = function () {
           location.href = '/qList/list';
         };
+      } else if (errorMessage) {
+        // delete/edit/update 실패 시 컨트롤러가 redirect로 넘긴 알림
+        openInfoModal('알림', errorMessage);
       }
     });
 
