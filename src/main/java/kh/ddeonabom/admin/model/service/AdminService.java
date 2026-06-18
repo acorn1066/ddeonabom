@@ -152,5 +152,9 @@ public class AdminService {
 	public int updateNotice(AdminNotice notice) {
 		return mapper.updateNotice(notice);
 	}
+
+	public ArrayList<AdminNotice> selectTopNotice() {
+		return mapper.selectTopNotice();
+	}
 }
 	

@@ -62,6 +62,8 @@ public interface AdminMapper {
 	AdminNotice selectNotice(int noticeNo);
 
 	int updateNotice(AdminNotice notice);
+
+	ArrayList<AdminNotice> selectTopNotice();
 	
 	
 }

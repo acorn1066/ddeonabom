@@ -217,7 +217,19 @@
            CONTENT = #{content},
            MODIFY_DATE = SYSDATE
      WHERE NOTICE_NO = #{noticeNo}
-	
 	</update>
+	
+<select id="selectTopNotice" resultType="adminNotice">
+    SELECT
+        N.NOTICE_NO,
+        N.TITLE,
+        N.CREATE_DATE,
+        M.NICKNAME AS MEMBER_NAME
+    FROM NOTICE N
+    JOIN MEMBER M
+        ON N.MEMBER_NO = M.MEMBER_NO
+    WHERE N.STATUS = 'Y'
+    ORDER BY N.NOTICE_NO DESC
+</select>
 
 </mapper>

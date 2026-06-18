@@ -144,6 +144,14 @@ public class AdminController {
 	    return aService.updateNotice(notice);
 	}
 	
+	@ResponseBody
+	@GetMapping("notice/top")
+	public ArrayList<AdminNotice> selectTopNotice() {
+
+	    return aService.selectTopNotice();
+
+	}
+	
 	
 	
 	
