@@ -135,7 +135,7 @@
     WHERE MEMBER_NO = #{memberNo}
       AND STATUS = 'Y'
 
-</select>
+	</select>
 	
 	<select id="selectMyBoardList" resultType="QList" parameterType="map">
 
@@ -151,5 +151,5 @@
     OFFSET #{startRow} ROWS
     FETCH NEXT #{listLimit} ROWS ONLY
 
-</select>
+	</select>
 </mapper>

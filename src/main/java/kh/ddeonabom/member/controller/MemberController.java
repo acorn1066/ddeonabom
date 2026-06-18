@@ -365,18 +365,18 @@ public class MemberController {
     	return "views/member/find-id";
     }
 
-// 비밀번호 찾기 페이지 열기
-@GetMapping("/find-pwd")
-public String findPwPage() {
-    return "views/member/find-pwd";
-}
+	// 비밀번호 찾기 페이지 열기
+	@GetMapping("/find-pwd")
+	public String findPwPage() {
+	    return "views/member/find-pwd";
+	}
 //=========================================================
 // 아이디 찾기 최종 처리 (Ajax)
 // =========================================================
-@ResponseBody
-@PostMapping("/find-id")
-public String findId(@RequestParam("email") String email, HttpSession session) {
-    // 세션 검증 (인증 완료 여부 및 타겟 이메일 크로스 체크)
+	@ResponseBody
+	@PostMapping("/find-id")
+	public String findId(@RequestParam("email") String email, HttpSession session) {
+	    // 세션 검증 (인증 완료 여부 및 타겟 이메일 크로스 체크)
     Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
     String verifiedEmail = (String) session.getAttribute("verifiedEmail");
     
@@ -403,10 +403,10 @@ public String findId(@RequestParam("email") String email, HttpSession session) {
 // =========================================================
 // 비밀번호 찾기 (임시 비밀번호 생성 + BCrypt 암호화 + 메일 전송)
 // =========================================================
-@ResponseBody
-@PostMapping("/find-pwd")
-public String findPw(@RequestParam("id") String id, @RequestParam("email") String email, HttpSession session) {
-    // 세션 검증
+	@ResponseBody
+	@PostMapping("/find-pwd")
+	public String findPw(@RequestParam("id") String id, @RequestParam("email") String email, HttpSession session) {
+	    // 세션 검증
     Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
     String verifiedEmail = (String) session.getAttribute("verifiedEmail");
     
@@ -472,16 +472,13 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
 	        Model model,
 	        HttpSession session) {
 
-	    Member loginUser =
-	            (Member)session.getAttribute("loginUser");
+	    Member loginUser =(Member)session.getAttribute("loginUser");
 
 	    if(loginUser == null) {
 	        return "redirect:/member/login";
 	    }
 
-	    if("posts".equals(tab)) {
-
-	        model.addAttribute("type", type);
+	    if("posts".equals(tab)) {model.addAttribute("type", type);
 
 	        // 질문글
 	        if("qna".equals(type)) {
@@ -494,51 +491,33 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
 
 	            PageInfo pi =Pagination.getPageInfo(page,listCount,5,8);
 
-	            map.put("startRow",
-	                    (pi.getCurrentPage()-1)
-	                    * pi.getBoardLimit());
+	            map.put("startRow",(pi.getCurrentPage()-1)* pi.getBoardLimit());
 
-	            map.put("listLimit",
-	                    pi.getBoardLimit());
+	            map.put("listLimit",pi.getBoardLimit());
 
-	            ArrayList<QList> postlist =
-	                    qListService.selectMyBoardList(map);
+	            ArrayList<QList> postlist =qListService.selectMyBoardList(map);
 
 	            model.addAttribute("postlist", postlist);
 	            model.addAttribute("pi", pi);
-	            System.out.println("listCount = " + listCount);
-	            System.out.println("pi = " + pi);
+	           
 	        }
 
 	        // 리뷰글
 	        else if("review".equals(type)) {
 
-	            int listCount =
-	                    rListService.getMyReviewCount(
-	                            loginUser.getMemberNo());
+	            int listCount = rListService.getMyReviewCount(loginUser.getMemberNo());
 
-	            PageInfo pi =
-	                    Pagination.getPageInfo(
-	                            page,
-	                            listCount,
-	                            5,
-	                            8);
+	            PageInfo pi =Pagination.getPageInfo(page,listCount,5,8);
 
-	            HashMap<String,Object> map =
-	                    new HashMap<>();
+	            HashMap<String,Object> map =new HashMap<>();
 
-	            map.put("memberNo",
-	                    loginUser.getMemberNo());
+	            map.put("memberNo",loginUser.getMemberNo());
 
-	            map.put("startRow",
-	                    (pi.getCurrentPage()-1)
-	                    * pi.getBoardLimit());
+	            map.put("startRow",(pi.getCurrentPage()-1)* pi.getBoardLimit());
 
-	            map.put("listLimit",
-	                    pi.getBoardLimit());
+	            map.put("listLimit",pi.getBoardLimit());
 
-	            ArrayList<Review> reviewlist =
-	                    rListService.selectMyReviewList(map);
+	            ArrayList<Review> reviewlist =rListService.selectMyReviewList(map);
 
 	            model.addAttribute("reviewlist", reviewlist);
 	            model.addAttribute("pi", pi);
@@ -547,31 +526,20 @@ public String findPw(@RequestParam("id") String id, @RequestParam("email") Strin
 /*
 	    else if("comments".equals(tab)) {
 
-	        HashMap<String,Object> map =
-	                new HashMap<>();
+	        HashMap<String,Object> map =new HashMap<>();
 
-	        map.put("memberNo",
-	                loginUser.getMemberNo());
+	        map.put("memberNo",loginUser.getMemberNo());
 
-	        int listCount =
-	                commentService.getMyCommentCount(map);
+	        int listCount =commentService.getMyCommentCount(map);
 
-	        PageInfo pi =
-	                Pagination.getPageInfo(
-	                        page,
-	                        listCount,
-	                        5,
-	                        8);
+	        PageInfo pi =Pagination.getPageInfo(page,listCount,5,8);
 
-	        map.put("startRow",
-	                (pi.getCurrentPage()-1)
-	                * pi.getBoardLimit());
+	        map.put("startRow",(pi.getCurrentPage()-1)* pi.getBoardLimit());
 
 	        map.put("listLimit",
 	                pi.getBoardLimit());
 
-	        ArrayList<Comment> commentlist =
-	                commentService.selectMyCommentList(map);
+	        ArrayList<Comment> commentlist =commentService.selectMyCommentList(map);
 
 	        model.addAttribute("commentlist", commentlist);
 	        model.addAttribute("pi", pi);
