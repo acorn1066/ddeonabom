@@ -144,5 +144,13 @@ public class AdminService {
 	public int insertNotice(AdminNotice notice) {
 		return mapper.insertNotice(notice);
 	}
+
+	public AdminNotice selectNotice(int noticeNo) {
+		return mapper.selectNotice(noticeNo);
+	}
+
+	public int updateNotice(AdminNotice notice) {
+		return mapper.updateNotice(notice);
+	}
 }
 	

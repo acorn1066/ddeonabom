@@ -5,7 +5,15 @@ const NoticeDetail = () => {
 
     const { noticeNo } = useParams();
 
-    const [notice, setNotice] = useState(null);
+    const [notice, setNotice] = useState({
+        noticeNo: "",
+        title: "",
+        content: "",
+        memberName: "",
+        createDate: "",
+        modifyDate: "",
+        status: "",
+    });
 
     const navigate = useNavigate();
 
@@ -18,15 +26,6 @@ const NoticeDetail = () => {
             .catch(err => console.log(err));
     }, [noticeNo]);
 
-    if (!notice) {
-        return (
-            <section className="flex-1 p-8">
-                <div className="text-center">
-                    로딩중...
-                </div>
-            </section>
-        );
-    }
 
     return (
         <section className="flex-1 p-8">
@@ -73,6 +72,13 @@ const NoticeDetail = () => {
 
                     <div>
                         <span className="font-semibold">
+                            공지번호 :
+                        </span>{" "}
+                        {notice.noticeNo}
+                    </div>
+
+                    <div>
+                        <span className="font-semibold">
                             작성자 :
                         </span>{" "}
                         {notice.memberName}
@@ -92,13 +98,6 @@ const NoticeDetail = () => {
                         {notice.modifyDate
                             ? notice.modifyDate.split("T")[0]
                             : "-"}
-                    </div>
-
-                    <div>
-                        <span className="font-semibold">
-                            공지번호 :
-                        </span>{" "}
-                        {notice.noticeNo}
                     </div>
 
                 </div>

@@ -58,6 +58,10 @@ public interface AdminMapper {
 	int updateNoticeStatus(AdminNotice notice);
 
 	int insertNotice(AdminNotice notice);
+
+	AdminNotice selectNotice(int noticeNo);
+
+	int updateNotice(AdminNotice notice);
 	
 	
 }
