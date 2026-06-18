@@ -44,8 +44,11 @@ public class ReviewService {
 		return reviewMapper.selectMyReviewList(memberNo);
 	}
 
-	public Review getReviewDetail(int travelNo) {
-		Review review = reviewMapper.getReviewDetail(travelNo);      
+	public Review getReviewDetail(int travelNo, Integer loginUserNo) {
+		Review review = reviewMapper.getReviewDetail(travelNo, loginUserNo);   
+		if(review == null) {
+			return null;
+		}
 	    List<ReviewSub> subList = reviewMapper.getReviewSubList(travelNo); 
 	    for (ReviewSub sub : subList) {
 	        List<Image> images = reviewMapper.getImageListBySubNo(sub.getTravelSubNo());
@@ -57,6 +60,22 @@ public class ReviewService {
 	    return review; 
 	}
 
+	public void increaseCount(int travelNo) {
+		reviewMapper.increaseCount(travelNo);
+	}
+
+	public int toggleLike(int travelNo, int memberNo) {
+
+	    int cnt = reviewMapper.existsLike(travelNo, memberNo);
+
+	    if (cnt > 0) {
+	        reviewMapper.deleteLike(travelNo, memberNo);
+	    } else {
+	        reviewMapper.insertLike(travelNo, memberNo);
+	    }
+
+	    return reviewMapper.selectLikeCount(travelNo);
+	}
 
 
 }

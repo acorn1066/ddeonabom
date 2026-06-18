@@ -62,7 +62,7 @@
       <span class="text-13 text-muted">들른 관광지</span>
     </div>
     <div class="rounded-xl bg-sunk p-4 text-center">
-      <b class="block text-2xl font-extrabold tracking-tight tabular-nums"
+      <b id="likeCount" class="block text-2xl font-extrabold tracking-tight tabular-nums"
          th:text="${review.likeCount}">0</b>
       <span class="text-13 text-muted">추천수</span>
     </div>
@@ -70,7 +70,7 @@
 
   <!-- 동선 지도 -->
   <div class="relative my-7 overflow-hidden rounded-2xl shadow-card" th:if="${review.subList != null and not #lists.isEmpty(review.subList)}">
-    <div id="map" class="h-80 w-full"></div>
+    <div id="map" style="width:100%;height:400px;"></div>
   </div>
 
   <!-- 관광지 목록 -->
@@ -82,7 +82,7 @@
         <div class="mb-3 flex items-center justify-between">
   
 		  <div class="text-lg font-bold tracking-tight"
-		       th:text="${sub.contentId}">
+		       th:text="${sub.contentTitle}">
 		    관광지명
 		  </div>
 		  <div class="flex items-center gap-1 text-yellow-400 text-sm">
@@ -142,39 +142,21 @@
 <footer th:replace="~{views/common/footer :: footer}"></footer>
 
 <script th:src="@{'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${kakaoApiKey} + '&libraries=services'}"></script>
-<script>
-function toggleLike() {
-  const travelNo = document.getElementById('likeBtn').dataset.travelNo;
-  fetch('/reviews/like?travelNo=' + travelNo, { method: 'POST' })
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById('likeCount').textContent = data.likeCount;
-    });
-}
+<script th:inline="javascript">
 
-// 관광지 좌표 목록 (서버에서 내려준 값으로 채워짐)
 const spotCoords = /*[[${review.subList}]]*/ [];
 
-function makeMarkerImage(num) {
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
-      <path d="M14 0C6.268 0 0 6.268 0 14c0 9.333 14 22 14 22S28 23.333 28 14C28 6.268 21.732 0 14 0z" fill="#1F47E6"/>
-      <text x="14" y="19" text-anchor="middle" fill="white" font-size="13" font-family="sans-serif" font-weight="bold">${num}</text>
-    </svg>`;
-  return new kakao.maps.MarkerImage(
-    'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg),
-    new kakao.maps.Size(28, 36),
-    { offset: new kakao.maps.Point(14, 36) }
-  );
-}
-
 function initDetailMap() {
+
   const mapContainer = document.getElementById('map');
   if (!mapContainer) return;
 
-  const validSpots = spotCoords.filter(s => s.lat && s.lng);
+  const validSpots = spotCoords.filter(s =>
+    s.lat != null && s.lng != null && s.lat != 0 && s.lng != 0
+  );
+
   if (validSpots.length === 0) {
-    mapContainer.innerHTML = '<div class="flex h-full items-center justify-center text-muted text-sm">등록된 위치 정보가 없습니다.</div>';
+    mapContainer.innerHTML = '등록된 위치 정보 없음';
     return;
   }
 
@@ -188,29 +170,60 @@ function initDetailMap() {
 
   validSpots.forEach((spot, i) => {
     const latlng = new kakao.maps.LatLng(spot.lat, spot.lng);
+
     new kakao.maps.Marker({
       map,
-      position: latlng,
-      image: makeMarkerImage(i + 1)
+      position: latlng
     });
+
     bounds.extend(latlng);
     path.push(latlng);
   });
 
-  // 동선 폴리라인
   new kakao.maps.Polyline({
     map,
     path,
-    strokeWeight: 2.5,
-    strokeColor: '#1F47E6',
-    strokeOpacity: 0.9,
-    strokeStyle: 'solid'
+    strokeWeight: 3,
+    strokeColor: '#1F47E6'
   });
 
   map.setBounds(bounds);
 }
 
-window.addEventListener('load', initDetailMap);
+/* ⭐ 핵심: "SDK 준비될 때까지 기다리는 단 하나의 루프" */
+function waitForKakao() {
+  if (window.kakao && kakao.maps && kakao.maps.load) {
+    kakao.maps.load(function () {
+      initDetailMap();
+    });
+  } else if (window.kakao && kakao.maps) {
+    initDetailMap();
+  } else {
+    setTimeout(waitForKakao, 50);
+  }
+}
+
+window.onload = waitForKakao;
+console.log(window.kakao)
+
+function toggleLike() {
+  const travelNo = document.getElementById('likeBtn').dataset.travelNo;
+
+  fetch('/reviews/like', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      travelNo: travelNo
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('likeCount').textContent = data.likeCount;
+    
+  });
+}
 </script>
 
 </body>
