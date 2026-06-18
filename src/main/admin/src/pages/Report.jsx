@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import "./Page.css";
+import Pagination from "../components/Pagination";
+import { useBoards } from "../hooks/useBoards";
 
 const statusLabel = {
     N: "미처리",
@@ -25,15 +27,13 @@ const statusMap = {
 };
 
 const Report = () => {
+    const { boards: reports, setBoards: setReports, setPageInfo,
+        pageInfo, currentPage, changePage, resetToFirstPage, handleStatusToggle: changeReportStatus,
+        selectBoard: selectReport, showModal, handleBoardClick: handleReportClick, closeModal } = useBoards("reports", "reportNo");
+
 
     const [reportType, setReportType] = useState("post");
-    const [status, setStatus] = useState("전체");
     const [keyword, setKeyword] = useState("");
-    const [reports, setReports] = useState([]);
-
-    const [searchParams, setSearchParams] = useSearchParams();
-    const currentPage = parseInt(searchParams.get('page') || '1');
-    const [pageInfo, setPageInfo] = useState(null);
 
     useEffect(() => {
         fetchReports(currentPage);
@@ -55,38 +55,6 @@ const Report = () => {
         } else {
             setSearchParams({ page: "1" });
         }
-    };
-
-    const changePage = page => {
-        setSearchParams({ page: page.toString() });
-    };
-
-    const changeReportStatus = (report, newStatus) => {
-
-        fetch("/react/admin/reports/status", {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json;charset=UTF-8"
-            },
-            body: JSON.stringify({
-                reportNo: report.reportNo,
-                reportType: reportType,
-                status: newStatus
-            })
-        })
-            .then(res => res.json())
-            .then(data => {
-
-                if (data === 1) {
-                    setReports(prev => prev.map(r =>
-                        r.reportNo === report.reportNo ? { ...r, status: newStatus } : r
-                    ));
-                } else {
-                    alert("처리에 실패하여 페이지를 새로고침합니다.");
-                    window.location.reload();
-                }
-            })
-            .catch(err => console.log(err));
     };
 
     return (
@@ -112,10 +80,9 @@ const Report = () => {
                         setSearchParams({ page: "1" });
                     }}
                     className={`rounded-lg px-6 py-2 font-semibold shadow
-                        ${
-                            reportType === "post"
-                                ? "bg-red-600 text-white hover:bg-red-700"
-                                : "cursor-pointer border border-gray-300 bg-white hover:bg-gray-100"
+                        ${reportType === "post"
+                            ? "bg-red-600 text-white hover:bg-red-700"
+                            : "cursor-pointer border border-gray-300 bg-white hover:bg-gray-100"
                         }`}
                 >
                     게시글 신고
@@ -127,10 +94,9 @@ const Report = () => {
                         setSearchParams({ page: "1" });
                     }}
                     className={`rounded-lg px-6 py-2 font-semibold shadow
-                        ${
-                            reportType === "reply"
-                                ? "bg-red-600 text-white hover:bg-red-700"
-                                : "cursor-pointer border border-gray-300 bg-white hover:bg-gray-100"
+                        ${reportType === "reply"
+                            ? "bg-red-600 text-white hover:bg-red-700"
+                            : "cursor-pointer border border-gray-300 bg-white hover:bg-gray-100"
                         }`}
                 >
                     댓글 신고
@@ -163,7 +129,7 @@ const Report = () => {
                         type="text"
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
-                        placeholder="신고자 또는 신고사유 검색"
+                        placeholder="신고자 검색"
                         className="flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
                     />
 
@@ -206,10 +172,10 @@ const Report = () => {
                             reports.map((report) => (
                                 <tr key={report.reportNo} className="border-b hover:bg-gray-50">
 
-                                    <td className="p-4 text-center">{report.reportNo}</td>
-                                    <td className="p-4 text-center">{report.targetTitle}</td>
-                                    <td className="p-4 text-center">{report.reporterName}</td>
-                                    <td className="p-4 text-center">{report.reportDate?.split("T")[0]}</td>
+                                    <td className="p-4 text-center cursor-pointer" onClick={() => handlePostClick(post)}>{report.reportNo}</td>
+                                    <td className="p-4 text-center cursor-pointer" onClick={() => handlePostClick(post)}>{report.targetTitle}</td>
+                                    <td className="p-4 text-center cursor-pointer" onClick={() => handlePostClick(post)}>{report.reporterName}</td>
+                                    <td className="p-4 text-center cursor-pointer" onClick={() => handlePostClick(post)}>{report.reportDate?.split("T")[0]}</td>
                                     <td className="p-4 text-center">
                                         <span className={`rounded-full px-3 py-1 text-sm font-semibold ${statusBadgeClass[report.status]}`}>
                                             {statusLabel[report.status]}
@@ -250,40 +216,100 @@ const Report = () => {
 
             </div>
 
-            {pageInfo && (
-                <div className="pagination-container">
+            <Pagination pageInfo={pageInfo} currentPage={currentPage} onChange={changePage} />
 
-                    <button
-                        className="pagination-btn"
-                        onClick={() => currentPage > 1 && changePage(currentPage - 1)}
-                        disabled={currentPage <= 1}
+            {showModal && selectReport && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+                    onClick={closeModal}
+                >
+                    <div
+                        className="w-full max-w-lg rounded-2xl bg-white shadow-xl"
+                        onClick={(e) => e.stopPropagation()}
                     >
-                        ‹
-                    </button>
+                        <div className="flex items-center justify-between border-b p-4">
+                            <h1 className="text-lg font-bold">
+                                신고 상세정보
+                            </h1>
 
-                    {Array.from(
-                        { length: pageInfo.endPage - pageInfo.startPage + 1 },
-                        (_, i) => pageInfo.startPage + i
-                    ).map(pageNum => (
-                        <button
-                            key={pageNum}
-                            onClick={() => changePage(pageNum)}
-                            className={`pagination-page ${currentPage === pageNum ? "active" : ""}`}
-                        >
-                            {pageNum}
-                        </button>
-                    ))}
+                            <button
+                                onClick={closeModal}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                ✕
+                            </button>
+                        </div>
 
-                    <button
-                        className="pagination-btn"
-                        onClick={() => currentPage < pageInfo.maxPage && changePage(currentPage + 1)}
-                        disabled={currentPage >= pageInfo.maxPage}
-                    >
-                        ›
-                    </button>
+                        <div className="space-y-3 p-4">
+                            <p>
+                                <strong>신고번호 :</strong> {selectReport.reportNo}
+                            </p>
+
+                            <p>
+                                <strong>신고대상 :</strong> {selectReport.targetTitle}
+                            </p>
+
+                            <p>
+                                <strong>신고자 :</strong> {selectReport.reporterName}
+                            </p>
+
+                            <p>
+                                <strong>신고일 :</strong>
+                                {" "}
+                                {selectReport.reportDate?.split("T")[0]}
+                            </p>
+
+                            <p>
+                                <strong>상태 :</strong>
+                                {" "}
+                                {statusLabel[selectReport.status]}
+                            </p>
+
+                            <p>
+                                <strong>신고사유 :</strong>
+                            </p>
+
+                            <div className="rounded-lg bg-gray-50 p-3">
+                                {selectReport.reason || "내용 없음"}
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-2 border-t p-4">
+                            {selectReport.status === "N" && (
+                                <>
+                                    <button
+                                        onClick={() => {
+                                            changeReportStatus(selectReport, "Y");
+                                            closeModal();
+                                        }}
+                                        className="rounded-lg bg-green-600 px-4 py-2 text-white"
+                                    >
+                                        처리
+                                    </button>
+
+                                    <button
+                                        onClick={() => {
+                                            changeReportStatus(selectReport, "R");
+                                            closeModal();
+                                        }}
+                                        className="rounded-lg bg-red-600 px-4 py-2 text-white"
+                                    >
+                                        반려
+                                    </button>
+                                </>
+                            )}
+
+                            <button
+                                onClick={closeModal}
+                                className="rounded-lg bg-gray-200 px-4 py-2"
+                            >
+                                닫기
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
-
+            {showModal && <div className="modal-backdrop fade show"></div>}
         </section>
     );
 };

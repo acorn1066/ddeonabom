@@ -3,60 +3,60 @@
 
 <mapper namespace="kh.ddeonabom.admin.model.mapper.AdminMapper">
 
-    <select id="selectMemberCount" resultType="int">
+    <select id="selectMemberCount" resultType="_int">
         SELECT COUNT(*)
         FROM MEMBER
         WHERE STATUS = 'Y'
     </select>
 
-    <select id="selectTravelCount" resultType="int">
+    <select id="selectTravelCount" resultType="_int">
         SELECT COUNT(*)
         FROM TRAVEL_LIST
         WHERE STATUS = 'Y'
     </select>
 
-    <select id="selectScheduleCount" resultType="int">
+    <select id="selectScheduleCount" resultType="_int">
         SELECT COUNT(*)
         FROM SCHEDULE_MAIN
         WHERE SCHEDULE_STATUS = 'Y'
     </select>
 
-    <select id="selectQlistCount" resultType="int">
+    <select id="selectQlistCount" resultType="_int">
         SELECT COUNT(*)
         FROM QLIST
         WHERE STATUS = 'Y'
     </select>
     
-     <select id="selectMemberCountList" resultType="int">
+     <select id="selectMemberCountList" resultType="_int">
         SELECT COUNT(*)
         FROM MEMBER
     </select>
     
-     <select id="selectTravelCountList" resultType="int">
+     <select id="selectTravelCountList" resultType="_int">
         SELECT COUNT(*)
         FROM TRAVEL_LIST
         WHERE VISIBILITY = 'PUBLIC'
     </select>
 
-    <select id="selectScheduleCountList" resultType="int">
+    <select id="selectScheduleCountList" resultType="_int">
         SELECT COUNT(*)
         FROM SCHEDULE_MAIN
         WHERE SCHEDULE_VISIBILITY = 'Y' and SCHEDULE_VISIBILITY = 'M'
     </select>
 
-    <select id="selectQlistCountList" resultType="int">
+    <select id="selectQlistCountList" resultType="_int">
         SELECT COUNT(*)
         FROM QLIST
     </select>
     
 
-    <select id="selectReplyCount" resultType="int">
+    <select id="selectReplyCount" resultType="_int">
         SELECT COUNT(*)
         FROM REPLY
         WHERE STATUS = 'Y'
     </select>
 
-    <select id="selectReportCount" resultType="int">
+    <select id="selectReportCount" resultType="_int">
         SELECT COUNT(*)
         FROM REPORT
         WHERE REPORT_STATUS = 'N'
@@ -196,5 +196,40 @@
 	    VALUES (SEQ_NOTICE.NEXTVAL, #{title}, #{content}, #{memberNo}, SYSDATE, 'Y')
 	</insert>
 	
+	<select id="selectNotice" parameterType="_int"  resultType="adminNotice">
+	 SELECT
+	        N.NOTICE_NO AS noticeNo,
+	        N.TITLE AS title,
+	        N.CONTENT AS content,
+	        M.NICKNAME AS memberName,
+	        N.CREATE_DATE AS createDate,
+	        N.MODIFY_DATE AS modifyDate,
+	        N.STATUS AS status
+	    FROM NOTICE N
+	    JOIN MEMBER M
+	        ON N.MEMBER_NO = M.MEMBER_NO
+    WHERE N.NOTICE_NO = #{noticeNo}
+	</select>
+ 
+	<update id="updateNotice" parameterType="adminNotice">
+		UPDATE NOTICE
+       SET TITLE = #{title},
+           CONTENT = #{content},
+           MODIFY_DATE = SYSDATE
+     WHERE NOTICE_NO = #{noticeNo}
+	</update>
+	
+<select id="selectTopNotice" resultType="adminNotice">
+    SELECT
+        N.NOTICE_NO,
+        N.TITLE,
+        N.CREATE_DATE,
+        M.NICKNAME AS MEMBER_NAME
+    FROM NOTICE N
+    JOIN MEMBER M
+        ON N.MEMBER_NO = M.MEMBER_NO
+    WHERE N.STATUS = 'Y'
+    ORDER BY N.NOTICE_NO DESC
+</select>
 
 </mapper>

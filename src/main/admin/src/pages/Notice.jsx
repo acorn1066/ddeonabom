@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "./Page.css";
+import Pagination from "../components/Pagination";
+import { useBoards } from "../hooks/useBoards";
+
 
 const Notice = () => {
-    const [notice, setNotice] = useState([])
-    const navigate = useNavigate();
+    const { boards: notice, setBoards: setNotice, setPageInfo,
+        pageInfo, currentPage, changePage, handleStatusToggle: changeStatus } = useBoards("notice", "noticeNo");
+
     const [keyword, setKeyword] = useState("");
 
-    const [searchParams, setSearchParams] = useSearchParams()
-    const currentPage = parseInt(searchParams.get('page') || '1')
-    const [pageInfo, setPageInfo] = useState(null)
+    const navigate = useNavigate(); 
 
     const handleSearch = () => {
         console.log("검색:", keyword);
@@ -29,37 +31,6 @@ const Notice = () => {
             })
             .catch(err => console.log(err))
     }
-
-    const changePage = page => {
-        setSearchParams({ page: page.toString() })
-    }
-
-    const changeStatus = (n, newStatus) => {
-
-        fetch("/react/admin/notice/status", {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json;charset=UTF-8"
-            },
-            body: JSON.stringify({
-                noticeNo: n.noticeNo,
-                status: newStatus
-            })
-        })
-            .then(res => res.json())
-            .then(data => {
-
-                if (data === 1) {
-                    setNotice(prev => prev.map(item =>
-                        item.noticeNo === n.noticeNo ? { ...item, status: newStatus } : item
-                    ));
-                } else {
-                    alert("상태 변경에 실패하여 페이지를 새로고침합니다.");
-                    window.location.reload();
-                }
-            })
-            .catch(err => console.log(err));
-    };
 
     return (
         <section className="flex-1 p-8">
@@ -152,11 +123,11 @@ const Notice = () => {
                                     <td className="p-4">
                                         <div className="flex justify-center gap-2">
 
-                                            <button onClick={() => n.status === "N" ? changeStatus(n, "Y") : null}
+                                            <button onClick={() => n.status === "N" ? changeStatus(n.noticeNo, "Y") : null}
                                                 className={`rounded-lg px-4 py-1 text-sm font-semibold border transition cursor-pointer ${n.status === "Y" ? "border-green-500 bg-green-500 text-white" : "border-gray-300 bg-white text-gray-500"}`}>게시
                                             </button>
 
-                                            <button onClick={() => n.status === "Y" ? changeStatus(n, "N") : null}
+                                            <button onClick={() => n.status === "Y" ? changeStatus(n.noticeNo, "N") : null}
                                                 className={`rounded-lg px-4 py-1 text-sm font-semibold border transition cursor-pointer ${n.status === "N" ? "border-red-500 bg-red-500 text-white" : "border-gray-300 bg-white text-gray-500"}`}>삭제
                                             </button>
 
@@ -177,31 +148,7 @@ const Notice = () => {
 
             </div>
 
-            {pageInfo && (
-                <div className="pagination-container">
-                    <button className="pagination-btn" onClick={() => currentPage > 1 && changePage(currentPage - 1)} disabled={currentPage <= 1}>
-                        ‹
-                    </button>
-
-                    {Array.from(
-                        { length: pageInfo.endPage - pageInfo.startPage + 1 },
-                        (_, i) => pageInfo.startPage + i
-                    ).map(pageNum => (
-                        <button key={pageNum}
-                            onClick={() => changePage(pageNum)}
-                            className={`pagination-page ${currentPage === pageNum ? "active" : ""}`}
-                        >{pageNum}
-                        </button>
-                    ))}
-
-                    <button
-                        className="pagination-btn"
-                        onClick={() => currentPage < pageInfo.maxPage && changePage(currentPage + 1)}
-                        disabled={currentPage >= pageInfo.maxPage}
-                    >›</button>
-                </div>
-            )}
-
+            <Pagination pageInfo={pageInfo} currentPage={currentPage} onChange={changePage} />
         </section>
     );
 };

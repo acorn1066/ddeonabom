@@ -57,7 +57,7 @@ tailwind.config = {
         detail: '1.4fr 1fr',
         infotable: '120px 1fr',
         plan: '460px 1fr',
-        qarow: '1fr 130px 110px 80px',
+        qarow: '1fr 90px 130px 110px 80px',
         admin: '1.6fr 1fr',
       },
       height: {

@@ -1,4 +1,4 @@
-package kh.ddeonabom.qList.model.vo;
+package kh.ddeonabom.reply.model.vo;
 
 import java.sql.Date;
 
@@ -13,17 +13,14 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class QList {
-	private int qNo;
-	private String title;
+public class Reply {
+	private int replyNo;
 	private String content;
 	private Date createDate;
 	private Date modifyDate;
-	private int count;
 	private String status;
+	private String postBoard;
+	private int postNo;
 	private int memberNo;
-	private String writer;
-	private String category;
-	private String visibility;
-	private int replyCount;
+	private String writer;   // MEMBER 테이블 JOIN으로 가져올 nickname
 }

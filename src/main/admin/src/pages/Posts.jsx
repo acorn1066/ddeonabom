@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom"
 import "./Page.css";
+import Pagination from "../components/Pagination";
+import { useBoards } from "../hooks/useBoards";
 
 const Posts = () => {
-    const [posts, setPosts] = useState([])
-    const [searchType, setSearchType] = useState("전체");
+
+    const { boards: posts, setBoards: setPosts, setPageInfo,
+        pageInfo, currentPage, changePage, resetToFirstPage, handleStatusToggle: changeStatus,
+        selectBoard: selectPost, showModal, handleBoardClick: handlePostClick, closeModal } = useBoards("posts", "postNo");
+
     const [keyword, setKeyword] = useState("");
     const [boardType, setBoardType] = useState("공유");
-
-    const [searchParams, setSearchParams] = useSearchParams()
-    const currentPage = parseInt(searchParams.get('page') || '1')
-    const [pageInfo, setPageInfo] = useState(null)
+    const [searchType, setSearchType] = useState("전체");
 
     const handleSearch = () => {
         console.log(searchType, keyword);
@@ -39,55 +41,6 @@ const Posts = () => {
             .catch(err => console.log(err))
     }
 
-    const changePage = page => {
-        setSearchParams({ page: page.toString() })
-    }
-
-    const changeStatus = (post, newStatus) => {
-
-        fetch("/react/admin/posts/status", {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json;charset=UTF-8"
-            },
-            body: JSON.stringify({
-                postNo: post.postNo,
-                boardType: post.boardType,
-                status: newStatus
-            })
-        })
-            .then(res => res.json())
-            .then(data => {
-
-                if (data === 1) {
-                    setPosts(prev => prev.map(p =>
-                        p.postNo === post.postNo ? { ...p, status: newStatus } : p
-                    ));
-                    if (selectPost && selectPost.postNo === post.postNo) {
-                        setSelectPost({ ...selectPost, status: newStatus });
-                    }
-
-                } else {
-                    alert("상태 변경에 실패하여 페이지를 새로고침합니다.");
-                    window.location.reload();
-                }
-            })
-            .catch(err => console.log(err));
-    };
-    const [selectPost, setSelectPost] = useState(null)
-    const [showModal, setShowModal] = useState(false)
-
-    const handlePostClick = post => {
-        setSelectPost(post)
-        setShowModal(true)
-    }
-
-    const closeModal = () => {
-        setShowModal(false)
-        setSelectPost(null)
-    }
-
-
     return (
         <section className="flex-1 p-8">
 
@@ -110,7 +63,7 @@ const Posts = () => {
                         key={board}
                         onClick={() => {
                             setBoardType(board)
-                            setSearchParams({ page: "1" })
+                            resetToFirstPage();
                         }}
                         className={`cursor-pointer rounded-lg border px-6 py-2 font-semibold shadow-sm transition-all
                         ${boardType === board
@@ -196,11 +149,11 @@ const Posts = () => {
                                     <td className="p-4">
                                         <div className="flex justify-center gap-2">
 
-                                            <button onClick={() => post.status === "N" ? changeStatus(post, "Y") : null}
+                                            <button onClick={() => post.status === "N" ? changeStatus(post.postNo, "Y", { boardType: post.boardType }) : null}
                                                 className={`rounded-lg px-4 py-1 text-sm font-semibold border transition cursor-pointer ${post.status === "Y" ? "border-green-500 bg-green-500 text-white" : "border-gray-300 bg-white text-gray-500"}`}>게시
                                             </button>
 
-                                            <button onClick={() => post.status === "Y" ? changeStatus(post, "N") : null}
+                                            <button onClick={() => post.status === "Y" ? changeStatus(post.postNo, "N", { boardType: post.boardType }) : null}
                                                 className={`rounded-lg px-4 py-1 text-sm font-semibold border transition cursor-pointer ${post.status === "N" ? "border-red-500 bg-red-500 text-white" : "border-gray-300 bg-white text-gray-500"}`}>삭제
                                             </button>
 
@@ -221,43 +174,7 @@ const Posts = () => {
 
             </div>
 
-            {pageInfo && (
-                <div className="pagination-container">
-
-                    <button
-                        className="pagination-btn"
-                        onClick={() => currentPage > 1 && changePage(currentPage - 1)}
-                        disabled={currentPage <= 1}
-                    >
-                        ‹
-                    </button>
-
-                    {Array.from(
-                        { length: pageInfo.endPage - pageInfo.startPage + 1 },
-                        (_, i) => pageInfo.startPage + i
-                    ).map(pageNum => (
-                        <button
-                            key={pageNum}
-                            onClick={() => changePage(pageNum)}
-                            className={`pagination-page ${currentPage === pageNum ? "active" : ""
-                                }`}
-                        >
-                            {pageNum}
-                        </button>
-                    ))}
-
-                    <button
-                        className="pagination-btn"
-                        onClick={() =>
-                            currentPage < pageInfo.maxPage &&
-                            changePage(currentPage + 1)
-                        }
-                        disabled={currentPage >= pageInfo.maxPage}
-                    >
-                        ›
-                    </button>
-                </div>
-            )}
+            <Pagination pageInfo={pageInfo} currentPage={currentPage} onChange={changePage} />
 
             {showModal && selectPost && (
                 <div

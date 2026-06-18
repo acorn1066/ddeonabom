@@ -14,11 +14,15 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
+import kh.ddeonabom.admin.model.service.AdminService;
+import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.member.model.vo.Member;
 import kh.ddeonabom.qList.model.vo.QList;
 import kh.ddeonabom.qList.service.QListService;
+import kh.ddeonabom.reply.model.vo.Reply;
+import kh.ddeonabom.reply.service.ReplyService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -26,6 +30,9 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/qList")
 public class QListController {
 	private final QListService qListService;
+	private final ReplyService replyService;
+	private final AdminService aService;
+
 	// 목록 보기
 	@GetMapping("list")
 	public ModelAndView selectQList(
@@ -51,6 +58,7 @@ public class QListController {
 
 	    // 3) map을 같이 넘겨야 필터링 + 페이징이 적용됨
 	    ArrayList<QList> qList = qListService.selectQList(map);
+	    ArrayList<AdminNotice> noticeList = aService.selectTopNotice();
 
 	    mv.addObject("qList",      qList)
 	      .addObject("pi",         pi)
@@ -58,6 +66,7 @@ public class QListController {
 	      .addObject("category",   category)
 	      .addObject("searchType", searchType)
 	      .addObject("searchInput",searchInput)
+	      .addObject("noticeList", noticeList)
 	      .setViewName("views/qList/list");
 
 	    return mv;
@@ -106,8 +115,12 @@ public class QListController {
 	    // 회원 공개 글인데 비로그인 상태라면 모달 트리거 플래그 전달
 	    boolean loginRequired = "MEMBER".equals(q.getVisibility())
 	                            && session.getAttribute("loginUser") == null;
-	    
+
+	    ArrayList<Reply> replyList = replyService.getReplyList(qNo, "Q");
+
 	    mv.addObject("q", q)
+	    	.addObject("replyList",  replyList)
+	    	.addObject("replyCount", replyList.size())
 	    	.addObject("loginRequired", loginRequired)
 	    	.setViewName("views/qList/detail");
 	    

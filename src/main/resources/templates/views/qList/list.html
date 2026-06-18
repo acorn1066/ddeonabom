@@ -116,8 +116,38 @@
 	  </div>
 	
 	  <div class="grid grid-cols-qarow gap-4 px-2 pb-3 pt-3 text-13 font-bold text-muted">
-	    <span>제목</span><span>작성자</span><span>작성일</span><span class="text-right">조회</span>
+	    <span>제목</span><span></span><span>작성자</span><span>작성일</span><span class="text-right">조회</span>
 	  </div>
+	  
+	  <!-- ===================================================== 공지 목록 ================================================================== -->
+	<div>
+	  <a th:each="notice : ${noticeList}"
+	     th:href="@{/notice/detail/{noticeNo}(noticeNo=${notice.noticeNo})}"
+	     class="grid grid-cols-qarow items-center gap-4 border-b border-line bg-yellow-50 px-2 py-4 transition hover:bg-yellow-100">
+	
+	    <span class="text-15 font-semibold">
+	      <span class="mr-2 font-bold text-red-500">📢 공지</span>
+	      [[${notice.title}]]
+	    </span>
+	
+		<span></span>
+	
+	    <span class="text-13 text-muted">
+	      [[${notice.memberName}]]
+	    </span>
+	
+	    <span class="text-13 text-muted">
+	      [[${notice.createDate}]]
+	    </span>
+	
+	    <span class="text-right text-13 font-semibold text-red-500">
+	      -
+	    </span>
+	
+	  </a>
+	</div>
+	    <!-- ===================================================== 공지 목록 ================================================================== -->
+	  
 	  <div>
 	    <a th:href="@{/qList/detail(qNo=${q.qNo})}"
 		   th:data-visibility="${q.visibility}"
@@ -125,16 +155,23 @@
 		   onclick="return checkAccess(this)"
 		   class="grid grid-cols-qarow items-center gap-4 border-b border-line px-2 py-4 transition hover:bg-sunk">
 		
-		  <span class="text-15 font-semibold">
-		    <span class="mr-1.5 text-13 font-bold text-brand" th:text="|[${q.category}]|"></span>
-		    [[${q.title}]]
+		  <span class="flex items-center min-w-0 text-15 font-semibold">
+		    <span class="min-w-0 flex-1 overflow-hidden whitespace-nowrap"
+		          style="-webkit-mask-image:linear-gradient(to right,black 80%,transparent 100%);mask-image:linear-gradient(to right,black 80%,transparent 100%);">
+		      <span class="mr-1.5 text-13 font-bold text-brand" th:text="|[${q.category}]|"></span>[[${q.title}]]
+		    </span>
 		    <!-- 회원 공개 배지 -->
 		    <span th:if="${q.visibility == 'MEMBER'}"
-		          class="ml-1.5 inline-flex h-5 items-center rounded-full bg-slate-100 px-2 text-11 font-semibold text-muted">
+		          class="ml-1.5 flex-shrink-0 inline-flex h-5 items-center rounded-full bg-slate-100 px-2 text-11 font-semibold text-muted">
 		      <i class='fas fa-lock'></i>&nbsp; 회원
 		    </span>
-		    <span class="ml-2 text-13 font-bold text-faint">· 댓글 ~</span>
 		  </span>
+
+		  <!-- 댓글 수: 1개 이상일 때만 노출, 0이면 빈 셀로 자리 유지 -->
+		  <span class="text-13 text-muted tabular-nums"
+		        th:if="${q.replyCount > 0}"
+		        th:text="|· 댓글 ${q.replyCount}|"></span>
+		  <span th:unless="${q.replyCount > 0}"></span>
 		  <span class="text-13 text-muted">[[${q.writer}]]</span>
 		  <span class="text-13 text-muted tabular-nums">[[${q.createDate}]]</span>
 		  <span class="text-right text-13 text-muted tabular-nums">[[${q.count}]]</span>
