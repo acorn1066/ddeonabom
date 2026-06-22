@@ -536,9 +536,9 @@ public class MemberController {
 	        
 	        // 탭 구분에 따라 매퍼에 넘겨줄 게시판 구분값 설정 (팀원의 reply 테이블 식별자 기준)
 	        if("qna".equals(type)) {
-	            map.put("postBoard", "Q"); // 예시: 질문게시판 식별자
+	            map.put("postBoard", "Q"); 
 	        } else if("review".equals(type)) {
-	            map.put("postBoard", "R"); // 예시: 리뷰게시판 식별자
+	            map.put("postBoard", "R"); 
 	        }
 
 	        // 공통 카운트 및 페이징 (매퍼 XML에서 postBoard 조건문 반영 필요)
@@ -563,40 +563,34 @@ public class MemberController {
                              @RequestParam(value = "type", defaultValue = "spot") String type,
                              HttpSession session, Model model) {
         
-        // 1. 로그인 유저 확인
         Member loginUser = (Member)session.getAttribute("loginUser");
         if(loginUser == null) {
-            return "redirect:/member/login"; // 로그인 안 되어 있으면 컷!
+            return "redirect:/member/login"; 
         }
         
         HashMap<String, Object> map = new HashMap<>();
         map.put("memberNo", loginUser.getMemberNo());
         
-        // 2. 관광지(spot) 찜 목록 조회
         if("spot".equals(type)) {
-            // 💡 [팀원 자산 활용] 팀원 서비스에 내 memberNo를 던져서 찜한 총 개수를 가져옵니다.
-            // (※ 만약 서비스에 개수 구하는 메서드가 없다면 매퍼 xml을 같이 참고하여 새로 한 줄 파시면 됩니다)
             int listCount = lService.getWishListCount(loginUser.getMemberNo()); 
             
-            // 카드는 한 페이지에 8개씩(4열 2행) 보여주는 게 화면상 가장 이쁩니다.
             PageInfo pi = Pagination.getPageInfo(currentPage, listCount, 5, 8);
             
             map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
             map.put("listLimit", pi.getBoardLimit());
             
-            // 💡 [팀원 자산 활용] 팀원이 만든 Landmark VO 바구니에 담긴 내 찜 목록을 리스트로 수확!
             ArrayList<Landmark> wishlist = lService.selectMyWishList(map);
             
             model.addAttribute("wishlist", wishlist);
             model.addAttribute("pi", pi);
         } 
-        // 3. 일정(plan) 찜 목록 조회 (추후 구현용 확장 공간)
+        
         else if("plan".equals(type)) {
             ArrayList<Object> wishlist = new ArrayList<>();
             model.addAttribute("wishlist", wishlist);
         }
         
-        // 4. [팀원 자산 100% 활용] 팀원 컨트롤러에 있던 카테고리 맵을 그대로 복사해서 배달!
+       
         Map<Integer, String> contentType = new HashMap<>();
         contentType.put(12, "관광지");
         contentType.put(14, "문화시설");
@@ -610,7 +604,7 @@ public class MemberController {
         model.addAttribute("contentType", contentType);
         model.addAttribute("type", type);
         
-        return "views/member/myWishlist"; // 새로 만든 독립된 위시리스트 뷰로 이동!
+        return "views/member/myWishlist"; 
     }
 	
 }
