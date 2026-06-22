@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -83,7 +84,6 @@ public class ReviewController {
 	    if (loginUser != null) {
 	        r.setMemberNo(loginUser.getMemberNo());
 	    }
-		
 	    int result = reviewService.insertReview(r);
 
 	    if (result > 0) {
@@ -96,10 +96,6 @@ public class ReviewController {
 	        if (r.getSubList() != null) {
 	            for (int i = 0; i < r.getSubList().size(); i++) {
 	                ReviewSub sub = r.getSubList().get(i);
-	                System.out.println("===== SUB DEBUG =====");
-	                System.out.println("contentId = " + sub.getContentId());
-	                System.out.println("rating = " + sub.getRating());
-	                System.out.println("content = " + sub.getTravelSubContent());
 	                sub.setTravelNo(r.getTravelNo());   
 	                sub.setTravelSubSeq(i + 1);
 
@@ -138,15 +134,42 @@ public class ReviewController {
 	}
 	
 	@GetMapping("/reviews/detail")
-	public String reviewDetail(@RequestParam("travelNo") int travelNo, Model model) {
-	    Review review = reviewService.getReviewDetail(travelNo);
+	public String reviewDetail(@RequestParam("travelNo") int travelNo, HttpSession session, Model model) {
+		Member loginUser = (Member) session.getAttribute("loginUser");
+	    Integer loginUserNo = (loginUser != null) ? loginUser.getMemberNo() : null;
+
+	    reviewService.increaseCount(travelNo);
+	    Review review = reviewService.getReviewDetail(travelNo, loginUserNo);
+
+	    if (review == null) {
+	        return "redirect:/reviews/list";
+	    }
 	    model.addAttribute("review", review);
 	    model.addAttribute("kakaoApiKey", "77218df82558088a0b690733061ba6f2");
 	    return "views/review/detail";
 	}
 	
 	
-	
+	@PostMapping("/reviews/like")
+	@ResponseBody
+	public Map<String, Object> like(@RequestBody Map<String, Integer> param,
+	                                HttpSession session) {
+
+	    int travelNo = param.get("travelNo");
+
+	    Member loginUser = (Member) session.getAttribute("loginUser");
+	    if (loginUser == null) {
+	        throw new RuntimeException("로그인이 필요합니다.");
+	    }
+	    int memberNo = loginUser.getMemberNo();
+
+	    int likeCount = reviewService.toggleLike(travelNo, memberNo);
+
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("likeCount", likeCount);
+
+	    return result;
+	}
 	
 	
 }

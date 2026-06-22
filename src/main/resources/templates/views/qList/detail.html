@@ -53,11 +53,19 @@
         <!-- ★ 수정/삭제: 로그인한 사용자가 작성자 본인일 때만 노출 -->
         <div class="ml-auto flex gap-2 text-13 text-muted"
              th:if="${session.loginUser != null and session.loginUser.memberNo == q.memberNo}">
-          <a th:href="@{/qList/edit(qNo=${q.qNo})}" class="hover:text-brand">수정</a>
-          <span class="text-line">·</span>
-          <!-- ★ confirm() 대신 danger 모달 사용 → openDeleteModal()로 qNo 전달 -->
-          <button type="button" class="hover:text-brand"
-                  th:onclick="|openDeleteModal([[${q.qNo}]])|">삭제</button>
+          <!-- 댓글이 달려있으면 수정/삭제 비활성 -->
+          <th:block th:if="${replyCount > 0}">
+            <span class="cursor-not-allowed opacity-40" title="댓글이 달린 글은 수정할 수 없습니다">수정</span>
+            <span class="text-line">·</span>
+            <span class="cursor-not-allowed opacity-40" title="댓글이 달린 글은 삭제할 수 없습니다">삭제</span>
+          </th:block>
+          <th:block th:unless="${replyCount > 0}">
+            <a th:href="@{/qList/edit(qNo=${q.qNo})}" class="hover:text-brand">수정</a>
+            <span class="text-line">·</span>
+            <!-- ★ confirm() 대신 danger 모달 사용 → openDeleteModal()로 qNo 전달 -->
+            <button type="button" class="hover:text-brand"
+                    th:onclick="|openDeleteModal([[${q.qNo}]])|">삭제</button>
+          </th:block>
         </div>
 
       </div>
@@ -86,20 +94,31 @@
       <!-- 댓글 작성 폼 (목록 상단 고정) -->
       <div class="mb-6 border-t-2 border-ink pt-6">
         <h3 class="mb-4 text-base font-bold">댓글 작성</h3>
-        <div class="overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
-          <textarea class="block min-h-composer w-full resize-none border-none bg-transparent px-4 py-3 text-sm leading-relaxed outline-none placeholder:text-faint"
-                    placeholder="질문에 도움이 되는 댓글을 남겨보세요"></textarea>
-          <div class="flex items-center justify-between border-t border-line py-2 pl-4 pr-2">
-            <span class="text-xs text-faint">서로 존중하는 댓글 문화를 만들어요</span>
-            <button class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">
-              댓글 등록
-            </button>
+        <form id="reply-form" th:action="@{/reply/insert}" method="post">
+          <input type="hidden" name="postNo"    th:value="${q.qNo}" />
+          <input type="hidden" name="postBoard" value="Q" />
+          <div class="overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
+            <textarea id="reply-content" name="content"
+                      class="block min-h-composer w-full resize-none border-none bg-transparent px-4 py-3 text-sm leading-relaxed outline-none placeholder:text-faint"
+                      th:readonly="${session.loginUser == null}"
+                      th:classappend="${session.loginUser == null} ? 'cursor-not-allowed bg-sunk' : ''"
+                      placeholder="질문에 도움이 되는 댓글을 남겨보세요"></textarea>
+            <div class="flex items-center justify-between border-t border-line py-2 pl-4 pr-2">
+              <span class="text-xs text-faint">서로 존중하는 댓글 문화를 만들어요</span>
+              <button type="button"
+                      onclick="handleReplySubmit()"
+                      class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">
+                댓글 등록
+              </button>
+            </div>
           </div>
-        </div>
+        </form>
       </div>
 
       <!-- 댓글 목록 -->
-      <div th:each="reply : ${replyList}" class="flex gap-4 border-t border-line py-5">
+      <div th:each="reply : ${replyList}"
+           th:id="|reply-${reply.replyNo}|"
+           class="flex gap-4 border-t border-line py-5">
         <span class="flex h-10.5 w-10.5 flex-none items-center justify-center rounded-full bg-sunk font-bold text-muted"
               th:text="${#strings.substring(reply.writer, 0, 1)}"></span>
         <div class="flex-1">
@@ -109,11 +128,36 @@
                   th:text="${#dates.format(reply.createDate, 'yyyy.MM.dd')}"></span>
             <span th:if="${session.loginUser != null and session.loginUser.memberNo == reply.memberNo}"
                   class="ml-auto flex gap-2.5 text-xs text-muted">
-              <a href="#" class="hover:text-brand">수정</a>
-              <a href="#" class="hover:text-brand">삭제</a>
+              <button type="button" class="hover:text-brand"
+                      th:onclick="|toggleReplyEdit([[${reply.replyNo}]])|">수정</button>
+              <button type="button" class="hover:text-red-500"
+                      th:onclick="|openReplyDeleteModal([[${reply.replyNo}]], [[${q.qNo}]])|">삭제</button>
             </span>
           </div>
-          <p class="text-15 leading-relaxed text-ink/85" th:text="${reply.content}"></p>
+          <!-- 댓글 본문 -->
+          <p th:id="|reply-text-${reply.replyNo}|"
+             class="text-15 leading-relaxed text-ink/85"
+             th:text="${reply.content}"></p>
+          <!-- 인라인 수정 폼 (기본 숨김) -->
+          <form th:id="|reply-edit-form-${reply.replyNo}|"
+                th:action="@{/reply/update}" method="post"
+                class="hidden mt-2">
+            <input type="hidden" name="replyNo" th:value="${reply.replyNo}" />
+            <input type="hidden" name="postNo"  th:value="${q.qNo}" />
+            <div class="overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
+              <textarea name="content"
+                        th:id="|reply-edit-ta-${reply.replyNo}|"
+                        class="block min-h-[80px] w-full resize-none border-none bg-transparent px-4 py-3 text-sm leading-relaxed outline-none"
+                        th:text="${reply.content}"></textarea>
+              <div class="flex justify-end gap-2 border-t border-line py-2 pr-2">
+                <button type="button"
+                        class="inline-flex h-9 items-center rounded-lg border border-line px-4 text-sm text-muted hover:bg-sunk"
+                        th:onclick="|cancelReplyEdit([[${reply.replyNo}]])|">취소</button>
+                <button type="submit"
+                        class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">저장</button>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -123,6 +167,12 @@
   <!-- ★ 삭제용 hidden form: GET 링크 대신 POST로 qNo 전송 → CSRF·URL 직접 접근 차단 -->
   <form id="delete-form" th:action="@{/qList/delete}" method="post" style="display:none">
     <input type="hidden" id="delete-qNo" name="qNo" />
+  </form>
+
+  <!-- 댓글 삭제용 hidden form -->
+  <form id="reply-delete-form" th:action="@{/reply/delete}" method="post" style="display:none">
+    <input type="hidden" id="delete-replyNo" name="replyNo" />
+    <input type="hidden" id="delete-reply-postNo" name="postNo" />
   </form>
 
   <!-- 비로그인 + MEMBER 공개글 → 모달 트리거 -->
@@ -156,6 +206,58 @@
         }
       );
     }
+
+    const replyLoginRequired = /*[[${session.loginUser == null}]]*/ true;
+
+    function handleReplySubmit() {
+      if (replyLoginRequired) {
+        openInfoModal('로그인이 필요합니다', '로그인 후 댓글을 작성할 수 있어요.');
+        return;
+      }
+      submitReplyForm();
+    }
+
+    function submitReplyForm() {
+      const content = document.getElementById('reply-content').value;
+      if (!content.trim()) {
+        openInfoModal('알림', '댓글 내용을 입력해주세요.');
+        return;
+      }
+      document.getElementById('reply-form').submit();
+    }
+
+    function toggleReplyEdit(replyNo) {
+      document.getElementById('reply-text-' + replyNo).classList.toggle('hidden');
+      document.getElementById('reply-edit-form-' + replyNo).classList.toggle('hidden');
+    }
+
+    function cancelReplyEdit(replyNo) {
+      document.getElementById('reply-text-' + replyNo).classList.remove('hidden');
+      document.getElementById('reply-edit-form-' + replyNo).classList.add('hidden');
+    }
+
+    function openReplyDeleteModal(replyNo, qNo) {
+      openDangerModal(
+        '댓글을 삭제할까요?',
+        '삭제한 댓글은 되돌릴 수 없어요.',
+        function () {
+          document.getElementById('delete-replyNo').value = replyNo;
+          document.getElementById('delete-reply-postNo').value = qNo;
+          document.getElementById('reply-delete-form').submit();
+        }
+      );
+    }
+
+    // 댓글 수정 폼 저장 시 공백 검증
+    document.querySelectorAll('form[id^="reply-edit-form-"]').forEach(function(form) {
+      form.addEventListener('submit', function(e) {
+        const ta = form.querySelector('textarea[name="content"]');
+        if (!ta.value.trim()) {
+          e.preventDefault();
+          openInfoModal('알림', '댓글 내용을 입력해주세요.');
+        }
+      });
+    });
   </script>
 
   <div th:replace="~{views/common/modal :: modal}"></div>
