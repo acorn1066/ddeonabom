@@ -1,6 +1,7 @@
 package kh.ddeonabom.review.model.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,8 +45,11 @@ public class ReviewService {
 		return reviewMapper.selectMyReviewList(memberNo);
 	}
 
-	public Review getReviewDetail(int travelNo) {
-		Review review = reviewMapper.getReviewDetail(travelNo);      
+	public Review getReviewDetail(int travelNo, Integer loginUserNo) {
+		Review review = reviewMapper.getReviewDetail(travelNo, loginUserNo);   
+		if(review == null) {
+			return null;
+		}
 	    List<ReviewSub> subList = reviewMapper.getReviewSubList(travelNo); 
 	    for (ReviewSub sub : subList) {
 	        List<Image> images = reviewMapper.getImageListBySubNo(sub.getTravelSubNo());
@@ -56,6 +60,34 @@ public class ReviewService {
 	    review.setSubList(subList); 
 	    return review; 
 	}
+
+	public void increaseCount(int travelNo) {
+		reviewMapper.increaseCount(travelNo);
+	}
+
+	public int toggleLike(int travelNo, int memberNo) {
+
+	    int cnt = reviewMapper.existsLike(travelNo, memberNo);
+
+	    if (cnt > 0) {
+	        reviewMapper.deleteLike(travelNo, memberNo);
+	    } else {
+	        reviewMapper.insertLike(travelNo, memberNo);
+	    }
+
+	    return reviewMapper.selectLikeCount(travelNo);
+	}
+	public ArrayList<Review> selectMyReviewList(HashMap<String, Object> reviewMap) {
+		return reviewMapper.selectMyReviewList(reviewMap);
+	}
+
+	public int getMyReviewCount(int memberNo) {
+		
+		return reviewMapper.getMyReviewCount(memberNo);
+	}
+
+	
+	
 
 
 

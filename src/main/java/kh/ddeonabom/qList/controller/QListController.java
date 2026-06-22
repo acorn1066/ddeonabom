@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -104,6 +105,18 @@ public class QListController {
 		}
 	}
 	
+	// ==================================================================== 공지사항 상세 ==============================================================
+	@GetMapping("notice")
+	public ModelAndView noticeDetail(@RequestParam("noticeNo") int noticeNo, ModelAndView mv) {
+
+	    AdminNotice notice = aService.selectNotice(noticeNo);
+	    mv.addObject("notice", notice)
+	      .setViewName("views/admin/memberNotice");
+
+	    return mv;
+	}
+	// ==================================================================== 공지사항 상세 ==============================================================
+	
 	@GetMapping("detail")
 	public ModelAndView detailQList(@RequestParam("qNo") int qNo, HttpSession session, ModelAndView mv) {
 	    
@@ -144,6 +157,13 @@ public class QListController {
 	        return "redirect:/qList/detail?qNo=" + qNo;
 	    }
 
+	    // 댓글이 존재하면 삭제 불가
+	    int replyCount = replyService.getReplyList(qNo, "Q").size();
+	    if (replyCount > 0) {
+	        redirectAttrs.addFlashAttribute("errorMessage", "댓글이 달린 글은 삭제할 수 없습니다.");
+	        return "redirect:/qList/detail?qNo=" + qNo;
+	    }
+
 	    // soft delete: STATUS = 'N' 처리
 	    int result = qListService.deleteQList(qNo);
 	    if (result > 0) {
@@ -171,6 +191,14 @@ public class QListController {
 	        return mv;
 	    }
 
+	    // 댓글이 존자하면 수정 불가
+	    int replyCount = replyService.getReplyList(qNo, "Q").size();
+	    if (replyCount > 0) {
+	        redirectAttrs.addFlashAttribute("errorMessage", "댓글이 달린 글은 수정할 수 없습니다.");
+	        mv.setViewName("redirect:/qList/detail?qNo=" + qNo);
+	        return mv;
+	    }
+
 	    mv.addObject("q", q)
 	      .setViewName("views/qList/edit");
 
@@ -189,6 +217,13 @@ public class QListController {
 	    QList existing = qListService.detailQList(q.getQNo());
 	    if (existing.getMemberNo() != loginUser.getMemberNo()) {
 	        redirectAttrs.addFlashAttribute("errorMessage", "수정 권한이 없습니다.");
+	        return "redirect:/qList/detail?qNo=" + q.getQNo();
+	    }
+
+	    // 댓글이 존재하면 수정 불가
+	    int replyCount = replyService.getReplyList(q.getQNo(), "Q").size();
+	    if (replyCount > 0) {
+	        redirectAttrs.addFlashAttribute("errorMessage", "댓글이 달린 글은 수정할 수 없습니다.");
 	        return "redirect:/qList/detail?qNo=" + q.getQNo();
 	    }
 

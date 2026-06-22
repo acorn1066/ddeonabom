@@ -321,6 +321,7 @@ function addSpotCard(name = '', address = '', index, lat = '', lng = '', content
       <div class="spot-name font-bold">
         ${name}
       </div>
+      <input type="hidden" name="subList[${idx}].contentTitle" value="${name}" />
       <input type="hidden"
              name="subList[${idx}].contentId"
         class="spot-name-input flex-1 rounded-lg border border-line bg-white px-3 py-2 text-base font-bold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft"
@@ -432,6 +433,7 @@ function reindexCards() {
 // ── 관광지 직접 추가 버튼 ─────────────────
 document.getElementById('addSpotBtn').addEventListener('click', () => addSpotCard());
 
+
 document.getElementById('submitBtn').addEventListener('click', () => {
 	  console.log('버튼 클릭됨');
 	  const form = document.querySelector('form');
@@ -440,25 +442,7 @@ document.getElementById('submitBtn').addEventListener('click', () => {
 	});
 
 
-document.getElementById('save-btn').addEventListener('click', async () => {
-	  const selectedVisibility = document.querySelector('input[name="visibility"]:checked').value;
 
-	  const response = await fetch('/api/review/save', {
-	    method: 'POST',
-	    headers: { 'Content-Type': 'application/json' },
-	    body: JSON.stringify({
-	      visibility: selectedVisibility,
-	      content: document.getElementById('review-content').value,
-	      // 다른 필드들도 같이
-	    })
-	  });
-
-	  if (response.ok) {
-	    alert('저장되었습니다.');
-	  } else {
-	    alert('저장에 실패했습니다.');
-	  }
-	});
 </script>
 
 </body>

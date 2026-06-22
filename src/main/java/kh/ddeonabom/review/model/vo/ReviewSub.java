@@ -28,5 +28,6 @@ public class ReviewSub {
     private List<MultipartFile> imageFiles;
     private double lat;
     private double lng;
+    private String contentTitle;
 
 }
