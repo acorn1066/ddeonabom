@@ -185,20 +185,63 @@ const Posts = () => {
                         className="w-full max-w-lg rounded-2xl bg-white shadow-xl"
                         onClick={(e) => e.stopPropagation()}
                     >
+                        {/* 공통 헤더 */}
                         <div className="flex items-center justify-between border-b p-4">
                             <h1 className="text-lg font-bold">{selectPost.title}</h1>
                             <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">✕</button>
                         </div>
-                        <div className="max-h-96 overflow-y-auto p-4">{selectPost.content}</div>
-                        <div className="p-4 text-right text-sm text-gray-500">작성자 : {selectPost.nickname}</div>
+
+                        {/* 게시판별 본문 */}
+                        <div className="max-h-96 overflow-y-auto p-4">
+
+                            {boardType === "질문" && (
+                                <>
+                                    <p className="mb-4 text-gray-800">{selectPost.content}</p>
+                                    <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
+                                </>
+                            )}
+
+                            {boardType === "후기" && (
+                                <>
+                                    <h2 className="mb-2 text-base font-semibold text-gray-700">{selectPost.contentTitle}</h2>
+                                    <p className="mb-4 text-gray-800">{selectPost.content}</p>
+                                    <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
+                                </>
+                            )}
+
+                            {boardType === "공유" && (
+                                <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
+                            )}
+
+                        </div>
+
+                        {/* 공통 버튼 + 공유 전용 버튼 */}
                         <div className="flex justify-end gap-2 border-t p-4">
+
+                            {boardType === "공유" && (
+                                <button
+                                    onClick={() => navigate(`/board/share/${selectPost.postNo}`)}
+                                    className="rounded-lg bg-indigo-500 px-4 py-2 text-white hover:bg-indigo-600 cursor-pointer"
+                                >
+                                    게시글 보기
+                                </button>
+                            )}
+
                             <button
-                                className={selectPost.status === 'N' ? "rounded-lg bg-blue-600 px-4 py-2 text-white" : "rounded-lg bg-gray-800 px-4 py-2 text-white"}
-                                onClick={() => selectPost.status === 'Y' ? changeStatus(selectPost, 'N') : changeStatus(selectPost, 'Y')}
+                                onClick={() => selectPost.status === 'Y'
+                                    ? changeStatus(selectPost.postNo, 'N', { boardType: selectPost.boardType })
+                                    : changeStatus(selectPost.postNo, 'Y', { boardType: selectPost.boardType })
+                                }
+                                className={selectPost.status === 'N'
+                                    ? "rounded-lg bg-blue-600 px-4 py-2 text-white cursor-pointer"
+                                    : "rounded-lg bg-gray-800 px-4 py-2 text-white cursor-pointer"
+                                }
                             >
                                 {selectPost.status === 'N' ? '게시글 올리기' : '게시글 내리기'}
                             </button>
-                            <button onClick={closeModal} className="rounded-lg bg-gray-200 px-4 py-2">닫기</button>
+
+                            <button onClick={closeModal} className="rounded-lg bg-gray-200 px-4 py-2 cursor-pointer">닫기</button>
+
                         </div>
                     </div>
                 </div>
