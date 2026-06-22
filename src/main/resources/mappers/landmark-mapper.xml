@@ -46,4 +46,21 @@
 		insert into nice
 		values(seq_nice_no.nextval, 'LJ', #{lNumber}, #{memberNo})
 	</insert>
+	
+	<select id="getWishListCount" parameterType="_int" resultType="_int">
+		SELECT COUNT(*)
+		FROM NICE
+		WHERE MEMBER_NO = #{memberNo}
+		  AND POST_BOARD_FX = 'LJ' </select>
+
+	<select id="selectMyWishList" parameterType="hashmap" resultType="kh.ddeonabom.landmark.model.vo.Landmark">
+		SELECT *
+		FROM (
+			SELECT l.*, ROW_NUMBER() OVER (ORDER BY n.NICE_NO DESC) AS rnum
+			FROM landmark l
+			JOIN NICE n ON (l.content_id = n.POST_NO)
+			WHERE n.MEMBER_NO = #{memberNo}
+			  AND n.POST_BOARD_FX = 'LJ' )
+		WHERE rnum BETWEEN #{startRow} + 1 AND #{startRow} + #{listLimit}
+	</select>
 </mapper>

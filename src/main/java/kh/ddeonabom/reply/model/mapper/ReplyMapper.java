@@ -18,4 +18,8 @@ public interface ReplyMapper {
 
 	int deleteReply(HashMap<String, Object> map);
 
+	int getMyCommentCount(HashMap<String, Object> map);
+
+	ArrayList<Reply> selectMyCommentList(HashMap<String, Object> map);
+
 }
