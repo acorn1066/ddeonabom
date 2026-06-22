@@ -12,4 +12,10 @@ public interface ReplyMapper {
 
 	ArrayList<Reply> getReplyList(HashMap<String, Object> map);
 
+	int insertReply(Reply reply);
+
+	int updateReply(Reply reply);
+
+	int deleteReply(HashMap<String, Object> map);
+
 }
