@@ -1,6 +1,7 @@
 package kh.ddeonabom.landmark.model.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
@@ -53,6 +54,15 @@ public class LandmarkService {
 
 	public void insertNice(int lNumber, int memberNo) {
 		mapper.insertNice(lNumber, memberNo);
+	}
+
+	public int getWishListCount(int memberNo) {
+		
+		return mapper.getWishListCount(memberNo);
+	}
+
+	public ArrayList<Landmark> selectMyWishList(HashMap<String, Object> map) {
+		return mapper.selectMyWishList(map);
 	}
 
 }

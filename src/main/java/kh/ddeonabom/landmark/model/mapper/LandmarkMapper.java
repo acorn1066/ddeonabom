@@ -1,6 +1,7 @@
 package kh.ddeonabom.landmark.model.mapper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -30,4 +31,8 @@ public interface LandmarkMapper {
 	void deleteNice(@Param("lNumber") int lNumber,@Param("memberNo") int memberNo);
 
 	void insertNice(@Param("lNumber") int lNumber,@Param("memberNo") int memberNo);
+
+	int getWishListCount(int memberNo);
+
+	ArrayList<Landmark> selectMyWishList(HashMap<String, Object> map);
 }

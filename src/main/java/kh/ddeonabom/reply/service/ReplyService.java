@@ -36,4 +36,12 @@ public class ReplyService {
 		return replyMapper.deleteReply(map);
 	}
 
+	public int getMyCommentCount(HashMap<String, Object> map) {
+		return replyMapper.getMyCommentCount(map);
+	}
+
+	public ArrayList<Reply> selectMyCommentList(HashMap<String, Object> map) {
+		return replyMapper.selectMyCommentList(map);
+	}
+
 }
