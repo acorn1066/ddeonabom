@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -103,6 +104,18 @@ public class QListController {
 			return "views/qList/write";
 		}
 	}
+	
+	// ==================================================================== 공지사항 상세 ==============================================================
+	@GetMapping("notice")
+	public ModelAndView noticeDetail(@RequestParam("noticeNo") int noticeNo, ModelAndView mv) {
+
+	    AdminNotice notice = aService.selectNotice(noticeNo);
+	    mv.addObject("notice", notice)
+	      .setViewName("views/admin/memberNotice");
+
+	    return mv;
+	}
+	// ==================================================================== 공지사항 상세 ==============================================================
 	
 	@GetMapping("detail")
 	public ModelAndView detailQList(@RequestParam("qNo") int qNo, HttpSession session, ModelAndView mv) {
