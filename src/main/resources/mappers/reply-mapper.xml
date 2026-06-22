@@ -14,4 +14,28 @@
 		ORDER BY r.create_date ASC
 	</select>
 
+	<!-- 댓글 등록 -->
+	<insert id="insertReply" parameterType="Reply">
+		INSERT INTO reply (reply_no, content, create_date, status, post_board, post_no, member_no)
+		VALUES (SEQ_RNO.NEXTVAL, #{content}, SYSDATE, 'Y', #{postBoard}, #{postNo}, #{memberNo})
+	</insert>
+
+	<!-- 댓글 수정 -->
+	<update id="updateReply" parameterType="Reply">
+		UPDATE reply
+		SET content     = #{content},
+		    modify_date = SYSDATE
+		WHERE reply_no  = #{replyNo}
+		AND   member_no = #{memberNo}
+		AND   status    = 'Y'
+	</update>
+
+	<!-- 댓글 삭제 (soft delete) -->
+	<update id="deleteReply" parameterType="hashmap">
+		UPDATE reply
+		SET status = 'N'
+		WHERE reply_no  = #{replyNo}
+		AND   member_no = #{memberNo}
+	</update>
+
 </mapper>

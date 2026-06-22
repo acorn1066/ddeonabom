@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.landmark.model.service.LandmarkService;
 import kh.ddeonabom.landmark.model.vo.Landmark;
+import kh.ddeonabom.member.model.vo.Member;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -55,7 +57,7 @@ public class LandmarkController {
 	// 관광지 세부사항 가져오기
 	@GetMapping("/{contentId}/{page}")
 	public String landmarkDetail(@PathVariable("contentId") int contentId, @PathVariable("page") int page,
-									Model model) {
+									Model model, HttpSession session) {
 		Landmark land = lService.landmarkDetail(contentId);
 		//System.out.println(land);
 		Map<Integer, String> contentType = new HashMap<>();
@@ -68,9 +70,14 @@ public class LandmarkController {
 		contentType.put(38, "쇼핑");
 		contentType.put(39, "음식점");
 		
-		int isNice = lService.landmarkNice(contentId, page); 
+		Member loginUser = (Member)session.getAttribute("loginUser");
+		if(loginUser != null) {
+			int memberNo = loginUser.getMemberNo();			
+			int isNice = lService.landmarkNice(contentId, memberNo);
+			model.addAttribute("isNice", isNice);			
+		} 
 		
-		model.addAttribute("isNice", isNice);
+		
 		model.addAttribute("contentType", contentType);
 		
 		model.addAttribute("land", land);
