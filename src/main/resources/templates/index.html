@@ -1,11 +1,351 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{views/common/head :: head}"></head>
-<body>
-    <div th:replace="~{views/common/navbar :: navbar}"></div>
-    
-    <main class="flex justify-center items-center h-64">
-        <h1 class="text-3xl font-bold text-gray-800">떠나봄 메인 페이지</h1>
-    </main>
+<body class="bg-white text-ink">
+
+<div th:replace="~{views/common/navbar :: navbar}"></div>
+
+<main>
+
+  <div class="mx-auto max-w-wide px-6">
+    <section class="grid grid-cols-hero items-center gap-16 pb-16 pt-24">
+      <div>
+        <span class="inline-flex items-center gap-2 text-sm font-semibold text-brand before:h-0.5 before:w-4 before:rounded before:bg-brand">
+          점을 잇다 · 길을 그리다
+        </span>
+        <h1 class="my-6 text-display font-extrabold">점이 아니라<br/><span class="text-brand">길</span>을 그리는<br/>여행 플래너.
+        </h1>
+        <p class="max-w-md text-lg leading-relaxed text-muted">
+          가고 싶은 관광지를 모으면 끝이 아닙니다. 떠나봄은 점을 잇고, 동선을 그리고, 하루의 흐름을 한 장의 지도로 보여줍니다. 그리고 그 길을 누군가와 나누세요.
+        </p>
+        <div class="mt-8 flex gap-3">
+          <a href="/schedule/new" class="inline-flex h-12 items-center rounded-lg bg-brand px-8 text-15 font-semibold text-white transition hover:bg-brand-ink">
+            길 그리러 가기 →
+          </a>
+          <a href="/landmark/list" class="inline-flex h-12 items-center rounded-lg border border-line bg-white px-8 text-15 font-semibold text-ink transition hover:bg-sunk">
+            관광지 둘러보기
+          </a>
+        </div>
+      </div>
+
+      <div class="relative aspect-portrait rounded-2xl shadow-pop">
+		  <div id="hero-map" class="absolute inset-0"></div>
+		
+		  <div th:if="${featuredSchedule != null}"
+		       class="absolute inset-x-4 bottom-4 z-50 flex items-center justify-between gap-3 rounded-xl bg-white/90 p-4 shadow-soft backdrop-blur">
+		    <div>
+		      <span class="text-xs font-semibold text-brand"
+		            th:text="'추천 코스 · ' + ${featuredSchedule.placeCount} + '곳'">추천 코스</span>
+		      <strong class="mt-0.5 block text-15 font-bold"
+		              th:text="${featuredSchedule.scheduleTitle}">제목</strong>
+		      <span class="text-xs text-muted"
+		            th:text="${featuredSchedule.scheduleStartdate} + ' — ' + ${featuredSchedule.scheduleEnddate}">날짜</span>
+		    </div>
+		    <a th:href="@{/schedule/share/{no}(no=${featuredSchedule.scheduleNo})}"
+		       class="inline-flex h-9 shrink-0 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">
+		      길 보기
+		    </a>
+		  </div>
+		
+		  <div th:unless="${featuredSchedule != null}"
+		       class="absolute inset-x-4 bottom-4 z-50 flex items-center justify-between gap-3 rounded-xl bg-white/90 p-4 shadow-soft backdrop-blur">
+		    <div>
+		      <span class="text-xs font-semibold text-brand">추천 코스</span>
+		      <strong class="mt-0.5 block text-15 font-bold">공유된 일정이 아직 없어요</strong>
+		    </div>
+		    <a href="/schedule/new"
+		       class="inline-flex h-9 shrink-0 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">
+		      첫 일정 만들기
+		    </a>
+		  </div>
+		</div>
+    </section>
+
+    <div class="grid grid-cols-4 gap-4 border-t border-line py-8">
+      <div class="px-2">
+        <b class="block text-4xl font-extrabold tracking-tight tabular-nums"
+           th:text="${stats != null ? #numbers.formatInteger(stats.landmarkCount, 0, 'COMMA') : '1,284'}">1,284</b>
+        <span class="text-sm font-medium text-muted">등록된 관광지</span>
+      </div>
+      <div class="px-2">
+        <b class="block text-4xl font-extrabold tracking-tight tabular-nums"
+           th:text="${stats != null ? #numbers.formatInteger(stats.sharedScheduleCount, 0, 'COMMA') : '312'}">312</b>
+        <span class="text-sm font-medium text-muted">공유된 여행 일정</span>
+      </div>
+      <div class="px-2">
+        <b class="block text-4xl font-extrabold tracking-tight tabular-nums"
+           th:text="${stats != null ? #numbers.formatInteger(stats.reviewCount, 0, 'COMMA') : '2,471'}">2,471</b>
+        <span class="text-sm font-medium text-muted">여행 후기</span>
+      </div>
+      <div class="px-2">
+        <b class="block text-4xl font-extrabold tracking-tight tabular-nums"
+           th:text="${stats != null ? #numbers.formatInteger(stats.memberCount, 0, 'COMMA') : '9,107'}">9,107</b>
+        <span class="text-sm font-medium text-muted">활동 중인 여행자</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-wide px-6">
+    <section class="py-24">
+      <div class="mb-8 flex items-end justify-between">
+        <div>
+          <span class="inline-flex items-center gap-2 text-sm font-semibold text-brand before:h-0.5 before:w-4 before:rounded before:bg-brand">이용 방법</span>
+          <h2 class="mt-3 text-h2 font-bold">이렇게 <span class="text-brand">길을 그립니다</span></h2>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-6">
+
+        <div class="flex min-h-feature flex-col gap-3 rounded-xl border border-line bg-white p-8 shadow-soft transition hover:-translate-y-1 hover:shadow-card">
+          <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand-soft text-sm font-bold text-brand-ink">1</span>
+          <div class="mt-2 text-xl font-bold">점 찍기</div>
+          <p class="text-sm leading-relaxed text-muted">전국 관광지에서 가고 싶은 곳을 찜하세요. 지역, 카테고리, 추천순으로 좁힐 수 있습니다.</p>
+          <span class="mt-auto inline-flex h-13 w-13 items-center justify-center self-start rounded-xl bg-sunk text-brand">
+            <svg viewBox="0 0 32 32" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="16" cy="13" r="6"/>
+              <path d="M16 19 L16 28"/>
+              <circle cx="16" cy="13" r="2" fill="currentColor"/>
+            </svg>
+          </span>
+        </div>
+
+        <div class="flex min-h-feature flex-col gap-3 rounded-xl border border-line bg-white p-8 shadow-soft transition hover:-translate-y-1 hover:shadow-card">
+          <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand-soft text-sm font-bold text-brand-ink">2</span>
+          <div class="mt-2 text-xl font-bold">선 잇기</div>
+          <p class="text-sm leading-relaxed text-muted">날짜별로 점을 끌어다 놓으면 지도 위에 동선이 그려집니다. 시간 순서, 거리, 이동 수단까지 한눈에.</p>
+          <span class="mt-auto inline-flex h-13 w-13 items-center justify-center self-start rounded-xl bg-sunk text-brand">
+            <svg viewBox="0 0 32 32" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="6" cy="24" r="2"/>
+              <circle cx="26" cy="6" r="2"/>
+              <path d="M6 24 Q 10 8, 16 14 T 26 6"/>
+            </svg>
+          </span>
+        </div>
+
+        <div class="flex min-h-feature flex-col gap-3 rounded-xl border border-line bg-white p-8 shadow-soft transition hover:-translate-y-1 hover:shadow-card">
+          <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand-soft text-sm font-bold text-brand-ink">3</span>
+          <div class="mt-2 text-xl font-bold">길 나누기</div>
+          <p class="text-sm leading-relaxed text-muted">완성된 일정은 한 번의 클릭으로 게시판에 공유됩니다. 다른 여행자의 길도 내 일정으로 복사할 수 있어요.</p>
+          <span class="mt-auto inline-flex h-13 w-13 items-center justify-center self-start rounded-xl bg-sunk text-brand">
+            <svg viewBox="0 0 32 32" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="9" cy="16" r="3"/>
+              <circle cx="23" cy="9" r="3"/>
+              <circle cx="23" cy="23" r="3"/>
+              <path d="M11.5 14 L20.5 10.5 M11.5 18 L20.5 21.5"/>
+            </svg>
+          </span>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <div class="mx-auto max-w-wide px-6">
+    <section class="pb-24">
+      <div class="mb-8 flex items-end justify-between">
+        <div>
+          <span class="inline-flex items-center gap-2 text-sm font-semibold text-brand before:h-0.5 before:w-4 before:rounded before:bg-brand">요즘 인기</span>
+          <h2 class="mt-3 text-h2 font-bold">많이 찜한 <span class="text-brand">관광지</span></h2>
+        </div>
+        <a href="/landmark/list" class="flex items-center gap-2 text-sm font-semibold text-brand">전체 보기 →</a>
+      </div>
+
+      <div class="grid grid-cols-4 gap-6" th:if="${popularLandmarks != null and !popularLandmarks.isEmpty()}">
+        <a th:each="landmark, stat : ${popularLandmarks}"
+           th:href="@{/landmark/detail/{no}(no=${landmark.contentId})}"
+           class="flex flex-col gap-3">
+          <div class="relative flex aspect-card items-center justify-center overflow-hidden rounded-xl border border-line bg-sunk">
+            <span class="absolute left-3 top-3 inline-flex h-6.5 w-6.5 items-center justify-center rounded-lg bg-ink text-sm font-bold text-white"
+                  th:text="${stat.index + 1}">1</span>
+            <img th:if="${landmark.firstimage != null and !landmark.firstimage.isEmpty()}"
+                 th:src="${landmark.firstimage}"
+                 th:alt="${landmark.title}"
+                 class="absolute inset-0 h-full w-full object-cover"/>
+            <span th:unless="${landmark.firstimage != null and !landmark.firstimage.isEmpty()}"
+                  class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted"
+                  th:text="'사진 · ' + ${landmark.title}">사진</span>
+          </div>
+          <div>
+            <div class="text-17 font-bold" th:text="${landmark.title}">관광지명</div>
+            <div class="text-sm text-muted" th:text="${landmark.addr1}">주소</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-4 gap-6" th:unless="${popularLandmarks != null and !popularLandmarks.isEmpty()}">
+        <a href="/landmark/detail" class="flex flex-col gap-3">
+          <div class="relative flex aspect-card items-center justify-center rounded-xl border border-line bg-sunk">
+            <span class="absolute left-3 top-3 inline-flex h-6.5 w-6.5 items-center justify-center rounded-lg bg-ink text-sm font-bold text-white">1</span>
+            <span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">사진 · 성산일출봉</span>
+          </div>
+          <div><div class="text-17 font-bold">성산일출봉</div><div class="text-sm text-muted">제주 서귀포시</div></div>
+        </a>
+        <a href="/landmark/detail" class="flex flex-col gap-3">
+          <div class="relative flex aspect-card items-center justify-center rounded-xl border border-line bg-sunk">
+            <span class="absolute left-3 top-3 inline-flex h-6.5 w-6.5 items-center justify-center rounded-lg bg-ink text-sm font-bold text-white">2</span>
+            <span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">사진 · 경복궁</span>
+          </div>
+          <div><div class="text-17 font-bold">경복궁</div><div class="text-sm text-muted">서울 종로구</div></div>
+        </a>
+        <a href="/landmark/detail" class="flex flex-col gap-3">
+          <div class="relative flex aspect-card items-center justify-center rounded-xl border border-line bg-sunk">
+            <span class="absolute left-3 top-3 inline-flex h-6.5 w-6.5 items-center justify-center rounded-lg bg-ink text-sm font-bold text-white">3</span>
+            <span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">사진 · 감천문화마을</span>
+          </div>
+          <div><div class="text-17 font-bold">감천문화마을</div><div class="text-sm text-muted">부산 사하구</div></div>
+        </a>
+        <a href="/landmark/detail" class="flex flex-col gap-3">
+          <div class="relative flex aspect-card items-center justify-center rounded-xl border border-line bg-sunk">
+            <span class="absolute left-3 top-3 inline-flex h-6.5 w-6.5 items-center justify-center rounded-lg bg-ink text-sm font-bold text-white">4</span>
+            <span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">사진 · 한라산 영실</span>
+          </div>
+          <div><div class="text-17 font-bold">한라산 영실</div><div class="text-sm text-muted">제주 서귀포시</div></div>
+        </a>
+      </div>
+    </section>
+  </div>
+
+  <div class="mx-auto max-w-wide px-6">
+    <section class="pb-24">
+      <div class="mb-8 flex items-end justify-between">
+        <div>
+          <span class="inline-flex items-center gap-2 text-sm font-semibold text-brand before:h-0.5 before:w-4 before:rounded before:bg-brand">공유된 길</span>
+          <h2 class="mt-3 text-h2 font-bold">다른 여행자의 <span class="text-brand">길</span></h2>
+        </div>
+        <a href="/schedule/share" class="flex items-center gap-2 text-sm font-semibold text-brand">게시판으로 →</a>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-line bg-white">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-line text-13 font-semibold text-muted">
+              <th class="w-16 p-4 text-left">#</th>
+              <th class="p-4 text-left">제목</th>
+              <th class="p-4 text-left">기간</th>
+              <th class="p-4 text-left">경유지</th>
+              <th class="p-4 text-left">작성자</th>
+              <th class="p-4 text-right">추천</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 서버에서 recentSharedList (List, 최대 5개) 내려줄 경우 -->
+            <tr th:each="item, stat : ${recentSharedList}"
+                th:classappend="${stat.last} ? '' : 'border-b border-line'"
+                class="transition hover:bg-sunk">
+              <td class="p-4 tabular-nums text-muted" th:text="${item.scheduleNo}">312</td>
+              <td class="p-4">
+                <a th:href="@{/schedule/share/{no}(no=${item.scheduleNo})}"
+                   class="font-bold"
+                   th:text="${item.scheduleTitle}">제목</a>
+              </td>
+              <td class="p-4 tabular-nums text-muted"
+                  th:text="${item.scheduleStartdate} + ' — ' + ${item.scheduleEnddate}">날짜</td>
+              <td class="p-4 text-muted">
+                <span th:text="${item.placeCount} + '곳'">0곳</span>
+              </td>
+              <td class="p-4" th:text="${item.memberNickname}">닉네임</td>
+              <td class="p-4 text-right tabular-nums">
+                ♥ <span th:text="${item.likeCount}">0</span>
+              </td>
+            </tr>
+
+            <!-- 폴백: 데이터 없을 때 샘플 5행 -->
+            <th:block th:if="${recentSharedList == null or recentSharedList.isEmpty()}">
+              <tr class="border-b border-line transition hover:bg-sunk">
+                <td class="p-4 tabular-nums text-muted">312</td>
+                <td class="p-4"><a href="/schedule/share" class="font-bold">제주 동쪽 한 바퀴 · 3박 4일</a></td>
+                <td class="p-4 tabular-nums text-muted">2026.04.10 — 04.13</td>
+                <td class="p-4 text-muted">12곳</td>
+                <td class="p-4">별헤는밤</td>
+                <td class="p-4 text-right tabular-nums">♥ 184</td>
+              </tr>
+              <tr class="border-b border-line transition hover:bg-sunk">
+                <td class="p-4 tabular-nums text-muted">311</td>
+                <td class="p-4"><a href="/schedule/share" class="font-bold">경주 야경 코스</a></td>
+                <td class="p-4 tabular-nums text-muted">2026.04.05 — 04.07</td>
+                <td class="p-4 text-muted">7곳</td>
+                <td class="p-4">제주한바퀴</td>
+                <td class="p-4 text-right tabular-nums">♥ 142</td>
+              </tr>
+              <tr class="border-b border-line transition hover:bg-sunk">
+                <td class="p-4 tabular-nums text-muted">310</td>
+                <td class="p-4"><a href="/schedule/share" class="font-bold">속초 1박 2일, 바다와 산</a></td>
+                <td class="p-4 tabular-nums text-muted">2026.03.30 — 03.31</td>
+                <td class="p-4 text-muted">5곳</td>
+                <td class="p-4">노을수집가</td>
+                <td class="p-4 text-right tabular-nums">♥ 121</td>
+              </tr>
+              <tr class="border-b border-line transition hover:bg-sunk">
+                <td class="p-4 tabular-nums text-muted">309</td>
+                <td class="p-4"><a href="/schedule/share" class="font-bold">전주 한옥마을 + 익산 미륵사지</a></td>
+                <td class="p-4 tabular-nums text-muted">2026.03.22 — 03.24</td>
+                <td class="p-4 text-muted">9곳</td>
+                <td class="p-4">느린산책</td>
+                <td class="p-4 text-right tabular-nums">♥ 98</td>
+              </tr>
+              <tr class="transition hover:bg-sunk">
+                <td class="p-4 tabular-nums text-muted">308</td>
+                <td class="p-4"><a href="/schedule/share" class="font-bold">강원 동해안 ↔ 설악</a></td>
+                <td class="p-4 tabular-nums text-muted">2026.03.18 — 03.21</td>
+                <td class="p-4 text-muted">11곳</td>
+                <td class="p-4">길위의하루</td>
+                <td class="p-4 text-right tabular-nums">♥ 73</td>
+              </tr>
+            </th:block>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+</main>
+<script th:inline="javascript">
+const heroRoute = /*[[${featuredRoute}]]*/ null;
+const heroCoords = /*[[${featuredSchedule?.coords}]]*/ null;
+
+kakao.maps.load(function () {
+    const container = document.getElementById('hero-map');
+    if (!container) return;
+
+    const map = new kakao.maps.Map(container, {
+        center: new kakao.maps.LatLng(36.5, 127.5),
+        level: 10,
+        draggable: false,
+        scrollwheel: false,
+        disableDoubleClickZoom: true
+    });
+
+    const bounds = new kakao.maps.LatLngBounds();
+
+    // 마커 (coords 기반 실제 장소)
+    if (heroCoords) {
+        heroCoords.split(';').forEach((pair, idx) => {
+            const [x, y] = pair.split(',').map(Number);
+            if (isNaN(x) || isNaN(y)) return;
+            const pos = new kakao.maps.LatLng(y, x);
+
+            new kakao.maps.Marker({ position: pos, map });
+            bounds.extend(pos);
+        });
+    }
+
+    // 실도로 폴리라인
+    if (heroRoute && heroRoute.length >= 2) {
+        const linePath = heroRoute.map(c => new kakao.maps.LatLng(c.lat, c.lng));
+        new kakao.maps.Polyline({
+            path: linePath,
+            strokeWeight: 4,
+            strokeColor: '#2563eb',
+            strokeOpacity: 0.85,
+            strokeStyle: 'solid',
+            map
+        });
+    }
+
+    if (!bounds.isEmpty()) map.setBounds(bounds);
+});
+</script>
+<footer th:replace="~{views/common/footer :: footer}"></footer>
+
 </body>
 </html>
