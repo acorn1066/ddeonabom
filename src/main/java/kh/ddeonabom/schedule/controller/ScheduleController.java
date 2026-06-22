@@ -52,7 +52,11 @@ public class ScheduleController {
 	}
 	
 	@GetMapping("/schedule/new")
-	public String newSchedule() {
+	public String newSchedule(HttpSession session) {
+		Member member = (Member) session.getAttribute("loginUser");
+			if (member == null) {
+			    return "redirect:/member/login";
+		}
 		return "views/schedule/write";
 	}
 	
