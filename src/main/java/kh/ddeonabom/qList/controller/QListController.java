@@ -144,7 +144,7 @@ public class QListController {
 	        return "redirect:/qList/detail?qNo=" + qNo;
 	    }
 
-	    // 댓글이 존자하면 삭제 불가
+	    // 댓글이 존재하면 삭제 불가
 	    int replyCount = replyService.getReplyList(qNo, "Q").size();
 	    if (replyCount > 0) {
 	        redirectAttrs.addFlashAttribute("errorMessage", "댓글이 달린 글은 삭제할 수 없습니다.");
@@ -207,7 +207,7 @@ public class QListController {
 	        return "redirect:/qList/detail?qNo=" + q.getQNo();
 	    }
 
-	    // 댓글이 존자하면 수정 불가
+	    // 댓글이 존재하면 수정 불가
 	    int replyCount = replyService.getReplyList(q.getQNo(), "Q").size();
 	    if (replyCount > 0) {
 	        redirectAttrs.addFlashAttribute("errorMessage", "댓글이 달린 글은 수정할 수 없습니다.");
