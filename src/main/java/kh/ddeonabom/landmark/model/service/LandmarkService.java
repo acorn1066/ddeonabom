@@ -2,6 +2,7 @@ package kh.ddeonabom.landmark.model.service;
 
 import java.util.ArrayList;
 
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,19 @@ public class LandmarkService {
 	//관광지 세부 가져오기
 	public Landmark landmarkDetail(int contentId) {
 		return mapper.landmarkDetail(contentId);
+	}
+	
+	// 관광지 찜 여부 확인
+	public int landmarkNice(int lNumber,int memberNo) {
+		return mapper.landmarkNice(lNumber, memberNo);
+	}
+
+	public void deleteNice(int lNumber, int memberNo) {
+		mapper.deleteNice(lNumber, memberNo);
+	}
+
+	public void insertNice(int lNumber, int memberNo) {
+		mapper.insertNice(lNumber, memberNo);
 	}
 
 }
