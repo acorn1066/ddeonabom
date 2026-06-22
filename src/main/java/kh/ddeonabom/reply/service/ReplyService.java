@@ -21,4 +21,12 @@ public class ReplyService {
 		return replyMapper.getReplyList(map);
 	}
 
+	public int insertReply(Reply r) {
+		return replyMapper.insertReply(r);
+	}
+
+	public ArrayList<Reply> selectReplyList(String postBoard, int postNo) {
+	return replyMapper.selectReplyList(postBoard, postNo);
+	}
+
 }

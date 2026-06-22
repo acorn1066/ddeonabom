@@ -14,4 +14,46 @@
 		ORDER BY r.create_date ASC
 	</select>
 
+	<select id="selectReplyList" resultType="Reply">
+	    SELECT
+	        R.REPLY_NO,
+	        R.CONTENT,
+	        R.CREATE_DATE,
+	        R.MODIFY_DATE,
+	        R.STATUS,
+	        R.POST_BOARD,
+	        R.POST_NO,
+	        R.MEMBER_NO,
+	        M.NICKNAME AS WRITER
+	    FROM REPLY R
+	    JOIN MEMBER M
+	      ON R.MEMBER_NO = M.MEMBER_NO
+	    WHERE R.POST_BOARD = 'T'
+	      AND R.POST_NO = #{postNo}
+	      AND R.STATUS = 'Y'
+	    ORDER BY R.CREATE_DATE DESC
+	</select>
+	
+	<insert id="insertReply">
+	    INSERT INTO REPLY
+	    (
+	        REPLY_NO,
+	        CONTENT,
+	        CREATE_DATE,
+	        STATUS,
+	        POST_BOARD,
+	        POST_NO,
+	        MEMBER_NO
+	    )
+	    VALUES
+	    (
+	        SEQ_RNO.NEXTVAL,
+	        #{content},
+	        SYSDATE,
+	        'Y',
+	        #{postBoard},
+	        #{postNo},
+	        #{memberNo}
+	    )
+	</insert>
 </mapper>
