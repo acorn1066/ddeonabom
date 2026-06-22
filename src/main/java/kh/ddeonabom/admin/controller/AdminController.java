@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.admin.model.service.AdminService;
 import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.admin.model.vo.AdminPost;
+import kh.ddeonabom.admin.model.vo.AdminReport;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.member.model.vo.Member;
@@ -184,10 +185,34 @@ public class AdminController {
 //		============================================================ 신고 =================================================================
 		
 	
-	@GetMapping("report")
-		public String adminReport() {
-		return "views/admin/report";
-	}
+		@ResponseBody
+		@GetMapping("/reports")
+		public HashMap<String, Object> reportList(
+		        @RequestParam("targetType") String targetType,
+		        @RequestParam(value = "status", defaultValue = "") String status,
+		        @RequestParam(value = "page", defaultValue = "1") int page) {
+
+		    int listCount = aService.getReportCount(targetType, status);
+		    PageInfo pi = Pagination.getPageInfo(page, listCount, 10, 10);
+		    ArrayList<AdminReport> list = aService.selectReportList(targetType, status, pi);
+
+		    HashMap<String, Object> data = new HashMap<>();
+		    data.put("list", list);
+		    data.put("pi", pi);
+		    return data;
+		}
+
+		@ResponseBody
+		@PatchMapping("reports")
+		public int updateReportStatus(@RequestBody AdminReport report) {
+		    return aService.updateReportStatus(report);
+		}
+		
+		@ResponseBody
+		@PatchMapping("reports/process")
+		public int processReport(@RequestBody AdminReport report) {
+		    return aService.processReport(report);
+		}
 
 	
 }

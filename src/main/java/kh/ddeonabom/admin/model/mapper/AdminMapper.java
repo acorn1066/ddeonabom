@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.admin.model.vo.AdminPost;
+import kh.ddeonabom.admin.model.vo.AdminReport;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.member.model.vo.Member;
 
@@ -64,6 +65,14 @@ public interface AdminMapper {
 	int updateNotice(AdminNotice notice);
 
 	ArrayList<AdminNotice> selectTopNotice();
+
+	int getReportCount(HashMap<String, Object> map);
+
+	ArrayList<AdminReport> selectReportList(HashMap<String, Object> map);
+
+	int updateReportStatus(AdminReport report);
+
+	int updateTargetStatus(AdminReport report);
 	
 	
 }

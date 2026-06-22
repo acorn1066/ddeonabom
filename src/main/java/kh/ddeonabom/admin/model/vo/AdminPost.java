@@ -23,5 +23,8 @@ public class AdminPost {
 	
     private int postNo;     
     private String boardType;
+    
+    private String contentTitle;     // CONTENT_TITLE (부제목)
+    private String subContent; 
 
 }
