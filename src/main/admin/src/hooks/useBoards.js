@@ -30,12 +30,14 @@ export const useBoards = (fetchUrl, idField = "boardId") => {
     };
 
     const handleStatusToggle = (id, newStatus, extraBody = {}) => {
+        const statusField = extraBody.reportStatus !== undefined ? "reportStatus" : "status";
+
         fetch(`/react/admin/${fetchUrl}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json;charset=UTF-8" },
             body: JSON.stringify({
                 [idField]: id,
-                status: newStatus,
+                [statusField]: newStatus,
                 ...extraBody
             })
         })
@@ -43,11 +45,10 @@ export const useBoards = (fetchUrl, idField = "boardId") => {
             .then(data => {
                 if (data === 1) {
                     setBoards(prev => prev.map(b =>
-                        b[idField] === id ? { ...b, status: newStatus } : b
+                        b[idField] === id ? { ...b, [statusField]: newStatus } : b
                     ));
-
                     if (selectBoard && selectBoard[idField] === id) {
-                        setSelectBoard(prev => ({ ...prev, status: newStatus }));
+                        setSelectBoard(prev => ({ ...prev, [statusField]: newStatus }));
                     }
                 } else {
                     alert("상태 변경에 실패하여 페이지를 새로고침합니다.");

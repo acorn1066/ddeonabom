@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import kh.ddeonabom.admin.model.mapper.AdminMapper;
 import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.admin.model.vo.AdminPost;
+import kh.ddeonabom.admin.model.vo.AdminReport;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.member.model.vo.Member;
 import lombok.RequiredArgsConstructor;
@@ -156,5 +157,32 @@ public class AdminService {
 	public ArrayList<AdminNotice> selectTopNotice() {
 		return mapper.selectTopNotice();
 	}
+
+	public int getReportCount(String targetType, String status) {
+		   HashMap<String, Object> map = new HashMap<>();
+		    map.put("targetType", targetType);
+		    map.put("status", status);
+		    return mapper.getReportCount(map);
+		}
+
+	public ArrayList<AdminReport> selectReportList(String targetType, String status, PageInfo pi) {
+		 HashMap<String, Object> map = new HashMap<>();
+		    map.put("targetType", targetType);
+		    map.put("status", status);
+		    map.put("pi", pi);
+		    return mapper.selectReportList(map);
+		}
+
+	public int updateReportStatus(AdminReport report) {
+		return mapper.updateReportStatus(report);
+	}
+
+	public int processReport(AdminReport report) {
+		report.setReportStatus("Y");
+	    mapper.updateReportStatus(report);
+	    return mapper.updateTargetStatus(report);
+
+	}
+	
 }
 	

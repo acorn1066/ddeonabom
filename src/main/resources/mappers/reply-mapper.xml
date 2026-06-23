@@ -14,46 +14,45 @@
 		ORDER BY r.create_date ASC
 	</select>
 
-	<select id="selectReplyList" resultType="Reply">
-	    SELECT
-	        R.REPLY_NO,
-	        R.CONTENT,
-	        R.CREATE_DATE,
-	        R.MODIFY_DATE,
-	        R.STATUS,
-	        R.POST_BOARD,
-	        R.POST_NO,
-	        R.MEMBER_NO,
-	        M.NICKNAME AS WRITER
-	    FROM REPLY R
-	    JOIN MEMBER M
-	      ON R.MEMBER_NO = M.MEMBER_NO
-	    WHERE R.POST_BOARD = 'T'
-	      AND R.POST_NO = #{postNo}
-	      AND R.STATUS = 'Y'
-	    ORDER BY R.CREATE_DATE DESC
-	</select>
-	
-	<insert id="insertReply">
-	    INSERT INTO REPLY
-	    (
-	        REPLY_NO,
-	        CONTENT,
-	        CREATE_DATE,
-	        STATUS,
-	        POST_BOARD,
-	        POST_NO,
-	        MEMBER_NO
-	    )
-	    VALUES
-	    (
-	        SEQ_RNO.NEXTVAL,
-	        #{content},
-	        SYSDATE,
-	        'Y',
-	        #{postBoard},
-	        #{postNo},
-	        #{memberNo}
-	    )
+	<!-- 댓글 등록 -->
+	<insert id="insertReply" parameterType="Reply">
+		INSERT INTO reply (reply_no, content, create_date, status, post_board, post_no, member_no)
+		VALUES (SEQ_RNO.NEXTVAL, #{content}, SYSDATE, 'Y', #{postBoard}, #{postNo}, #{memberNo})
 	</insert>
+
+	<!-- 댓글 수정 -->
+	<update id="updateReply" parameterType="Reply">
+		UPDATE reply
+		SET content     = #{content},
+		    modify_date = SYSDATE
+		WHERE reply_no  = #{replyNo}
+		AND   member_no = #{memberNo}
+		AND   status    = 'Y'
+	</update>
+
+	<!-- 댓글 삭제 (soft delete) -->
+	<update id="deleteReply" parameterType="hashmap">
+		UPDATE reply
+		SET status = 'N'
+		WHERE reply_no  = #{replyNo}
+		AND   member_no = #{memberNo}
+	</update>
+	<select id="getMyCommentCount" parameterType="hashmap" resultType="_int">
+		SELECT COUNT(*)
+		FROM reply
+		WHERE member_no = #{memberNo}
+		  AND post_board = #{postBoard} AND status = 'Y'
+	</select>
+
+	<select id="selectMyCommentList" parameterType="hashmap" resultType="Reply">
+		SELECT *
+		FROM (
+			SELECT r.*, ROW_NUMBER() OVER (ORDER BY r.create_date DESC) AS rnum
+			FROM reply r
+			WHERE r.member_no = #{memberNo}
+			  AND r.post_board = #{postBoard} AND r.status = 'Y'
+		)
+		WHERE rnum BETWEEN #{startRow} + 1 AND #{startRow} + #{listLimit}
+	</select>
+
 </mapper>

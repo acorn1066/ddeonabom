@@ -21,12 +21,32 @@ public class ReplyService {
 		return replyMapper.getReplyList(map);
 	}
 
-	public int insertReply(Reply r) {
-		return replyMapper.insertReply(r);
+	public ArrayList<Reply> selectReplyList(String postBoard, int postNo) {
+		return replyMapper.selectReplyList(postBoard, postNo);
 	}
 
-	public ArrayList<Reply> selectReplyList(String postBoard, int postNo) {
-	return replyMapper.selectReplyList(postBoard, postNo);
+	public int insertReply(Reply reply) {
+		return replyMapper.insertReply(reply);
+	}
+
+	public int updateReply(Reply reply) {
+		return replyMapper.updateReply(reply);
+	}
+
+	public int deleteReply(int replyNo, int memberNo) {
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("replyNo",  replyNo);
+		map.put("memberNo", memberNo);
+		return replyMapper.deleteReply(map);
+	}
+
+	public int getMyCommentCount(HashMap<String, Object> map) {
+		return replyMapper.getMyCommentCount(map);
+	}
+
+	public ArrayList<Reply> selectMyCommentList(HashMap<String, Object> map) {
+		return replyMapper.selectMyCommentList(map);
+
 	}
 
 }

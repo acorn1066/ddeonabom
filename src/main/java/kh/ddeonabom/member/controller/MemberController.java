@@ -4,7 +4,7 @@ package kh.ddeonabom.member.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -19,11 +19,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
+import kh.ddeonabom.landmark.model.service.LandmarkService;
+import kh.ddeonabom.landmark.model.vo.Landmark;
 import kh.ddeonabom.member.model.vo.Member;
 import kh.ddeonabom.member.service.EmailService;
 import kh.ddeonabom.member.service.MemberService;
 import kh.ddeonabom.qList.model.vo.QList;
 import kh.ddeonabom.qList.service.QListService;
+import kh.ddeonabom.reply.model.vo.Reply;
+import kh.ddeonabom.reply.service.ReplyService;
 import kh.ddeonabom.review.model.service.ReviewService;
 import kh.ddeonabom.review.model.vo.Review;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +43,8 @@ public class MemberController {
 	private final EmailService emailService;
 	private final QListService qListService;
 	private final ReviewService rListService;
+	private final ReplyService replyService;
+	private final LandmarkService lService;
 	
 	
 	
@@ -523,29 +529,82 @@ public class MemberController {
 	            model.addAttribute("pi", pi);
 	        }
 	    }
-/*
+
 	    else if("comments".equals(tab)) {
+	        HashMap<String,Object> map = new HashMap<>();
+	        map.put("memberNo", loginUser.getMemberNo());
+	        
+	        // 탭 구분에 따라 매퍼에 넘겨줄 게시판 구분값 설정 (팀원의 reply 테이블 식별자 기준)
+	        if("qna".equals(type)) {
+	            map.put("postBoard", "Q"); 
+	        } else if("review".equals(type)) {
+	            map.put("postBoard", "R"); 
+	        }
 
-	        HashMap<String,Object> map =new HashMap<>();
+	        // 공통 카운트 및 페이징 (매퍼 XML에서 postBoard 조건문 반영 필요)
+	        int listCount = replyService.getMyCommentCount(map);
+	        PageInfo pi = Pagination.getPageInfo(page, listCount, 5, 8);
 
-	        map.put("memberNo",loginUser.getMemberNo());
+	        map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
+	        map.put("listLimit", pi.getBoardLimit());
 
-	        int listCount =commentService.getMyCommentCount(map);
-
-	        PageInfo pi =Pagination.getPageInfo(page,listCount,5,8);
-
-	        map.put("startRow",(pi.getCurrentPage()-1)* pi.getBoardLimit());
-
-	        map.put("listLimit",
-	                pi.getBoardLimit());
-
-	        ArrayList<Comment> commentlist =commentService.selectMyCommentList(map);
+	        ArrayList<Reply> commentlist = replyService.selectMyCommentList(map);
 
 	        model.addAttribute("commentlist", commentlist);
 	        model.addAttribute("pi", pi);
+	        model.addAttribute("tab", tab);
+	        model.addAttribute("type", type); //  내부 탭 활성화 상태 유지를 위해 반드시 전송
 	    }
-*/
+
 	    return "views/member/mypage";
 	}
+	@GetMapping("/mypage/wishlist")
+    public String myWishlist(@RequestParam(value = "page", defaultValue = "1") int currentPage,
+                             @RequestParam(value = "type", defaultValue = "spot") String type,
+                             HttpSession session, Model model) {
+        
+        Member loginUser = (Member)session.getAttribute("loginUser");
+        if(loginUser == null) {
+            return "redirect:/member/login"; 
+        }
+        
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("memberNo", loginUser.getMemberNo());
+        
+        if("spot".equals(type)) {
+            int listCount = lService.getWishListCount(loginUser.getMemberNo()); 
+            
+            PageInfo pi = Pagination.getPageInfo(currentPage, listCount, 5, 8);
+            
+            map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
+            map.put("listLimit", pi.getBoardLimit());
+            
+            ArrayList<Landmark> wishlist = lService.selectMyWishList(map);
+            
+            model.addAttribute("wishlist", wishlist);
+            model.addAttribute("pi", pi);
+        } 
+        
+        else if("plan".equals(type)) {
+            ArrayList<Object> wishlist = new ArrayList<>();
+            model.addAttribute("wishlist", wishlist);
+        }
+        
+       
+        Map<Integer, String> contentType = new HashMap<>();
+        contentType.put(12, "관광지");
+        contentType.put(14, "문화시설");
+        contentType.put(15, "축제/공연/행사");
+        contentType.put(25, "여행코스");
+        contentType.put(28, "레포츠");
+        contentType.put(32, "숙박");
+        contentType.put(38, "쇼핑");
+        contentType.put(39, "음식점");
+        
+        model.addAttribute("contentType", contentType);
+        model.addAttribute("type", type);
+        
+        return "views/member/myWishlist"; 
+    }
 	
 }
