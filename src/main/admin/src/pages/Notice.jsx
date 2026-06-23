@@ -7,22 +7,17 @@ import { useBoards } from "../hooks/useBoards";
 
 const Notice = () => {
     const { boards: notice, setBoards: setNotice, setPageInfo,
-        pageInfo, currentPage, changePage, handleStatusToggle: changeStatus } = useBoards("notice", "noticeNo");
+        pageInfo, currentPage, changePage, handleStatusToggle: changeStatus,
+        keyword, setKeyword, handleSearch: triggerSearch } = useBoards("notice", "noticeNo");
 
-    const [keyword, setKeyword] = useState("");
-
-    const navigate = useNavigate(); 
-
-    const handleSearch = () => {
-        console.log("검색:", keyword);
-    };
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchNotice(currentPage)
     }, [currentPage])
 
     const fetchNotice = page => {
-        fetch(`/react/admin/notice?page=${page}`)
+        fetch(`/react/admin/notice?page=${page}&keyword=${keyword}`)
             .then(res => res.json())
             .then(data => {
 
@@ -70,12 +65,13 @@ const Notice = () => {
                         type="text"
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && triggerSearch(fetchNotice)}
                         placeholder="공지사항 제목 검색"
                         className="flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
 
                     <button
-                        onClick={handleSearch}
+                        onClick={() => triggerSearch(fetchNotice)}
                         className="cursor-pointer rounded-lg bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                     >
                         검색

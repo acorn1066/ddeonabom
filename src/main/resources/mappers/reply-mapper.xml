@@ -45,6 +45,7 @@
 	</select>
 
 	<select id="selectMyCommentList" parameterType="hashmap" resultType="Reply">
+
 		SELECT *
 		FROM (
 			SELECT r.*, ROW_NUMBER() OVER (ORDER BY r.create_date DESC) AS rnum
@@ -92,6 +93,7 @@
 	    AND post_board = #{postBoard}
 	    AND status = 'Y'
 	</update>
-	
+
+
 
 </mapper>

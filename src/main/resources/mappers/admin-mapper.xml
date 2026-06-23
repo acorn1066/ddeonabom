@@ -33,24 +33,6 @@
         FROM MEMBER
     </select>
     
-     <select id="selectTravelCountList" resultType="_int">
-        SELECT COUNT(*)
-        FROM TRAVEL_LIST
-        WHERE VISIBILITY = 'PUBLIC'
-    </select>
-
-    <select id="selectScheduleCountList" resultType="_int">
-        SELECT COUNT(*)
-        FROM SCHEDULE_MAIN
-        WHERE SCHEDULE_VISIBILITY = 'Y' and SCHEDULE_VISIBILITY = 'M'
-    </select>
-
-    <select id="selectQlistCountList" resultType="_int">
-        SELECT COUNT(*)
-        FROM QLIST
-    </select>
-    
-
     <select id="selectReplyCount" resultType="_int">
         SELECT COUNT(*)
         FROM REPLY
@@ -65,39 +47,112 @@
     
     <!-- ======================================================================	회원 ========================================================= -->
     
-   <select id="selectMembers" resultType="Member">
-    SELECT
-        ID,
-        NICKNAME,
-        EMAIL,
-        PHONE,
-        ENROLL_DATE,
-        STATUS
-    FROM MEMBER
-    WHERE ID != #{id}
-    OFFSET #{startRow} ROWS
-    FETCH NEXT #{listLimit} ROWS ONLY
-</select>
+	<select id="selectMembers" parameterType="map" resultType="Member">
+	    SELECT * FROM (
+	        SELECT ROWNUM RN, A.* FROM (
+	            SELECT
+	                ID          AS id,
+	                NICKNAME    AS nickname,
+	                EMAIL       AS email,
+	                PHONE       AS phone,
+	                ENROLL_DATE AS enrollDate,
+	                STATUS      AS status
+	            FROM MEMBER
+	            WHERE ID != #{id}
+	            <if test="keyword != null and keyword != ''">
+	                AND (ID       LIKE '%' || #{keyword} || '%'
+	                OR NICKNAME   LIKE '%' || #{keyword} || '%'
+	                OR EMAIL      LIKE '%' || #{keyword} || '%')
+	            </if>
+	            ORDER BY ENROLL_DATE DESC
+	        ) <![CDATA[ A WHERE ROWNUM <= #{startRow} + #{listLimit}
+	    ) WHERE RN > #{startRow} ]]>
+	</select>
 	
 	<update id="updateMemberStatus" parameterType="hashmap">
 	   update member set ${col} = #{val} where id = #{id}
 	</update>
 	
-<!-- 	<select id="selectNoticeList" resultType="kh.ddeonabom.admin.model.vo.AdminNotice"> -->
-<!-- 	    SELECT -->
-<!-- 	        N.NOTICE_NO, -->
-<!-- 	        N.TITLE, -->
-<!-- 	        M.ID AS MEMBER_NAME, -->
-<!-- 	        N.CREATE_DATE, -->
-<!-- 	        N.MODIFY_DATE -->
-<!-- 	    FROM NOTICE N -->
-<!-- 	    JOIN MEMBER M -->
-<!-- 	        ON N.MEMBER_NO = M.MEMBER_NO -->
-<!-- 	    ORDER BY N.NOTICE_NO DESC -->
-<!-- 	</select> -->
 	
 	<!-- ======================================================================	게시글 ========================================================= -->
 	
+	<!-- COUNT 쿼리 -->
+	<select id="selectScheduleCountList" parameterType="hashmap" resultType="_int">
+	    SELECT COUNT(*)
+	    FROM SCHEDULE_MAIN S
+	    JOIN MEMBER M ON S.MEMBER_NO = M.MEMBER_NO
+	    WHERE S.SCHEDULE_VISIBILITY IN ('Y', 'M')
+	    <choose>
+	        <when test="searchType == '제목'">
+	            <if test="keyword != null and keyword != ''">
+	                AND S.SCHEDULE_TITLE LIKE '%' || #{keyword} || '%'
+	            </if>
+	        </when>
+	        <when test="searchType == '작성자'">
+	            <if test="keyword != null and keyword != ''">
+	                AND M.NICKNAME LIKE '%' || #{keyword} || '%'
+	            </if>
+	        </when>
+	        <otherwise>
+	            <if test="keyword != null and keyword != ''">
+	                AND (S.SCHEDULE_TITLE LIKE '%' || #{keyword} || '%'
+	                OR M.NICKNAME LIKE '%' || #{keyword} || '%')
+	            </if>
+	        </otherwise>
+	    </choose>
+	</select>
+	
+	<select id="selectTravelCountList" parameterType="hashmap" resultType="_int">
+	    SELECT COUNT(*)
+	    FROM TRAVEL_LIST T
+	    JOIN MEMBER M ON T.MEMBER_NO = M.MEMBER_NO
+	    WHERE 1=1
+	    <choose>
+	        <when test="searchType == '제목'">
+	            <if test="keyword != null and keyword != ''">
+	                AND T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
+	            </if>
+	        </when>
+	        <when test="searchType == '작성자'">
+	            <if test="keyword != null and keyword != ''">
+	                AND M.NICKNAME LIKE '%' || #{keyword} || '%'
+	            </if>
+	        </when>
+	        <otherwise>
+	            <if test="keyword != null and keyword != ''">
+	                AND (T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
+	                OR M.NICKNAME LIKE '%' || #{keyword} || '%')
+	            </if>
+	        </otherwise>
+	    </choose>
+	</select>
+	
+	<select id="selectQlistCountList" parameterType="hashmap" resultType="_int">
+	    SELECT COUNT(*)
+	    FROM QLIST Q
+	    JOIN MEMBER M ON Q.MEMBER_NO = M.MEMBER_NO
+	    WHERE 1=1
+	    <choose>
+	        <when test="searchType == '제목'">
+	            <if test="keyword != null and keyword != ''">
+	                AND Q.TITLE LIKE '%' || #{keyword} || '%'
+	            </if>
+	        </when>
+	        <when test="searchType == '작성자'">
+	            <if test="keyword != null and keyword != ''">
+	                AND M.NICKNAME LIKE '%' || #{keyword} || '%'
+	            </if>
+	        </when>
+	        <otherwise>
+	            <if test="keyword != null and keyword != ''">
+	                AND (Q.TITLE LIKE '%' || #{keyword} || '%'
+	                OR M.NICKNAME LIKE '%' || #{keyword} || '%')
+	            </if>
+	        </otherwise>
+	    </choose>
+	</select>
+	
+	<!-- 목록 쿼리 -->
 	<select id="selectSchedulePosts" parameterType="hashmap" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
 	    SELECT
 	        S.SCHEDULE_NO AS postNo,
@@ -107,46 +162,98 @@
 	        S.CREATE_DATE AS createDate,
 	        S.SCHEDULE_STATUS AS status
 	    FROM SCHEDULE_MAIN S
-	    JOIN MEMBER M
-	        ON S.MEMBER_NO = M.MEMBER_NO
+	    JOIN MEMBER M ON S.MEMBER_NO = M.MEMBER_NO
 	    WHERE S.SCHEDULE_VISIBILITY IN ('Y', 'M')
+	    <choose>
+	        <when test="searchType == '제목'">
+	            <if test="keyword != null and keyword != ''">
+	                AND S.SCHEDULE_TITLE LIKE '%' || #{keyword} || '%'
+	            </if>
+	        </when>
+	        <when test="searchType == '작성자'">
+	            <if test="keyword != null and keyword != ''">
+	                AND M.NICKNAME LIKE '%' || #{keyword} || '%'
+	            </if>
+	        </when>
+	        <otherwise>
+	            <if test="keyword != null and keyword != ''">
+	                AND (S.SCHEDULE_TITLE LIKE '%' || #{keyword} || '%'
+	                OR M.NICKNAME LIKE '%' || #{keyword} || '%')
+	            </if>
+	        </otherwise>
+	    </choose>
 	    ORDER BY S.CREATE_DATE DESC
 	    OFFSET #{startRow} ROWS
 	    FETCH NEXT #{listLimit} ROWS ONLY
 	</select>
 	
 	<select id="selectReviewPosts" parameterType="hashmap" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
-		SELECT
-		    T.TRAVEL_NO AS postNo,
-		    '후기' AS boardType,
-		    T.TRAVEL_TITLE AS title,
-		    M.NICKNAME AS nickname,
-		    T.CREATE_DATE AS createDate,
-		    T.STATUS AS status,
-		    S.TRAVEL_SUB_CONTENT AS content,
-		    S.CONTENT_TITLE AS contentTitle
-		FROM TRAVEL_LIST T
-		JOIN MEMBER M
-		    ON T.MEMBER_NO = M.MEMBER_NO
-		LEFT JOIN TRAVEL_LIST_SUB S
-		    ON T.TRAVEL_NO = S.TRAVEL_NO
-		ORDER BY T.CREATE_DATE DESC
-		OFFSET #{startRow} ROWS
-		FETCH NEXT #{listLimit} ROWS ONLY
+	    SELECT
+	        T.TRAVEL_NO AS postNo,
+	        '후기' AS boardType,
+	        T.TRAVEL_TITLE AS title,
+	        M.NICKNAME AS nickname,
+	        T.CREATE_DATE AS createDate,
+	        T.STATUS AS status,
+	        S.TRAVEL_SUB_CONTENT AS content,
+	        S.CONTENT_TITLE AS contentTitle
+	    FROM TRAVEL_LIST T
+	    JOIN MEMBER M ON T.MEMBER_NO = M.MEMBER_NO
+	    LEFT JOIN TRAVEL_LIST_SUB S ON T.TRAVEL_NO = S.TRAVEL_NO
+	    WHERE 1=1
+	    <choose>
+	        <when test="searchType == '제목'">
+	            <if test="keyword != null and keyword != ''">
+	                AND T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
+	            </if>
+	        </when>
+	        <when test="searchType == '작성자'">
+	            <if test="keyword != null and keyword != ''">
+	                AND M.NICKNAME LIKE '%' || #{keyword} || '%'
+	            </if>
+	        </when>
+	        <otherwise>
+	            <if test="keyword != null and keyword != ''">
+	                AND (T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
+	                OR M.NICKNAME LIKE '%' || #{keyword} || '%')
+	            </if>
+	        </otherwise>
+	    </choose>
+	    ORDER BY T.CREATE_DATE DESC
+	    OFFSET #{startRow} ROWS
+	    FETCH NEXT #{listLimit} ROWS ONLY
 	</select>
-	
+
 	<select id="selectQuestionPosts" parameterType="hashmap" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
 	    SELECT
 	        Q.Q_NO AS postNo,
 	        '질문' AS boardType,
 	        Q.TITLE AS title,
-	        Q.CONTENT AS CONTENT,
+	        Q.CONTENT AS content,
 	        M.NICKNAME AS nickname,
 	        Q.CREATE_DATE AS createDate,
 	        Q.STATUS AS status
 	    FROM QLIST Q
-	    JOIN MEMBER M
-	        ON Q.MEMBER_NO = M.MEMBER_NO
+	    JOIN MEMBER M ON Q.MEMBER_NO = M.MEMBER_NO
+	    WHERE 1=1
+	    <choose>
+	        <when test="searchType == '제목'">
+	            <if test="keyword != null and keyword != ''">
+	                AND Q.TITLE LIKE '%' || #{keyword} || '%'
+	            </if>
+	        </when>
+	        <when test="searchType == '작성자'">
+	            <if test="keyword != null and keyword != ''">
+	                AND M.NICKNAME LIKE '%' || #{keyword} || '%'
+	            </if>
+	        </when>
+	        <otherwise>
+	            <if test="keyword != null and keyword != ''">
+	                AND (Q.TITLE LIKE '%' || #{keyword} || '%'
+	                OR M.NICKNAME LIKE '%' || #{keyword} || '%')
+	            </if>
+	        </otherwise>
+	    </choose>
 	    ORDER BY Q.CREATE_DATE DESC
 	    OFFSET #{startRow} ROWS
 	    FETCH NEXT #{listLimit} ROWS ONLY
@@ -170,22 +277,29 @@
 	    WHERE Q_NO = #{postNo}
 	</update>
 <!-- ======================================================================	공지사항 ========================================================= -->
-	<select id="getNoticeCount" resultType="_int">
+	<select id="getNoticeCount" parameterType="hashmap" resultType="_int">
 	    SELECT COUNT(*)
-	    FROM notice
+	    FROM NOTICE
+	    WHERE 1=1
+	    <if test="keyword != null and keyword != ''">
+	        AND TITLE LIKE '%' || #{keyword} || '%'
+	    </if>
 	</select>
 	
 	<select id="selectNoticeList" parameterType="hashmap" resultType="kh.ddeonabom.admin.model.vo.AdminNotice">
 	    SELECT
-	        N.NOTICE_NO AS noticeNo,
-	        N.TITLE AS title,
-	        M.NICKNAME AS memberName,
+	        N.NOTICE_NO   AS noticeNo,
+	        N.TITLE       AS title,
+	        M.NICKNAME    AS memberName,
 	        N.CREATE_DATE AS createDate,
 	        N.MODIFY_DATE AS modifyDate,
-	        N.STATUS AS status
+	        N.STATUS      AS status
 	    FROM NOTICE N
-	    JOIN MEMBER M
-	        ON N.MEMBER_NO = M.MEMBER_NO
+	    JOIN MEMBER M ON N.MEMBER_NO = M.MEMBER_NO
+	    WHERE 1=1
+	    <if test="keyword != null and keyword != ''">
+	        AND N.TITLE LIKE '%' || #{keyword} || '%'
+	    </if>
 	    ORDER BY N.CREATE_DATE DESC
 	    OFFSET #{startRow} ROWS
 	    FETCH NEXT #{listLimit} ROWS ONLY
@@ -257,47 +371,47 @@
     </if>
 </select>
 
-<select id="selectReportList" parameterType="map" resultType="AdminReport">
-    SELECT * FROM (
-        SELECT ROWNUM AS RN, A.*
-        FROM (
-            SELECT
-                R.REPORT_NO                           AS reportNo,
-                R.TARGET_TYPE                         AS targetType,
-                R.TARGET_NO                           AS targetNo,
-                R.REASON                              AS reason,
-                R.REPORT_STATUS                       AS reportStatus,
-                TO_CHAR(R.REPORT_DATE, 'YYYY-MM-DD')  AS reportDate,
-                R.MEMBER_NO                           AS memberNo,
-                M.NICKNAME                            AS reporterName,
-                CASE
-                    WHEN R.TARGET_TYPE = 'travel'   THEN T.TRAVEL_TITLE
-                    WHEN R.TARGET_TYPE = 'question' THEN Q.TITLE
-                    WHEN R.TARGET_TYPE = 'reply'    THEN RP.CONTENT
-                END AS targetTitle
-            FROM REPORT R
-            JOIN MEMBER M              ON R.MEMBER_NO  = M.MEMBER_NO
-            LEFT JOIN TRAVEL_LIST T    ON R.TARGET_TYPE = 'travel'   AND R.TARGET_NO = T.TRAVEL_NO
-            LEFT JOIN QLIST Q          ON R.TARGET_TYPE = 'question' AND R.TARGET_NO = Q.Q_NO
-            LEFT JOIN REPLY RP         ON R.TARGET_TYPE = 'reply'    AND R.TARGET_NO = RP.REPLY_NO
-            WHERE 1=1
-            <choose>
-                <when test="targetType == 'reply'">
-                    AND R.TARGET_TYPE = 'reply'
-                </when>
-                <otherwise>
-                    AND R.TARGET_TYPE IN ('travel', 'question')
-                </otherwise>
-            </choose>
-            <if test="status != null and status != ''">
-                AND R.REPORT_STATUS = #{status}
-            </if>
-            ORDER BY R.REPORT_DATE DESC
-        ) A
-        WHERE ROWNUM &lt;= #{pi.currentPage} * #{pi.boardLimit}
-    )
-    WHERE RN &gt; (#{pi.currentPage} - 1) * #{pi.boardLimit}
-</select>
+	<select id="selectReportList" parameterType="map" resultType="AdminReport">
+	    SELECT * FROM (
+	        SELECT ROWNUM AS RN, A.*
+	        FROM (
+	            SELECT
+	                R.REPORT_NO                           AS reportNo,
+	                R.TARGET_TYPE                         AS targetType,
+	                R.TARGET_NO                           AS targetNo,
+	                R.REASON                              AS reason,
+	                R.REPORT_STATUS                       AS reportStatus,
+	                TO_CHAR(R.REPORT_DATE, 'YYYY-MM-DD')  AS reportDate,
+	                R.MEMBER_NO                           AS memberNo,
+	                M.NICKNAME                            AS reporterName,
+	                CASE
+	                    WHEN R.TARGET_TYPE = 'travel'   THEN T.TRAVEL_TITLE
+	                    WHEN R.TARGET_TYPE = 'question' THEN Q.TITLE
+	                    WHEN R.TARGET_TYPE = 'reply'    THEN RP.CONTENT
+	                END AS targetTitle
+	            FROM REPORT R
+	            JOIN MEMBER M              ON R.MEMBER_NO  = M.MEMBER_NO
+	            LEFT JOIN TRAVEL_LIST T    ON R.TARGET_TYPE = 'travel'   AND R.TARGET_NO = T.TRAVEL_NO
+	            LEFT JOIN QLIST Q          ON R.TARGET_TYPE = 'question' AND R.TARGET_NO = Q.Q_NO
+	            LEFT JOIN REPLY RP         ON R.TARGET_TYPE = 'reply'    AND R.TARGET_NO = RP.REPLY_NO
+	            WHERE 1=1
+	            <choose>
+	                <when test="targetType == 'reply'">
+	                    AND R.TARGET_TYPE = 'reply'
+	                </when>
+	                <otherwise>
+	                    AND R.TARGET_TYPE IN ('travel', 'question')
+	                </otherwise>
+	            </choose>
+	            <if test="status != null and status != ''">
+	                AND R.REPORT_STATUS = #{status}
+	            </if>
+	            ORDER BY R.REPORT_DATE DESC
+	        ) A
+	        <![CDATA[ WHERE ROWNUM <= #{pi.currentPage} * #{pi.boardLimit}
+	    )
+	    WHERE RN > (#{pi.currentPage} - 1) * #{pi.boardLimit} ]]>
+	</select>
 
 	<update id="updateReportStatus" parameterType="AdminReport">
 	    UPDATE REPORT

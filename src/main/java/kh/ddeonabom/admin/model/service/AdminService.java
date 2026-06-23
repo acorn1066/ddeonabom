@@ -43,19 +43,7 @@ public class AdminService {
         return mapper.selectReportCount();
     }
 
-    public ArrayList<Member> selectMembers(
-            String id,
-            PageInfo pi) {
-
-        HashMap<String, Object> map = new HashMap<>();
-
-        map.put("id", id);
-        map.put("startRow",
-                (pi.getCurrentPage() - 1) * pi.getBoardLimit());
-
-        map.put("listLimit",
-                pi.getBoardLimit());
-
+    public ArrayList<Member> selectMembers(HashMap<String, Object> map) {
         return mapper.selectMembers(map);
     }
 	
@@ -81,60 +69,33 @@ public class AdminService {
 	    }
 	}
 
-	public int getPostCount(String category) {
-
+	public int getPostCount(String category, HashMap<String, Object> map) {
 	    switch(category) {
-
-	        case "schedule":
-	            return mapper.selectScheduleCountList();
-
-	        case "review":
-	            return mapper.selectTravelCountList();
-
-	        case "question":
-	            return mapper.selectQlistCountList();
-
-	        default:
-	            return 0;
+	        case "schedule": return mapper.selectScheduleCountList(map);
+	        case "review":   return mapper.selectTravelCountList(map);
+	        case "question": return mapper.selectQlistCountList(map);
+	        default: return 0;
 	    }
 	}
 
-	public ArrayList<AdminPost> selectPostList(String category, PageInfo pi) {
-		
-	    HashMap<String, Object> map = new HashMap<>();
-	    map.put("startRow",(pi.getCurrentPage() - 1) * pi.getBoardLimit());
-	    map.put("listLimit", pi.getBoardLimit());
-
+	public ArrayList<AdminPost> selectPostList(String category, HashMap<String, Object> map) {
 	    switch(category) {
-
-	        case "schedule":
-	            return mapper.selectSchedulePosts(map);
-
-	        case "review":
-	            return mapper.selectReviewPosts(map);
-
-	        case "question":
-	            return mapper.selectQuestionPosts(map);
-
-	        default:
-	            return new ArrayList<>();
+	        case "schedule": return mapper.selectSchedulePosts(map);
+	        case "review":   return mapper.selectReviewPosts(map);
+	        case "question": return mapper.selectQuestionPosts(map);
+	        default: return new ArrayList<>();
 	    }
 	}
 
-	public int selectMemberCountList(String id) {
-		return mapper.selectMemberCountList(id);
+	public int selectMemberCountList(HashMap<String, Object> map) {
+	    return mapper.selectMemberCountList(map);
 	}
 
-	public int getNoticeCount() {
-		return mapper.getNoticeCount();
+	public int getNoticeCount(HashMap<String, Object> map) {
+		return mapper.getNoticeCount(map);
 	}
 
-	public ArrayList<AdminNotice> selectNoticeList(PageInfo pi) {
-
-	    HashMap<String, Object> map = new HashMap<>();
-	    map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
-	    map.put("listLimit", pi.getBoardLimit());
-
+	public ArrayList<AdminNotice> selectNoticeList(HashMap<String, Object> map) {
 	    return mapper.selectNoticeList(map);
 	}
 

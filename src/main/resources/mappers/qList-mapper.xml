@@ -143,18 +143,31 @@
 	</select>
 	
 	<select id="selectMyBoardList" resultType="QList" parameterType="map">
-
-    SELECT Q.*,
-           M.ID,
-           Q.CREATE_DATE AS createDate
-    FROM QLIST Q
+    SELECT 
+        p.*,
+        M.ID,
+        p.REPORT_STATUS AS reportStatus
+    FROM (
+        SELECT 
+            Q.Q_NO,
+            Q.MEMBER_NO,
+            Q.TITLE,
+            Q.CONTENT,
+            Q.STATUS,
+            Q.CATEGORY, Q.CREATE_DATE AS createDate,
+            RP.REPORT_STATUS FROM QLIST Q
+        LEFT JOIN REPORT RP
+          ON Q.Q_NO = RP.TARGET_NO 
+         AND RP.TARGET_TYPE = 'question' 
+         AND RP.REPORT_STATUS = 'N'
+        WHERE Q.MEMBER_NO = #{memberNo}
+          AND Q.STATUS = 'Y'
+        ORDER BY Q.Q_NO DESC
+        OFFSET #{startRow} ROWS
+        FETCH NEXT #{listLimit} ROWS ONLY
+    ) p
     JOIN MEMBER M
-      ON Q.MEMBER_NO = M.MEMBER_NO
-    WHERE Q.MEMBER_NO = #{memberNo}
-      AND Q.STATUS = 'Y'
-    ORDER BY Q.Q_NO DESC
-    OFFSET #{startRow} ROWS
-    FETCH NEXT #{listLimit} ROWS ONLY
-
-	</select>
+      ON p.MEMBER_NO = M.MEMBER_NO
+    ORDER BY p.Q_NO DESC
+</select>
 </mapper>

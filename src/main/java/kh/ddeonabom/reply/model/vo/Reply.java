@@ -23,4 +23,5 @@ public class Reply {
 	private int postNo;
 	private int memberNo;
 	private String writer;   // MEMBER 테이블 JOIN으로 가져올 nickname
+	private String reportStatus;
 }
