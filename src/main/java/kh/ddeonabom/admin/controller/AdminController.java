@@ -68,19 +68,26 @@ public class AdminController {
 	@ResponseBody
 	@GetMapping("/members")
 	public HashMap<String, Object> members(
-	        @RequestParam(value = "page", defaultValue = "1") int page, HttpSession session) {
+	        @RequestParam(value = "page", defaultValue = "1") int page,
+	        @RequestParam(value = "keyword", defaultValue = "") String keyword,
+	        HttpSession session) {
 
 	    Member loginUser = (Member)session.getAttribute("loginUser");
-	    int listCount = aService.selectMemberCountList(loginUser.getId());
-	    PageInfo pi = Pagination.getPageInfo(page, listCount, 10, 10);
+	    // map 여기서 만들어서 바로 mapper 호출
+	    HashMap<String, Object> map = new HashMap<>();
+	    map.put("id", loginUser.getId());
+	    map.put("keyword", keyword);
 
-	    ArrayList<Member> list = aService.selectMembers(loginUser.getId(), pi);
+	    int listCount = aService.selectMemberCountList(map);  // Service는 map만 받도록
+	    PageInfo pi = Pagination.getPageInfo(page, listCount, 10, 10);
+	    map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
+	    map.put("listLimit", pi.getBoardLimit());
+
+	    ArrayList<Member> list = aService.selectMembers(map);
 
 	    HashMap<String, Object> data = new HashMap<>();
-
 	    data.put("list", list);
 	    data.put("pi", pi);
-
 	    return data;
 	}
 	
@@ -117,17 +124,21 @@ public class AdminController {
 
 	@ResponseBody
 	@GetMapping("notice")
-	public HashMap<String, Object> noticeList(@RequestParam(value = "page", defaultValue = "1") int page) {
+	public HashMap<String, Object> notice(
+	        @RequestParam(value = "page", defaultValue = "1") int page,
+	        @RequestParam(value = "keyword", defaultValue = "") String keyword) {
 
-	    int listCount = aService.getNoticeCount();
-	    
-//	    System.out.println("listCount = " + listCount);
+	    HashMap<String, Object> map = new HashMap<>();
+	    map.put("keyword", keyword);
 
+	    int listCount = aService.getNoticeCount(map);
 	    PageInfo pi = Pagination.getPageInfo(page, listCount, 10, 10);
-	    ArrayList<AdminNotice> list = aService.selectNoticeList(pi);
-	    HashMap<String, Object> data = new HashMap<>();
 
-	    data.put("list", list);
+	    map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
+	    map.put("listLimit", pi.getBoardLimit());
+
+	    HashMap<String, Object> data = new HashMap<>();
+	    data.put("list", aService.selectNoticeList(map));
 	    data.put("pi", pi);
 	    return data;
 	}
@@ -158,19 +169,26 @@ public class AdminController {
 	
 //	============================================================ 게시글 =================================================================
 	
-	@ResponseBody
 	@GetMapping("/posts")
-	public HashMap<String, Object> postList(@RequestParam("category") String category, @RequestParam(value = "page", defaultValue = "1") int page) {
+	@ResponseBody
+	public HashMap<String, Object> posts(
+	        @RequestParam(value = "category") String category,
+	        @RequestParam(value = "page", defaultValue = "1") int page,
+	        @RequestParam(value = "keyword", defaultValue = "") String keyword,
+	        @RequestParam(value = "searchType", defaultValue = "전체") String searchType) {
 
-	    int listCount = aService.getPostCount(category);
-	    
-//	    System.out.println("category = " + category);
-//	    System.out.println("listCount = " + listCount);
+	    HashMap<String, Object> map = new HashMap<>();
+	    map.put("keyword", keyword);
+	    map.put("searchType", searchType);
+
+	    int listCount = aService.getPostCount(category, map);
 	    PageInfo pi = Pagination.getPageInfo(page, listCount, 10, 10);
-	    ArrayList<AdminPost> list = aService.selectPostList(category, pi);
-	    HashMap<String, Object> data = new HashMap<>();
 
-	    data.put("list", list);
+	    map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
+	    map.put("listLimit", pi.getBoardLimit());
+
+	    HashMap<String, Object> data = new HashMap<>();
+	    data.put("list", aService.selectPostList(category, map));
 	    data.put("pi", pi);
 	    return data;
 	}

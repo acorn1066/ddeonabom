@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom"
 import "./Page.css";
+import Pagination from "../components/Pagination";
 
 const Members = () => {
     const [members, setMembers] = useState([]);
@@ -11,19 +12,27 @@ const Members = () => {
 
     const [pageInfo, setPageInfo] = useState(null)
 
-    const handleSearch = () => {
-        console.log("검색:", keyword);
-    };
 
 
-
-    useEffect(() => {
-        fetch(`/react/admin/members?page=${currentPage}`)
+    const fetchMembers = (page) => {
+        fetch(`/react/admin/members?page=${page}&keyword=${keyword}`)
             .then(res => res.json())
             .then(data => {
                 setMembers(data.list);
                 setPageInfo(data.pi);
             });
+    };
+
+    const handleSearch = () => {
+        if (currentPage === 1) {
+            fetchMembers(1);
+        } else {
+            setSearchParams({ page: "1" });
+        }
+    };
+
+    useEffect(() => {
+        fetchMembers(currentPage);
     }, [currentPage]);
 
     const changePage = page => {
@@ -78,6 +87,7 @@ const Members = () => {
                         type="text"
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                         placeholder="아이디, 닉네임, 이메일 검색"
                         className="flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -177,44 +187,7 @@ const Members = () => {
                 </table>
             </div>
 
-            {pageInfo && (
-                <div className="pagination-container">
-
-                    <button
-                        className="pagination-btn"
-                        onClick={() => currentPage > 1 && changePage(currentPage - 1)}
-                        disabled={currentPage <= 1}
-                    >
-                        ‹
-                    </button>
-
-                    {Array.from(
-                        { length: pageInfo.endPage - pageInfo.startPage + 1 },
-                        (_, i) => pageInfo.startPage + i
-                    ).map(pageNum => (
-                        <button
-                            key={pageNum}
-                            onClick={() => changePage(pageNum)}
-                            className={`pagination-page ${currentPage === pageNum ? "active" : ""
-                                }`}
-                        >
-                            {pageNum}
-                        </button>
-                    ))}
-
-                    <button
-                        className="pagination-btn"
-                        onClick={() =>
-                            currentPage < pageInfo.maxPage &&
-                            changePage(currentPage + 1)
-                        }
-                        disabled={currentPage >= pageInfo.maxPage}
-                    >
-                        ›
-                    </button>
-
-                </div>
-            )}
+            <Pagination pageInfo={pageInfo} currentPage={currentPage} onChange={changePage} />
 
 
         </section>

@@ -8,15 +8,10 @@ const Posts = () => {
 
     const { boards: posts, setBoards: setPosts, setPageInfo,
         pageInfo, currentPage, changePage, resetToFirstPage, handleStatusToggle: changeStatus,
-        selectBoard: selectPost, showModal, handleBoardClick: handlePostClick, closeModal } = useBoards("posts", "postNo");
+        selectBoard: selectPost, showModal, handleBoardClick: handlePostClick, closeModal, keyword, setKeyword, handleSearch: triggerSearch } = useBoards("posts", "postNo");
 
-    const [keyword, setKeyword] = useState("");
     const [boardType, setBoardType] = useState("공유");
     const [searchType, setSearchType] = useState("전체");
-
-    const handleSearch = () => {
-        console.log(searchType, keyword);
-    };
 
     useEffect(() => {
         fetchPosts(currentPage)
@@ -30,7 +25,7 @@ const Posts = () => {
             질문: "question"
         };
 
-        fetch(`/react/admin/posts?category=${categoryMap[boardType]}&page=${page}`)
+        fetch(`/react/admin/posts?category=${categoryMap[boardType]}&page=${page}&keyword=${keyword}&searchType=${searchType}`)
             .then(res => res.json())
             .then(data => {
                 // console.log(data);
@@ -100,12 +95,13 @@ const Posts = () => {
                         type="text"
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && triggerSearch(fetchPosts)}
                         placeholder="검색어를 입력하세요"
                         className="flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
 
                     <button
-                        onClick={handleSearch}
+                        onClick={() => triggerSearch(fetchPosts)}
                         className="cursor-pointer rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
                     >
                         검색
