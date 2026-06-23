@@ -17,6 +17,8 @@ const ChartSection = ({ title, data }) => {
     };
 
     const sevenChart = (data) => {
+       // console.log(canvasRef.current)
+        //console.log(data)
         const today = new Date();
         const ctx = canvasRef.current;
 
@@ -24,9 +26,14 @@ const ChartSection = ({ title, data }) => {
 
         const labels = [6, 5, 4, 3, 2, 1, 0].map(n => getDateFormat(getThatDays(today, n)));
 
+        // 배열 즉 게시판은 배열로 객체 즉 로그인 기록은 객체로
         const counts = labels.map(date => {
-            const found = data.find(item => item.CREATEDATE === date);
-            return found ? Number(found.CNT) : 0;
+            if (Array.isArray(data)) {
+                const found = data.find(item => item.CREATEDATE === date);
+                return found ? Number(found.CNT) : 0;
+            } else {
+                return data[date] ?? 0;
+            }
         });
 
         chartRef.current = new Chart(ctx, {
@@ -69,10 +76,7 @@ const ChartSection = ({ title, data }) => {
     return (
         <div className="rounded-xl bg-white p-6 shadow-sm border">
             <h4 className="mb-4 text-lg font-semibold">{title}</h4>
-            {data
-                ? <canvas ref={canvasRef} height="150"></canvas>
-                : <div className="flex h-36 items-center justify-center text-gray-400"></div>
-            }
+            <canvas ref={canvasRef} height="150"></canvas>
         </div>
     );
 };

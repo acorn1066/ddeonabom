@@ -1,8 +1,13 @@
 package kh.ddeonabom.admin.controller;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,6 +59,39 @@ public class AdminController {
 	    map.put("reportCount", aService.selectReportCount());
 
 	    return map;
+	}
+	
+	@ResponseBody
+	@GetMapping("/logs")
+	public TreeMap<String, Integer> getLogs() {
+	    File f = new File("C:/logs/ddeonabom/login/");
+	    File[] files = f.listFiles();
+
+	    TreeMap<String, Integer> dateCount = new TreeMap<>();
+	    BufferedReader br = null;
+	    try {
+	        for (File file : files) {
+	            br = new BufferedReader(new FileReader(file));
+	            String data;
+	            while ((data = br.readLine()) != null) {
+	                String date = data.split(" ")[0];
+	                if (!dateCount.containsKey(date)) {
+	                    dateCount.put(date, 1);
+	                } else {
+	                    dateCount.put(date, dateCount.get(date) + 1);
+	                }
+	            }
+	        }
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (br != null) br.close();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return dateCount;
 	}
 	
 	@ResponseBody
