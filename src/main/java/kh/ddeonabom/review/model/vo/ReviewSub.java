@@ -23,11 +23,14 @@ public class ReviewSub {
     private Date travelSubDate;
     private int travelNo;
     private int contentId;
+    // 조회한 이미지 경로 목록
     private List<String> images;
     private int rating;    
+    // 이미지 업로드 파일
     private List<MultipartFile> imageFiles;
     private double lat;
     private double lng;
+    // 관광지이름
     private String contentTitle;
 
 }

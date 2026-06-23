@@ -60,10 +60,10 @@ body {
 		        </svg>
 		        <input class="h-9 w-56 rounded-full border border-line bg-white pl-9 pr-3 text-13 outline-none transition placeholder:text-faint focus:border-brand" placeholder="여행·관광지 검색" id="searchInput"/>
 		    </div>
-		    <select class="ml-2 h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none">
-		        <option>최신순</option>
-		        <option>추천 많은 순</option>
-		        <option>조회수 높은 순</option>
+		    <select id="sortSelect" class="ml-2 h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none">
+		        <option value="latest">최신순</option>
+		        <option value="like">추천 많은 순</option>
+		        <option value="view">조회수 높은 순</option>
 		    </select>
 		</div>
 
@@ -83,6 +83,7 @@ body {
 	let currentPage = 1;
 	let currentRegion = "";
 	let currentKeyword = "";  
+	let sortType = 'latest';
 
 	window.onload = () => {
 	    loadTravelList(currentPage);
@@ -120,6 +121,10 @@ body {
     	});
 	}
 
+	$('#sortSelect').on('change', function () {
+	    sortType = $(this).val();
+	    loadTravelList(1);
+	});
 	function loadTravelList(page) {
 	    $.ajax({
 	        url: '/selectReviewList',
@@ -127,7 +132,8 @@ body {
 	        data: {
 	            currentPage: page,
 	            region: currentRegion,
-	            keyword: currentKeyword 
+	            keyword: currentKeyword,
+	            sort: sortType
 	        },
 	        dataType: 'json',
 	        success: function(response) {
@@ -144,7 +150,8 @@ body {
 	            }
 
 	            data.forEach(travel => {
-	                const displayDate = travel.modifyDate ? travel.modifyDate : travel.createDate;
+	            	const rawDate = travel.modifyDate ?? travel.createDate;
+	            	const displayDate = rawDate ? rawDate.substring(0, 10) : '';
 	                const cardHtml = `
 	                  <a href="/reviews/detail?travelNo=${travel.travelNo}" class="flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card">
 	                    <div class="flex flex-1 flex-col gap-2 p-4">
@@ -160,6 +167,7 @@ body {
 	                        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-brand-soft text-11 font-bold text-brand-ink">M</span>
 	                        <span class="font-semibold text-muted">회원 ${travel.nickname} </span>
 	                        <span class="ml-auto text-muted text-xs">조회수 <span class="font-bold text-ink">${travel.count}</span></span>
+	                        / 추천 <span class="font-bold text-ink">${travel.likeCount ?? 0}</span>
 	                      </div>
 	                    </div>
 	                  </a>
@@ -199,6 +207,10 @@ body {
 
 	    pContainer.innerHTML = html;
 	}
+	
+	$(document).ready(function () {
+	    loadTravelList(1);
+	});
 </script>
 
 </body>
