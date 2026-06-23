@@ -45,14 +45,37 @@
 	</select>
 
 	<select id="selectMyCommentList" parameterType="hashmap" resultType="Reply">
-		SELECT *
-		FROM (
-			SELECT r.*, ROW_NUMBER() OVER (ORDER BY r.create_date DESC) AS rnum
-			FROM reply r
-			WHERE r.member_no = #{memberNo}
-			  AND r.post_board = #{postBoard} AND r.status = 'Y'
-		)
-		WHERE rnum BETWEEN #{startRow} + 1 AND #{startRow} + #{listLimit}
-	</select>
+    SELECT 
+        p.REPLY_NO        AS replyNo,
+        p.CONTENT         AS content,
+        p.CREATE_DATE     AS createDate,
+        p.MODIFY_DATE     AS modifyDate,
+        p.STATUS          AS status,
+        p.POST_BOARD      AS postBoard,
+        p.POST_NO         AS postNo,
+        p.MEMBER_NO       AS memberNo,
+        p.REPORT_STATUS   AS reportStatus FROM (
+        SELECT 
+            r.REPLY_NO,
+            r.CONTENT,
+            r.CREATE_DATE,
+            r.MODIFY_DATE,
+            r.STATUS,
+            r.POST_BOARD,
+            r.POST_NO,
+            r.MEMBER_NO,
+            RP.REPORT_STATUS FROM reply r
+        LEFT JOIN REPORT RP
+          ON r.REPLY_NO = RP.TARGET_NO 
+         AND RP.TARGET_TYPE = 'reply' 
+         AND RP.REPORT_STATUS = 'N' WHERE r.member_no = #{memberNo}
+          AND r.post_board = #{postBoard}
+          AND r.status = 'Y'
+        ORDER BY r.CREATE_DATE DESC
+        OFFSET #{startRow} ROWS
+        FETCH NEXT #{listLimit} ROWS ONLY
+    ) p
+    ORDER BY p.CREATE_DATE DESC
+</select>
 
 </mapper>
