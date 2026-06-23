@@ -179,6 +179,19 @@
 
 			</div>
 		</div>
+		
+		<!-- Visibility 선택 모달 -->
+		<div id="visibilityModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
+		    <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+		        <h3 class="text-base font-bold text-ink">공개 범위 설정</h3>
+		        <p class="mt-1 text-13 text-muted">이 일정을 누구에게 공개할까요?</p>
+		        <div class="mt-4 flex flex-col gap-2" id="visibilityOptions"></div>
+		        <button onclick="closeVisibilityModal()"
+		                class="mt-4 w-full rounded-lg border border-line py-2.5 text-sm font-semibold text-muted transition hover:border-muted">
+		            취소
+		        </button>
+		    </div>
+		</div>
 
 		<!-- 토스트 컨테이너 -->
 		<div id="toast-container"
@@ -448,6 +461,54 @@
 	pgPrev.addEventListener('click', () => { if (page > 0) { page--; renderAll(); } });
 	pgNext.addEventListener('click', () => { if (page < totalPages - 1) { page++; renderAll(); } });
 })();
+    
+    
+const VISIBILITY_OPTIONS = [
+    { value: 'Y', label: '전체 공개', desc: '로그인 없이 누구나 볼 수 있어요.' },
+    { value: 'M', label: '회원 공개', desc: '로그인한 회원만 볼 수 있어요.' },
+    { value: 'N', label: '비공개',   desc: '나만 볼 수 있어요.' },
+];
+
+let _visibilityCallback = null;
+
+const openVisibilityModal = (currentVis, callback) => {  // ← currentVis 파라미터 추가
+    _visibilityCallback = callback;
+    const container = document.getElementById('visibilityOptions');
+    container.innerHTML = '';
+
+    VISIBILITY_OPTIONS.forEach(opt => {
+        const btn = document.createElement('button');
+        const isCurrent = opt.value === currentVis;  // ← 이제 정상 비교
+        btn.className = `flex flex-col items-start w-full rounded-xl border px-4 py-3 text-left transition
+            ${isCurrent
+                ? 'border-brand bg-brand-soft text-brand-ink'
+                : 'border-line bg-white text-ink hover:border-brand'}`;
+        btn.innerHTML = `
+            <span class="text-sm font-bold">${opt.label}${isCurrent ? ' <span class="text-xs font-normal">(현재)</span>' : ''}</span>
+            <span class="text-xs text-muted mt-0.5">${opt.desc}</span>
+        `;
+        btn.addEventListener('click', () => {
+            closeVisibilityModal();
+            _visibilityCallback(opt.value);  // ← 선택값 콜백으로 전달
+        });
+        container.appendChild(btn);
+    });
+
+    const modal = document.getElementById('visibilityModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+};
+
+const closeVisibilityModal = () => {
+    const modal = document.getElementById('visibilityModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+};
+
+// 바깥 클릭 시 닫기
+document.getElementById('visibilityModal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeVisibilityModal();
+});
 </script>
 
 	</th:block>
