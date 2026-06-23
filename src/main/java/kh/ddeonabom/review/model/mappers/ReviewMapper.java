@@ -47,6 +47,8 @@ public interface ReviewMapper {
 
 	Review getTravelWithSubList(Long travelNo);
 
+	Review sReview(int travelNo);
+
 	
 
 }
