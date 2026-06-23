@@ -61,7 +61,13 @@
 	      <th:block th:unless="${l.firstimage != null and !#strings.isEmpty(l.firstimage)}">
 	      	<div class="absolute inset-0 flex items-center justify-center bg-sunk"><span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">[[${l.title}]]</span></div>
 	      </th:block>
-	        <span class="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-brand"><svg width="17" height="17" viewBox="0 0 18 18" fill="currentColor" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span>
+	      <th:block th:if="${session.loginUser != null}">
+	        <span th:if="${niceList != null and niceList.contains(l.contentId)}" class="nice absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-brand"><svg width="17" height="17" viewBox="0 0 18 18" fill="currentColor" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span>
+	        <span th:unless="${niceList != null and niceList.contains(l.contentId)}" class="nice absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-muted"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span>
+	      </th:block>
+	      <th:block th:if="${session.loginUser == null}">	      
+	        <span class="nice absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-muted"><svg id="heart" width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span>
+	      </th:block>
 	        <span class="absolute bottom-2.5> left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">[[${contentType[l.contentTypeId]}]]</span>
 	      </div>
 	      <div class="px-0.5 pb-1 pt-3" >
@@ -130,10 +136,55 @@
 					console.log(e.target);
 					const div = e.target.closest('.overflow-hidden');
 					console.log(div);
-					const contentId = div.querySelector('.overflow-hidden .id').innerText
+					const contentId = div.querySelector('.id').innerText
 					console.log(contentId);
 					location.href = '/landmark/' + contentId + "/" + /*[[${pi.currentPage}]]*/0;
 				});
+			}
+			
+			const nices = document.querySelectorAll(".nice");
+// 			const heart = document.querySelector('#heart');
+// 			console.log(heart);
+// 			const contentId = div.querySelector('.overflow-hidden .id').innerText
+			for(nice of nices){
+				nice.addEventListener('click', (e) => {
+					e.stopPropagation();
+// 					console.log(e.target);
+					const div = e.target.closest('.overflow-hidden');
+					const contentId = div.querySelector('.id').innerText;
+					console.log(contentId);
+					const heart = div.querySelector('.nice svg');		
+					
+					const loginUser = /*[[${session.loginUser}]]*/null;
+					if(loginUser == null) {
+						alert("로그인이 필요합니다");
+						return;
+					}
+				
+					$.ajax({
+						url: '/landmark/listNice',
+						type: 'post',
+						data: {
+							contentId: contentId,
+							memberNo: /*[[${session.loginUser?.memberNo}]]*/0
+						},
+						success: data => {
+							console.log(data);
+							if(data > 0){
+								heart.setAttribute("fill", "blue");
+								nice.classList.add("text-brand");
+								nice.classList.remove("text-muted");
+							} else{
+								heart.setAttribute("fill", "none");
+								nice.classList.add("text-muted");
+								nice.classList.remove("text-brand");
+							}
+							
+							
+						},
+						error: data => console.log(data)
+					})
+				})
 			}
 		}
 	</script>
