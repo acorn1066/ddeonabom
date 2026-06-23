@@ -162,6 +162,7 @@ public class ScheduleAjaxController {
     @PostMapping("/visibility")
     @ResponseBody
     public Map<String, Object> toggleVisibility(@RequestParam("scheduleNo") int scheduleNo,
+                                                @RequestParam("visibility") String visibility,  // 추가
                                                 HttpSession session) {
         Map<String, Object> result = new HashMap<>();
 
@@ -173,10 +174,17 @@ public class ScheduleAjaxController {
             return result;
         }
 
+        // Y/M/N 외 값 방어
+        if (!List.of("Y", "M", "N").contains(visibility)) {
+            result.put("success", false);
+            result.put("message", "올바르지 않은 공개 설정이에요.");
+            return result;
+        }
+
         try {
-            String visibility = sService.toggleVisibility(scheduleNo, loginUser.getMemberNo());
+            sService.setVisibility(scheduleNo, loginUser.getMemberNo(), visibility);  // 메서드명 변경
             result.put("success", true);
-            result.put("visibility", visibility);   // 바뀐 값 'Y'/'N'
+            result.put("visibility", visibility);
         } catch (Exception e) {
             e.printStackTrace();
             result.put("success", false);

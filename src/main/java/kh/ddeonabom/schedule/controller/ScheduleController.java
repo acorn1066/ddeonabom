@@ -26,6 +26,7 @@ public class ScheduleController {
 		
 		int mainNum = 0;
 		int showNum = 0;
+		int memberNum = 0;
 		int hideNum = 0;
 		ArrayList<ScheduleMain> sMain = null;
 		
@@ -36,6 +37,7 @@ public class ScheduleController {
 	        if (mainNum > 0) {
 	            for(ScheduleMain main : sMain) {
 	                if(main.getScheduleVisibility().equals("N")) hideNum++;
+	                else if(main.getScheduleVisibility().equals("M")) memberNum++;
 	                else showNum++;
 	            }
 	        }
@@ -43,6 +45,7 @@ public class ScheduleController {
 		
 		model.addAttribute("scheduleList", sMain);
 		model.addAttribute("mainNum", mainNum);
+		model.addAttribute("memberNum", memberNum);
 		model.addAttribute("showNum", showNum);
 		model.addAttribute("hideNum", hideNum);
 		model.addAttribute("isLogin", member!=null?"Y":"N");
