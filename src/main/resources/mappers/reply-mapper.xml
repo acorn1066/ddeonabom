@@ -54,4 +54,5 @@
 		)
 		WHERE rnum BETWEEN #{startRow} + 1 AND #{startRow} + #{listLimit}
 	</select>
+
 </mapper>

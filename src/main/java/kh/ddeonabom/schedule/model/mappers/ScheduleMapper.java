@@ -31,4 +31,6 @@ public interface ScheduleMapper {
 	int deleteScheduleSubAll(int scheduleNo);
 	
 	int updateScheduleVisibility(Map<String, Object> param);
+
+	void updateVisibility(int scheduleNo, int memberNo, String visibility);
 }
