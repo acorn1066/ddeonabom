@@ -45,6 +45,30 @@
         WHERE REPORT_STATUS = 'N'
     </select>
     
+    <select id="selectScheduleActivity" resultType="hashmap">
+	    SELECT TO_CHAR(CREATE_DATE, 'YY-MM-DD') AS CREATEDATE, COUNT(*) AS CNT
+	    FROM SCHEDULE_MAIN
+	    WHERE CREATE_DATE >= SYSDATE - 7
+	    GROUP BY TO_CHAR(CREATE_DATE, 'YY-MM-DD')
+	    ORDER BY CREATEDATE
+	</select>
+	
+	<select id="selectQlistActivity" resultType="hashmap">
+	    SELECT TO_CHAR(CREATE_DATE, 'YY-MM-DD') AS CREATEDATE, COUNT(*) AS CNT
+	    FROM QLIST
+	    WHERE CREATE_DATE >= SYSDATE - 7
+	    GROUP BY TO_CHAR(CREATE_DATE, 'YY-MM-DD')
+	    ORDER BY CREATEDATE
+	</select>
+	
+	<select id="selectTravelActivity" resultType="hashmap">
+	    SELECT TO_CHAR(CREATE_DATE, 'YY-MM-DD') AS CREATEDATE, COUNT(*) AS CNT
+	    FROM TRAVEL_LIST
+	    WHERE CREATE_DATE >= SYSDATE - 7
+	    GROUP BY TO_CHAR(CREATE_DATE, 'YY-MM-DD')
+	    ORDER BY CREATEDATE
+	</select>
+    
     <!-- ======================================================================	회원 ========================================================= -->
     
 	<select id="selectMembers" parameterType="map" resultType="Member">

@@ -14,14 +14,13 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import kh.ddeonabom.landmark.model.vo.Landmark;
 import kh.ddeonabom.main.model.mapper.MainMapper;
 import kh.ddeonabom.schedule.model.vo.RoutePoint;
 import kh.ddeonabom.schedule.model.vo.ScheduleMain;
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor
