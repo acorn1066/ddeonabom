@@ -21,6 +21,10 @@ public class ReplyService {
 		return replyMapper.getReplyList(map);
 	}
 
+	public ArrayList<Reply> selectReplyList(String postBoard, int postNo) {
+		return replyMapper.selectReplyList(postBoard, postNo);
+	}
+
 	public int insertReply(Reply reply) {
 		return replyMapper.insertReply(reply);
 	}
@@ -34,6 +38,15 @@ public class ReplyService {
 		map.put("replyNo",  replyNo);
 		map.put("memberNo", memberNo);
 		return replyMapper.deleteReply(map);
+	}
+
+	public int getMyCommentCount(HashMap<String, Object> map) {
+		return replyMapper.getMyCommentCount(map);
+	}
+
+	public ArrayList<Reply> selectMyCommentList(HashMap<String, Object> map) {
+		return replyMapper.selectMyCommentList(map);
+
 	}
 
 }

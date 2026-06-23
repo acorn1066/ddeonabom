@@ -9,6 +9,8 @@
 	    <result property="status" column="STATUS"/>
 	    <result property="createDate" column="CREATE_DATE"/>
 	    <result property="memberNo" column="MEMBER_NO"/>
+	    <result property="travelStartDate" column="TRAVEL_START_DATE"/>
+		<result property="travelEndDate" column="TRAVEL_END_DATE"/>
 	    
 	    <collection property="subList" ofType="ReviewSub">
 	        <id property="travelSubNo" column="TRAVEL_SUB_NO"/>
@@ -16,12 +18,16 @@
 	        <result property="travelSubSeq" column="TRAVEL_SUB_SEQ"/>
 	        <result property="contentId" column="CONTENT_ID"/>
 	        <result property="rating" column="RATING"/>
+	        <result property="contentTitle" column="CONTENT_TITLE"/>
 	        
-	        <collection property="images" ofType="string">
-	            <result column="RENAME_FILE"/> </collection>
 	    </collection>
 	</resultMap>
-
+	
+	<select id="getImagesBySubNo">
+	    SELECT RENAME_FILE
+	    FROM TRAVEL_SUB_IMAGE
+	    WHERE TRAVEL_SUB_NO = #{travelSubNo}
+	</select>
     <!-- 목록 조회 -->
 	<select id="selectReviewList" resultType="kh.ddeonabom.review.model.vo.Review">
 	    SELECT
@@ -41,7 +47,18 @@
 	    <if test="region != null and region != ''">
 	        AND T.REGION = #{region}
 	    </if>
-	    ORDER BY T.TRAVEL_NO DESC
+	   ORDER BY
+		<choose>
+		    <when test="sort == 'like'">
+		        LIKE_COUNT DESC
+		    </when>
+		    <when test="sort == 'view'">
+		        T.COUNT DESC
+		    </when>
+		    <otherwise>
+		        T.CREATE_DATE DESC
+		    </otherwise>
+		</choose>
 	    OFFSET (#{pi.currentPage} - 1) * #{pi.boardLimit} ROWS
 	    FETCH NEXT #{pi.boardLimit} ROWS ONLY
 	</select>
@@ -70,12 +87,15 @@
 		        TRAVEL_NO, 
 		        TRAVEL_TITLE, 
 		        STATUS,CREATE_DATE,REGION,
-		        MEMBER_NO, VISIBILITY
+		        MEMBER_NO, VISIBILITY, TRAVEL_START_DATE,
+        		TRAVEL_END_DATE
+		        
 		    ) VALUES (
 		        #{travelNo}, 
 		        #{travelTitle}, 
 		        'Y', SYSDATE,#{region},
-		        #{memberNo}, #{visibility}
+		        #{memberNo}, #{visibility}, #{travelStartDate},
+        #{travelEndDate}
 		    )
 	</insert>
 	
@@ -192,5 +212,28 @@
 	    SELECT COUNT(*)
 	    FROM NICE
 	    WHERE POST_NO = #{travelNo}
+	</select>
+	
+	<select id="getTravelWithSubList" parameterType="long" resultMap="reviewDetailMap">
+
+	    SELECT
+	        T.TRAVEL_NO,
+	        T.TRAVEL_TITLE,
+	        T.STATUS,
+	        T.CREATE_DATE,
+	        T.MEMBER_NO,
+	        TS.TRAVEL_SUB_NO,
+	        TS.TRAVEL_SUB_CONTENT,
+	        TS.TRAVEL_SUB_SEQ,
+	        TS.TRAVEL_SUB_DATE,
+	        TS.CONTENT_ID,
+	        TS.RATING,
+	        TS.CONTENT_TITLE
+	    FROM TRAVEL_LIST T
+	    LEFT JOIN TRAVEL_LIST_SUB TS
+	           ON T.TRAVEL_NO = TS.TRAVEL_NO
+	    WHERE T.TRAVEL_NO = #{travelNo}
+	    ORDER BY TS.TRAVEL_SUB_SEQ
+	
 	</select>
 </mapper>

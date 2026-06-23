@@ -37,5 +37,22 @@
 		WHERE reply_no  = #{replyNo}
 		AND   member_no = #{memberNo}
 	</update>
+	<select id="getMyCommentCount" parameterType="hashmap" resultType="_int">
+		SELECT COUNT(*)
+		FROM reply
+		WHERE member_no = #{memberNo}
+		  AND post_board = #{postBoard} AND status = 'Y'
+	</select>
+
+	<select id="selectMyCommentList" parameterType="hashmap" resultType="Reply">
+		SELECT *
+		FROM (
+			SELECT r.*, ROW_NUMBER() OVER (ORDER BY r.create_date DESC) AS rnum
+			FROM reply r
+			WHERE r.member_no = #{memberNo}
+			  AND r.post_board = #{postBoard} AND r.status = 'Y'
+		)
+		WHERE rnum BETWEEN #{startRow} + 1 AND #{startRow} + #{listLimit}
+	</select>
 
 </mapper>

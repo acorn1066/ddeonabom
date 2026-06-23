@@ -3,6 +3,7 @@
 
 <mapper namespace="kh.ddeonabom.admin.model.mapper.AdminMapper">
 
+<!-- ======================================================================	대시보드 ========================================================= -->
     <select id="selectMemberCount" resultType="_int">
         SELECT COUNT(*)
         FROM MEMBER
@@ -62,6 +63,8 @@
         WHERE REPORT_STATUS = 'N'
     </select>
     
+    <!-- ======================================================================	회원 ========================================================= -->
+    
    <select id="selectMembers" resultType="Member">
     SELECT
         ID,
@@ -93,6 +96,8 @@
 <!-- 	    ORDER BY N.NOTICE_NO DESC -->
 <!-- 	</select> -->
 	
+	<!-- ======================================================================	게시글 ========================================================= -->
+	
 	<select id="selectSchedulePosts" parameterType="hashmap" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
 	    SELECT
 	        S.SCHEDULE_NO AS postNo,
@@ -111,22 +116,23 @@
 	</select>
 	
 	<select id="selectReviewPosts" parameterType="hashmap" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
-	    SELECT
-	        T.TRAVEL_NO AS postNo,
-	        '후기' AS boardType,
-	        T.TRAVEL_TITLE AS title,
-	        M.NICKNAME AS nickname,
-	        T.CREATE_DATE AS createDate,
-	        T.STATUS AS status,
-	        S.TRAVEL_SUB_CONTENT AS content
-	    FROM TRAVEL_LIST T
-	    JOIN MEMBER M
-	        ON T.MEMBER_NO = M.MEMBER_NO
-	    LEFT JOIN TRAVEL_LIST_SUB S
-	        ON T.TRAVEL_NO = S.TRAVEL_NO
-	    ORDER BY T.CREATE_DATE DESC
-	    OFFSET #{startRow} ROWS
-	    FETCH NEXT #{listLimit} ROWS ONLY
+		SELECT
+		    T.TRAVEL_NO AS postNo,
+		    '후기' AS boardType,
+		    T.TRAVEL_TITLE AS title,
+		    M.NICKNAME AS nickname,
+		    T.CREATE_DATE AS createDate,
+		    T.STATUS AS status,
+		    S.TRAVEL_SUB_CONTENT AS content,
+		    S.CONTENT_TITLE AS contentTitle
+		FROM TRAVEL_LIST T
+		JOIN MEMBER M
+		    ON T.MEMBER_NO = M.MEMBER_NO
+		LEFT JOIN TRAVEL_LIST_SUB S
+		    ON T.TRAVEL_NO = S.TRAVEL_NO
+		ORDER BY T.CREATE_DATE DESC
+		OFFSET #{startRow} ROWS
+		FETCH NEXT #{listLimit} ROWS ONLY
 	</select>
 	
 	<select id="selectQuestionPosts" parameterType="hashmap" resultType="kh.ddeonabom.admin.model.vo.AdminPost">
@@ -163,7 +169,7 @@
 	    SET STATUS = #{status}
 	    WHERE Q_NO = #{postNo}
 	</update>
-	
+<!-- ======================================================================	공지사항 ========================================================= -->
 	<select id="getNoticeCount" resultType="_int">
 	    SELECT COUNT(*)
 	    FROM notice
@@ -231,5 +237,86 @@
     WHERE N.STATUS = 'Y'
     ORDER BY N.NOTICE_NO DESC
 </select>
+
+<!-- ======================================================================	신고 ========================================================= -->
+
+<select id="getReportCount" parameterType="map" resultType="_int">
+    SELECT COUNT(*)
+    FROM REPORT
+    WHERE 1=1
+    <choose>
+        <when test="targetType == 'reply'">
+            AND TARGET_TYPE = 'reply'
+        </when>
+        <otherwise>
+            AND TARGET_TYPE IN ('travel', 'question')
+        </otherwise>
+    </choose>
+    <if test="status != null and status != ''">
+        AND REPORT_STATUS = #{status}
+    </if>
+</select>
+
+<select id="selectReportList" parameterType="map" resultType="AdminReport">
+    SELECT * FROM (
+        SELECT ROWNUM AS RN, A.*
+        FROM (
+            SELECT
+                R.REPORT_NO                           AS reportNo,
+                R.TARGET_TYPE                         AS targetType,
+                R.TARGET_NO                           AS targetNo,
+                R.REASON                              AS reason,
+                R.REPORT_STATUS                       AS reportStatus,
+                TO_CHAR(R.REPORT_DATE, 'YYYY-MM-DD')  AS reportDate,
+                R.MEMBER_NO                           AS memberNo,
+                M.NICKNAME                            AS reporterName,
+                CASE
+                    WHEN R.TARGET_TYPE = 'travel'   THEN T.TRAVEL_TITLE
+                    WHEN R.TARGET_TYPE = 'question' THEN Q.TITLE
+                    WHEN R.TARGET_TYPE = 'reply'    THEN RP.CONTENT
+                END AS targetTitle
+            FROM REPORT R
+            JOIN MEMBER M              ON R.MEMBER_NO  = M.MEMBER_NO
+            LEFT JOIN TRAVEL_LIST T    ON R.TARGET_TYPE = 'travel'   AND R.TARGET_NO = T.TRAVEL_NO
+            LEFT JOIN QLIST Q          ON R.TARGET_TYPE = 'question' AND R.TARGET_NO = Q.Q_NO
+            LEFT JOIN REPLY RP         ON R.TARGET_TYPE = 'reply'    AND R.TARGET_NO = RP.REPLY_NO
+            WHERE 1=1
+            <choose>
+                <when test="targetType == 'reply'">
+                    AND R.TARGET_TYPE = 'reply'
+                </when>
+                <otherwise>
+                    AND R.TARGET_TYPE IN ('travel', 'question')
+                </otherwise>
+            </choose>
+            <if test="status != null and status != ''">
+                AND R.REPORT_STATUS = #{status}
+            </if>
+            ORDER BY R.REPORT_DATE DESC
+        ) A
+        WHERE ROWNUM &lt;= #{pi.currentPage} * #{pi.boardLimit}
+    )
+    WHERE RN &gt; (#{pi.currentPage} - 1) * #{pi.boardLimit}
+</select>
+
+	<update id="updateReportStatus" parameterType="AdminReport">
+	    UPDATE REPORT
+	    SET REPORT_STATUS = #{reportStatus}
+	    WHERE REPORT_NO = #{reportNo}
+	</update>
+
+	<update id="updateTargetStatus" parameterType="AdminReport">
+	    <choose>
+	        <when test="targetType == 'travel'">
+	            UPDATE TRAVEL_LIST SET STATUS = 'N' WHERE TRAVEL_NO = #{targetNo}
+	        </when>
+	        <when test="targetType == 'question'">
+	            UPDATE QLIST SET STATUS = 'N' WHERE Q_NO = #{targetNo}
+	        </when>
+	        <when test="targetType == 'reply'">
+	            UPDATE REPLY SET STATUS = 'N' WHERE REPLY_NO = #{targetNo}
+	        </when>
+	    </choose>
+	</update>
 
 </mapper>

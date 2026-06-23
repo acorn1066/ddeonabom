@@ -125,7 +125,7 @@
 			        </svg>
 			        <span class="share-btn-text">공유</span>
 			    </button>
-			    <button onclick="reviewComingSoon()" class="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-line text-13 font-semibold text-muted transition hover:bg-sunk hover:text-ink">
+			    <button th:onclick="|goToReviewWrite(${schedule.scheduleNo})|" class="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-line text-13 font-semibold text-muted transition hover:bg-sunk hover:text-ink">
 			        <svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v7H8l-3 3v-3H3z" /></svg>
 			        후기
 			    </button>
@@ -349,6 +349,10 @@ const handleNeedLogin = (data) => {
 document.addEventListener('DOMContentLoaded', initShareButtons);
 document.addEventListener('DOMContentLoaded', shortenRegionBadges);
 document.addEventListener('DOMContentLoaded', drawRoutes);
+
+function goToReviewWrite(scheduleNo) {
+    location.href = '/reviews/sdwrite?travelNo=' + scheduleNo;
+}
 </script>
 </body>
 </html>
