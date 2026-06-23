@@ -58,11 +58,21 @@ export const useBoards = (fetchUrl, idField = "boardId") => {
             .catch(err => console.log(err));
     };
 
+    const [keyword, setKeyword] = useState("");
+
+    const handleSearch = (fetchFn) => {
+        if (currentPage === 1) {
+            fetchFn(1);
+        } else {
+            resetToFirstPage();
+        }
+    };
+
     return {
         boards, setBoards,
         pageInfo, setPageInfo,
         currentPage, changePage, resetToFirstPage,
         handleStatusToggle,
-        selectBoard, showModal, handleBoardClick, closeModal
+        selectBoard, showModal, handleBoardClick, closeModal, keyword, setKeyword, handleSearch
     };
 };

@@ -3,20 +3,16 @@ import { useSearchParams } from "react-router-dom"
 import "./Page.css";
 import Pagination from "../components/Pagination";
 import { useBoards } from "../hooks/useBoards";
+import AdminModal from "../components/AdminModal";
 
 const Posts = () => {
 
     const { boards: posts, setBoards: setPosts, setPageInfo,
         pageInfo, currentPage, changePage, resetToFirstPage, handleStatusToggle: changeStatus,
-        selectBoard: selectPost, showModal, handleBoardClick: handlePostClick, closeModal } = useBoards("posts", "postNo");
+        selectBoard: selectPost, showModal, handleBoardClick: handlePostClick, closeModal, keyword, setKeyword, handleSearch: triggerSearch } = useBoards("posts", "postNo");
 
-    const [keyword, setKeyword] = useState("");
     const [boardType, setBoardType] = useState("공유");
     const [searchType, setSearchType] = useState("전체");
-
-    const handleSearch = () => {
-        console.log(searchType, keyword);
-    };
 
     useEffect(() => {
         fetchPosts(currentPage)
@@ -30,7 +26,7 @@ const Posts = () => {
             질문: "question"
         };
 
-        fetch(`/react/admin/posts?category=${categoryMap[boardType]}&page=${page}`)
+        fetch(`/react/admin/posts?category=${categoryMap[boardType]}&page=${page}&keyword=${keyword}&searchType=${searchType}`)
             .then(res => res.json())
             .then(data => {
                 // console.log(data);
@@ -100,12 +96,13 @@ const Posts = () => {
                         type="text"
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && triggerSearch(fetchPosts)}
                         placeholder="검색어를 입력하세요"
                         className="flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
 
                     <button
-                        onClick={handleSearch}
+                        onClick={() => triggerSearch(fetchPosts)}
                         className="cursor-pointer rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
                     >
                         검색
@@ -177,46 +174,12 @@ const Posts = () => {
             <Pagination pageInfo={pageInfo} currentPage={currentPage} onChange={changePage} />
 
             {showModal && selectPost && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-                    onClick={closeModal}
-                >
-                    <div
-                        className="w-full max-w-lg rounded-2xl bg-white shadow-xl"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        {/* 공통 헤더 */}
-                        <div className="flex items-center justify-between border-b p-4">
-                            <h1 className="text-lg font-bold">{selectPost.title}</h1>
-                            <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">✕</button>
-                        </div>
+                <AdminModal
+                    title={selectPost.title}
+                    onClose={closeModal}
+                    footer={
 
-                        {/* 게시판별 본문 */}
-                        <div className="max-h-96 overflow-y-auto p-4">
-
-                            {boardType === "질문" && (
-                                <>
-                                    <p className="mb-4 text-gray-800">{selectPost.content}</p>
-                                    <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
-                                </>
-                            )}
-
-                            {boardType === "후기" && (
-                                <>
-                                    <h2 className="mb-2 text-base font-semibold text-gray-700">{selectPost.contentTitle}</h2>
-                                    <p className="mb-4 text-gray-800">{selectPost.content}</p>
-                                    <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
-                                </>
-                            )}
-
-                            {boardType === "공유" && (
-                                <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
-                            )}
-
-                        </div>
-
-                        {/* 공통 버튼 + 공유 전용 버튼 */}
-                        <div className="flex justify-end gap-2 border-t p-4">
+                        <>
 
                             {boardType === "공유" && (
                                 <button
@@ -242,9 +205,29 @@ const Posts = () => {
 
                             <button onClick={closeModal} className="rounded-lg bg-gray-200 px-4 py-2 cursor-pointer">닫기</button>
 
-                        </div>
-                    </div>
-                </div>
+                        </>
+
+                    }
+                    >
+                            {boardType === "질문" && (
+                                <>
+                                    <p className="mb-4 text-gray-800">{selectPost.content}</p>
+                                    <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
+                                </>
+                            )}
+
+                            {boardType === "후기" && (
+                                <>
+                                    <h2 className="mb-2 text-base font-semibold text-gray-700">{selectPost.contentTitle}</h2>
+                                    <p className="mb-4 text-gray-800">{selectPost.content}</p>
+                                    <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
+                                </>
+                            )}
+
+                            {boardType === "공유" && (
+                                <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
+                            )}
+                </AdminModal>
             )}
             {showModal && <div className="modal-backdrop fade show"></div>}
 

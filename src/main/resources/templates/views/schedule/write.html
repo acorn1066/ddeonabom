@@ -784,6 +784,7 @@ const confirmDelete = () => {
 ////////////공유 토글
 
 //현재 공유 상태 (initialData에서 가져옴)
+// 현재 공유 상태
 let currentVisibility = (initialData && initialData.scheduleVisibility) || 'N';
 
 const updateShareButton = () => {
@@ -792,7 +793,10 @@ const updateShareButton = () => {
     if (!btn || !text) return;
 
     if (currentVisibility === 'Y') {
-        text.textContent = '공유 해제';
+        text.textContent = '전체 공개 중';
+        btn.className = 'inline-flex h-11 items-center gap-2 rounded-lg border border-brand bg-brand-soft px-4 text-sm font-semibold text-brand-ink transition hover:border-brand hover:bg-brand hover:text-white';
+    } else if (currentVisibility === 'M') {
+        text.textContent = '회원 공개 중';
         btn.className = 'inline-flex h-11 items-center gap-2 rounded-lg border border-brand bg-brand-soft px-4 text-sm font-semibold text-brand-ink transition hover:border-brand hover:bg-brand hover:text-white';
     } else {
         text.textContent = '공유 게시판에 게시';
@@ -801,35 +805,33 @@ const updateShareButton = () => {
 };
 
 const toggleShare = () => {
-	if (!initialData || !initialData.scheduleNo) {
-		showToast('먼저 일정을 저장해 주세요.', false);
-		return;
-	}
+    if (!initialData || !initialData.scheduleNo) {
+        showToast('먼저 일정을 저장해 주세요.', false);
+        return;
+    }
 
-	const sharing = (currentVisibility !== 'Y');   // 지금 'N'이면 공유하려는 것
-	const title = sharing ? '이 일정을 공유할까요?' : '공유를 해제할까요?';
-	const text = sharing ? '공유하면 다른 여행자들이 내 일정을 볼 수 있어요.' : '공유를 해제하면 게시판에서 내려가요.';
-	
-	openConfirmModal(title, text, async () => {
-		try {
-			const res = await fetch('/schedule/visibility', {
-	             method: 'POST',
-	             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-	             body: 'scheduleNo=' + initialData.scheduleNo
-			});
-			const data = await res.json();
-			if (handleNeedLogin(data)) return;
-			if (data.success) {
-				currentVisibility = data.visibility;
-				updateShareButton();
-				showToast(data.visibility === 'Y' ? '일정을 공유했어요.' : '공유를 해제했어요.');
-			} else {
-				showToast(data.message || '변경에 실패했어요.', false);
-			}
-		} catch (e) {
-			showToast('변경 중 오류가 발생했어요.', false);
-		}
-	});
+    openVisibilityModal(currentVisibility,async (selected) => {
+        if (selected === currentVisibility) return; // 변화 없으면 스킵
+        try {
+            const res = await fetch('/schedule/visibility', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'scheduleNo=' + initialData.scheduleNo + '&visibility=' + selected
+            });
+            const data = await res.json();
+            if (handleNeedLogin(data)) return;
+            if (data.success) {
+                currentVisibility = data.visibility;
+                updateShareButton();
+                const msg = { Y: '전체 공개로 설정했어요.', M: '회원 공개로 설정했어요.', N: '공유를 해제했어요.' };
+                showToast(msg[data.visibility] || '변경했어요.');
+            } else {
+                showToast(data.message || '변경에 실패했어요.', false);
+            }
+        } catch (e) {
+            showToast('변경 중 오류가 발생했어요.', false);
+        }
+    });
 };
 
 

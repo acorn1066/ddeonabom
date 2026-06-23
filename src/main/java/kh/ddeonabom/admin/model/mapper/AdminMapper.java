@@ -44,15 +44,15 @@ public interface AdminMapper {
 
 	int updateQuestionStatus(AdminPost post);
 
-	int selectScheduleCountList();
+	int selectScheduleCountList(HashMap<String, Object> map);
 
-	int selectTravelCountList();
+	int selectTravelCountList(HashMap<String, Object> map);
 
-	int selectQlistCountList();
+	int selectQlistCountList(HashMap<String, Object> map);
 
-	int selectMemberCountList(String id);
-
-	int getNoticeCount();
+	int getNoticeCount(HashMap<String, Object> map);
+	
+	
 
 	ArrayList<AdminNotice> selectNoticeList(HashMap<String, Object> map);
 
@@ -73,6 +73,14 @@ public interface AdminMapper {
 	int updateReportStatus(AdminReport report);
 
 	int updateTargetStatus(AdminReport report);
+
+	int selectMemberCountList(HashMap<String, Object> map);
+
+	ArrayList<HashMap<String, Object>> selectScheduleActivity();
+
+	ArrayList<HashMap<String, Object>> selectQlistActivity();
+
+	ArrayList<HashMap<String, Object>> selectTravelActivity();
 	
 	
 }

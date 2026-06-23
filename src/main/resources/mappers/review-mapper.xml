@@ -122,19 +122,32 @@
       AND STATUS = 'Y'
 
 </select>
-	<select id="selectMyReviewList"
-        parameterType="map"
-        resultType="Review">
-
-    SELECT *
-    FROM TRAVEL_LIST
-    WHERE MEMBER_NO = #{memberNo}
-      AND STATUS='Y'
-    ORDER BY TRAVEL_NO DESC
-    OFFSET #{startRow} ROWS
-    FETCH NEXT #{listLimit} ROWS ONLY
-
+	<select id="selectMyReviewList" parameterType="map" resultType="Review">
+    SELECT 
+        p.*,
+        p.TRAVEL_TITLE AS title, p.CREATE_DATE AS createDate, p.REPORT_STATUS AS reportStatus
+    FROM (
+        SELECT 
+            T.TRAVEL_NO,
+            T.TRAVEL_TITLE,
+            T.STATUS,
+            T.CREATE_DATE,
+            T.COUNT,
+            T.MEMBER_NO,
+            T.REGION,
+            RP.REPORT_STATUS FROM TRAVEL_LIST T
+        LEFT JOIN REPORT RP
+          ON T.TRAVEL_NO = RP.TARGET_NO 
+         AND RP.TARGET_TYPE = 'travel' 
+         AND RP.REPORT_STATUS = 'N' WHERE T.MEMBER_NO = #{memberNo}
+          AND T.STATUS = 'Y'
+        ORDER BY T.TRAVEL_NO DESC
+        OFFSET #{startRow} ROWS
+        FETCH NEXT #{listLimit} ROWS ONLY
+    ) p
+    ORDER BY p.TRAVEL_NO DESC
 </select>
+
 	
 	<select id="getReviewDetail" parameterType="int" resultType="kh.ddeonabom.review.model.vo.Review">
 	    SELECT 
