@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{views/common/head :: head}"></head>
+<style>
+	#mapMove{cursor: pointer;}
+</style>
 <body>
 	<div th:replace="~{views/common/navbar :: navbar}"></div>
 	<main class="mx-auto max-w-wide px-6">
@@ -81,7 +84,7 @@
 	        <div id="map" class="relative flex h-70 items-center justify-center" style="background-image:linear-gradient(to right,#E4E7EF 1px,transparent 1px),linear-gradient(to bottom,#E4E7EF 1px,transparent 1px);background-size:44px 44px;background-color:#EEF1F6;">
 	          <div class="flex flex-col items-center gap-1"></div>
 	        </div>
-	        <div class="p-4">
+	        <div id="mapMove" th:onclick="|window.open('https://map.kakao.com/link/map/${land.mapy},${land.mapx}')|" class="p-4">
 	          <div class="mb-0.5 text-15 font-bold">위치</div>
 	          <div class="text-13 text-muted">[[${land.addr1}]]</div>
 <!-- 	          <a href="#" class="mt-3 flex h-9 w-full items-center justify-center rounded-lg border border-line bg-white text-sm font-semibold text-ink transition hover:bg-sunk">지도 크게 보기</a> -->
@@ -163,7 +166,6 @@
 	<footer th:replace="~{views/common/footer :: footer}"></footer>
 	
 	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=ae7558070dd980121f380ddf4793bf53"></script>
-	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=ae7558070dd980121f380ddf4793bf53&libraries=services,clusterer,drawing"></script>
 	<script th:inline="javascript">
 		window.onload = () => {
 			
@@ -196,7 +198,6 @@
 					return;
 				}
 				
-				
 				$.ajax({
 					url: '/landmark/nice',
 					type: 'post',
@@ -217,6 +218,8 @@
 					error: data => console.log(data)
 				})
 			})
+			
+			
 		}
 	</script>
 </body>
