@@ -20,8 +20,8 @@ public class ReviewService {
 	
 	private final ReviewMapper reviewMapper;
 
-    public ArrayList<Review> selectReviewList(PageInfo pi, String keyword, String region, Integer loginUserNo) {
-        return reviewMapper.selectReviewList(pi, keyword, region, loginUserNo);
+    public ArrayList<Review> selectReviewList(PageInfo pi, String keyword, String region, Integer loginUserNo, String sort) {
+        return reviewMapper.selectReviewList(pi, keyword, region, loginUserNo, sort);
     }
 
 	public int selectListCount(String keyword, String region, Integer loginUserNo) {
@@ -39,10 +39,6 @@ public class ReviewService {
 
 	public void insertImage(Image img) {
 		reviewMapper.insertImage(img);
-	}
-
-	public ArrayList<Review> selectMyReviewList(int memberNo) {
-		return reviewMapper.selectMyReviewList(memberNo);
 	}
 
 	public Review getReviewDetail(int travelNo, Integer loginUserNo) {
@@ -84,6 +80,10 @@ public class ReviewService {
 	public int getMyReviewCount(int memberNo) {
 		
 		return reviewMapper.getMyReviewCount(memberNo);
+	}
+
+	public Review getTravelWithSubList(Long travelNo) {
+		return reviewMapper.getTravelWithSubList(travelNo);
 	}
 
 	

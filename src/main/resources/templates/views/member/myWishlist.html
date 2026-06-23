@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{views/common/head :: head}"></head>
+<body class="bg-slate-50 text-ink font-[system-ui]">
+
+<header th:replace="~{views/common/navbar :: navbar}"></header>
+
+<main class="mx-auto max-w-wide px-6 py-12">
+    
+    <div class="mb-8 flex items-center gap-3">
+        <a href="/member/mypage?tab=wishlist" class="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-white text-muted hover:bg-sunk transition shadow-sm">
+            <i class="fa-solid fa-arrow-left text-sm"></i>
+        </a>
+        <div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-ink">
+                <i class="fa-solid fa-heart text-red-500 mr-1"></i> 나의 관심 보관함
+            </h1>
+            <p class="text-xs text-muted mt-0.5">내가 찜한 핫플레이스와 추천 여행 코스를 모아 관리하세요.</p>
+        </div>
+    </div>
+
+    <div class="flex gap-2 mb-8 border-b border-line pb-4">
+        <a th:href="@{/member/mypage/wishlist(type='spot')}"
+           class="px-5 py-2.5 rounded-full text-sm font-semibold transition shadow-sm border"
+           th:classappend="${type == 'spot' or type == null} ? 'bg-brand text-white border-brand' : 'bg-white border-line text-muted hover:bg-sunk'">
+            <i class="fa-solid fa-map-pin mr-1"></i> 찜한 관광지
+        </a>
+        <a th:href="@{/member/mypage/wishlist(type='plan')}"
+           class="px-5 py-2.5 rounded-full text-sm font-semibold transition shadow-sm border"
+           th:classappend="${type == 'plan'} ? 'bg-brand text-white border-brand' : 'bg-white border-line text-muted hover:bg-sunk'">
+            <i class="fa-regular fa-calendar-check mr-1"></i> 찜한 일정
+        </a>
+    </div>
+
+    <div th:if="${type == 'spot' or type == null}" class="space-y-6">
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            
+            <div th:each="spot : ${wishlist}" 
+                 class="wish-card group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-soft transition tracking-tight duration-300 hover:-translate-y-1 hover:shadow-card">
+                
+                <div class="relative aspect-[4/3] w-full overflow-hidden bg-sunk">
+                    <img th:src="${spot.firstimage != null && !#strings.isEmpty(spot.firstimage)} ? ${spot.firstimage} : '/resources/images/default-spot.jpg'" 
+                         alt="관광지 사진" 
+                         class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+                         
+                    <span class="absolute left-3 top-3 inline-flex h-6 items-center rounded-md bg-ink/80 backdrop-blur-sm px-2 text-[11px] font-medium text-white shadow-sm"
+                          th:text="${contentType != null ? contentType[spot.contentTypeId] : '관광지'}">
+                    </span>
+                    
+                    <button class="remove-wish-btn absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm transition hover:bg-white text-red-500"
+                            th:data-lnumber="${spot.contentId}"
+                            th:data-memberno="${session.loginUser?.memberNo}">
+                        <i class="fa-solid fa-heart"></i>
+                    </button>
+                </div>
+
+                <div class="flex flex-1 flex-col p-4"> <div class="mb-1">
+        <span class="text-[13px] font-semibold text-brand" 
+              th:text="${spot.addr1 != null ? spot.addr1.split(' ')[0] : '제주'}">
+        </span>
+    </div>
+    
+    <h3 class="font-extrabold text-ink text-base line-clamp-1 group-hover:text-brand transition mb-1">
+        [[${spot.title}]]
+    </h3>
+    
+    <p class="text-xs text-muted leading-relaxed line-clamp-2 mb-4" 
+       th:text="${spot.overview}">
+        소개글
+    </p>
+    
+    <a th:href="@{/landmark/{id}/1(id=${spot.contentId})}" 
+       class="mt-auto inline-flex h-9 w-full items-center justify-center rounded-xl bg-sunk/60 text-xs font-bold text-ink transition hover:bg-brand hover:text-white">
+        자세히 보기 <i class="fa-solid fa-chevron-right ml-1 text-[9px]"></i>
+    </a>
+</div>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(wishlist)}" class="text-center py-24 border-2 border-dashed border-line rounded-2xl bg-white shadow-sm">
+            <div class="inline-flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-faint text-xl mb-4"><i class="fa-solid fa-heart-crack"></i></div>
+            <p class="text-sm font-semibold text-muted">아직 보관함에 담은 관광지가 없습니다.</p>
+            <p class="text-xs text-faint mt-1">마음에 드는 핫플레이스를 찾아 '관심 관광지'로 추가해보세요!</p>
+            <a href="/landmark/list" class="mt-4 inline-flex h-9 items-center rounded-xl bg-brand px-4 text-xs font-bold text-white shadow-sm hover:bg-brand-ink transition">관광지 검색하러 가기</a>
+        </div>
+    </div>
+
+    <div th:if="${type == 'plan'}" class="space-y-6">
+        <div th:if="${#lists.isEmpty(wishlist)}" class="text-center py-24 border-2 border-dashed border-line rounded-2xl bg-white shadow-sm">
+            <div class="inline-flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-faint text-xl mb-4"><i class="fa-regular fa-calendar-xmark"></i></div>
+            <p class="text-sm font-semibold text-muted">아직 보관함에 담은 일정이 없습니다.</p>
+            <a href="/schedule/shareList" class="mt-4 inline-flex h-9 items-center rounded-xl border border-line bg-white px-4 text-xs font-bold text-ink transition hover:bg-sunk">추천 일정 둘러보기</a>
+        </div>
+    </div>
+
+    <nav th:if="${pi != null and pi.maxPage > 0}" class="flex items-center justify-center gap-1 mt-12">
+        <a th:href="@{/member/mypage/wishlist(type=${type}, page=${pi.currentPage - 1})}" th:classappend="${pi.currentPage == 1} ? 'pointer-events-none opacity-30'" class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-white text-sm font-medium text-muted hover:bg-sunk">&lt;</a>
+        <th:block th:each="p : ${#numbers.sequence(pi.startPage, pi.endPage)}">
+            <a th:href="@{/member/mypage/wishlist(type=${type}, page=${p})}" th:text="${p}" th:classappend="${p == pi.currentPage} ? 'bg-brand text-white border-brand' : 'border-line bg-white text-muted hover:bg-sunk'" class="inline-flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-semibold"></a>
+        </th:block>
+        <a th:href="@{/member/mypage/wishlist(type=${type}, page=${pi.currentPage + 1})}" th:classappend="${pi.currentPage == pi.maxPage} ? 'pointer-events-none opacity-30'" class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-white text-sm font-medium text-muted hover:bg-sunk">&gt;</a>
+    </nav>
+
+</main>
+
+<footer th:replace="~{views/common/footer :: footer}"></footer>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script th:inline="javascript">
+    $(document).ready(function() {
+        $('.remove-wish-btn').on('click', function() {
+            const $btn = $(this);
+            const lNumber = $btn.data('lnumber');
+            const memberNo = $btn.data('memberno');
+            const $card = $btn.closest('.wish-card');
+
+            if(!memberNo) {
+                alert("로그인이 필요한 서비스입니다.");
+                return;
+            }
+
+            if(confirm("관심 보관함에서 삭제하시겠습니까?")) {
+                $.ajax({
+                    url: '/landmark/nice',
+                    type: 'post',
+                    data: { lNumber: lNumber, memberNo: memberNo },
+                    success: function(newState) {
+                        if(newState === 0) {
+                            $card.fadeOut(300, function() {
+                                $(this).remove();
+                                if($('.wish-card').length === 0) {
+                                    location.reload();
+                                }
+                            });
+                        }
+                    },
+                    error: function(err) {
+                        console.error("오류 발생:", err);
+                    }
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -19,8 +19,12 @@
 			</span> 
 			<span th:if="${showNum > 0}" data-filter="Y" onclick="filterSchedules(this)"
 			      class="filter-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">
-				공유됨 [[${showNum}]]
+				전체공개 [[${showNum}]]
 			</span> 
+			<span th:if="${showNum > 0}" data-filter="Y" onclick="filterSchedules(this)"
+			      class="filter-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">
+				회원공개 [[${memberNum}]]
+			</span>
 			<span th:if="${hideNum > 0}" data-filter="N" onclick="filterSchedules(this)"
 			      class="filter-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">
 				비공개 [[${hideNum}]]
@@ -93,8 +97,10 @@
 	            <!-- 공유/비공개 뱃지 -->
 				<span th:if="${schedule.scheduleVisibility == 'N'}"
 				      class="vis-badge absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-ink text-white px-3 text-xs font-medium">비공개</span>
-				<span th:unless="${schedule.scheduleVisibility == 'N'}"
-				      class="vis-badge absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-brand text-white px-3 text-xs font-medium">공유됨</span>
+				<span th:if="${schedule.scheduleVisibility == 'M'}"
+				      class="vis-badge absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-slate-500 text-white px-3 text-xs font-medium">회원공개</span>
+				<span th:if="${schedule.scheduleVisibility == 'Y'}"
+				      class="vis-badge absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-brand text-white px-3 text-xs font-medium">전체공개</span>
 	        </a>
 	
 	        <a th:href="@{/schedule/detail/{no}(no=${schedule.scheduleNo})}" class="block p-4">
@@ -119,7 +125,7 @@
 			        </svg>
 			        <span class="share-btn-text">공유</span>
 			    </button>
-			    <button onclick="reviewComingSoon()" class="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-line text-13 font-semibold text-muted transition hover:bg-sunk hover:text-ink">
+			    <button th:onclick="|goToReviewWrite(${schedule.scheduleNo})|" class="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-line text-13 font-semibold text-muted transition hover:bg-sunk hover:text-ink">
 			        <svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v7H8l-3 3v-3H3z" /></svg>
 			        후기
 			    </button>
@@ -167,7 +173,6 @@ const deleteSchedule = (scheduleNo) => {
 };
 
 
-// 필터 탭: 공유됨/비공개/전체 전환 (JS show-hide)
 const filterSchedules = (tab) => {
     const filter = tab.dataset.filter;
 
@@ -273,37 +278,28 @@ const drawRoutes = () => {
     });
 }
 
-// 목록 카드에서 공유 토글
 const toggleShare = (scheduleNo, btn) => {
     const card = btn.closest('.schedule-card');
-    const cur = btn.dataset.visibility;   // 현재 'Y'/'N'
-    const sharing = (cur !== 'Y');
+    const cur = btn.dataset.visibility;
 
-    const title = sharing ? '이 일정을 공유할까요?' : '공유를 해제할까요?';
-    const text = sharing ? '공유하면 다른 여행자들이 내 일정을 볼 수 있어요.' : '공유를 해제하면 게시판에서 내려가요.';
-
-    openConfirmModal(title, text, async () => {
+    openVisibilityModal(cur, async (selected) => {
+        if (selected === cur) return;
         try {
             const res = await fetch('/schedule/visibility', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'scheduleNo=' + scheduleNo
+                body: 'scheduleNo=' + scheduleNo + '&visibility=' + selected
             });
             const data = await res.json();
             if (handleNeedLogin(data)) return;
             if (data.success) {
                 const vis = data.visibility;
-
-                // 버튼 상태 갱신
                 btn.dataset.visibility = vis;
-                btn.querySelector('.share-btn-text').textContent = (vis === 'Y') ? '공유 해제' : '공유';
-
-                // 카드 뱃지 갱신
+                btn.querySelector('.share-btn-text').textContent = shareBtnLabel(vis);
                 updateCardBadge(card, vis);
-                // 필터용 카드 상태도 갱신
                 card.dataset.visibility = vis;
-
-                showToast(vis === 'Y' ? '일정을 공유했어요.' : '공유를 해제했어요.');
+                const msg = { Y: '전체 공개로 설정했어요.', M: '회원 공개로 설정했어요.', N: '공유를 해제했어요.' };
+                showToast(msg[vis] || '변경했어요.');
             } else {
                 showToast(data.message || '변경에 실패했어요.', false);
             }
@@ -313,26 +309,28 @@ const toggleShare = (scheduleNo, btn) => {
     });
 };
 
+const shareBtnLabel = (vis) => {
+    if (vis === 'Y') return '전체공개 중';
+    if (vis === 'M') return '회원공개 중';
+    return '공유';
+};
+
 const updateCardBadge = (card, vis) => {
     const badge = card.querySelector('.vis-badge');
     if (!badge) return;
-    if (vis === 'Y') {
-        badge.textContent = '공유됨';
-        badge.className = 'vis-badge absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-brand text-white px-3 text-xs font-medium';
-    } else {
-        badge.textContent = '비공개';
-        badge.className = 'vis-badge absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full bg-ink text-white px-3 text-xs font-medium';
-    }
-};
-
-const reviewComingSoon = () => {
-    showToast('후기 기능은 준비 중이에요.', false);
+    const map = {
+        Y: { text: '전체공개',  cls: 'bg-brand' },
+        M: { text: '회원공개', cls: 'bg-slate-500' },
+        N: { text: '비공개',  cls: 'bg-ink' },
+    };
+    const { text, cls } = map[vis] || map['N'];
+    badge.textContent = text;
+    badge.className = `vis-badge absolute left-2.5 top-2.5 inline-flex h-7 items-center rounded-full ${cls} text-white px-3 text-xs font-medium`;
 };
 
 const initShareButtons = () => {
     document.querySelectorAll('.share-btn').forEach(btn => {
-        const vis = btn.dataset.visibility;
-        btn.querySelector('.share-btn-text').textContent = (vis === 'Y') ? '공유 해제' : '공유';
+        btn.querySelector('.share-btn-text').textContent = shareBtnLabel(btn.dataset.visibility);
     });
 };
 
@@ -351,6 +349,10 @@ const handleNeedLogin = (data) => {
 document.addEventListener('DOMContentLoaded', initShareButtons);
 document.addEventListener('DOMContentLoaded', shortenRegionBadges);
 document.addEventListener('DOMContentLoaded', drawRoutes);
+
+function goToReviewWrite(scheduleNo) {
+    location.href = '/reviews/sdwrite?travelNo=' + scheduleNo;
+}
 </script>
 </body>
 </html>

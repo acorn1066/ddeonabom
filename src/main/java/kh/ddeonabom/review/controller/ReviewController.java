@@ -22,6 +22,8 @@ import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.member.model.vo.Member;
+import kh.ddeonabom.reply.model.vo.Reply;
+import kh.ddeonabom.reply.service.ReplyService;
 import kh.ddeonabom.review.model.service.ReviewService;
 import kh.ddeonabom.review.model.vo.Image;
 import kh.ddeonabom.review.model.vo.Review;
@@ -34,6 +36,7 @@ import lombok.RequiredArgsConstructor;
 
 public class ReviewController {
 	private final ReviewService reviewService;
+	private final ReplyService replyService;
 	
 	@GetMapping("/reviews/list")
     
@@ -47,6 +50,7 @@ public class ReviewController {
     public Map<String, Object> selectReviewList(@RequestParam(value="currentPage", defaultValue="1") int currentPage,
     											@RequestParam(value="region", defaultValue="") String region,
             									@RequestParam(value="keyword", defaultValue="") String keyword,
+            									@RequestParam(value = "sort", defaultValue = "latest") String sort,
             									HttpSession session) {
         
 		Member loginUser = (Member) session.getAttribute("loginUser");
@@ -57,7 +61,7 @@ public class ReviewController {
         int boardLimit = 9;  
 
         PageInfo pi = Pagination.getPageInfo(currentPage, listCount, pageLimit, boardLimit);
-        ArrayList<Review> list = reviewService.selectReviewList(pi, keyword, region, loginUserNo);
+        ArrayList<Review> list = reviewService.selectReviewList(pi, keyword, region, loginUserNo, sort);
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("list", list);
         responseData.put("pi", pi);
@@ -68,13 +72,24 @@ public class ReviewController {
 	@GetMapping("/reviews/write")
 	public String reviewWrite(Model model, HttpSession session) {
 		Member loginUser = (Member) session.getAttribute("loginUser");
-		System.out.println("loginUser: " + session.getAttribute("loginUser"));
+		
 		if (loginUser == null) {
 	        return "redirect:/member/login?targetUrl=/reviews/write";
 	    }
 		model.addAttribute("kakaoApiKey", "77218df82558088a0b690733061ba6f2");
 		
 	    return "views/review/write"; 
+	}
+	
+	@GetMapping("/reviews/sdwrite")
+	public String writeForm(@RequestParam("travelNo") Long travelNo, Model model) {
+		System.out.println("travelNo = " + travelNo);
+	    if (travelNo != null) {
+	        Review review = reviewService.getTravelWithSubList(travelNo); // 제목 + subList(관광지들) 같이 조회
+	        model.addAttribute("review", review);
+	        
+	    }
+	    return "views/review/write";
 	}
 
 	@PostMapping("/reviews/insert")
@@ -86,6 +101,8 @@ public class ReviewController {
 	    }
 	    int result = reviewService.insertReview(r);
 
+	    System.out.println("start = " + r.getTravelStartDate());
+ 	    System.out.println("end = " + r.getTravelEndDate());
 	    if (result > 0) {
 	    	String uploadPath = "C:/reviews"; 
 	        
@@ -94,6 +111,8 @@ public class ReviewController {
 	            uploadDir.mkdirs();
 	        }
 	        if (r.getSubList() != null) {
+	        	 System.out.println("start = " + r.getTravelStartDate());
+	     	    System.out.println("end = " + r.getTravelEndDate());
 	            for (int i = 0; i < r.getSubList().size(); i++) {
 	                ReviewSub sub = r.getSubList().get(i);
 	                sub.setTravelNo(r.getTravelNo());   
@@ -131,6 +150,7 @@ public class ReviewController {
 	    } else {
 	        return "redirect:/reviews/write";
 	    }
+	   
 	}
 	
 	@GetMapping("/reviews/detail")

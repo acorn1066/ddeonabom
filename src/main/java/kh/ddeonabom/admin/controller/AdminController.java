@@ -57,6 +57,16 @@ public class AdminController {
 	}
 	
 	@ResponseBody
+	@GetMapping("/activity")
+	public HashMap<String, Object> getBoardActivity() {
+	    HashMap<String, Object> map = new HashMap<>();
+	    map.put("schedule", aService.selectScheduleActivity());
+	    map.put("qlist", aService.selectQlistActivity());
+	    map.put("travel", aService.selectTravelActivity());
+	    return map;
+	}
+	
+	@ResponseBody
 	@GetMapping("users")
 	public Member getAdmin(HttpSession session) {
 		return (Member)session.getAttribute("loginUser");

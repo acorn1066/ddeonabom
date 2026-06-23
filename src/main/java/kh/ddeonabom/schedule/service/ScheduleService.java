@@ -124,4 +124,13 @@ public class ScheduleService {
 
 	    return next;
 	}
+
+
+	public void setVisibility(int scheduleNo, int memberNo, String visibility) {
+		Map<String, Object> param = new HashMap<>();
+	    param.put("scheduleNo", scheduleNo);
+	    param.put("memberNo", memberNo);
+	    param.put("visibility", visibility);
+	    mapper.updateScheduleVisibility(param);
+	}
 }

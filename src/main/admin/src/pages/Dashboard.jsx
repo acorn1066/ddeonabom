@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ChartSection from "../components/ChartSection";
 
 const Dashboard = () => {
 
@@ -9,6 +10,12 @@ const Dashboard = () => {
         reportCount: 0,
     });
 
+    const [activity, setActivity] = useState({
+        schedule: null,
+        qlist: null,
+        travel: null,
+    });
+
     useEffect(() => {
         fetch("/react/admin/dashboard", {
             credentials: "include",
@@ -17,6 +24,13 @@ const Dashboard = () => {
             .then(data => {
                 setStats(data);
             })
+            .catch(err => console.log(err));
+
+        fetch("/react/admin/activity", {
+            credentials: "include"
+        })
+            .then(res => res.json())
+            .then(data => setActivity(data))
             .catch(err => console.log(err));
     }, []);
 
@@ -61,6 +75,13 @@ const Dashboard = () => {
                     </p>
                 </div>
 
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-6">
+                <ChartSection title="일주일 로그인 활동" data={null} />
+                <ChartSection title="일주일 공유게시판 활동" data={activity.schedule} />
+                <ChartSection title="일주일 후기게시판 활동" data={activity.travel} />
+                <ChartSection title="일주일 질문게시판 활동" data={activity.qlist} />
             </div>
 
         </section>
