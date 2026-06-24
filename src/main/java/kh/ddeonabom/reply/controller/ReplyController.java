@@ -1,6 +1,7 @@
 package kh.ddeonabom.reply.controller;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 
@@ -18,6 +19,8 @@ import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.member.model.vo.Member;
 import kh.ddeonabom.reply.model.vo.Reply;
 import kh.ddeonabom.reply.service.ReplyService;
+import kh.ddeonabom.review.model.service.ReviewService;
+import kh.ddeonabom.review.model.vo.Review;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -25,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/reply")
 public class ReplyController {
 	private final ReplyService replyService;
+	
 
 	// 댓글 등록
 	@PostMapping("insert")
@@ -44,8 +48,9 @@ public class ReplyController {
 		reply.setMemberNo(loginUser.getMemberNo());
 
 		int result = replyService.insertReply(reply);
+		
 		if (result <= 0) {
-			redirectAttrs.addFlashAttribute("errorMessage", "댓글 등록을 싴패하였습니다.");
+			redirectAttrs.addFlashAttribute("errorMessage", "댓글 등록을 실패하였습니다.");
 		}
 		return "redirect:/qList/detail?qNo=" + reply.getPostNo();
 	}
@@ -91,6 +96,66 @@ public class ReplyController {
 			redirectAttrs.addFlashAttribute("errorMessage", "댓글 삭제를 싴패하였습니다.");
 		}
 		return "redirect:/qList/detail?qNo=" + postNo;
+	}
+		
+	
+
+	// 댓글 등록
+	@PostMapping("rInsert")
+	public String rInsertReply(@ModelAttribute Reply reply,
+	                           HttpSession session,
+	                           RedirectAttributes redirectAttrs) {
+
+	    Member loginUser = (Member) session.getAttribute("loginUser");
+
+	    if (loginUser == null) {
+	        return "redirect:/reviews/detail?travelNo=" + reply.getPostNo();
+	    }
+	    reply.setMemberNo(loginUser.getMemberNo());
+	    reply.setPostBoard("T");
+
+	    replyService.rInsertReply(reply);
+	    
+
+	    return "redirect:/reviews/detail?travelNo=" + reply.getPostNo();
+	}
+	// 댓글 수정
+	@PostMapping("rUpdate")
+	public String rUpdateReply(@ModelAttribute Reply reply,
+	                           HttpSession session) {
+
+	    Member loginUser = (Member) session.getAttribute("loginUser");
+
+	    if (loginUser == null) {
+	        return "redirect:/reviews/detail?travelNo=" + reply.getPostNo();
+	    }
+
+	    reply.setMemberNo(loginUser.getMemberNo());
+	    reply.setPostBoard("T");
+
+	    replyService.rUpdateReply(reply);
+
+	    return "redirect:/reviews/detail?travelNo=" + reply.getPostNo();
+	}
+
+	// 댓글 삭제
+	@PostMapping("rDelete")
+	public String rDeleteReply(@ModelAttribute Reply reply,
+	                            HttpSession session,
+	                            RedirectAttributes redirectAttrs) {
+
+	    Member loginUser = (Member) session.getAttribute("loginUser");
+
+	    if (loginUser == null) {
+	        return "redirect:/reviews/detail?travelNo=" + reply.getPostNo();
+	    }
+
+	    reply.setMemberNo(loginUser.getMemberNo());
+	    reply.setPostBoard("T");
+
+	    replyService.rDeleteReply(reply);
+
+	    return "redirect:/reviews/detail?travelNo=" + reply.getPostNo();
 	}
 }
 

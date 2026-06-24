@@ -2,6 +2,8 @@ package kh.ddeonabom.reply.model.mapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -24,6 +26,14 @@ public interface ReplyMapper {
 	int getMyCommentCount(HashMap<String, Object> map);
 
 	ArrayList<Reply> selectMyCommentList(HashMap<String, Object> map);
+
+	List<Reply> sReplyList(Map<String, Object> map);
+
+	int rInsertReply(Reply reply);
+
+	int rUpdateReply(Reply reply);
+
+	int rDeleteReply(Reply reply);
 
 
 }

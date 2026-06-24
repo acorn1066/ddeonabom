@@ -49,6 +49,9 @@ public class ReviewService {
 	    List<ReviewSub> subList = reviewMapper.getReviewSubList(travelNo); 
 	    for (ReviewSub sub : subList) {
 	        List<Image> images = reviewMapper.getImageListBySubNo(sub.getTravelSubNo());
+	        if (images == null) {
+	            images = new ArrayList<>();
+	        }
 	        sub.setImages(images.stream()
 	                            .map(img -> img.getImagePath() + "/" + img.getRenameFile())
 	                            .collect(Collectors.toList()));
@@ -84,6 +87,10 @@ public class ReviewService {
 
 	public Review getTravelWithSubList(Long travelNo) {
 		return reviewMapper.getTravelWithSubList(travelNo);
+	}
+
+	public Review sReview(int travelNo) {
+		return reviewMapper.sReview(travelNo);
 	}
 
 	
