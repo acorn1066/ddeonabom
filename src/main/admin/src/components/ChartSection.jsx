@@ -1,6 +1,7 @@
 import { Chart } from "chart.js/auto";
 import { useEffect, useRef } from "react";
 
+
 const ChartSection = ({ title, data }) => {
     const canvasRef = useRef();
     const chartRef = useRef();
