@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +30,9 @@ import kh.ddeonabom.review.model.service.ReviewService;
 import kh.ddeonabom.review.model.vo.Image;
 import kh.ddeonabom.review.model.vo.Review;
 import kh.ddeonabom.review.model.vo.ReviewSub;
+import kh.ddeonabom.schedule.model.vo.ScheduleMain;
+import kh.ddeonabom.schedule.model.vo.ScheduleSub;
+import kh.ddeonabom.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -36,6 +41,12 @@ import lombok.RequiredArgsConstructor;
 public class ReviewController {
 	private final ReviewService reviewService;
 	private final ReplyService replyService;
+	
+	private final ScheduleService sService;
+
+	@Value("${kakao.api.key}")
+	private String kakaoApiKey;
+	
 	
 	@GetMapping("/reviews/list")
     
@@ -69,15 +80,43 @@ public class ReviewController {
     }
 	
 	@GetMapping("/reviews/write")
-	public String reviewWrite(Model model, HttpSession session) {
-		Member loginUser = (Member) session.getAttribute("loginUser");
-		
-		if (loginUser == null) {
+	public String reviewWrite(@RequestParam(name = "scheduleNo", required = false) Integer scheduleNo,
+	                          Model model, HttpSession session) {
+	    Member loginUser = (Member) session.getAttribute("loginUser");
+	    if (loginUser == null) {
 	        return "redirect:/member/login?targetUrl=/reviews/write";
 	    }
-		model.addAttribute("kakaoApiKey", "77218df82558088a0b690733061ba6f2");
-		
-	    return "views/review/write"; 
+
+	    //일정에서 후기 작성하러 들어왔을 경우
+	    if (scheduleNo != null) {
+	    	if (scheduleNo != null) {
+	    	    ScheduleMain main = sService.selectScheduleDetail(scheduleNo);
+	    	    if (main != null && main.getMemberNo() == loginUser.getMemberNo()) {
+	    	        List<ScheduleSub> subList = sService.selectScheduleSubList(scheduleNo);
+	    	        
+	    	        //일정이랑 후기랑 이름이 안맞는 구간이 있어서 수정용
+	    	        List<Map<String, Object>> mappedList = subList.stream().map(sub -> {
+	    	            Map<String, Object> m = new HashMap<>();
+	    	            m.put("contentTitle", sub.getTitle());
+	    	            m.put("contentId", sub.getContentId());
+	    	            m.put("lat", sub.getMapy());
+	    	            m.put("lng", sub.getMapx());
+	    	            return m;
+	    	        }).collect(Collectors.toList());
+
+	    	        Map<String, Object> review = new HashMap<>();
+	    	        review.put("subList", mappedList);
+	    	        
+	    	        model.addAttribute("review", review);
+	    	        model.addAttribute("scheduleTitle", main.getScheduleTitle());
+	    	        model.addAttribute("scheduleStartdate", main.getScheduleStartdate());
+	    	        model.addAttribute("scheduleEnddate", main.getScheduleEnddate());
+	    	    }
+	    	}
+	    }
+
+	    model.addAttribute("kakaoApiKey", kakaoApiKey);
+	    return "views/review/write";
 	}
 	
 	@GetMapping("/reviews/sdwrite")
@@ -165,7 +204,7 @@ public class ReviewController {
 
 	    List<Reply> replyList = replyService.sReplyList(map);
 	    model.addAttribute("replyList", replyList);
-	    model.addAttribute("kakaoApiKey", "77218df82558088a0b690733061ba6f2");
+	    model.addAttribute("kakaoApiKey", kakaoApiKey);
 	    return "views/review/detail";
 	}
 	

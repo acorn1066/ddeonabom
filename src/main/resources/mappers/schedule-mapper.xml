@@ -80,7 +80,7 @@
 	    where schedule_no = #{scheduleNo}
 	      and schedule_status = 'Y'
 	</select>
-	<select id="selectScheduleSubList" resultType="ScheduleSub">
+	<select id="selectScheduleSubList">
 	    select to_char(s.schedule_sub_date, 'yyyy-mm-dd') as scheduleSubDate,
 	           s.schedule_sub_seq,
 	           s.content_id,

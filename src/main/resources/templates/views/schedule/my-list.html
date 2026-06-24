@@ -125,10 +125,10 @@
 			        </svg>
 			        <span class="share-btn-text">공유</span>
 			    </button>
-			    <button th:onclick="|goToReviewWrite(${schedule.scheduleNo})|" class="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-line text-13 font-semibold text-muted transition hover:bg-sunk hover:text-ink">
-			        <svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v7H8l-3 3v-3H3z" /></svg>
-			        후기
-			    </button>
+			    <button th:onclick="|location.href='/reviews/write?scheduleNo=${schedule.scheduleNo}'|" class="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-line text-13 font-semibold text-muted transition hover:bg-sunk hover:text-ink">
+				    <svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v7H8l-3 3v-3H3z" /></svg>
+				    후기
+				</button>
 			    <button th:onclick="|deleteSchedule(${schedule.scheduleNo})|" class="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-line text-13 font-semibold text-muted transition hover:bg-red-50 hover:text-err">
 			        <svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5">
 			            <path d="M3 5h10M6.5 5V3.5h3V5M5 5l.6 8h4.8L11 5" />
