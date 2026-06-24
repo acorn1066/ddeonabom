@@ -378,6 +378,19 @@
 
 <!-- ======================================================================	신고 ========================================================= -->
 
+<select id="checkDuplicateReport" parameterType="AdminReport" resultType="_int">
+    SELECT COUNT(*)
+    FROM REPORT
+    WHERE MEMBER_NO   = #{memberNo}
+      AND TARGET_TYPE = #{targetType}
+      AND TARGET_NO   = #{targetNo}
+</select>
+
+<insert id="insertReport" parameterType="AdminReport">
+    INSERT INTO REPORT (REPORT_NO, TARGET_TYPE, TARGET_NO, REASON, REPORT_DATE, MEMBER_NO)
+    VALUES (SEQ_REPORT.NEXTVAL, #{targetType}, #{targetNo}, #{reason}, SYSDATE, #{memberNo})
+</insert>
+
 <select id="getReportCount" parameterType="map" resultType="_int">
     SELECT COUNT(*)
     FROM REPORT
@@ -387,7 +400,7 @@
             AND TARGET_TYPE = 'reply'
         </when>
         <otherwise>
-            AND TARGET_TYPE IN ('travel', 'question')
+            AND TARGET_TYPE IN ('review', 'question')
         </otherwise>
     </choose>
     <if test="status != null and status != ''">
@@ -409,7 +422,7 @@
 	                R.MEMBER_NO                           AS memberNo,
 	                M.NICKNAME                            AS reporterName,
 	                CASE
-	                    WHEN R.TARGET_TYPE = 'travel'   THEN T.TRAVEL_TITLE
+	                    WHEN R.TARGET_TYPE = 'review'   THEN T.TRAVEL_TITLE
 	                    WHEN R.TARGET_TYPE = 'question' THEN Q.TITLE
 	                    WHEN R.TARGET_TYPE = 'reply'    THEN RP.CONTENT
 	                END AS targetTitle
@@ -424,7 +437,7 @@
 	                    AND R.TARGET_TYPE = 'reply'
 	                </when>
 	                <otherwise>
-	                    AND R.TARGET_TYPE IN ('travel', 'question')
+	                    AND R.TARGET_TYPE IN ('review', 'question')
 	                </otherwise>
 	            </choose>
 	            <if test="status != null and status != ''">
@@ -445,7 +458,7 @@
 
 	<update id="updateTargetStatus" parameterType="AdminReport">
 	    <choose>
-	        <when test="targetType == 'travel'">
+	        <when test="targetType == 'review'">
 	            UPDATE TRAVEL_LIST SET STATUS = 'N' WHERE TRAVEL_NO = #{targetNo}
 	        </when>
 	        <when test="targetType == 'question'">
