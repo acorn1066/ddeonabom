@@ -14,6 +14,7 @@ const Posts = () => {
     const [boardType, setBoardType] = useState("공유");
     const [searchType, setSearchType] = useState("전체");
 
+
     useEffect(() => {
         fetchPosts(currentPage)
     }, [currentPage, boardType])
@@ -183,8 +184,12 @@ const Posts = () => {
 
                             {boardType === "공유" && (
                                 <button
-                                    onClick={() => navigate(`/board/share/${selectPost.postNo}`)}
-                                    className="rounded-lg bg-indigo-500 px-4 py-2 text-white hover:bg-indigo-600 cursor-pointer"
+                                    onClick={() => window.location.href = `http://localhost:8080/share/detail/${selectPost.postNo}`}
+                                    disabled={selectPost.status === "N"}
+                                    className={`rounded-lg px-4 py-2 text-white ${selectPost.status === "N"
+                                            ? "bg-indigo-300 cursor-not-allowed"
+                                            : "bg-indigo-500 hover:bg-indigo-600 cursor-pointer"
+                                        }`}
                                 >
                                     게시글 보기
                                 </button>
@@ -208,25 +213,25 @@ const Posts = () => {
                         </>
 
                     }
-                    >
-                            {boardType === "질문" && (
-                                <>
-                                    <p className="mb-4 text-gray-800">{selectPost.content}</p>
-                                    <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
-                                </>
-                            )}
+                >
+                    {boardType === "질문" && (
+                        <>
+                            <p className="mb-4 text-gray-800">{selectPost.content}</p>
+                            <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
+                        </>
+                    )}
 
-                            {boardType === "후기" && (
-                                <>
-                                    <h2 className="mb-2 text-base font-semibold text-gray-700">{selectPost.contentTitle}</h2>
-                                    <p className="mb-4 text-gray-800">{selectPost.content}</p>
-                                    <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
-                                </>
-                            )}
+                    {boardType === "후기" && (
+                        <>
+                            <h2 className="mb-2 text-base font-semibold text-gray-700">{selectPost.contentTitle}</h2>
+                            <p className="mb-4 text-gray-800">{selectPost.content}</p>
+                            <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
+                        </>
+                    )}
 
-                            {boardType === "공유" && (
-                                <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
-                            )}
+                    {boardType === "공유" && (
+                        <p className="text-sm text-gray-500">작성자: {selectPost.nickname}</p>
+                    )}
                 </AdminModal>
             )}
             {showModal && <div className="modal-backdrop fade show"></div>}
