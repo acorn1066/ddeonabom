@@ -2,8 +2,6 @@ package kh.ddeonabom.reply.controller;
 
 import java.util.Map;
 import java.util.function.Function;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -16,8 +14,6 @@ import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.member.model.vo.Member;
 import kh.ddeonabom.reply.model.vo.Reply;
 import kh.ddeonabom.reply.service.ReplyService;
-import kh.ddeonabom.review.model.service.ReviewService;
-import kh.ddeonabom.review.model.vo.Review;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -29,8 +25,9 @@ public class ReplyController {
 
 	// 게시판 코드 → 상세 URL 매핑 (게시판 추가 시 여기에만 추가)
 	private static final Map<String, Function<Integer, String>> BOARD_URL = Map.of(
-		"Q", no -> "/qList/detail?qNo=" + no,
-		"S", no -> "/share/detail/"     + no
+		"Q", no -> "/qList/detail?qNo="    + no,
+		"S", no -> "/share/detail/"        + no,
+		"T", no -> "/reviews/detail?travelNo=" + no
 	);
 
 	private String redirectUrl(String postBoard, int postNo) {
