@@ -18,25 +18,33 @@
 	<select id="getListCount" resultType="_int">
 		select count(*)
 		from landmark
-		where 1=1
-		<if test="contentTypeId != null">
-			and content_type_id = #{contentTypeId}
-		</if>
-		<if test="area != null and area != ''">
-			and addr1 like '%' || #{area} || '%'
-		</if>
+		<where>
+			<if test="contentTypeId != null">
+				and content_type_id = #{contentTypeId}
+			</if>
+			<if test="area != null and area != ''">
+				and addr1 like '%' || #{area} || '%'
+			</if>
+			<if test="keyword != null and keyword != ''">
+				and (title like '%' || #{keyword} || '%' or addr1 like '%' || #{keyword} || '%')
+			</if>
+		</where>
 	</select>
 	
 	<select id="selectLandmarkList">
 		select *
 		from landmark
-		where 1=1
-		<if test="contentTypeId != null">
-			and content_type_id = #{contentTypeId}
-		</if>
-		<if test="area != null and area != ''">
-			and addr1 like '%' || #{area} || '%'
-		</if>
+		<where>
+			<if test="contentTypeId != null">
+				and content_type_id = #{contentTypeId}
+			</if>
+			<if test="area != null and area != ''">
+				and addr1 like '%' || #{area} || '%'
+			</if>
+			<if test="keyword != null and keyword != ''">
+				and (title like '%' || #{keyword} || '%' or addr1 like '%' || #{keyword} || '%')
+			</if>
+		</where>
 	</select>
 	
 	<select id="landmarkDetail">

@@ -19,7 +19,9 @@
 	        <result property="contentId" column="CONTENT_ID"/>
 	        <result property="rating" column="RATING"/>
 	        <result property="contentTitle" column="CONTENT_TITLE"/>
-	        
+	        <result property="imagePath" column="IMAGE_PATH"/>
+	        <result property="lat" column="LAT" />
+			<result property="lng" column="LNG" />
 	    </collection>
 	</resultMap>
 	
@@ -248,4 +250,47 @@
 	    ORDER BY TS.TRAVEL_SUB_SEQ
 	
 	</select>
+	
+	<select id="ReviewDetail" parameterType="int" resultMap="reviewDetailMap">
+        SELECT 
+            M.TRAVEL_NO, 
+            M.TRAVEL_TITLE, 
+            M.STATUS, 
+            M.CREATE_DATE, 
+            M.MEMBER_NO, 
+            M.TRAVEL_START_DATE, 
+            M.TRAVEL_END_DATE,
+            S.TRAVEL_SUB_NO, 
+            S.TRAVEL_SUB_CONTENT, 
+            S.TRAVEL_SUB_SEQ, 
+            S.CONTENT_ID, 
+            S.RATING, 
+            S.CONTENT_TITLE,
+            S.LAT,
+            S.LNG,
+            I.IMAGE_PATH || '/' || I.RENAME_FILE AS IMAGE_PATH 
+        FROM TRAVEL_LIST M
+        LEFT JOIN TRAVEL_LIST_SUB S ON M.TRAVEL_NO = S.TRAVEL_NO
+        LEFT JOIN TB_IMAGE I ON S.TRAVEL_SUB_NO = I.TRAVEL_SUB_NO 
+        WHERE M.TRAVEL_NO = #{travelNo}
+    </select>
+    
+    <update id="reviewUpdateAction" parameterType="kh.ddeonabom.review.model.vo.Review">
+        UPDATE TRAVEL_LIST 
+        SET 
+            TRAVEL_TITLE      = #{travelTitle},
+            TRAVEL_START_DATE = #{travelStartDate, jdbcType=DATE}, 
+            TRAVEL_END_DATE   = #{travelEndDate, jdbcType=DATE}
+        WHERE TRAVEL_NO = #{travelNo}
+    </update>
+    
+    <update id="reviewSubUpdate" parameterType="kh.ddeonabom.review.model.vo.ReviewSub">
+        UPDATE TRAVEL_LIST_SUB 
+        SET 
+            CONTENT_TITLE      = #{contentTitle, jdbcType=VARCHAR},
+            RATING             = #{rating, jdbcType=INTEGER},
+            TRAVEL_SUB_CONTENT = #{travelSubContent, jdbcType=VARCHAR},
+            LAT                = #{lat, jdbcType=DOUBLE}, LNG                = #{lng, jdbcType=DOUBLE}  WHERE 
+            TRAVEL_SUB_NO      = #{travelSubNo, jdbcType=INTEGER}
+    </update>
 </mapper>

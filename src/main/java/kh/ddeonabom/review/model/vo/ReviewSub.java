@@ -32,5 +32,7 @@ public class ReviewSub {
     private double lng;
     // 관광지이름
     private String contentTitle;
+    // DB 테이블에는 없지만, JOIN 결과를 담기 위해 자바 객체에만 추가하는 필드!
+    private String imagePath;
 
 }

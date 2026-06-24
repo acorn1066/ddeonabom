@@ -49,6 +49,19 @@ public interface ReviewMapper {
 
 	Review sReview(int travelNo);
 
+	// 1) [수정 폼 조회용] 글 번호로 기존 데이터를 셀렉트해오는 메서드
+    Review ReviewDetail(int travelNo);
+
+    // 2) [진짜 DB 수정용] 데이터를 업데이트하는 메서드 (나중에 쓰임)
+    int reviewUpdate(Review review); 
+    
+    // 3) [서브 관광지 수정용] 서브 데이터를 업데이트하는 메서드
+    int reviewSubUpdate(ReviewSub sub);
+
+	int reviewUpdateAction(Review review);
+
+	void updateReviewSub(ReviewSub sub);
+
 	
 
 }

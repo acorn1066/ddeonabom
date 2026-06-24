@@ -1,15 +1,6 @@
 <!doctype html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title th:text="${review.travelTitle} + ' — 여행 후기'">여행 후기 상세</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script th:src="@{/css/tw.js}"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
-<style> body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing:antialiased; letter-spacing:-0.01em; } </style>
-</head>
+<head th:replace="~{views/common/head :: head}"></head>
 <body class="bg-white text-ink">
 
 <div th:replace="~{views/common/navbar :: navbar}"></div>
@@ -131,22 +122,42 @@
     <h3 class="mb-5 text-lg font-bold">댓글</h3>
 
     <!-- 댓글 작성 (로그인 시만) -->
-    <div class="mb-6 flex gap-3" th:if="${session.loginUser != null}">
-      <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-brand-soft font-bold text-brand-ink">M</span>
-      <div class="flex-1 overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
-        <form th:action="@{/reply/insert}" method="post">
-          <input type="hidden" name="postNo"    th:value="${review.travelNo}" />
-          <input type="hidden" name="postBoard" value="T" />
-          <textarea name="content"
-                    class="block min-h-16 w-full resize-none border-none bg-transparent px-4 py-3 text-sm leading-relaxed outline-none placeholder:text-faint"
-                    placeholder="댓글을 남겨보세요"></textarea>
-          <div class="flex items-center justify-between border-t border-line py-2 pl-4 pr-2">
-            <span class="text-xs text-faint">여행자에게 따뜻한 한마디를 남겨보세요</span>
-            <button type="submit" class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">등록</button>
-          </div>
-        </form>
-      </div>
-    </div>
+
+    <div class="mb-6 flex gap-3">
+	  <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-brand-soft font-bold text-brand-ink">M</span>
+	  <div class="flex-1 overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
+	    <form th:if="${session.loginUser != null}" th:action="@{/reply/insert}" method="post">
+	
+	      <input type="hidden" name="postNo" th:value="${review.travelNo}" />
+	      <input type="hidden" name="postBoard" value="T" />
+	      <textarea name="content"
+	                class="block min-h-16 w-full resize-none border-none bg-transparent px-4 py-3 text-sm leading-relaxed outline-none placeholder:text-faint"
+	                placeholder="댓글을 남겨보세요"></textarea>
+	
+	      <div class="flex items-center justify-between border-t border-line py-2 pl-4 pr-2">
+	        <span class="text-xs text-faint">여행자에게 따뜻한 한마디를 남겨보세요</span>
+	        <button type="submit"
+	                class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">등록</button>
+	      </div>
+	    </form>
+	
+	    <!-- 비로그인 -->
+	    <div th:unless="${session.loginUser != null}">
+	      <textarea
+	        id="loginRequiredTextarea"
+	        readonly
+	        class="block min-h-16 w-full resize-none border-none bg-transparent px-4 py-3 text-sm leading-relaxed outline-none placeholder:text-faint cursor-pointer"
+	        placeholder="댓글을 남겨보세요"></textarea>
+	
+	      <div class="flex items-center justify-between border-t border-line py-2 pl-4 pr-2">
+	        <span class="text-xs text-faint">로그인 후 댓글을 작성할 수 있습니다</span>
+	        <button type="button"
+	                id="loginBtn"
+	                class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">등록</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
 	    <!-- 댓글 목록 -->
 	<div th:if="${replyList != null}">
 	  <div th:each="r : ${replyList}" class="border-t border-line py-4">
@@ -294,7 +305,31 @@ function toggleLike() {
    
   });
 }
+document.addEventListener("DOMContentLoaded", () => {
 
+    const textarea = document.getElementById("loginRequiredTextarea");
+
+    if (textarea) {
+        textarea.addEventListener("click", () => {
+            openInfoModal(
+                "로그인이 필요합니다",
+                "댓글 작성은 로그인 후 이용 가능합니다."
+            );
+        });
+    }
+
+    const loginBtn = document.getElementById("loginBtn");
+
+    if (loginBtn) {
+        loginBtn.addEventListener("click", () => {
+            openInfoModal(
+                "로그인이 필요합니다",
+                "댓글 작성은 로그인 후 이용 가능합니다."
+            );
+        });
+    }
+
+});
 
 function openReplyEditModal(btn) {
 

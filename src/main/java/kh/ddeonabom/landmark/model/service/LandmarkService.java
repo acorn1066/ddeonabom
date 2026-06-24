@@ -30,15 +30,15 @@ public class LandmarkService {
 	}
 	
 	// 관광지 개수 가져오기
-	public int getListCount(Integer contentTypeId, String area) {
-		return mapper.getListCount(contentTypeId, area);
+	public int getListCount(Integer contentTypeId, String area, String keyword) {
+		return mapper.getListCount(contentTypeId, area, keyword);
 	}
 	
 	// 관광지 리스트 가져오기
-	public ArrayList<Landmark> selectLandmarkList(PageInfo pi, Integer contentTypeId, String area) {
+	public ArrayList<Landmark> selectLandmarkList(PageInfo pi, Integer contentTypeId, String area, String keyword) {
 		int offset = (pi.getCurrentPage() - 1) * pi.getBoardLimit();
 		RowBounds rowBounds = new RowBounds(offset, pi.getBoardLimit());
-		return mapper.selectLandmarkList(rowBounds, contentTypeId, area);
+		return mapper.selectLandmarkList(rowBounds, contentTypeId, area, keyword);
 	}
 	
 	//관광지 세부 가져오기

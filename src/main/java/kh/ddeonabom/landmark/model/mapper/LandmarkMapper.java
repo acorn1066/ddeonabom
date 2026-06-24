@@ -16,10 +16,10 @@ import kh.ddeonabom.landmark.model.vo.Landmark;
 public interface LandmarkMapper {
 
 	// 관광지 개수 가져오기
-	int getListCount(@Param("contentTypeId") Integer contentTypeId, @Param("area") String area);
+	int getListCount(@Param("contentTypeId") Integer contentTypeId, @Param("area") String area, @Param("keyword") String keyword);
 	
 	// 관광지 리스트 가져오기
-	ArrayList<Landmark> selectLandmarkList(RowBounds rowBounds, @Param("contentTypeId") Integer contentTypeId, @Param("area") String area);
+	ArrayList<Landmark> selectLandmarkList(RowBounds rowBounds, @Param("contentTypeId") Integer contentTypeId, @Param("area") String area, @Param("keyword") String keyword);
 	
 	ArrayList<Landmark> searchLandmarks(@Param("q") String q, @Param("region") String region, @Param("offset") int offset, @Param("size") int size);
 	int countLandmarks(@Param("q") String q, @Param("region") String region);
