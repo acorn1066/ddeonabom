@@ -44,9 +44,9 @@ public class ShareController {
         map.put("region",      region);
         map.put("searchInput", searchInput);
 
-        // 1) 총 게시글 수 → 페이징 계산 (한 페이지 9개, 페이지 번호 최대 5개)
+        // 1) 총 게시글 수 → 페이징 계산 (페이지 번호 최대 5개, 한 페이지 9개)
         int listCount = shareService.getShareListCount(map);
-        PageInfo pi   = Pagination.getPageInfo(currentPage, listCount, 9, 5);
+        PageInfo pi   = Pagination.getPageInfo(currentPage, listCount, 5, 9);
 
         // 2) 페이징 오프셋 추가
         map.put("startRow",  (pi.getCurrentPage() - 1) * pi.getBoardLimit());

@@ -145,6 +145,12 @@ public class AdminService {
 
 	}
 
+	// 중복 신고 시 -1 반환
+	public int insertReport(AdminReport report) {
+		if (mapper.checkDuplicateReport(report) > 0) return -1;
+		return mapper.insertReport(report);
+	}
+
 	public ArrayList<HashMap<String, Object>> selectScheduleActivity() {
 	    return mapper.selectScheduleActivity();
 	}

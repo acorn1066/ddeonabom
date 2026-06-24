@@ -14,7 +14,7 @@ const statusBadgeClass = {
 };
 const statusMap = { 전체: "", 미처리: "N", 처리완료: "Y", 확인완료: "C", 반려: "R" };
 const boardTypeLabel = {
-    travel: "후기 게시판",
+    review: "후기 게시판",
     question: "질문 게시판",
     reply: "댓글"
 };

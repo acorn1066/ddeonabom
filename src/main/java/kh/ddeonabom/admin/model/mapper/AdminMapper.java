@@ -76,6 +76,10 @@ public interface AdminMapper {
 
 	int selectMemberCountList(HashMap<String, Object> map);
 
+	int insertReport(AdminReport report);
+
+	int checkDuplicateReport(AdminReport report);
+
 	ArrayList<HashMap<String, Object>> selectScheduleActivity();
 
 	ArrayList<HashMap<String, Object>> selectQlistActivity();
