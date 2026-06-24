@@ -51,6 +51,43 @@
 
       </div>
     </form>
+    
+    <!-- ==================================================== 공지사항 ================================================================ -->
+    
+	    <div th:if="${not #lists.isEmpty(noticeList)}" class="mb-4 overflow-hidden rounded-xl border border-blue-200 bg-blue-50">
+		
+		  <!-- 헤더 -->
+		  <button type="button"
+		          onclick="toggleNoticeBar()"
+		          class="flex w-full items-center justify-between px-4 py-2.5 text-left">
+		    <span class="flex items-center gap-2 text-13 font-semibold text-blue-700">
+		    <i class="fa fa-bullhorn"></i>공지사항
+		      <span class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1.5 text-11 font-bold text-white"
+		            th:text="${#lists.size(noticeList)}">0</span>
+		    </span>
+		    <span id="notice-toggle-label" class="flex items-center gap-1 text-12 text-blue-500">
+		      펼치기
+		      <svg id="notice-chevron" width="12" height="12" viewBox="0 0 12 12"
+		           fill="none" stroke="currentColor" stroke-width="2"
+		           style="transition:transform 0.2s; transform:rotate(0deg)">
+		        <path d="M2 4l4 4 4-4"/>
+		      </svg>
+		    </span>
+		  </button>
+		
+		  <!-- 공지 목록 -->
+		  <div id="notice-body" class="border-t border-blue-200" style="display:none">
+		    <a th:each="notice, iter : ${noticeList}"
+		       th:href="@{/share/notice(noticeNo=${notice.noticeNo})}"
+		       class="flex items-center gap-3 border-b border-blue-100 px-4 py-2.5 text-13 transition last:border-b-0 hover:bg-blue-100">
+		      <span class="min-w-5 text-right text-12 text-blue-400" th:text="${iter.index + 1}">1</span>
+		      <span class="flex-1" th:text="${notice.title}">공지 제목</span>
+		      <span class="text-12 text-muted" th:text="${notice.createDate}">날짜</span>
+		    </a>
+		  </div>
+		
+		</div>
+	<!-- ==================================================== 공지사항 ================================================================ -->
 
     <!-- 카드 그리드 -->
     <!-- 결과 없음 -->
@@ -185,6 +222,21 @@
       const region = extractRegion(badge.dataset.addr);
       if (region) badge.textContent = region;
     });
+    
+	/* ============================================================ 공지사항 =================================================================  */
+    function toggleNoticeBar() {
+        const body    = document.getElementById('notice-body');
+        const label   = document.getElementById('notice-toggle-label');
+        const chevron = document.getElementById('notice-chevron');
+        const isOpen  = body.style.display !== 'none';
+        body.style.display      = isOpen ? 'none' : '';
+        chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        label.childNodes[0].textContent = isOpen ? '펼치기 ' : '접기 ';
+      }
+    
+    /* ============================================================ 공지사항 =================================================================  */
+    
+    
 
   </script>
 

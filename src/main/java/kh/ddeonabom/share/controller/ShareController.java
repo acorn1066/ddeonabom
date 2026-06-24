@@ -3,8 +3,6 @@ package kh.ddeonabom.share.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import jakarta.servlet.http.HttpSession;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import jakarta.servlet.http.HttpSession;
+import kh.ddeonabom.admin.model.service.AdminService;
+import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.member.model.vo.Member;
@@ -30,6 +31,7 @@ public class ShareController {
 
     private final ShareService shareService;
     private final ReplyService replyService;
+    private final AdminService aService;
 
     @GetMapping("list")
     public ModelAndView shareList(
@@ -52,15 +54,32 @@ public class ShareController {
 
         // 3) 목록 조회
         ArrayList<Share> shareList = shareService.selectShareList(map);
+        ArrayList<AdminNotice> noticeList = aService.selectTopNotice();
 
         mv.addObject("shareList",   shareList)
           .addObject("pi",          pi)
           .addObject("region",      region)
           .addObject("searchInput", searchInput)
+          .addObject("noticeList",  noticeList)
           .setViewName("views/share/list");
 
         return mv;
     }
+    
+ // ==================================================================== 공지사항 상세 ==============================================================
+    
+    @GetMapping("notice")
+    public ModelAndView noticeDetail(@RequestParam("noticeNo") int noticeNo, ModelAndView mv) {
+
+        AdminNotice notice = aService.selectNotice(noticeNo);
+        mv.addObject("notice", notice)
+          .addObject("from", "share")
+          .setViewName("views/admin/memberNotice");
+        return mv;
+    }
+    
+ // ==================================================================== 공지사항 상세 ==============================================================
+    
 
     @GetMapping("detail/{no}")
     public ModelAndView shareDetail(

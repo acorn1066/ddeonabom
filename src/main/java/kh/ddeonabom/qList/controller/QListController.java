@@ -105,17 +105,18 @@ public class QListController {
 		}
 	}
 	
-	// ==================================================================== 공지사항 상세 ==============================================================
+	// ==================================================================== 공지사항 ==============================================================
 	@GetMapping("notice")
 	public ModelAndView noticeDetail(@RequestParam("noticeNo") int noticeNo, ModelAndView mv) {
 
 	    AdminNotice notice = aService.selectNotice(noticeNo);
 	    mv.addObject("notice", notice)
+	      .addObject("from", "qList")
 	      .setViewName("views/admin/memberNotice");
 
 	    return mv;
 	}
-	// ==================================================================== 공지사항 상세 ==============================================================
+	// ==================================================================== 공지사항 ==============================================================
 	
 	@GetMapping("detail")
 	public ModelAndView detailQList(@RequestParam("qNo") int qNo, HttpSession session, ModelAndView mv) {

@@ -204,6 +204,7 @@ public class MemberController {
             session.setAttribute("loginUser", loginUser);
             
             //로그인 활동량을 위해 만든 파일 입니다
+        if (!"Y".equals(loginUser.getIsAdmin())) {
             String logPath = "C:/logs/ddeonabom/login/";
             File dir = new File(logPath);
             if (!dir.exists()) dir.mkdirs();
@@ -217,6 +218,7 @@ public class MemberController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+          }
             
             // 관리자면 admin 페이지 우선 이동
             if ("Y".equals(loginUser.getIsAdmin())) {
