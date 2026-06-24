@@ -3,6 +3,7 @@ package kh.ddeonabom.landmark.model.mapper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -38,4 +39,6 @@ public interface LandmarkMapper {
 	ArrayList<Landmark> selectMyWishList(HashMap<String, Object> map);
 
 	Set<Integer> niceList(int memberNo);
+
+	int getWishListCountByParam(Map<String, Object> param);
 }
