@@ -33,11 +33,13 @@ public class LandmarkController {
 	// 관광지 리스트 가져오기
 	@GetMapping("list")
 	public String selectList(@RequestParam(value = "page", defaultValue = "1") int currentPage,
+								@RequestParam(value = "contentTypeId", required = false) Integer contentTypeId,
+								@RequestParam(value = "area", required = false) String area,
 								Model model, HttpServletRequest request, HttpSession session) {
 		
-		int listCount = lService.getListCount();
+		int listCount = lService.getListCount(contentTypeId, area);
 		PageInfo pi = Pagination.getPageInfo(currentPage, listCount, 10, 20);
-		ArrayList<Landmark> list = lService.selectLandmarkList(pi);
+		ArrayList<Landmark> list = lService.selectLandmarkList(pi, contentTypeId, area);
 		
 		Map<Integer, String> contentType = new HashMap<>();
 		contentType.put(12, "관광지");
@@ -56,6 +58,8 @@ public class LandmarkController {
 			model.addAttribute("niceList", niceList);
 		}
 		
+		model.addAttribute("area", area);
+		model.addAttribute("contentTypeId", contentTypeId);
 		model.addAttribute("contentType", contentType);
 		model.addAttribute("loc", request.getRequestURI());
 		model.addAttribute("list", list).addAttribute("pi", pi);

@@ -21,30 +21,82 @@
 	    <button class="inline-flex h-13 items-center rounded-xl bg-brand px-8 text-15 font-semibold text-white transition hover:bg-brand-ink">검색</button>
 	  </div>
 	
-	  <div class="flex flex-wrap items-center gap-2 border-b border-line pb-5">
+	  <div class="flex flex-col gap-3 border-b border-line pb-5">
 	    <div class="flex flex-wrap gap-1.5">
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-ink bg-ink px-4 text-13 font-semibold text-white">전체 지역</span>
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">서울</span>
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">부산</span>
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">경기</span>
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">제주</span>
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">강원</span>
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">경상</span>
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">전라</span>
-<!-- 	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">충청</span> -->
+	      <a th:href="@{/landmark/list}"
+	      	th:classappend="${contentTypeId == null and area == null}? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	전체 지역</a>
+	      <a th:href="@{/landmark/list(area='서울')}"
+	      	th:classappend="${area == '서울'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	서울</a>
+	      <a th:href="@{/landmark/list(area='부산')}"
+	      	th:classappend="${area == '부산'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	부산</a>
+	      <a th:href="@{/landmark/list(area='경기')}"
+	      	th:classappend="${area == '경기'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	경기</a>
+	      <a th:href="@{/landmark/list(area='제주')}"
+	      	th:classappend="${area == '제주'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	제주</a>
+	      <a th:href="@{/landmark/list(area='강원')}"
+	      	th:classappend="${area == '강원'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	강원</a>
+	      <a th:href="@{/landmark/list(area='경상')}"
+	      	th:classappend="${area == '경상'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	경상</a>
+	      <a th:href="@{/landmark/list(area='전라')}"
+	      	th:classappend="${area == '전라'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	전라</a>
+	      <a th:href="@{/landmark/list(area='충청')}"
+	      	th:classappend="${area == '충청'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	충청</a>
 	    </div>
-	    <span class="mx-1.5 h-6 w-px bg-line"></span>
-	    <div class="flex flex-wrap gap-1.5">
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">관광지</span>
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">문화시설</span>
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">축제/공연/행사</span>
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">여행코스</span>
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">레포츠</span>
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">숙박</span>
-	      <span class="inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">쇼핑</span>
-	    </div>
-	    <div class="ml-auto">
-	      <select class="h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none"><option>추천순</option><option>조회순</option><option>후기 많은 순</option><option>평점 높은 순</option></select>
+<!-- 	    <span class="mx-1.5 h-6 w-px bg-line"></span> -->
+	    <div class="flex flex-wrap items-center gap-1.5">
+	      <a th:href="@{/landmark/list(contentTypeId=12)}"
+	      	th:classappend="${contentTypeId == 12} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	관광지</a>
+	      <a th:href="@{/landmark/list(contentTypeId=14)}"
+	      	th:classappend="${contentTypeId == 14} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	문화시설</a>
+	      <a th:href="@{/landmark/list(contentTypeId=15)}"
+	      	th:classappend="${contentTypeId == 15} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	축제/공연/행사</a>
+	      <a th:href="@{/landmark/list(contentTypeId=25)}"
+	      	th:classappend="${contentTypeId == 25} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	여행코스</a>
+	      <a th:href="@{/landmark/list(contentTypeId=28)}"
+	      	th:classappend="${contentTypeId == 28} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	레포츠</a>
+	      <a th:href="@{/landmark/list(contentTypeId=32)}"
+	      	th:classappend="${contentTypeId == 32} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	숙박</a>
+	      <a th:href="@{/landmark/list(contentTypeId=38)}"
+	      	th:classappend="${contentTypeId == 38} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	쇼핑</a>
+	      <a th:href="@{/landmark/list(contentTypeId=39)}"
+	      	th:classappend="${contentTypeId == 39} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	음식점</a>
+		    <div class="ml-auto">
+		      <select class="h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none"><option>추천순</option><option>조회순</option><option>후기 많은 순</option><option>평점 높은 순</option></select>
+		    </div>
 	    </div>
 	  </div>
 	
@@ -93,7 +145,7 @@
 	  	</a>
 	  	
 	  	<a th:if="${pi.currentPage > 1}"
-	  		th:href="@{${loc}(page=${pi.currentPage - 1})}"
+	  		th:href="@{${loc}(page=${pi.currentPage - 1}, contentTypeId=${contentTypeId}, area=${area})}"
 	  		class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">
 	  	‹	
 	  	</a>
@@ -104,14 +156,14 @@
 		  	[[${p}]]
 		  	</span>
 		  	<a th:unless="${p == pi.currentPage}"
-		  		th:href="@{${loc}(page=${p})}"
+		  		th:href="@{${loc}(page=${p}, contentTypeId=${contentTypeId}, area=${area})}"
 		  		class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">
 		  	[[${p}]]
 		  	</a>
 	  	</th:block>
 	  	
 	  	<a th:if="${pi.currentPage < pi.maxPage}"
-	  		th:href="@{${loc}(page=${pi.currentPage + 1})}"
+	  		th:href="@{${loc}(page=${pi.currentPage + 1}, contentTypeId=${contentTypeId}, area=${area})}"
 	  		class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">
 	  	›	
 	  	</a>
