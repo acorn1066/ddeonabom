@@ -158,13 +158,9 @@ public class ReviewController {
 	    if (review == null) {
 	        return "redirect:/reviews/list";
 	    }
-	    model.addAttribute("review", review);
-	    Map<String, Object> map = new HashMap<>();
-	    map.put("postNo", travelNo);
-	    map.put("postBoard", "T");
-
-	    List<Reply> replyList = replyService.sReplyList(map);
+	    ArrayList<Reply> replyList = replyService.getReplyList(travelNo, "T");
 	    model.addAttribute("replyList", replyList);
+	    model.addAttribute("review", review);
 	    model.addAttribute("kakaoApiKey", "77218df82558088a0b690733061ba6f2");
 	    return "views/review/detail";
 	}
