@@ -9,7 +9,7 @@
         select
             (select count(*) from landmark) as "landmarkCount",
             (select count(*) from schedule_main where schedule_visibility = 'Y' and schedule_status = 'Y') as "sharedScheduleCount",
-            (select count(*) from travel_list where visibility = 'Y' and status = 'Y') as "reviewCount",
+            (select count(*) from travel_list where visibility = 'PUBLIC' and status = 'Y') as "reviewCount",
             (select count(*) from member where status = 'Y') as "memberCount"
         from dual
     </select>

@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -227,5 +230,121 @@ public class ReviewController {
 	    return result;
 	}
 	
+	@GetMapping("/reviews/update")
+	public String reviewUpdateForm(@RequestParam("travelNo") int travelNo, Model model, HttpSession session) {
+	    // 1. 로그인 유저 체크 (내 글이 맞는지 검증용)
+	    Member loginUser = (Member) session.getAttribute("loginUser");
+	    if (loginUser == null) {
+	        return "redirect:/login"; 
+	    }
+
+	    // 2. DB에서 기존 게시글 정보 + 관광지 서브 리스트(subList)까지 싹 다 긁어오기
+	    // (보통 서비스 단에서 기존 상세조회 로직을 재활용합니다)
+	    Review review = reviewService.reviewUpdate(travelNo);
+	    
+	    System.out.println("====== [백엔드 점검 1] review 객체 전체: " + review);
+	    if (review != null) {
+	        System.out.println("====== [백엔드 점검 2] subList 주머니 상태: " + review.getSubList());
+	    }
+
+	    // 3. 본인 글이 맞는지 검증
+	    if (review.getMemberNo() != loginUser.getMemberNo()) {
+	        return "redirect:/reviews/list";
+	    }
+
+	    // 4. 꺼내온 데이터를 'review'라는 이름으로 모델에 담아 화면으로 토스!
+	    model.addAttribute("review", review);
+
+	    // 후기 작성 폼(write.html)을 함께 쓰거나 별도의 update.html을 리턴합니다.
+	    return "views/review/write"; 
+	}
+	
+	@PostMapping("/reviews/update")
+	@ResponseBody
+	public ResponseEntity<String> reviewUpdate(MultipartHttpServletRequest request) {
+	    
+	    System.out.println("====== [400 에러 절대 방어 수동 수집 시작] ======");
+	    
+	    Review review = new Review();
+	    
+	    // 1. 메인 정보 추출
+	    String travelNoStr = request.getParameter("travelNo");
+	    int travelNo = (travelNoStr != null && !travelNoStr.trim().isEmpty()) ? Integer.parseInt(travelNoStr.trim()) : 0;
+	    
+	    review.setTravelNo(travelNo);
+	    review.setTravelTitle(request.getParameter("travelTitle"));
+	    review.setRegion(request.getParameter("region"));
+	    review.setVisibility(request.getParameter("visibility"));
+
+	    // 🌟 [날짜 오류 해결] 문자열 포맷을 java.sql.Date로 안전하게 파싱하여 정확한 변수명으로 매핑!
+	    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+	    String startDateStr = request.getParameter("travelStartDate");
+	    String endDateStr = request.getParameter("travelEndDate");
+	    
+	    try {
+	        if (startDateStr != null && !startDateStr.trim().isEmpty()) {
+	            java.util.Date parsedDate = dateFormat.parse(startDateStr.trim());
+	            java.sql.Date sqlStartDate = new java.sql.Date(parsedDate.getTime());
+	            review.setTravelStartDate(sqlStartDate); // ➔ 변수명 매칭 완료!
+	        }
+	        if (endDateStr != null && !endDateStr.trim().isEmpty()) {
+	            java.util.Date parsedDate = dateFormat.parse(endDateStr.trim());
+	            java.sql.Date sqlEndDate = new java.sql.Date(parsedDate.getTime());
+	            review.setTravelEndDate(sqlEndDate); // ➔ 변수명 매칭 완료!
+	        }
+	    } catch (Exception e) {
+	        System.out.println("❌ [날짜 파싱 에러] 시작일 또는 종료일 형식이 잘못되었습니다.");
+	        e.printStackTrace();
+	    }
+
+	    // 2. 서브 리스트(관광지 카드) 수동 빌드
+	    List<ReviewSub> subList = new ArrayList<>();
+	    int i = 0;
+	    
+	    while (request.getParameter("subList[" + i + "].contentTitle") != null) {
+	        ReviewSub sub = new ReviewSub();
+	        
+	        sub.setContentTitle(request.getParameter("subList[" + i + "].contentTitle"));
+	        sub.setTravelSubContent(request.getParameter("subList[" + i + "].travelSubContent"));
+	        sub.setImagePath(request.getParameter("subList[" + i + "].imagePath"));
+	        
+	        // 🌟 [contentId 오류 해결] 혹시 contentId가 숫자(int)형일 경우를 대비해 숫자로 변환하여 주입합니다.
+	        // 만약 본인 VO의 contentId가 String이 맞다면 바로 아래 3줄을 지우고 원래 쓰시던 sub.setContentId(rawContentId); 로 바꾸시면 됩니다.
+	        String rawContentId = request.getParameter("subList[" + i + "].contentId");
+	        int contentId = (rawContentId != null && !rawContentId.trim().isEmpty()) ? Integer.parseInt(rawContentId.trim()) : 0;
+	        sub.setContentId(contentId); 
+	        
+	        // 에러를 유발하는 수치형 파싱 안전장치 완비
+	        String subNoStr = request.getParameter("subList[" + i + "].travelSubNo");
+	        String latStr   = request.getParameter("subList[" + i + "].lat");
+	        String lngStr   = request.getParameter("subList[" + i + "].lng");
+	        String rtgStr   = request.getParameter("subList[" + i + "].rating");
+	        
+	        sub.setTravelSubNo(subNoStr != null && !subNoStr.trim().isEmpty() ? Integer.parseInt(subNoStr.trim()) : 0);
+	        sub.setLat(latStr != null && !latStr.trim().isEmpty() ? Double.parseDouble(latStr.trim()) : 0.0);
+	        sub.setLng(lngStr != null && !lngStr.trim().isEmpty() ? Double.parseDouble(lngStr.trim()) : 0.0);
+	        sub.setRating(rtgStr != null && !rtgStr.trim().isEmpty() ? Integer.parseInt(rtgStr.trim()) : 0);
+	        
+	        subList.add(sub);
+	        i++;
+	    }
+	    review.setSubList(subList);
+
+	    // 3. 📸 사진 리스트 가로채기
+	    List<MultipartFile> imageFiles = request.getFiles("imageFiles");
+	    
+	    System.out.println("▶ 메인 제목: " + review.getTravelTitle());
+	    System.out.println("▶ 장소 개수: " + subList.size());
+	    System.out.println("📸 사진 개수: " + (imageFiles != null ? imageFiles.size() : 0));
+
+	    // 서비스 호출
+	    int result = reviewService.reviewUpdateAction(review, imageFiles); 
+	    
+	    if(result > 0) {
+	        return ResponseEntity.ok("success");
+	    } else {
+	        return ResponseEntity.status(500).body("fail");
+	    }
+	}
 	
 }
