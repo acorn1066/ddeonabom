@@ -67,20 +67,43 @@
 		where member_no = #{memberNo}
 	</select>
 	
-	<select id="getWishListCount" parameterType="_int" resultType="_int">
+	<select id="getWishListCount" resultType="_int">
 		SELECT COUNT(*)
 		FROM NICE
 		WHERE MEMBER_NO = #{memberNo}
-		  AND POST_BOARD_FX = 'LJ' </select>
+		  AND POST_BOARD_FX = 'LJ' 
+		  
+	</select>
 
 	<select id="selectMyWishList" parameterType="hashmap" resultType="kh.ddeonabom.landmark.model.vo.Landmark">
 		SELECT *
-		FROM (
-			SELECT l.*, ROW_NUMBER() OVER (ORDER BY n.NICE_NO DESC) AS rnum
-			FROM landmark l
-			JOIN NICE n ON (l.content_id = n.POST_NO)
-			WHERE n.MEMBER_NO = #{memberNo}
-			  AND n.POST_BOARD_FX = 'LJ' )
-		WHERE rnum BETWEEN #{startRow} + 1 AND #{startRow} + #{listLimit}
+	    FROM (
+	        SELECT l.*, ROW_NUMBER() OVER (ORDER BY n.NICE_NO DESC) AS rnum
+	        FROM LANDMARK l
+	        JOIN NICE n ON l.CONTENT_ID = n.POST_NO
+	        WHERE n.MEMBER_NO = #{memberNo}
+	          AND n.POST_BOARD_FX = 'LJ'
+	        <if test="q != null and q != ''">
+	          AND l.TITLE LIKE '%' || #{q} || '%'
+	        </if>
+	        <if test="region != null and region != ''">
+	          AND l.ADDR1 LIKE #{region} || '%'
+	        </if>
+	    )
+	    WHERE rnum BETWEEN #{startRow} + 1 AND #{startRow} + #{listLimit}
+	</select>
+	
+	<select id="getWishListCountByParam" resultType="_int">
+		SELECT COUNT(*)
+	    FROM NICE n
+	    JOIN LANDMARK l ON n.POST_NO = l.CONTENT_ID
+	    WHERE n.MEMBER_NO = #{memberNo}
+	      AND n.POST_BOARD_FX = 'LJ'
+	    <if test="q != null and q != ''">
+	      AND l.TITLE LIKE '%' || #{q} || '%'
+	    </if>
+	    <if test="region != null and region != ''">
+	      AND l.ADDR1 LIKE #{region} || '%'
+	    </if>
 	</select>
 </mapper>

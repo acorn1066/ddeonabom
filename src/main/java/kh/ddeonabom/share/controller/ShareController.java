@@ -3,8 +3,6 @@ package kh.ddeonabom.share.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import jakarta.servlet.http.HttpSession;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import jakarta.servlet.http.HttpSession;
+import kh.ddeonabom.admin.model.service.AdminService;
+import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.member.model.vo.Member;
@@ -30,6 +31,7 @@ public class ShareController {
 
     private final ShareService shareService;
     private final ReplyService replyService;
+    private final AdminService aService;
 
     @GetMapping("list")
     public ModelAndView shareList(
@@ -42,9 +44,9 @@ public class ShareController {
         map.put("region",      region);
         map.put("searchInput", searchInput);
 
-        // 1) 총 게시글 수 → 페이징 계산 (한 페이지 9개, 페이지 번호 최대 5개)
+        // 1) 총 게시글 수 → 페이징 계산 (페이지 번호 최대 5개, 한 페이지 9개)
         int listCount = shareService.getShareListCount(map);
-        PageInfo pi   = Pagination.getPageInfo(currentPage, listCount, 9, 5);
+        PageInfo pi   = Pagination.getPageInfo(currentPage, listCount, 5, 9);
 
         // 2) 페이징 오프셋 추가
         map.put("startRow",  (pi.getCurrentPage() - 1) * pi.getBoardLimit());
@@ -52,15 +54,32 @@ public class ShareController {
 
         // 3) 목록 조회
         ArrayList<Share> shareList = shareService.selectShareList(map);
+        ArrayList<AdminNotice> noticeList = aService.selectTopNotice();
 
         mv.addObject("shareList",   shareList)
           .addObject("pi",          pi)
           .addObject("region",      region)
           .addObject("searchInput", searchInput)
+          .addObject("noticeList",  noticeList)
           .setViewName("views/share/list");
 
         return mv;
     }
+    
+ // ==================================================================== 공지사항 상세 ==============================================================
+    
+    @GetMapping("notice")
+    public ModelAndView noticeDetail(@RequestParam("noticeNo") int noticeNo, ModelAndView mv) {
+
+        AdminNotice notice = aService.selectNotice(noticeNo);
+        mv.addObject("notice", notice)
+          .addObject("from", "share")
+          .setViewName("views/admin/memberNotice");
+        return mv;
+    }
+    
+ // ==================================================================== 공지사항 상세 ==============================================================
+    
 
     @GetMapping("detail/{no}")
     public ModelAndView shareDetail(

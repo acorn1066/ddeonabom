@@ -68,6 +68,13 @@
           </th:block>
         </div>
 
+        <!-- ★ 글 신고: 본인 글이 아닐 때만 노출 -->
+        <div class="ml-auto flex gap-2 text-13 text-muted"
+             th:if="${session.loginUser != null and session.loginUser.memberNo != q.memberNo}">
+          <button type="button" class="hover:text-red-500"
+                  th:onclick="|openReportModal('question', [[${q.qNo}]])|">신고</button>
+        </div>
+
       </div>
     </div>
 
@@ -133,6 +140,13 @@
               <button type="button" class="hover:text-red-500"
                       th:onclick="|openReplyDeleteModal([[${reply.replyNo}]], [[${q.qNo}]])|">삭제</button>
             </span>
+
+            <!-- ★ 댓글 신고: 본인 댓글이 아닐 때만 노출 -->
+            <span th:if="${session.loginUser != null and session.loginUser.memberNo != reply.memberNo}"
+                  class="ml-auto flex gap-2.5 text-xs text-muted">
+              <button type="button" class="hover:text-red-500"
+                      th:onclick="|openReportModal('reply', [[${reply.replyNo}]])|">신고</button>
+            </span>
           </div>
           <!-- 댓글 본문 -->
           <p th:id="|reply-text-${reply.replyNo}|"
@@ -142,8 +156,9 @@
           <form th:id="|reply-edit-form-${reply.replyNo}|"
                 th:action="@{/reply/update}" method="post"
                 class="hidden mt-2">
-            <input type="hidden" name="replyNo" th:value="${reply.replyNo}" />
-            <input type="hidden" name="postNo"  th:value="${q.qNo}" />
+            <input type="hidden" name="replyNo"   th:value="${reply.replyNo}" />
+            <input type="hidden" name="postNo"    th:value="${q.qNo}" />
+            <input type="hidden" name="postBoard" value="Q" />
             <div class="overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
               <textarea name="content"
                         th:id="|reply-edit-ta-${reply.replyNo}|"
@@ -171,9 +186,32 @@
 
   <!-- 댓글 삭제용 hidden form -->
   <form id="reply-delete-form" th:action="@{/reply/delete}" method="post" style="display:none">
-    <input type="hidden" id="delete-replyNo" name="replyNo" />
-    <input type="hidden" id="delete-reply-postNo" name="postNo" />
+    <input type="hidden" id="delete-replyNo"         name="replyNo" />
+    <input type="hidden" id="delete-reply-postNo"    name="postNo" />
+    <input type="hidden" id="delete-reply-postBoard" name="postBoard" value="Q" />
   </form>
+
+  <!-- 신고 모달 -->
+  <div id="modal-report" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
+    <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+      <h2 class="mb-4 text-lg font-bold">신고하기</h2>
+      <p class="mb-3 text-sm text-muted">신고 사유를 선택해주세요.</p>
+      <select id="report-reason"
+              class="mb-5 w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand">
+        <option value="">-- 사유 선택 --</option>
+        <option value="A">광고</option>
+        <option value="B">욕설</option>
+        <option value="C">음란</option>
+        <option value="D">도배</option>
+      </select>
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="closeReportModal()"
+                class="inline-flex h-9 items-center rounded-lg border border-line px-4 text-sm text-muted hover:bg-sunk">취소</button>
+        <button type="button" onclick="submitReport()"
+                class="inline-flex h-9 items-center rounded-lg bg-red-500 px-4 text-sm font-semibold text-white hover:bg-red-600">신고</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 비로그인 + MEMBER 공개글 → 모달 트리거 -->
   <script th:inline="javascript">
@@ -258,6 +296,45 @@
         }
       });
     });
+
+    // ─── 신고 모달 ───────────────────────────────────────────
+    let reportTargetType = null;
+    let reportTargetNo   = null;
+
+    function openReportModal(targetType, targetNo) {
+      reportTargetType = targetType;
+      reportTargetNo   = targetNo;
+      document.getElementById('report-reason').value = '';
+      const modal = document.getElementById('modal-report');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeReportModal() {
+      const modal = document.getElementById('modal-report');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function submitReport() {
+      const reason = document.getElementById('report-reason').value;
+      if (!reason) {
+        openInfoModal('알림', '신고 사유를 선택해주세요.');
+        return;
+      }
+      fetch('/report/insert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'targetType=' + reportTargetType
+            + '&targetNo='  + reportTargetNo
+            + '&reason='    + encodeURIComponent(reason)
+      })
+      .then(r => r.json())
+      .then(data => {
+        closeReportModal();
+        openInfoModal(data.status === 'success' ? '신고 완료' : '알림', data.message);
+      });
+    }
   </script>
 
   <div th:replace="~{views/common/modal :: modal}"></div>

@@ -12,6 +12,8 @@ public class NavbarInterceptor implements HandlerInterceptor {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
         if (modelAndView != null) {
+            String viewName = modelAndView.getViewName();
+            if (viewName != null && viewName.startsWith("redirect:")) return;
             modelAndView.addObject("currentURI", request.getRequestURI());
         }
     }

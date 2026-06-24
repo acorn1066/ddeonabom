@@ -31,3 +31,6 @@ node_modules/
 # Gradle
 .gradle/
 build/
+
+# 로컬 MD 정리 문서 (버전 관리 제외)
+md정리함/

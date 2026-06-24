@@ -2,6 +2,8 @@ package kh.ddeonabom.landmark.model.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
@@ -68,6 +70,10 @@ public class LandmarkService {
 
 	public Set<Integer> niceList(int memberNo) {
 		return mapper.niceList(memberNo);
+	}
+
+	public int getWishListCountByParam(Map<String, Object> param) {
+	    return mapper.getWishListCountByParam(param);
 	}
 
 }

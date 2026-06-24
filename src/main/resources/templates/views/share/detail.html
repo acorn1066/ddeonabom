@@ -199,8 +199,9 @@
           <form th:id="|reply-edit-form-${reply.replyNo}|"
                 th:action="@{/reply/update}" method="post"
                 class="hidden mt-2">
-            <input type="hidden" name="replyNo" th:value="${reply.replyNo}" />
-            <input type="hidden" name="postNo"  th:value="${schedule.scheduleNo}" />
+            <input type="hidden" name="replyNo"   th:value="${reply.replyNo}" />
+            <input type="hidden" name="postNo"    th:value="${schedule.scheduleNo}" />
+            <input type="hidden" name="postBoard" value="S" />
             <div class="overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
               <textarea name="content"
                         th:id="|reply-edit-ta-${reply.replyNo}|"
@@ -224,8 +225,9 @@
 
   <!-- 댓글 삭제 hidden form -->
   <form id="reply-delete-form" th:action="@{/reply/delete}" method="post" style="display:none">
-    <input type="hidden" id="delete-replyNo" name="replyNo" />
-    <input type="hidden" id="delete-reply-postNo" name="postNo" />
+    <input type="hidden" id="delete-replyNo"      name="replyNo" />
+    <input type="hidden" id="delete-reply-postNo"    name="postNo" />
+    <input type="hidden" id="delete-reply-postBoard" name="postBoard" />
   </form>
 
   <!-- ════════════ SCRIPT ════════════ -->
@@ -408,8 +410,9 @@
         '댓글을 삭제할까요?',
         '삭제한 댓글은 되돌릴 수 없어요.',
         function () {
-          document.getElementById('delete-replyNo').value    = replyNo;
-          document.getElementById('delete-reply-postNo').value = postNo;
+          document.getElementById('delete-replyNo').value         = replyNo;
+          document.getElementById('delete-reply-postNo').value    = postNo;
+          document.getElementById('delete-reply-postBoard').value = 'S';
           document.getElementById('reply-delete-form').submit();
         }
       );

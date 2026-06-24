@@ -25,5 +25,4 @@ public interface ReplyMapper {
 
 	ArrayList<Reply> selectMyCommentList(HashMap<String, Object> map);
 
-
 }
