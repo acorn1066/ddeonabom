@@ -19,8 +19,8 @@
 		     'relative py-2 font-semibold text-ink after:absolute after:-bottom-0.5 after:left-0 after:right-0 after:h-0.5 after:rounded after:bg-brand' : 
 		     'relative py-2 transition-colors hover:text-ink'">일정 플래너</a>
 		
-		<a th:href="@{/share-board/list}"
-		   th:class="${currentURI != null and currentURI.contains('/share-board')} ? 
+		<a th:href="@{/share/list}"
+		   th:class="${currentURI != null and currentURI.contains('/share')} ? 
 		     'relative py-2 font-semibold text-ink after:absolute after:-bottom-0.5 after:left-0 after:right-0 after:h-0.5 after:rounded after:bg-brand' : 
 		     'relative py-2 transition-colors hover:text-ink'">일정 공유</a>
 		

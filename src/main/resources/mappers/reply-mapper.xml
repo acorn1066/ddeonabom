@@ -45,6 +45,7 @@
 	</select>
 
 	<select id="selectMyCommentList" parameterType="hashmap" resultType="Reply">
+
 		SELECT *
 		FROM (
 			SELECT r.*, ROW_NUMBER() OVER (ORDER BY r.create_date DESC) AS rnum
@@ -54,5 +55,45 @@
 		)
 		WHERE rnum BETWEEN #{startRow} + 1 AND #{startRow} + #{listLimit}
 	</select>
+	
+	
+	<select id="sReplyList" parameterType="map">
+		SELECT r.*, m.nickname AS writer
+		FROM reply r
+		JOIN member m ON r.member_no = m.member_no
+		WHERE r.post_no    = #{postNo}
+		AND   r.post_board = #{postBoard}
+		AND   r.status     = 'Y'
+		ORDER BY r.create_date ASC
+	</select>
+
+	<!-- 댓글 등록 -->
+	<insert id="rInsertReply" parameterType="Reply">
+		INSERT INTO reply (reply_no, content, create_date, status, post_board, post_no, member_no)
+		VALUES (SEQ_RNO.NEXTVAL, #{content}, SYSDATE, 'Y', #{postBoard}, #{postNo}, #{memberNo})
+	</insert>
+
+	<!-- 댓글 수정 -->
+	<update id="rUpdateReply" parameterType="Reply">
+		UPDATE reply
+		SET content     = #{content},
+		    modify_date = SYSDATE
+		WHERE reply_no  = #{replyNo}
+		AND   member_no = #{memberNo}
+		AND   status    = 'Y'
+		AND post_board = #{postBoard}
+	</update>
+
+	<!-- 댓글 삭제 (soft delete) -->
+	<update id="rDeleteReply" parameterType="Reply">
+	    UPDATE reply
+	    SET status = 'N'
+	    WHERE reply_no = #{replyNo}
+	    AND member_no = #{memberNo}
+	    AND post_board = #{postBoard}
+	    AND status = 'Y'
+	</update>
+
+
 
 </mapper>

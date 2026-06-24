@@ -26,4 +26,5 @@ public class QList {
 	private String category;
 	private String visibility;
 	private int replyCount;
+	private String reportStatus;
 }

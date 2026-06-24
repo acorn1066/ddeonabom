@@ -47,6 +47,12 @@
 		values(seq_nice_no.nextval, 'LJ', #{lNumber}, #{memberNo})
 	</insert>
 	
+	<select id="niceList">
+		select post_no
+		from nice
+		where member_no = #{memberNo}
+	</select>
+	
 	<select id="getWishListCount" parameterType="_int" resultType="_int">
 		SELECT COUNT(*)
 		FROM NICE

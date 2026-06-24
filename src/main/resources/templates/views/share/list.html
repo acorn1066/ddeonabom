@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{views/common/head :: head}"></head>
+<body>
+  <div th:replace="~{views/common/navbar :: navbar}"></div>
+
+  <!-- ════════════ MAIN ════════════ -->
+  <main class="mx-auto max-w-wide px-6">
+
+    <!-- 헤더 -->
+    <div class="flex items-end justify-between pb-5 pt-12">
+      <div>
+        <span class="inline-flex items-center gap-2 text-sm font-semibold text-brand before:h-0.5 before:w-4 before:rounded before:bg-brand">일정 공유 게시판</span>
+        <h1 class="mt-2 text-h2 font-extrabold tracking-tight">다른 여행자의 길</h1>
+        <p class="mt-2 text-15 text-muted">공유된 여행 일정을 둘러보고, 마음에 들면 내 일정으로 복사하세요.</p>
+      </div>
+      <a th:href="@{/schedule/list}" class="inline-flex h-12 items-center rounded-lg bg-brand px-8 text-15 font-semibold text-white transition hover:bg-brand-ink">
+        내 일정 공유하기
+      </a>
+    </div>
+
+    <!-- 필터 탭 + 검색 -->
+    <form id="filter-form" th:action="@{/share/list}" method="get">
+      <input type="hidden" name="region"      id="region-input" th:value="${region}" />
+      <input type="hidden" name="searchInput" id="search-hidden" th:value="${searchInput}" />
+
+      <div class="flex items-center gap-2 border-b border-line pb-5">
+
+        <!-- 지역 필터 탭 -->
+        <span th:each="tab : ${ {'전체','제주','수도권','강원','경상','전라'} }"
+              th:text="${tab}"
+              th:attr="data-region=${tab}"
+              th:class="${tab == region} ?
+                'filter-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-ink bg-ink px-4 text-13 font-semibold text-white' :
+                'filter-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink'"
+              onclick="selectRegion(this)">
+        </span>
+
+        <!-- 검색 -->
+        <div class="relative ml-auto">
+          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-faint" width="16" height="16"
+               viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="8" cy="8" r="5.5"/><path d="M12.5 12.5L16 16"/>
+          </svg>
+          <input id="search-input"
+                 class="h-9 w-60 rounded-full border border-line bg-white pl-9 pr-3 text-13 outline-none transition placeholder:text-faint focus:border-brand"
+                 placeholder="일정 검색"
+                 th:value="${searchInput}"
+                 onkeydown="if(event.key==='Enter'){submitSearch()}" />
+        </div>
+
+      </div>
+    </form>
+
+    <!-- 카드 그리드 -->
+    <!-- 결과 없음 -->
+    <div th:if="${#lists.isEmpty(shareList)}"
+         class="flex flex-col items-center justify-center gap-3 py-24 text-center">
+      <span class="mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-sunk text-faint">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M5 18 Q 9 8, 13 12 T 19 6"/>
+          <circle cx="5" cy="18" r="1.6" fill="currentColor" stroke="none"/>
+          <circle cx="19" cy="6"  r="1.6" fill="currentColor" stroke="none"/>
+        </svg>
+      </span>
+      <h3 class="text-22 font-bold tracking-tight">공유된 일정이 없어요</h3>
+      <p class="text-15 text-muted">첫 번째로 일정을 공유해보세요!</p>
+      <a th:href="@{/schedule/list}"
+         class="mt-3 inline-flex h-12 items-center rounded-lg bg-brand px-8 text-15 font-semibold text-white transition hover:bg-brand-ink">
+        내 일정 공유하기
+      </a>
+    </div>
+
+    <!-- 카드 목록 -->
+    <div th:unless="${#lists.isEmpty(shareList)}" class="grid grid-cols-3 gap-5 py-6">
+      <a th:each="share : ${shareList}"
+         th:href="@{/share/detail/{no}(no=${share.scheduleNo})}"
+         class="overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card">
+
+        <!-- 썸네일 -->
+        <div class="relative aspect-video overflow-hidden bg-sunk">
+          <!-- 이미지가 있으면 출력, 없으면 빈 배경 -->
+          <img th:if="${share.firstImage != null}"
+               th:src="${share.firstImage}"
+               class="h-full w-full object-cover"
+               alt="">
+          <!-- 지역 뱃지 -->
+          <div class="absolute bottom-2.5 left-2.5">
+            <span class="region-badge inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white"
+                  th:attr="data-addr=${share.firstAddr}">지역</span>
+          </div>
+        </div>
+
+        <!-- 카드 본문 -->
+        <div class="p-4">
+          <div class="text-17 font-bold tracking-tight" th:text="${share.scheduleTitle}">제목</div>
+          <div class="mt-1 text-13 text-muted tabular-nums"
+               th:text="${share.scheduleStartdate} + ' — ' + ${share.scheduleEnddate}">기간</div>
+
+          <div class="mt-4 flex items-center gap-3 border-t border-line pt-4">
+            <!-- 작성자 아바타 + 닉네임 -->
+            <span class="flex items-center gap-2 text-13 font-semibold">
+              <span class="flex h-6.5 w-6.5 items-center justify-center rounded-full bg-brand-soft text-xs font-bold text-brand-ink"
+                    th:text="${#strings.substring(share.memberNickname, 0, 1)}">닉</span>
+              <span th:text="${share.memberNickname}">닉네임</span>
+            </span>
+            <!-- 추천·댓글 수 -->
+            <span class="ml-auto flex gap-3 text-13 text-muted">
+              <span class="tabular-nums" th:text="'♥ ' + ${share.likeCount}">♥ 0</span>
+              <span class="tabular-nums" th:text="'💬 ' + ${share.replyCount}">💬 0</span>
+            </span>
+          </div>
+        </div>
+
+      </a>
+    </div>
+
+    <!-- 페이징 -->
+    <div th:if="${pi != null and pi.maxPage > 0}" class="flex justify-center gap-1 py-6">
+      <!-- 이전 그룹 -->
+      <a th:if="${pi.startPage > 1}"
+         th:href="@{/share/list(page=${pi.startPage - 1}, region=${region}, searchInput=${searchInput})}"
+         class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">‹</a>
+
+      <!-- 페이지 번호 -->
+      <th:block th:each="p : ${#numbers.sequence(pi.startPage, pi.endPage)}">
+        <span th:if="${p == pi.currentPage}"
+              class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg bg-brand px-2 text-sm font-medium text-white"
+              th:text="${p}">1</span>
+        <a th:unless="${p == pi.currentPage}"
+           th:href="@{/share/list(page=${p}, region=${region}, searchInput=${searchInput})}"
+           class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink"
+           th:text="${p}">2</a>
+      </th:block>
+
+      <!-- 다음 그룹 -->
+      <a th:if="${pi.endPage < pi.maxPage}"
+         th:href="@{/share/list(page=${pi.endPage + 1}, region=${region}, searchInput=${searchInput})}"
+         class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">›</a>
+    </div>
+
+  </main>
+
+  <div th:replace="~{views/common/modal :: modal}"></div>
+  <footer th:replace="~{views/common/footer :: footer}"></footer>
+
+  <script>
+    /* ─── 지역 필터 탭 클릭 → hidden input 변경 후 폼 제출 ─── */
+    function selectRegion(tab) {
+      document.getElementById('region-input').value = tab.dataset.region;
+      document.getElementById('search-hidden').value = document.getElementById('search-input').value;
+      document.getElementById('filter-form').submit();
+    }
+
+    /* ─── 검색 Enter ─── */
+    function submitSearch() {
+      document.getElementById('search-hidden').value = document.getElementById('search-input').value;
+      document.getElementById('filter-form').submit();
+    }
+
+    /* ─── 지역 뱃지 단축 (my-list.html 동일 방식) ─── */
+    const REGION_MAP = {
+      '서울': '서울', '부산': '부산', '대구': '대구', '인천': '인천',
+      '광주': '광주', '대전': '대전', '울산': '울산', '세종': '세종',
+      '경기': '경기', '강원': '강원', '제주': '제주',
+      '충청북도': '충북', '충청남도': '충남',
+      '전라북도': '전북', '전라남도': '전남',
+      '경상북도': '경북', '경상남도': '경남',
+      '충북': '충북', '충남': '충남', '전북': '전북', '전남': '전남',
+      '경북': '경북', '경남': '경남', '강원특별자치도': '강원',
+      '제주특별자치도': '제주', '전북특별자치도': '전북'
+    };
+
+    function extractRegion(addr1) {
+      if (!addr1) return null;
+      const head = addr1.trim().split(' ')[0];
+      const keys = Object.keys(REGION_MAP).sort((a, b) => b.length - a.length);
+      for (const key of keys) {
+        if (head.startsWith(key)) return REGION_MAP[key];
+      }
+      return head;
+    }
+
+    document.querySelectorAll('.region-badge').forEach(badge => {
+      const region = extractRegion(badge.dataset.addr);
+      if (region) badge.textContent = region;
+    });
+
+  </script>
+
+</body>
+</html>

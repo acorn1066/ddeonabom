@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kh.ddeonabom.share.model.mapper.ShareMapper">
+
+    <!-- ══════════════════════════════════════════════
+         공통 필터 조건 (COUNT·SELECT 양쪽에서 재사용)
+         sm = schedule_main / m = member
+         ══════════════════════════════════════════════ -->
+    <sql id="shareWhereClause">
+        WHERE sm.schedule_status = 'Y'
+
+        <!-- 지역 필터: 일정 내 장소 중 해당 지역 포함 여부 -->
+        <if test="region != null and region != '전체'">
+            AND EXISTS (
+                SELECT 1
+                  FROM schedule_sub ss
+                  JOIN landmark l ON l.content_id = ss.content_id
+                 WHERE ss.schedule_no = sm.schedule_no
+                <choose>
+                    <when test="region == '제주'">
+                        AND l.addr1 LIKE '%제주%'
+                    </when>
+                    <when test="region == '수도권'">
+                        AND (l.addr1 LIKE '%서울%' OR l.addr1 LIKE '%경기%' OR l.addr1 LIKE '%인천%')
+                    </when>
+                    <when test="region == '강원'">
+                        AND l.addr1 LIKE '%강원%'
+                    </when>
+                    <when test="region == '경상'">
+                        AND (l.addr1 LIKE '%경상%' OR l.addr1 LIKE '%부산%'
+                          OR l.addr1 LIKE '%대구%' OR l.addr1 LIKE '%울산%')
+                    </when>
+                    <when test="region == '전라'">
+                        AND (l.addr1 LIKE '%전라%' OR l.addr1 LIKE '%광주%')
+                    </when>
+                </choose>
+            )
+        </if>
+
+        <!-- 검색: 제목 또는 작성자 닉네임 -->
+        <if test="searchInput != null and searchInput != ''">
+            AND (sm.schedule_title LIKE '%' || #{searchInput} || '%'
+              OR m.nickname        LIKE '%' || #{searchInput} || '%')
+        </if>
+    </sql>
+
+    <!-- ══════════════════════════════
+         총 개수 (페이징 계산용)
+         ══════════════════════════════ -->
+    <select id="getShareListCount" parameterType="hashmap" resultType="int">
+        SELECT COUNT(*)
+          FROM schedule_main sm
+          JOIN member m ON sm.member_no = m.member_no
+        <include refid="shareWhereClause" />
+    </select>
+
+    <!-- ══════════════════════════════
+         목록 조회 (페이징 + 필터 적용)
+         ══════════════════════════════ -->
+    <select id="selectShareList" parameterType="hashmap" resultType="Share">
+        SELECT
+            sm.schedule_no,
+            sm.schedule_title,
+            TO_CHAR(sm.schedule_startdate, 'yyyy.mm.dd') AS scheduleStartdate,
+            TO_CHAR(sm.schedule_enddate,   'yyyy.mm.dd') AS scheduleEnddate,
+            sm.schedule_visibility,
+            sm.create_date AS createDate,
+            sm.member_no,
+            m.nickname     AS memberNickname,
+
+            <!-- 경유지 수 -->
+            (SELECT COUNT(*)
+               FROM schedule_sub ss
+              WHERE ss.schedule_no = sm.schedule_no) AS placeCount,
+
+            <!-- 추천 수: NICE.POST_BOARD_FX = 'SR' -->
+            (SELECT COUNT(*)
+               FROM nice n
+              WHERE n.post_no       = sm.schedule_no
+                AND n.post_board_fx = 'SR') AS likeCount,
+
+            <!-- 댓글 수: REPLY.POST_BOARD = 'S' -->
+            (SELECT COUNT(*)
+               FROM reply r
+              WHERE r.post_no    = sm.schedule_no
+                AND r.post_board = 'S'
+                AND r.status     = 'Y') AS replyCount,
+
+            <!-- 첫 번째 장소 썸네일 (LANDMARK.FIRSTIMAGE2) -->
+            (SELECT l.firstimage2
+               FROM schedule_sub ss
+               JOIN landmark l ON l.content_id = ss.content_id
+              WHERE ss.schedule_no = sm.schedule_no
+              ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq
+              FETCH FIRST 1 ROWS ONLY) AS firstImage,
+
+            <!-- 첫 번째 장소 주소 (지역 뱃지용) -->
+            (SELECT l.addr1
+               FROM schedule_sub ss
+               JOIN landmark l ON l.content_id = ss.content_id
+              WHERE ss.schedule_no = sm.schedule_no
+              ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq
+              FETCH FIRST 1 ROWS ONLY) AS firstAddr,
+
+            <!-- SVG 루트 좌표: 첫째 날 장소들의 mapx,mapy 연결 -->
+            (SELECT LISTAGG(l.mapx || ',' || l.mapy, ';')
+                        WITHIN GROUP (ORDER BY ss.schedule_sub_seq)
+               FROM schedule_sub ss
+               JOIN landmark l ON l.content_id = ss.content_id
+              WHERE ss.schedule_no = sm.schedule_no
+                AND l.mapx IS NOT NULL
+                AND l.mapy IS NOT NULL
+                AND ss.schedule_sub_date = (
+                    SELECT MIN(schedule_sub_date)
+                      FROM schedule_sub
+                     WHERE schedule_no = sm.schedule_no
+                )) AS coords
+
+        FROM schedule_main sm
+        JOIN member m ON sm.member_no = m.member_no
+        <include refid="shareWhereClause" />
+        ORDER BY sm.create_date DESC
+        OFFSET #{startRow} ROWS FETCH NEXT #{listLimit} ROWS ONLY
+    </select>
+
+    <!-- ══════════════════════════════
+         상세 조회 (단건)
+         ══════════════════════════════ -->
+    <select id="selectShareDetail" parameterType="int" resultType="ShareDetail">
+        SELECT
+            sm.schedule_no,
+            sm.schedule_title,
+            sm.schedule_startdate,
+            sm.schedule_enddate,
+            sm.create_date  AS createDate,
+            sm.member_no,
+            m.nickname      AS memberNickname,
+
+            (SELECT COUNT(*)
+               FROM schedule_sub ss
+              WHERE ss.schedule_no = sm.schedule_no) AS placeCount,
+
+            (SELECT COUNT(*)
+               FROM nice n
+              WHERE n.post_no       = sm.schedule_no
+                AND n.post_board_fx = 'SR') AS likeCount,
+
+            (SELECT l.addr1
+               FROM schedule_sub ss
+               JOIN landmark l ON l.content_id = ss.content_id
+              WHERE ss.schedule_no = sm.schedule_no
+              ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq
+              FETCH FIRST 1 ROWS ONLY) AS firstAddr,
+
+            <!-- 전체 장소 좌표: detail SVG는 전 날짜 포함 -->
+            (SELECT LISTAGG(l.mapx || ',' || l.mapy, ';')
+                        WITHIN GROUP (ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq)
+               FROM schedule_sub ss
+               JOIN landmark l ON l.content_id = ss.content_id
+              WHERE ss.schedule_no = sm.schedule_no
+                AND l.mapx IS NOT NULL
+                AND l.mapy IS NOT NULL) AS coords
+
+        FROM schedule_main sm
+        JOIN member m ON sm.member_no = m.member_no
+        WHERE sm.schedule_no = #{scheduleNo}
+    </select>
+
+    <!-- ══════════════════════════════
+         장소 목록 (DAY별 그룹핑용 flat 조회)
+         ══════════════════════════════ -->
+    <select id="selectSharePlaceList" parameterType="int" resultType="SharePlace">
+        SELECT
+            ss.schedule_sub_date AS subDate,
+            ss.schedule_sub_seq  AS subSeq,
+            l.title,
+            l.addr1,
+            l.mapx AS mapX,
+            l.mapy AS mapY
+        FROM schedule_sub ss
+        JOIN landmark l ON l.content_id = ss.content_id
+        WHERE ss.schedule_no = #{scheduleNo}
+        ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq
+    </select>
+
+    <!-- 추천 여부 (NICE.POST_BOARD_FX = 'SR') -->
+    <select id="isLiked" parameterType="hashmap" resultType="int">
+        SELECT COUNT(*) FROM nice
+        WHERE post_no       = #{scheduleNo}
+          AND post_board_fx = 'SR'
+          AND member_no     = #{memberNo}
+    </select>
+
+    <!-- 찜 여부 (NICE.POST_BOARD_FX = 'SJ') -->
+    <select id="isWished" parameterType="hashmap" resultType="int">
+        SELECT COUNT(*) FROM nice
+        WHERE post_no       = #{scheduleNo}
+          AND post_board_fx = 'SJ'
+          AND member_no     = #{memberNo}
+    </select>
+
+</mapper>

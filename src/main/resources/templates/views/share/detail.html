@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{views/common/head :: head}"></head>
+<body>
+  <div th:replace="~{views/common/navbar :: navbar}"></div>
+
+  <!-- ════════════ MAIN ════════════ -->
+  <main class="mx-auto max-w-postwide px-6 pb-24 pt-12">
+
+    <!-- 브레드크럼 -->
+    <div class="mb-5 text-13 text-muted">
+      <a th:href="@{/share/list}" class="hover:text-brand">일정 공유</a>
+      › <span class="breadcrumb-region" th:attr="data-addr=${schedule.firstAddr}">지역</span>
+    </div>
+
+    <!-- ════ 게시글 헤더 ════ -->
+    <div class="border-b border-line pb-5">
+      <div class="mb-3 flex gap-2">
+        <!-- 지역 뱃지 (firstAddr 기반, JS extractRegion으로 단축) -->
+        <span class="region-badge inline-flex h-7.5 items-center rounded-full bg-brand-soft px-3 text-13 font-medium text-brand-ink"
+              th:attr="data-addr=${schedule.firstAddr}">지역</span>
+        <!-- 기간 뱃지 (시작일~종료일) -->
+        <span class="inline-flex h-7.5 items-center rounded-full border border-line px-3 text-13 font-medium text-muted"
+              th:text="${#dates.format(schedule.scheduleStartdate, 'MM.dd')} + ' — ' + ${#dates.format(schedule.scheduleEnddate, 'MM.dd')}">기간</span>
+      </div>
+
+      <!-- 제목 -->
+      <h1 class="mb-4 text-h2 font-extrabold tracking-tight"
+          th:text="${schedule.scheduleTitle}">제주 동쪽 한 바퀴 · 3박 4일</h1>
+
+      <!-- 작성자 정보 + 복사 버튼 -->
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2.5">
+          <!-- 아바타: MEMBER.NICKNAME 첫 글자 -->
+          <span class="flex h-10.5 w-10.5 items-center justify-center rounded-full bg-brand font-extrabold text-white"
+                th:text="${#strings.substring(schedule.memberNickname, 0, 1)}">별</span>
+          <div>
+            <div class="text-15 font-bold" th:text="${schedule.memberNickname}">별헤는밤</div>
+            <div class="text-13 text-muted tabular-nums"
+                 th:text="${#dates.format(schedule.createDate, 'yyyy.MM.dd')} + ' 작성'">2026.04.14 작성</div>
+          </div>
+        </div>
+
+        <!-- 내 일정으로 복사 버튼 -->
+        <button type="button"
+                th:onclick="|copySchedule([[${schedule.scheduleNo}]])|"
+                class="ml-auto inline-flex h-11 items-center rounded-lg bg-brand px-5 text-sm font-semibold text-white transition hover:bg-brand-ink">
+          내 일정으로 복사 →
+        </button>
+      </div>
+    </div>
+
+    <!-- DAY 탭 -->
+    <div id="day-tabs" class="flex gap-2 overflow-x-auto py-4"
+         style="scrollbar-width:none;-ms-overflow-style:none;"></div>
+
+    <!-- ════ 루트 지도 (카카오맵) ════ -->
+    <div class="mb-7 overflow-hidden rounded-2xl shadow-card">
+      <div id="map" class="h-80 w-full"></div>
+    </div>
+
+    <!-- ════ DAY별 일정 타임라인 ════ -->
+    <div th:each="day, dayStat : ${dayList}"
+         th:id="|day-section-${dayStat.index}|"
+         class="mb-7">
+
+      <!-- DAY 헤더: SCHEDULE_SUB_DATE 기반 (dayTitle/dayOfWeek 없음) -->
+      <h2 class="mb-4 flex items-center gap-2.5 text-xl font-bold tracking-tight">
+        <span class="rounded-full bg-brand-soft px-2.5 py-1 text-xs font-bold text-brand-ink"
+              th:text="'DAY ' + ${dayStat.count}">DAY 1</span>
+        <span th:text="${#dates.format(day.subDate, 'MM월 dd일')}">04월 10일</span>
+      </h2>
+
+      <!-- 타임라인 -->
+      <div class="relative pl-2">
+        <div class="absolute bottom-3.5 left-3.5 top-3.5 w-0.5 bg-line"></div>
+
+        <div th:each="place, placeStat : ${day.placeList}"
+             th:class="${placeStat.last} ? 'relative flex gap-4' : 'relative flex gap-4 pb-4'">
+
+          <!-- 번호 원 -->
+          <span class="z-10 flex h-8 w-8 flex-none items-center justify-center rounded-full bg-brand text-13 font-bold text-white ring-4 ring-white"
+                th:text="${placeStat.count}">1</span>
+
+          <!-- place: LANDMARK.TITLE + LANDMARK.ADDR1 (SCHEDULE_SUB JOIN) -->
+          <div class="flex-1 pt-1">
+            <div class="text-base font-bold" th:text="${place.title}">함덕 해수욕장</div>
+            <div class="mt-0.5 text-13 text-muted" th:text="${place.addr1}">제주특별자치도 제주시 조천읍</div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════ 추천 / 찜 / 복사 액션 바 ════ -->
+    <div class="mt-6 flex justify-center gap-3 border-t border-line py-6">
+
+      <!-- 추천 버튼 -->
+      <button type="button"
+              id="like-btn"
+              th:onclick="|toggleLike([[${schedule.scheduleNo}]])|"
+              th:class="${isLiked} ?
+                'inline-flex h-12 items-center gap-2 rounded-full border border-brand bg-brand-soft px-6 text-15 font-bold text-brand transition hover:bg-brand hover:text-white' :
+                'inline-flex h-12 items-center gap-2 rounded-full border border-line bg-white px-6 text-15 font-bold transition hover:bg-sunk'">
+        ♥ 추천 <b id="like-count" class="tabular-nums" th:text="${schedule.likeCount}">184</b>
+      </button>
+
+      <!-- 찜(스크랩) 버튼 -->
+      <button type="button"
+              id="wish-btn"
+              th:onclick="|toggleWish([[${schedule.scheduleNo}]])|"
+              th:class="${isWished} ?
+                'inline-flex h-12 items-center gap-2 rounded-full border border-brand bg-brand-soft px-6 text-15 font-bold text-brand transition hover:bg-brand hover:text-white' :
+                'inline-flex h-12 items-center gap-2 rounded-full border border-line bg-white px-6 text-15 font-bold transition hover:bg-sunk'">
+        ☆ 찜
+      </button>
+
+      <!-- 내 일정으로 복사 -->
+      <button type="button"
+              th:onclick="|copySchedule([[${schedule.scheduleNo}]])|"
+              class="inline-flex h-12 items-center rounded-full bg-brand px-6 text-15 font-bold text-white transition hover:bg-brand-ink">
+        내 일정으로 복사 →
+      </button>
+
+    </div>
+
+    <!-- ════ 댓글 섹션 ════ -->
+    <section class="mt-7">
+
+      <!-- 댓글 수 -->
+      <h3 class="mb-5 text-lg font-bold">
+        댓글 <span class="text-brand tabular-nums" th:text="${replyCount}">0</span>
+      </h3>
+
+      <!-- 댓글 작성 폼 -->
+      <div class="mb-6 border-t-2 border-ink pt-6">
+        <form id="reply-form" th:action="@{/reply/insert}" method="post">
+          <input type="hidden" name="postNo"    th:value="${schedule.scheduleNo}" />
+          <input type="hidden" name="postBoard" value="S" />
+
+          <div class="flex gap-3">
+            <!-- 아바타 -->
+            <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-brand-soft font-bold text-brand-ink"
+                  th:if="${session.loginUser != null}"
+                  th:text="${#strings.substring(session.loginUser.nickname, 0, 1)}">나</span>
+            <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-sunk font-bold text-faint"
+                  th:if="${session.loginUser == null}">?</span>
+
+            <div class="flex-1 overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
+              <textarea id="reply-content" name="content"
+                        class="block min-h-16 w-full resize-none border-none bg-transparent px-4 py-3 text-sm leading-relaxed outline-none placeholder:text-faint"
+                        th:readonly="${session.loginUser == null}"
+                        th:classappend="${session.loginUser == null} ? 'cursor-not-allowed bg-sunk' : ''"
+                        placeholder="응원과 질문을 남겨보세요"></textarea>
+              <div class="flex items-center justify-between border-t border-line py-2 pl-4 pr-2">
+                <span class="text-xs text-faint">이 길을 다녀온 여행자에게 댓글을 남겨보세요</span>
+                <button type="button"
+                        onclick="handleReplySubmit()"
+                        class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">
+                  등록
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- 댓글 목록 -->
+      <div th:each="reply : ${replyList}"
+           th:id="|reply-${reply.replyNo}|"
+           class="flex gap-3 border-t border-line py-4">
+
+        <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-sunk font-bold text-muted"
+              th:text="${#strings.substring(reply.writer, 0, 1)}">제</span>
+
+        <div class="flex-1">
+          <div class="mb-1 flex items-center gap-2">
+            <span class="text-sm font-bold" th:text="${reply.writer}">댓글작성자</span>
+            <span class="text-xs text-faint tabular-nums"
+                  th:text="${#dates.format(reply.createDate, 'yyyy.MM.dd')}">2026.04.15</span>
+
+            <!-- 수정/삭제: 본인 댓글만 -->
+            <span th:if="${session.loginUser != null and session.loginUser.memberNo == reply.memberNo}"
+                  class="ml-auto flex gap-2.5 text-xs text-muted">
+              <button type="button" class="hover:text-brand"
+                      th:onclick="|toggleReplyEdit([[${reply.replyNo}]])|">수정</button>
+              <button type="button" class="hover:text-red-500"
+                      th:onclick="|openReplyDeleteModal([[${reply.replyNo}]], [[${schedule.scheduleNo}]])|">삭제</button>
+            </span>
+          </div>
+
+          <!-- 댓글 본문 -->
+          <p th:id="|reply-text-${reply.replyNo}|"
+             class="text-sm leading-relaxed text-ink/85"
+             th:text="${reply.content}">댓글 내용</p>
+
+          <!-- 인라인 수정 폼 -->
+          <form th:id="|reply-edit-form-${reply.replyNo}|"
+                th:action="@{/reply/update}" method="post"
+                class="hidden mt-2">
+            <input type="hidden" name="replyNo" th:value="${reply.replyNo}" />
+            <input type="hidden" name="postNo"  th:value="${schedule.scheduleNo}" />
+            <div class="overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
+              <textarea name="content"
+                        th:id="|reply-edit-ta-${reply.replyNo}|"
+                        class="block min-h-[80px] w-full resize-none border-none bg-transparent px-4 py-3 text-sm leading-relaxed outline-none"
+                        th:text="${reply.content}"></textarea>
+              <div class="flex justify-end gap-2 border-t border-line py-2 pr-2">
+                <button type="button"
+                        class="inline-flex h-9 items-center rounded-lg border border-line px-4 text-sm text-muted hover:bg-sunk"
+                        th:onclick="|cancelReplyEdit([[${reply.replyNo}]])|">취소</button>
+                <button type="submit"
+                        class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">저장</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+    </section>
+  </main>
+
+  <!-- 댓글 삭제 hidden form -->
+  <form id="reply-delete-form" th:action="@{/reply/delete}" method="post" style="display:none">
+    <input type="hidden" id="delete-replyNo" name="replyNo" />
+    <input type="hidden" id="delete-reply-postNo" name="postNo" />
+  </form>
+
+  <!-- ════════════ SCRIPT ════════════ -->
+  <script th:inline="javascript">
+    const scheduleNo    = /*[[${schedule.scheduleNo}]]*/ 0;
+    const loginRequired = /*[[${session.loginUser == null}]]*/ true;
+    let   isLiked       = /*[[${isLiked}]]*/ false;
+    let   isWished      = /*[[${isWished}]]*/ false;
+    const dayListData   = /*[[${dayList}]]*/ [];
+
+    /* ─── 카카오맵 ─── */
+    // markers, polylines, map, mapReady 는 kakao-map 프래그먼트에서 선언됨
+    let selectedDayIndex = 0;
+
+    const clearMap = () => {
+      if (typeof markers !== 'undefined') {
+        markers.forEach(m => m.setMap(null));
+        polylines.forEach(p => p.setMap(null));
+        markers = []; polylines = [];
+      }
+    };
+
+    /* ─── DAY 탭 렌더링 ─── */
+    function renderDayTabs() {
+      const container = document.getElementById('day-tabs');
+      const weekdays = ['일','월','화','수','목','금','토'];
+
+      dayListData.forEach((day, i) => {
+        const d = new Date(day.subDate);
+        const label = `${d.getMonth()+1}.${String(d.getDate()).padStart(2,'0')} ${weekdays[d.getDay()]}`;
+
+        const div = document.createElement('div');
+        div.className = i === 0
+          ? 'min-w-20 rounded-xl border border-transparent bg-brand p-3 text-center text-white cursor-pointer'
+          : 'min-w-20 cursor-pointer rounded-xl border border-line bg-white p-3 text-center transition hover:border-muted';
+        div.innerHTML = `
+          <b class="block text-sm font-bold">DAY ${i + 1}</b>
+          <span class="text-xs ${i === 0 ? 'text-white/75' : 'text-muted'} tabular-nums">${label}</span>`;
+        div.addEventListener('click', () => selectDay(i));
+        container.appendChild(div);
+      });
+
+      showDaySection(0);
+      drawRoute();
+    }
+
+    /* ─── DAY 탭 선택 ─── */
+    function selectDay(idx) {
+      selectedDayIndex = idx;
+      const tabs = document.querySelectorAll('#day-tabs > div');
+      tabs.forEach((t, i) => {
+        const span = t.querySelector('span');
+        if (i === idx) {
+          t.className = 'min-w-20 rounded-xl border border-transparent bg-brand p-3 text-center text-white cursor-pointer';
+          if (span) span.className = 'text-xs text-white/75 tabular-nums';
+        } else {
+          t.className = 'min-w-20 cursor-pointer rounded-xl border border-line bg-white p-3 text-center transition hover:border-muted';
+          if (span) span.className = 'text-xs text-muted tabular-nums';
+        }
+      });
+      showDaySection(idx);
+      drawRoute();
+    }
+
+    /* ─── 타임라인 섹션 show/hide ─── */
+    function showDaySection(idx) {
+      dayListData.forEach((_, i) => {
+        const el = document.getElementById('day-section-' + i);
+        if (el) el.style.display = (i === idx) ? '' : 'none';
+      });
+    }
+
+    /* ─── 선택된 DAY 장소 카카오맵에 표시 ─── */
+    const drawRoute = async () => {
+      if (!mapReady || !map) return;
+      clearMap();
+
+      const places = (dayListData[selectedDayIndex] && dayListData[selectedDayIndex].placeList) || [];
+      if (places.length === 0) return;
+
+      const bounds = new kakao.maps.LatLngBounds();
+      places.forEach((place, idx) => {
+        const lat = parseFloat(place.mapY), lng = parseFloat(place.mapX);
+        if (isNaN(lat) || isNaN(lng)) return;
+        const pos = new kakao.maps.LatLng(lat, lng);
+
+        const marker = new kakao.maps.Marker({ position: pos, map });
+        markers.push(marker);
+
+        const overlay = new kakao.maps.CustomOverlay({
+          position: pos, yAnchor: 2.1,
+          content: `<div style="background:#2563eb;color:#fff;width:22px;height:22px;`
+                 + `border-radius:50%;display:flex;align-items:center;justify-content:center;`
+                 + `font-size:12px;font-weight:700;border:2px solid #fff;`
+                 + `box-shadow:0 1px 3px rgba(0,0,0,.3)">${idx + 1}</div>`
+        });
+        overlay.setMap(map);
+        markers.push(overlay);
+        bounds.extend(pos);
+      });
+      map.setBounds(bounds);
+
+      if (places.length >= 2) await drawRoadPath(places);
+    };
+
+    /* ─── 실도로 경로 (write.html 동일) ─── */
+    const drawRoadPath = async (places) => {
+      const points = places
+        .map(p => ({ lat: parseFloat(p.mapY), lng: parseFloat(p.mapX) }))
+        .filter(p => !isNaN(p.lat) && !isNaN(p.lng));
+      if (points.length < 2) return;
+
+      const MAX = 7, segments = [];
+      for (let i = 0; i < points.length - 1; i += (MAX - 1)) {
+        const slice = points.slice(i, i + MAX);
+        if (slice.length >= 2) segments.push(slice);
+      }
+
+      for (const seg of segments) {
+        try {
+          const res = await fetch('/schedule/route', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ points: seg })
+          });
+          const data = await res.json();
+
+          const linePath = [
+            new kakao.maps.LatLng(seg[0].lat, seg[0].lng),
+            ...(data.path || []).map(c => new kakao.maps.LatLng(c.lat, c.lng)),
+            new kakao.maps.LatLng(seg[seg.length - 1].lat, seg[seg.length - 1].lng)
+          ];
+          if (linePath.length < 2) continue;
+          const polyline = new kakao.maps.Polyline({
+            path: linePath, strokeWeight: 5,
+            strokeColor: '#2563eb', strokeOpacity: 0.85, strokeStyle: 'solid'
+          });
+          polyline.setMap(map); polylines.push(polyline);
+        } catch (e) {
+          const fallback = new kakao.maps.Polyline({
+            path: seg.map(p => new kakao.maps.LatLng(p.lat, p.lng)),
+            strokeWeight: 4, strokeColor: '#94a3b8',
+            strokeOpacity: 0.7, strokeStyle: 'shortdash'
+          });
+          fallback.setMap(map); polylines.push(fallback);
+        }
+      }
+    };
+
+    /* ─── 댓글 등록 ─── */
+    function handleReplySubmit() {
+      if (loginRequired) {
+        openInfoModal('로그인이 필요합니다', '로그인 후 댓글을 작성할 수 있어요.');
+        return;
+      }
+      const content = document.getElementById('reply-content').value;
+      if (!content.trim()) {
+        openInfoModal('알림', '댓글 내용을 입력해주세요.');
+        return;
+      }
+      document.getElementById('reply-form').submit();
+    }
+
+    /* ─── 댓글 수정/취소 ─── */
+    function toggleReplyEdit(replyNo) {
+      document.getElementById('reply-text-' + replyNo).classList.toggle('hidden');
+      document.getElementById('reply-edit-form-' + replyNo).classList.toggle('hidden');
+      const ta = document.getElementById('reply-edit-ta-' + replyNo);
+      if (ta) ta.focus();
+    }
+
+    function cancelReplyEdit(replyNo) {
+      document.getElementById('reply-text-' + replyNo).classList.remove('hidden');
+      document.getElementById('reply-edit-form-' + replyNo).classList.add('hidden');
+    }
+
+    /* ─── 댓글 삭제 ─── */
+    function openReplyDeleteModal(replyNo, postNo) {
+      openDangerModal(
+        '댓글을 삭제할까요?',
+        '삭제한 댓글은 되돌릴 수 없어요.',
+        function () {
+          document.getElementById('delete-replyNo').value    = replyNo;
+          document.getElementById('delete-reply-postNo').value = postNo;
+          document.getElementById('reply-delete-form').submit();
+        }
+      );
+    }
+
+    /* ─── 댓글 수정 폼 빈값 차단 ─── */
+    document.querySelectorAll('form[id^="reply-edit-form-"]').forEach(function (form) {
+      form.addEventListener('submit', function (e) {
+        const ta = form.querySelector('textarea[name="content"]');
+        if (!ta.value.trim()) {
+          e.preventDefault();
+          openInfoModal('알림', '댓글 내용을 입력해주세요.');
+        }
+      });
+    });
+
+    /* ─── 추천 토글 ─── */
+    async function toggleLike(scheduleNo) {
+      if (loginRequired) {
+        openInfoModal('로그인이 필요합니다', '로그인 후 추천할 수 있어요.');
+        return;
+      }
+      try {
+        const res  = await fetch('/share/like', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'scheduleNo=' + scheduleNo
+        });
+        const data = await res.json();
+        if (!data.success) { showToast(data.message || '처리 중 오류가 발생했어요.', false); return; }
+
+        isLiked = data.liked;
+        document.getElementById('like-count').textContent = data.likeCount;
+
+        const btn = document.getElementById('like-btn');
+        if (isLiked) {
+          btn.className = 'inline-flex h-12 items-center gap-2 rounded-full border border-brand bg-brand-soft px-6 text-15 font-bold text-brand transition hover:bg-brand hover:text-white';
+        } else {
+          btn.className = 'inline-flex h-12 items-center gap-2 rounded-full border border-line bg-white px-6 text-15 font-bold transition hover:bg-sunk';
+        }
+        showToast(isLiked ? '추천했어요!' : '추천을 취소했어요.');
+      } catch (e) {
+        showToast('처리 중 오류가 발생했어요.', false);
+      }
+    }
+
+    /* ─── 찜 토글 ─── */
+    async function toggleWish(scheduleNo) {
+      if (loginRequired) {
+        openInfoModal('로그인이 필요합니다', '로그인 후 찜할 수 있어요.');
+        return;
+      }
+      try {
+        const res  = await fetch('/share/wish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'scheduleNo=' + scheduleNo
+        });
+        const data = await res.json();
+        if (!data.success) { showToast(data.message || '처리 중 오류가 발생했어요.', false); return; }
+
+        isWished = data.wished;
+        const btn = document.getElementById('wish-btn');
+        if (isWished) {
+          btn.className = 'inline-flex h-12 items-center gap-2 rounded-full border border-brand bg-brand-soft px-6 text-15 font-bold text-brand transition hover:bg-brand hover:text-white';
+          btn.textContent = '★ 찜';
+        } else {
+          btn.className = 'inline-flex h-12 items-center gap-2 rounded-full border border-line bg-white px-6 text-15 font-bold transition hover:bg-sunk';
+          btn.textContent = '☆ 찜';
+        }
+        showToast(isWished ? '찜했어요!' : '찜을 취소했어요.');
+      } catch (e) {
+        showToast('처리 중 오류가 발생했어요.', false);
+      }
+    }
+
+    /* ─── 내 일정으로 복사 ─── */
+    function copySchedule(scheduleNo) {
+      if (loginRequired) {
+        openInfoModal('로그인이 필요합니다', '로그인 후 일정을 복사할 수 있어요.');
+        return;
+      }
+      openConfirmModal(
+        '이 일정을 복사할까요?',
+        '내 일정 목록에 동일한 일정이 추가돼요.',
+        async function () {
+          try {
+            const res  = await fetch('/share/copy', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: 'scheduleNo=' + scheduleNo
+            });
+            const data = await res.json();
+            if (data.success) {
+              showToast('일정을 내 목록에 추가했어요!');
+              setTimeout(() => { location.href = '/schedule/list'; }, 900);
+            } else {
+              showToast(data.message || '복사에 실패했어요.', false);
+            }
+          } catch (e) {
+            showToast('복사 중 오류가 발생했어요.', false);
+          }
+        }
+      );
+    }
+
+    /* ─── 지역 뱃지 단축 ─── */
+    const REGION_MAP = {
+      '서울': '서울', '부산': '부산', '대구': '대구', '인천': '인천',
+      '광주': '광주', '대전': '대전', '울산': '울산', '세종': '세종',
+      '경기': '경기', '강원': '강원', '제주': '제주',
+      '충청북도': '충북', '충청남도': '충남',
+      '전라북도': '전북', '전라남도': '전남',
+      '경상북도': '경북', '경상남도': '경남',
+      '충북': '충북', '충남': '충남', '전북': '전북', '전남': '전남',
+      '경북': '경북', '경남': '경남', '강원특별자치도': '강원',
+      '제주특별자치도': '제주', '전북특별자치도': '전북'
+    };
+
+    function extractRegion(addr1) {
+      if (!addr1) return null;
+      const head = addr1.trim().split(' ')[0];
+      const keys = Object.keys(REGION_MAP).sort(function (a, b) { return b.length - a.length; });
+      for (const key of keys) {
+        if (head.startsWith(key)) return REGION_MAP[key];
+      }
+      return head;
+    }
+
+    function applyRegionLabels() {
+      const region = extractRegion(document.querySelector('.region-badge') && document.querySelector('.region-badge').dataset.addr);
+      document.querySelectorAll('.region-badge, .breadcrumb-region').forEach(function (el) {
+        if (region) el.textContent = region;
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      applyRegionLabels();
+      renderDayTabs();
+    });
+  </script>
+
+  <div th:replace="~{views/common/modal :: modal}"></div>
+  <div th:replace="~{views/common/kakao-map :: kakao-map}"></div>
+  <footer th:replace="~{views/common/footer :: footer}"></footer>
+</body>
+</html>

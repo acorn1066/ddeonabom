@@ -34,4 +34,5 @@ public class Review {
     private String keyword;
     private String visibility;
     private String nickname;
+    private String reportStatus;
 }
