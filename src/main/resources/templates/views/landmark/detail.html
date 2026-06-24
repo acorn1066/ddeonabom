@@ -9,8 +9,8 @@
 	<main class="mx-auto max-w-wide px-6">
 	  <!-- breadcrumb -->
 	  <div class="flex items-center gap-2 pt-5 text-13 text-muted">
-	    <a href="sites.html" class="hover:text-brand">관광지</a><span class="text-faint">›</span>
-	    <a href="sites.html" class="hover:text-brand">[[${contentType[land.contentTypeId]}]]</a><span class="text-faint">›</span>
+	    <a th:href="@{/landmark/list}" class="hover:text-brand">관광지</a><span class="text-faint">›</span>
+	    <a th:href="@{/landmark/list(contentTypeId=${land.contentTypeId})}" class="hover:text-brand">[[${contentType[land.contentTypeId]}]]</a><span class="text-faint">›</span>
 	    <span class="font-semibold text-ink">[[${land.title}]]</span>
 	  </div>
 	
@@ -206,7 +206,7 @@
 						memberNo: /*[[${session.loginUser?.memberNo}]]*/0
 					},
 					success: data => {
-						console.log(data);
+// 						console.log(data);
 						if(data > 0){
 							heart.setAttribute("fill", "red");
 							heart.setAttribute("stroke", "red");

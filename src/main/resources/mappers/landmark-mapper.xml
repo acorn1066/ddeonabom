@@ -18,11 +18,25 @@
 	<select id="getListCount" resultType="_int">
 		select count(*)
 		from landmark
+		where 1=1
+		<if test="contentTypeId != null">
+			and content_type_id = #{contentTypeId}
+		</if>
+		<if test="area != null and area != ''">
+			and addr1 like '%' || #{area} || '%'
+		</if>
 	</select>
 	
 	<select id="selectLandmarkList">
 		select *
 		from landmark
+		where 1=1
+		<if test="contentTypeId != null">
+			and content_type_id = #{contentTypeId}
+		</if>
+		<if test="area != null and area != ''">
+			and addr1 like '%' || #{area} || '%'
+		</if>
 	</select>
 	
 	<select id="landmarkDetail">
