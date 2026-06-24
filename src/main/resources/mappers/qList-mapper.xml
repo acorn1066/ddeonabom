@@ -133,6 +133,34 @@
 		)
 	</insert>
 	
+	<!-- 추천 여부 (내 레코드만 조회) -->
+	<select id="isLiked" parameterType="hashmap" resultType="int">
+	    SELECT COUNT(*) FROM NICE
+	    WHERE post_no       = #{qNo}
+	      AND post_board_fx = 'QR'
+	      AND member_no     = #{memberNo}
+	</select>
+
+	<!-- 추천 등록 -->
+	<insert id="insertLike" parameterType="hashmap">
+	    INSERT INTO NICE VALUES (SEQ_NICE_NO.NEXTVAL, 'QR', #{qNo}, #{memberNo})
+	</insert>
+
+	<!-- 추천 취소 -->
+	<delete id="deleteLike" parameterType="hashmap">
+	    DELETE FROM NICE
+	    WHERE post_no       = #{qNo}
+	      AND post_board_fx = 'QR'
+	      AND member_no     = #{memberNo}
+	</delete>
+
+	<!-- 전체 추천 수 -->
+	<select id="getLikeCount" parameterType="_int" resultType="int">
+	    SELECT COUNT(*) FROM NICE
+	    WHERE post_no       = #{qNo}
+	      AND post_board_fx = 'QR'
+	</select>
+
 	<select id="getMyListCount" resultType="_int" parameterType="map">
 
     SELECT COUNT(*)
