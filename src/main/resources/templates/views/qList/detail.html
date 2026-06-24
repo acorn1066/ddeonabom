@@ -142,8 +142,9 @@
           <form th:id="|reply-edit-form-${reply.replyNo}|"
                 th:action="@{/reply/update}" method="post"
                 class="hidden mt-2">
-            <input type="hidden" name="replyNo" th:value="${reply.replyNo}" />
-            <input type="hidden" name="postNo"  th:value="${q.qNo}" />
+            <input type="hidden" name="replyNo"   th:value="${reply.replyNo}" />
+            <input type="hidden" name="postNo"    th:value="${q.qNo}" />
+            <input type="hidden" name="postBoard" value="Q" />
             <div class="overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
               <textarea name="content"
                         th:id="|reply-edit-ta-${reply.replyNo}|"
@@ -171,8 +172,9 @@
 
   <!-- 댓글 삭제용 hidden form -->
   <form id="reply-delete-form" th:action="@{/reply/delete}" method="post" style="display:none">
-    <input type="hidden" id="delete-replyNo" name="replyNo" />
-    <input type="hidden" id="delete-reply-postNo" name="postNo" />
+    <input type="hidden" id="delete-replyNo"         name="replyNo" />
+    <input type="hidden" id="delete-reply-postNo"    name="postNo" />
+    <input type="hidden" id="delete-reply-postBoard" name="postBoard" value="Q" />
   </form>
 
   <!-- 비로그인 + MEMBER 공개글 → 모달 트리거 -->

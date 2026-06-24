@@ -2,8 +2,6 @@ package kh.ddeonabom.reply.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -49,22 +47,6 @@ public class ReplyService {
 	public ArrayList<Reply> selectMyCommentList(HashMap<String, Object> map) {
 		return replyMapper.selectMyCommentList(map);
 
-	}
-
-	public List<Reply> sReplyList(Map<String, Object> map) {
-		return replyMapper.sReplyList(map);
-	}
-
-	public int rInsertReply(Reply reply) {
-		return replyMapper.rInsertReply(reply);
-	}
-
-	public int rUpdateReply(Reply reply) {
-		return replyMapper.rUpdateReply(reply);
-	}
-
-	public int rDeleteReply(Reply reply) {
-	    return replyMapper.rDeleteReply(reply);
 	}
 
 }

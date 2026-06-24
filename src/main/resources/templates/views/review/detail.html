@@ -134,8 +134,9 @@
     <div class="mb-6 flex gap-3" th:if="${session.loginUser != null}">
       <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-brand-soft font-bold text-brand-ink">M</span>
       <div class="flex-1 overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
-        <form th:action="@{/reply/rInsert}" method="post">
-          <input type="hidden" name="postNo" th:value="${review.travelNo}" />
+        <form th:action="@{/reply/insert}" method="post">
+          <input type="hidden" name="postNo"    th:value="${review.travelNo}" />
+          <input type="hidden" name="postBoard" value="T" />
           <textarea name="content"
                     class="block min-h-16 w-full resize-none border-none bg-transparent px-4 py-3 text-sm leading-relaxed outline-none placeholder:text-faint"
                     placeholder="댓글을 남겨보세요"></textarea>
@@ -170,10 +171,11 @@
 	
 	  <div class="bg-white p-5 rounded-lg w-96">
 	
-	    <form method="post" th:action="@{/reply/rUpdate}">
+	    <form method="post" th:action="@{/reply/update}">
 	      
 	      <input type="hidden" name="replyNo">
-	      <input type="hidden" name="postNo" th:value="${review.travelNo}">
+	      <input type="hidden" name="postNo"    th:value="${review.travelNo}">
+	      <input type="hidden" name="postBoard" value="T">
 	
 	      <textarea name="content" class="w-full border p-2 rounded" rows="4"></textarea>
 	
@@ -195,6 +197,7 @@
 	    <form id="replyDeleteForm" method="post">
 	      <input type="hidden" name="replyNo">
 	      <input type="hidden" name="postNo">
+	      <input type="hidden" name="postBoard" value="T">
 	
 	      <div class="flex justify-end gap-2">
 	        <button type="button" onclick="closeReplyDeleteModal()">취소</button>
@@ -319,7 +322,7 @@ function openReplyDeleteModal(btn) {
     const modal = document.getElementById("replyDeleteModal");
     const form = document.getElementById("replyDeleteForm");
 
-    form.action = "/reply/rDelete";
+    form.action = "/reply/delete";
 
     form.querySelector('input[name="replyNo"]').value = replyNo;
     form.querySelector('input[name="postNo"]').value = postNo;
