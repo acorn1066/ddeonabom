@@ -41,9 +41,10 @@
            th:if="${session.loginUser != null and session.loginUser.memberNo == review.memberNo}">
         <a th:href="@{/reviews/update(travelNo=${review.travelNo})}" class="hover:text-brand">수정</a>
         <span class="text-line">·</span>
-        <a th:href="@{/reviews/delete(travelNo=${review.travelNo})}"
-           onclick="return confirm('정말 삭제하시겠습니까?')"
-           class="hover:text-brand">삭제</a>
+        <form id="deleteForm" action="/reviews/delete" method="post">
+		    <input type="hidden" name="travelNo" th:value="${review.travelNo}">
+		    <button type="button" th:onclick="|deleteReview(${review.travelNo})|">삭제</button>
+		</form>
       </div>
     </div>
   </div>
@@ -367,6 +368,17 @@ function openReplyDeleteModal(btn) {
 
 function closeReplyDeleteModal() {
     document.getElementById("replyDeleteModal").classList.add("hidden");
+}
+
+function deleteReview(travelNo) {
+    openDangerModal(
+        "게시글 삭제",
+        "정말 삭제하시겠습니까?",
+        () => {
+            document.getElementById("deleteForm").submit();
+        },
+        "삭제"
+    );
 }
 
 </script>

@@ -62,6 +62,8 @@ public interface ReviewMapper {
 
 	void updateReviewSub(ReviewSub sub);
 
+	void deleteReview(int travelNo);
+
 	
 
 }
