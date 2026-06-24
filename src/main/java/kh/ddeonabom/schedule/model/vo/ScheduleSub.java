@@ -26,4 +26,8 @@ public class ScheduleSub {
     private String firstimage;
     private String mapx;
     private String mapy;
+    
+    private String contentTitle;
+    private double lat;
+    private double lng;
 }
