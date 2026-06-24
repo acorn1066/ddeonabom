@@ -109,8 +109,6 @@ public class ReviewService {
 			List<ReviewSub> subList = review.getSubList();
 			
 			if (subList != null && !subList.isEmpty()) {
-				
-				// 🌟 [핵심 변경] 몇 번째 파일이 저장될지 추적하는 별도의 인덱스 포인터 가동!
 				int fileIdx = 0; 
 				
 				for (int i = 0; i < subList.size(); i++) {
@@ -121,8 +119,6 @@ public class ReviewService {
 					
 					// 2. 관광지 기본 정보 수정 (위度, 경도 등)
 					reviewMapper.reviewSubUpdate(sub); 
-					
-					// 3. 📸 [사진 누락 박멸] 독립된 fileIdx 포인터를 기준으로 파일을 순차 검색합니다.
 					if (imageFiles != null && imageFiles.size() > fileIdx) {
 						MultipartFile file = imageFiles.get(fileIdx);
 						
@@ -137,28 +133,20 @@ public class ReviewService {
 							    
 							    // 하드디스크에 실물 파일 물리 저장
 							    file.transferTo(new java.io.File(savePath + rename));
-							    
-							    // ──────────────────────────────────────────
-							    // 🌟 [Image VO 맞춤형] 진짜 필드명으로 매핑 완료!
-							    // ──────────────────────────────────────────
 							    Image img = new Image();
 							    
-							    img.setTravelSubNo(sub.getTravelSubNo()); // 매칭 완료
-							    img.setImagePath("/uploads");              // 매칭 완료
-							    img.setFileName(originalName);            // 🌟 오리지널 이름은 fileName에 저장!
-							    img.setRenameFile(rename);                // 🌟 바뀐 이름은 renameFile에 저장!
+							    img.setTravelSubNo(sub.getTravelSubNo());
+							    img.setImagePath("/uploads");              
+							    img.setFileName(originalName);  
+							    img.setRenameFile(rename);               
 							    
 							    // 이미지 레벨 세터는 VO에 없으므로 과감히 제외합니다.
 							    
-							    this.insertImage(img);
-							    System.out.println("📸 [업로드 성공] DB 및 폴더 저장 완료 -> " + rename);
-							    
-							} catch (Exception e) {
-							    System.out.println("❌ 파일 저장 중 예외 발생");
+							    this.insertImage(img);						    
+							} catch (Exception e) {							  
 							    e.printStackTrace();
 							}
 						}
-						// 🌟 한 장 처리했든 빈 파일이든 다음 파일로 포인터를 이동시킵니다.
 						fileIdx++; 
 					}
 				}

@@ -276,7 +276,7 @@ public class ReviewController {
 	    review.setRegion(request.getParameter("region"));
 	    review.setVisibility(request.getParameter("visibility"));
 
-	    // 🌟 [날짜 오류 해결] 문자열 포맷을 java.sql.Date로 안전하게 파싱하여 정확한 변수명으로 매핑!
+	    //문자열 포맷을 java.sql.Date로 안전하게 파싱하여 정확한 변수명으로 매핑!
 	    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
 	    String startDateStr = request.getParameter("travelStartDate");
 	    String endDateStr = request.getParameter("travelEndDate");
@@ -308,8 +308,7 @@ public class ReviewController {
 	        sub.setTravelSubContent(request.getParameter("subList[" + i + "].travelSubContent"));
 	        sub.setImagePath(request.getParameter("subList[" + i + "].imagePath"));
 	        
-	        // 🌟 [contentId 오류 해결] 혹시 contentId가 숫자(int)형일 경우를 대비해 숫자로 변환하여 주입합니다.
-	        // 만약 본인 VO의 contentId가 String이 맞다면 바로 아래 3줄을 지우고 원래 쓰시던 sub.setContentId(rawContentId); 로 바꾸시면 됩니다.
+
 	        String rawContentId = request.getParameter("subList[" + i + "].contentId");
 	        int contentId = (rawContentId != null && !rawContentId.trim().isEmpty()) ? Integer.parseInt(rawContentId.trim()) : 0;
 	        sub.setContentId(contentId); 
