@@ -2,7 +2,13 @@ package kh.ddeonabom.member.controller;
 
 
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -196,6 +202,21 @@ public class MemberController {
         if (loginUser != null && bcrypt.matches(m.getPwd(), loginUser.getPwd())) {
 
             session.setAttribute("loginUser", loginUser);
+            
+            //로그인 활동량을 위해 만든 파일 입니다
+            String logPath = "C:/logs/ddeonabom/login/";
+            File dir = new File(logPath);
+            if (!dir.exists()) dir.mkdirs();
+
+            String today = new SimpleDateFormat("yy-MM-dd").format(new Date());
+            File logFile = new File(logPath + today + ".log");
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, true))) {
+                bw.write(today + " " + loginUser.getId());
+                bw.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             
             // 관리자면 admin 페이지 우선 이동
             if ("Y".equals(loginUser.getIsAdmin())) {

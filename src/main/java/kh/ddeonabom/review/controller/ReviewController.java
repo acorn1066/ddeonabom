@@ -33,7 +33,6 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 
-
 public class ReviewController {
 	private final ReviewService reviewService;
 	private final ReplyService replyService;
@@ -83,7 +82,7 @@ public class ReviewController {
 	
 	@GetMapping("/reviews/sdwrite")
 	public String writeForm(@RequestParam("travelNo") Long travelNo, Model model) {
-		System.out.println("travelNo = " + travelNo);
+		
 	    if (travelNo != null) {
 	        Review review = reviewService.getTravelWithSubList(travelNo); // 제목 + subList(관광지들) 같이 조회
 	        model.addAttribute("review", review);
@@ -100,9 +99,6 @@ public class ReviewController {
 	        r.setMemberNo(loginUser.getMemberNo());
 	    }
 	    int result = reviewService.insertReview(r);
-
-	    System.out.println("start = " + r.getTravelStartDate());
- 	    System.out.println("end = " + r.getTravelEndDate());
 	    if (result > 0) {
 	    	String uploadPath = "C:/reviews"; 
 	        
@@ -111,8 +107,6 @@ public class ReviewController {
 	            uploadDir.mkdirs();
 	        }
 	        if (r.getSubList() != null) {
-	        	 System.out.println("start = " + r.getTravelStartDate());
-	     	    System.out.println("end = " + r.getTravelEndDate());
 	            for (int i = 0; i < r.getSubList().size(); i++) {
 	                ReviewSub sub = r.getSubList().get(i);
 	                sub.setTravelNo(r.getTravelNo());   
@@ -165,6 +159,12 @@ public class ReviewController {
 	        return "redirect:/reviews/list";
 	    }
 	    model.addAttribute("review", review);
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("postNo", travelNo);
+	    map.put("postBoard", "T");
+
+	    List<Reply> replyList = replyService.sReplyList(map);
+	    model.addAttribute("replyList", replyList);
 	    model.addAttribute("kakaoApiKey", "77218df82558088a0b690733061ba6f2");
 	    return "views/review/detail";
 	}

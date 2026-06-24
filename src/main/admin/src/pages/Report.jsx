@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import "./Page.css";
 import Pagination from "../components/Pagination";
 import { useBoards } from "../hooks/useBoards";
+import AdminModal from "../components/AdminModal";
 
 const statusLabel = { N: "미처리", Y: "처리완료", C: "확인완료", R: "반려" };
 const statusBadgeClass = {
@@ -174,23 +175,11 @@ const Report = () => {
 
             {/* 모달 */}
             {showModal && selectReport && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={closeModal}>
-                    <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-between border-b p-4">
-                            <h1 className="text-lg font-bold">신고 상세정보</h1>
-                            <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">✕</button>
-                        </div>
-                        <div className="space-y-3 p-4">
-                            <p><strong>신고번호 :</strong> {selectReport.reportNo}</p>
-                            <p><strong>신고유형 :</strong> {boardTypeLabel[selectReport.targetType]}</p>
-                            <p><strong>신고대상 :</strong> {selectReport.targetTitle}</p>
-                            <p><strong>신고자 :</strong> {selectReport.reporterName}</p>
-                            <p><strong>신고일 :</strong> {selectReport.reportDate.split('T')[0]}</p>
-                            <p><strong>상태 :</strong> {statusLabel[selectReport.reportStatus]}</p>
-                            <p><strong>신고사유 :</strong></p>
-                            <div className="rounded-lg bg-gray-50 p-3">{selectReport.reason || "내용 없음"}</div>
-                        </div>
-                        <div className="flex justify-end gap-2 border-t p-4">
+                <AdminModal
+                    title="신고 정보"
+                    onClose={closeModal}
+                    footer={
+                        <>
                             {selectReport.reportStatus === "N" && (
                                 <>
                                     <button
@@ -208,13 +197,23 @@ const Report = () => {
                                 </>
                             )}
                             <button onClick={closeModal} className="rounded-lg bg-gray-200 px-4 py-2 cursor-pointer">닫기</button>
-                        </div>
+                        </>
+                    }
+                >
+                    <div className="space-y-3">
+                        <p><strong>신고번호 :</strong> {selectReport.reportNo}</p>
+                        <p><strong>신고유형 :</strong> {boardTypeLabel[selectReport.targetType]}</p>
+                        <p><strong>신고대상 :</strong> {selectReport.targetTitle}</p>
+                        <p><strong>신고자 :</strong> {selectReport.reporterName}</p>
+                        <p><strong>신고일 :</strong> {selectReport.reportDate.split('T')[0]}</p>
+                        <p><strong>상태 :</strong> {statusLabel[selectReport.reportStatus]}</p>
+                        <p><strong>신고사유 :</strong></p>
+                        <div className="rounded-lg bg-gray-50 p-3">{selectReport.reason || "내용 없음"}</div>
                     </div>
-                </div>
+                </AdminModal>
             )}
-            {showModal && <div className="modal-backdrop fade show"></div>}
 
-        </section>
+        </section >
     );
 };
 

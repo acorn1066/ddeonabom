@@ -75,6 +75,12 @@ public interface AdminMapper {
 	int updateTargetStatus(AdminReport report);
 
 	int selectMemberCountList(HashMap<String, Object> map);
+
+	ArrayList<HashMap<String, Object>> selectScheduleActivity();
+
+	ArrayList<HashMap<String, Object>> selectQlistActivity();
+
+	ArrayList<HashMap<String, Object>> selectTravelActivity();
 	
 	
 }

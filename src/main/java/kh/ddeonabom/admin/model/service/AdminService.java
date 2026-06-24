@@ -144,6 +144,20 @@ public class AdminService {
 	    return mapper.updateTargetStatus(report);
 
 	}
+
+	public ArrayList<HashMap<String, Object>> selectScheduleActivity() {
+	    return mapper.selectScheduleActivity();
+	}
+
+	public ArrayList<HashMap<String, Object>> selectQlistActivity() {
+	    return mapper.selectQlistActivity();
+	}
+
+	public ArrayList<HashMap<String, Object>> selectTravelActivity() {
+	    return mapper.selectTravelActivity();
+	}
+
+
 	
 }
 	
