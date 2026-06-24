@@ -3,6 +3,8 @@ package kh.ddeonabom.review.model.vo;
 import java.sql.Date;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,4 +37,7 @@ public class Review {
     private String visibility;
     private String nickname;
     private String reportStatus;
+    
+  
+
 }

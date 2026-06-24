@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.review.model.mappers.ReviewMapper;
@@ -91,6 +93,78 @@ public class ReviewService {
 
 	public Review sReview(int travelNo) {
 		return reviewMapper.sReview(travelNo);
+	}
+
+	public Review reviewUpdate(int travelNo) {
+		return reviewMapper.ReviewDetail(travelNo);
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public int reviewUpdateAction(Review review, List<MultipartFile> imageFiles) {
+		
+		// 1. 메인 테이블 수정
+		int result = reviewMapper.reviewUpdateAction(review);
+		
+		if (result > 0) {
+			List<ReviewSub> subList = review.getSubList();
+			
+			if (subList != null && !subList.isEmpty()) {
+				
+				// 🌟 [핵심 변경] 몇 번째 파일이 저장될지 추적하는 별도의 인덱스 포인터 가동!
+				int fileIdx = 0; 
+				
+				for (int i = 0; i < subList.size(); i++) {
+					ReviewSub sub = subList.get(i);
+					
+					sub.setTravelNo(review.getTravelNo()); 
+					sub.setTravelSubSeq(i + 1);            
+					
+					// 2. 관광지 기본 정보 수정 (위度, 경도 등)
+					reviewMapper.reviewSubUpdate(sub); 
+					
+					// 3. 📸 [사진 누락 박멸] 독립된 fileIdx 포인터를 기준으로 파일을 순차 검색합니다.
+					if (imageFiles != null && imageFiles.size() > fileIdx) {
+						MultipartFile file = imageFiles.get(fileIdx);
+						
+						// 비어있지 않은 진짜 파일인지 체크
+						if (file != null && !file.isEmpty()) {
+							String savePath = "C:/reviews/"; // 실제 물리 경로
+							
+							try {
+							    String originalName = file.getOriginalFilename();
+							    String ext = originalName.substring(originalName.lastIndexOf("."));
+							    String rename = java.util.UUID.randomUUID().toString() + ext;
+							    
+							    // 하드디스크에 실물 파일 물리 저장
+							    file.transferTo(new java.io.File(savePath + rename));
+							    
+							    // ──────────────────────────────────────────
+							    // 🌟 [Image VO 맞춤형] 진짜 필드명으로 매핑 완료!
+							    // ──────────────────────────────────────────
+							    Image img = new Image();
+							    
+							    img.setTravelSubNo(sub.getTravelSubNo()); // 매칭 완료
+							    img.setImagePath("/uploads");              // 매칭 완료
+							    img.setFileName(originalName);            // 🌟 오리지널 이름은 fileName에 저장!
+							    img.setRenameFile(rename);                // 🌟 바뀐 이름은 renameFile에 저장!
+							    
+							    // 이미지 레벨 세터는 VO에 없으므로 과감히 제외합니다.
+							    
+							    this.insertImage(img);
+							    System.out.println("📸 [업로드 성공] DB 및 폴더 저장 완료 -> " + rename);
+							    
+							} catch (Exception e) {
+							    System.out.println("❌ 파일 저장 중 예외 발생");
+							    e.printStackTrace();
+							}
+						}
+						// 🌟 한 장 처리했든 빈 파일이든 다음 파일로 포인터를 이동시킵니다.
+						fileIdx++; 
+					}
+				}
+			}
+		}
+		return result; 
 	}
 
 	

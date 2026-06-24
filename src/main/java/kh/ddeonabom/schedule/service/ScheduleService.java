@@ -133,4 +133,14 @@ public class ScheduleService {
 	    param.put("visibility", visibility);
 	    mapper.updateScheduleVisibility(param);
 	}
+
+	
+	public List<ScheduleSub> selectScheduleSubList(int scheduleNo){
+		return mapper.selectScheduleSubList(scheduleNo);
+	}
+
+
+	public ScheduleMain selectScheduleDetail(Integer scheduleNo) {
+		return mapper.selectScheduleDetail(scheduleNo);
+	}
 }

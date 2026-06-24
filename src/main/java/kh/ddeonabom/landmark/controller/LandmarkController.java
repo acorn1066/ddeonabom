@@ -4,6 +4,7 @@ package kh.ddeonabom.landmark.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,7 +33,7 @@ public class LandmarkController {
 	// 관광지 리스트 가져오기
 	@GetMapping("list")
 	public String selectList(@RequestParam(value = "page", defaultValue = "1") int currentPage,
-								Model model, HttpServletRequest request) {
+								Model model, HttpServletRequest request, HttpSession session) {
 		
 		int listCount = lService.getListCount();
 		PageInfo pi = Pagination.getPageInfo(currentPage, listCount, 10, 20);
@@ -47,6 +48,13 @@ public class LandmarkController {
 		contentType.put(32, "숙박");
 		contentType.put(38, "쇼핑");
 		contentType.put(39, "음식점");
+		
+		Member loginUser = (Member)session.getAttribute("loginUser");
+		if(loginUser != null) {
+			int memberNo = loginUser.getMemberNo();
+			Set<Integer> niceList = lService.niceList(memberNo);
+			model.addAttribute("niceList", niceList);
+		}
 		
 		model.addAttribute("contentType", contentType);
 		model.addAttribute("loc", request.getRequestURI());
@@ -96,6 +104,25 @@ public class LandmarkController {
 			newState = 0;
 		} else {
 			lService.insertNice(lNumber, memberNo);
+			newState = 1;
+		}
+		
+		return newState;
+	}
+	
+	@ResponseBody
+	@PostMapping("listNice")
+	public int listNice(@RequestParam("contentId") int contentId, @RequestParam("memberNo") int memberNo) {
+		
+		int result = lService.landmarkNice(contentId, memberNo);
+		System.out.println(result);
+		
+		int newState;
+		if(result > 0) {
+			lService.deleteNice(contentId, memberNo);
+			newState = 0;
+		} else {
+			lService.insertNice(contentId, memberNo);
 			newState = 1;
 		}
 		

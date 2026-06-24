@@ -1,18 +1,20 @@
 <!doctype html>
 <html lang="ko">
 <head th:replace="~{views/common/head :: head}"></head>
-
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=bc2203afc9aba0a5253c96f937497e0d&libraries=services"></script>
 <body class="bg-white text-ink">
 
 <div th:replace="~{views/common/navbar :: navbar}"></div>
 
-<!-- ════════════ MAIN ════════════ -->
 <main class="mx-auto max-w-3xl px-6 pb-24 pt-16">
-  <h1 class="mb-2 text-3xl font-extrabold tracking-tight">여행 후기 작성</h1>
+  <h1 class="mb-2 text-3xl font-extrabold tracking-tight" 
+      th:text="${review != null ? '여행 후기 수정' : '여행 후기 작성'}">여행 후기 작성</h1>
   <p class="mb-12 text-15 text-muted">한 번의 여행에서 들른 관광지들의 후기를 모아 한 편의 글로 남겨보세요.</p>
 
-  <form action="/reviews/insert" method="post" enctype="multipart/form-data">
-    <!-- 1. 여행 정보 -->
+  <form th:action="${review != null ? '/reviews/update' : '/reviews/insert'}" method="post" enctype="multipart/form-data">
+    
+    <input type="hidden" name="travelNo" th:value="${review != null ? review.travelNo : 0}" />
+
     <div class="mb-5 rounded-xl border border-line bg-white p-6 shadow-soft">
       <h2 class="mb-5 flex items-center gap-2 text-base font-bold">
         <span class="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-13 font-bold text-white">1</span>
@@ -21,39 +23,43 @@
       <div class="flex flex-col gap-5">
         <div class="flex flex-col gap-2">
           <label class="text-13 font-semibold">여행 제목</label>
-          <input id="travelTitle" name="travelTitle" th:value="${travel != null ? travel.travelTitle : ''}" class="h-13 rounded-lg border border-line bg-white px-4 text-17 font-semibold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft" placeholder="예) 제주 동쪽 3박 4일" />
+          <input id="travelTitle" name="travelTitle" 
+                 th:value="${review != null ? review.travelTitle : ''}" 
+                 class="h-13 rounded-lg border border-line bg-white px-4 text-17 font-semibold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft" 
+                 placeholder="예) 제주 동쪽 3박 4일" />
         </div>
         <div class="flex flex-col gap-2">
-		  <label class="text-13 font-semibold">지역</label>
-		  <select name="region" id="region"
-		    class="h-12 rounded-lg border border-line bg-white px-4 text-sm outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft">
-		    <option value="">지역 선택</option>
-		    <option value="제주">제주</option>
-		    <option value="수도권">수도권</option>
-		    <option value="강원">강원</option>
-		    <option value="충청">충청</option>
-		    <option value="경상">경상</option>
-		    <option value="전라">전라</option>
-		    
-		  </select>
-		</div>
+          <label class="text-13 font-semibold">지역</label>
+          <select name="region" id="region"
+            class="h-12 rounded-lg border border-line bg-white px-4 text-sm outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft">
+            <option value="">지역 선택</option>
+            <option value="제주" th:selected="${review != null and review.region == '제주'}">제주</option>
+            <option value="수도권" th:selected="${review != null and review.region == '수도권'}">수도권</option>
+            <option value="강원" th:selected="${review != null and review.region == '강원'}">강원</option>
+            <option value="충청" th:selected="${review != null and review.region == '충청'}">충청</option>
+            <option value="경상" th:selected="${review != null and review.region == '경상'}">경상</option>
+            <option value="전라" th:selected="${review != null and review.region == '전라'}">전라</option>
+          </select>
+        </div>
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-2">
             <label class="text-13 font-semibold">여행 시작일</label>
-            <input type="date" id="startDate" name="travelStartDate" class="h-12 rounded-lg border border-line bg-white px-4 text-sm outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft" />
+            <input type="date" id="startDate" name="travelStartDate" 
+                   th:value="${review != null ? review.travelStartDate : ''}" 
+                   class="h-12 rounded-lg border border-line bg-white px-4 text-sm outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft" />
           </div>
           <div class="flex flex-col gap-2">
             <label class="text-13 font-semibold">여행 종료일</label>
-            <input type="date" id="endDate" name="travelEndDate" class="h-12 rounded-lg border border-line bg-white px-4 text-sm outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft" />
+            <input type="date" id="endDate" name="travelEndDate" 
+                   th:value="${review != null ? review.travelEndDate : ''}" 
+                   class="h-12 rounded-lg border border-line bg-white px-4 text-sm outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft" />
           </div>
         </div>
 
-        <!-- 지도 검색 + 지도 -->
         <div class="flex flex-col gap-2">
           <label class="text-13 font-semibold">동선 지도</label>
           <p class="text-xs text-muted">장소를 검색해서 지도에 추가하면 관광지 카드가 자동으로 생성됩니다.</p>
 
-          <!-- 검색창 -->
           <div class="flex gap-2">
             <input id="mapSearchInput" type="text"
               class="h-10 flex-1 rounded-lg border border-line bg-white px-4 text-sm outline-none transition placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft"
@@ -64,73 +70,66 @@
             </button>
           </div>
 
-          <!-- 검색 결과 목록 -->
           <ul id="mapSearchResults" class="hidden flex-col gap-1 rounded-lg border border-line bg-white p-2 text-sm shadow-soft"></ul>
 
-          <!-- 카카오맵 -->
-          <div id="map" class="overflow-hidden rounded-lg border border-line"></div>
+          <div id="map" class="h-96 overflow-hidden rounded-lg border border-line"></div>
         </div>
       </div>
     </div>
 
-    <!-- 2. 관광지별 후기 -->
     <div class="mb-5 rounded-xl border border-line bg-white p-6 shadow-soft">
-	  <h2 class="mb-5 flex items-center gap-2 text-base font-bold">
-	    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-13 font-bold text-white">2</span>
-	    관광지별 후기
-	  </h2>
-	  <div id="spotList" class="flex flex-col gap-4">
-	    <p id="spotEmpty" class="py-6 text-center text-sm text-muted">지도에서 장소를 추가하거나 아래 버튼을 눌러 직접 입력하세요.</p>
-	  </div>
-	  <button type="button" id="addSpotBtn"
-	    class="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line bg-sunk text-sm font-bold text-muted transition hover:border-brand hover:bg-brand-soft hover:text-brand">
-	    <span class="text-lg">＋</span> 관광지 직접 추가
-	  </button>
-	</div>
+      <h2 class="mb-5 flex items-center gap-2 text-base font-bold">
+        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-13 font-bold text-white">2</span>
+        관광지별 후기
+      </h2>
+      <div id="spotList" class="flex flex-col gap-4">
+        <p id="spotEmpty" class="py-6 text-center text-sm text-muted">지도에서 장소를 추가하거나 아래 버튼을 눌러 직접 입력하세요.</p>
+      </div>
+      <button type="button" id="addSpotBtn"
+        class="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line bg-sunk text-sm font-bold text-muted transition hover:border-brand hover:bg-brand-soft hover:text-brand">
+        <span class="text-lg">＋</span> 관광지 직접 추가
+      </button>
+    </div>
 
-    <!-- 3. 공개 설정 -->
     <div class="mb-5 rounded-xl border border-line bg-white p-6 shadow-soft">
       <h2 class="mb-5 flex items-center gap-2 text-base font-bold">
         <span class="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-13 font-bold text-white">3</span>
         공개 설정
       </h2>
       <div id="visibility-group" class="flex flex-col gap-3">
-	    <label class="flex items-center gap-2.5 text-sm text-muted">
-	        <input type="radio" name="visibility" value="PUBLIC" class="accent-brand" checked />
-	        <span><b class="text-ink">전체 공개</b> · 누구나 볼 수 있고 관광지 상세에 후기가 노출됩니다</span>
-	    </label>
-	    <label class="flex items-center gap-2.5 text-sm text-muted">
-	        <input type="radio" name="visibility" value="MEMBER" class="accent-brand" />
-	        <span><b class="text-ink">회원 공개</b> · 로그인한 떠나봄 회원만 볼 수 있습니다</span>
-	    </label>
-	  </div>
+        <label class="flex items-center gap-2.5 text-sm text-muted">
+            <input type="radio" name="visibility" value="PUBLIC" class="accent-brand" 
+                   th:checked="${review == null or review.visibility == 'PUBLIC' or review.visibility == null}" />
+            <span><b class="text-ink">전체 공개</b> · 누구나 볼 수 있고 관광지 상세에 후기가 노출됩니다</span>
+        </label>
+        <label class="flex items-center gap-2.5 text-sm text-muted">
+            <input type="radio" name="visibility" value="MEMBER" class="accent-brand" 
+                   th:checked="${review != null and review.visibility == 'MEMBER'}" />
+            <span><b class="text-ink">회원 공개</b> · 로그인한 떠나봄 회원만 볼 수 있습니다</span>
+        </label>
+      </div>
     </div>
 
     <div class="flex justify-end gap-2">
       <a href="list" class="inline-flex h-11 items-center rounded-lg border border-line bg-white px-5 text-sm font-semibold text-ink transition hover:bg-sunk">취소</a>
-      <button type="button" id="submitBtn" class="inline-flex h-11 items-center rounded-lg border border-line bg-white px-5 text-sm font-semibold text-ink transition hover:bg-sunk">후기 등록</button>
+      <button type="button" id="submitBtn" 
+              th:text="${review != null ? '후기 수정' : '후기 등록'}"
+              class="inline-flex h-11 items-center rounded-lg border border-line bg-white px-5 text-sm font-semibold text-ink transition hover:bg-sunk">후기 등록</button>
     </div>
   </form>
 </main>
 
 <footer th:replace="~{views/common/footer :: footer}"></footer>
 
-
-
-// ════════════════════════════════════════
-//  카카오맵 초기화
-// ════════════════════════════════════════
 <script th:inline="javascript">
-// 🌟 [중요] autoload=false 일 때는 이 안에서 모든 카카오 지도 코드가 실행되어야 합니다.
 kakao.maps.load(function () {
 
-    // 1. 지도 초기화 (id가 'map'인 div에 지도를 그립니다)
+    // 1. 지도 초기화
     const map = new kakao.maps.Map(document.getElementById('map'), {
         center: new kakao.maps.LatLng(33.3617, 126.5292), // 제주도 중심
         level: 10
     });
 
-    // 2. 장소 검색 서비스 객체 생성 (head에 &libraries=services 가 있어야 정상 작동)
     const ps = new kakao.maps.services.Places();
     const markers = [];   // 지도 위 마커 목록
     
@@ -144,13 +143,13 @@ kakao.maps.load(function () {
         strokeStyle: 'solid'
     });
 
-    // ── 동선 폴리라인 갱신 ──────────────────
+    // 동선 폴리라인 갱신
     function updatePolyline() {
         const path = markers.map(m => m.getPosition());
         polyline.setPath(path);
     }
 
-    // ── 마커 번호 이미지 생성 ────────────────
+    // 마커 번호 이미지 생성 
     function makeMarkerImage(num) {
         const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
@@ -210,7 +209,6 @@ kakao.maps.load(function () {
     searchBtn.addEventListener('click', searchPlaces);
     searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') searchPlaces(); });
 
-    // 검색창 바깥 클릭 시 결과 닫기
     document.addEventListener('click', e => {
         if (!searchInput.contains(e.target) && !searchBtn.contains(e.target) && !resultsList.contains(e.target)) {
             resultsList.classList.add('hidden');
@@ -242,6 +240,19 @@ kakao.maps.load(function () {
             place.x,
             place.id           
         );
+    }
+
+    function addExistingPlaceToMap(title, lat, lng, contentId, index) {
+        if(!lat || !lng) return;
+        const latlng = new kakao.maps.LatLng(lat, lng);
+
+        const marker = new kakao.maps.Marker({
+            map,
+            position: latlng,
+            image: makeMarkerImage(index)
+        });
+        markers.push(marker);
+        updatePolyline();
     }
 
     // ════════════════════════════════════════
@@ -280,9 +291,9 @@ kakao.maps.load(function () {
     }
 
     // ════════════════════════════════════════
-    //  관광지 리뷰 카드 동적 생성
+    //  [업그레이드된] 관광지 리뷰 카드 동적 생성 및 사진 미리보기 함수
     // ════════════════════════════════════════
-    function addSpotCard(name = '', address = '', index, lat = '', lng = '', contentId = '') {
+    function addSpotCard(name = '', address = '', index, lat = '', lng = '', contentId = '', rating = 0, textContent = '', travelSubNo = 0, imagePath = '') {
         document.getElementById('spotEmpty')?.remove();
 
         const list = document.getElementById('spotList');
@@ -291,9 +302,12 @@ kakao.maps.load(function () {
 
         const div = document.createElement('div');
         div.className = 'spot-card rounded-xl border border-line p-5';
+        
         div.innerHTML = `
             <input type="hidden" class="spot-lat" name="subList[${idx}].lat" value="${lat}" />
             <input type="hidden" class="spot-lng" name="subList[${idx}].lng" value="${lng}" />
+            <input type="hidden" class="spot-sub-no" name="subList[${idx}].travelSubNo" value="${travelSubNo}" />
+
             <div class="mb-4 flex items-center gap-3">
                 <span class="spot-num flex h-7 w-7 flex-none items-center justify-center rounded-full bg-brand-soft text-13 font-bold text-brand-ink">${num}</span>
                 <div class="spot-name font-bold">${name}</div>
@@ -311,23 +325,33 @@ kakao.maps.load(function () {
                     <span class="star-btn select-none cursor-pointer" data-val="5">★</span>
                 </div>
                 <span class="rating-label text-13 font-semibold text-muted">별점을 선택해주세요</span>
-                <input type="hidden" class="rating-value" name="subList[${idx}].rating" value="0" />
+                <input type="hidden" class="rating-value" name="subList[${idx}].rating" value="${rating}" />
             </div>
             <textarea
                 name="subList[${idx}].travelSubContent"
                 class="min-h-24 w-full rounded-lg border border-line bg-white p-3 text-sm leading-relaxed outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft"
-                placeholder="관광지에 대한 후기를 작성해주세요."></textarea>
+                placeholder="관광지에 대한 후기를 작성해주세요.">${textContent}</textarea>
+            
             <div class="mt-3 flex flex-col gap-2">
+	            ${imagePath && imagePath !== '/' ? `
+	            	    <div class="existing-image-preview flex items-center gap-2 mb-1 existing-img-wrap">
+	            	        <div class="relative h-18 w-18 overflow-hidden rounded-lg border border-line">
+	            	            <img src="${imagePath}" class="h-full w-full object-cover" alt="기존 등록 사진" />
+	            	        </div>
+	            	        <span class="text-xs text-muted">기존 등록된 사진이 있습니다.</span>
+	            	        <input type="hidden" class="spot-img-path" name="subList[${idx}].imagePath" value="${imagePath}" />
+	            	    </div>
+	            	` : ''}
+
                 <label class="flex h-18 w-18 flex-col items-center justify-center gap-0.5 rounded-lg border border-dashed border-line bg-sunk text-faint transition hover:border-brand hover:text-brand cursor-pointer">
                     <span class="text-lg">＋</span>
                     <span class="text-xs">사진</span>
                     <input type="file" name="subList[${idx}].imageFiles" accept="image/*" class="hidden" multiple />
                 </label>
-                <div class="file-name-list text-xs text-muted flex flex-col gap-1"></div>
+                <div class="file-name-list flex flex-wrap gap-2 mt-2"></div>
             </div>
         `;
 
-        // 카드 삭제 이벤트
         div.querySelector('.remove-spot').addEventListener('click', () => {
             const idx = Array.from(list.querySelectorAll('.spot-card')).indexOf(div);
             if (idx >= 0 && markers[idx]) {
@@ -341,8 +365,16 @@ kakao.maps.load(function () {
         });
 
         initStars(div);
+        
+        if(rating > 0) {
+            const stars = div.querySelectorAll('.star-btn');
+            stars.forEach(s => { s.style.color = parseInt(s.dataset.val) <= rating ? BRAND : '#D1D5DB'; });
+            const label = div.querySelector('.rating-label');
+            label.textContent = RATING_LABELS[rating];
+            label.style.color = BRAND;
+        }
 
-        // 사진 파일 업로드 이벤트 핸들러
+        // 🌟 [미리보기 치트키] 새로 추가한 사진의 썸네일 노출 및 파일 데이터 유지 로직
         const fileInput = div.querySelector('input[type="file"]');
         const fileNameList = div.querySelector('.file-name-list');
         let allFiles = [];
@@ -353,82 +385,209 @@ kakao.maps.load(function () {
                     allFiles.push(file);
                 }
             });
-
             const dt = new DataTransfer();
             allFiles.forEach(file => dt.items.add(file));
             fileInput.files = dt.files;
-
             renderFileList();
         });
 
         function renderFileList() {
-            fileNameList.innerHTML = '';
+            fileNameList.innerHTML = ''; // 초기화
             allFiles.forEach((file, i) => {
-                const p = document.createElement('p');
-                p.className = 'flex items-center gap-1';
-                p.innerHTML = `📎 ${file.name} <button type="button" class="text-red-400 text-xs ml-1" data-index="${i}">✕</button>`;
-                fileNameList.appendChild(p);
-            });
-
-            fileNameList.querySelectorAll('button').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const idx = parseInt(this.dataset.index);
-                    allFiles.splice(idx, 1);
-                    const dt = new DataTransfer();
-                    allFiles.forEach(file => dt.items.add(file));
-                    fileInput.files = dt.files;
-                    renderFileList();
-                });
+                const container = document.createElement('div');
+                container.className = 'flex items-center gap-2 p-1.5 border border-line rounded-lg bg-sunk relative';
+                
+                // FileReader를 이용하여 실시간 파일 데이터 시각화
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    container.innerHTML = `
+                        <div class="relative h-14 w-14 overflow-hidden rounded-md border border-line">
+                            <img src="${e.target.result}" class="h-full w-full object-cover" alt="미리보기" />
+                        </div>
+                        <div class="text-11 truncate max-w-24">
+                            <p class="font-medium truncate text-ink">${file.name}</p>
+                            <p class="text-muted">${(file.size / 1024).toFixed(1)} KB</p>
+                        </div>
+                        <button type="button" class="text-red-400 font-bold ml-1 px-1 text-xs hover:bg-white rounded" data-index="${i}">✕</button>
+                    `;
+                    
+                    // 미리보기 상자 내부 삭제 버튼 기동
+                    container.querySelector('button').addEventListener('click', function() {
+                        const idx = parseInt(this.dataset.index);
+                        allFiles.splice(idx, 1);
+                        const dt = new DataTransfer();
+                        allFiles.forEach(file => dt.items.add(file));
+                        fileInput.files = dt.files;
+                        renderFileList();
+                    });
+                };
+                reader.readAsDataURL(file);
+                fileNameList.appendChild(container);
             });
         }
 
         list.appendChild(div);
     }
 
-    // ── 카드 삭제/추가 시 Spring DTO 바인딩 인덱스(name) 자동 재정렬 ──
     function reindexCards() {
         document.querySelectorAll('.spot-card').forEach((c, i) => {
-            c.querySelector('.spot-num').textContent = i + 1;
-            c.querySelector('.spot-lat').name = `subList[${i}].lat`;
-            c.querySelector('.spot-lng').name = `subList[${i}].lng`;
-            c.querySelector('.spot-title').name = `subList[${i}].contentTitle`;
-            c.querySelector('.spot-id').name = `subList[${i}].contentId`;
-            c.querySelector('.rating-value').name = `subList[${i}].rating`;
-            c.querySelector('textarea').name = `subList[${i}].travelSubContent`;
-            c.querySelector('input[type="file"]').name = `subList[${i}].imageFiles`;
+            if(c.querySelector('.spot-lat'))      c.querySelector('.spot-lat').name = `subList[${i}].lat`;
+            if(c.querySelector('.spot-lng'))      c.querySelector('.spot-lng').name = `subList[${i}].lng`;
+            if(c.querySelector('.spot-sub-no'))   c.querySelector('.spot-sub-no').name = `subList[${i}].travelSubNo`;
+            if(c.querySelector('.spot-title'))    c.querySelector('.spot-title').name = `subList[${i}].contentTitle`;
+            if(c.querySelector('.spot-id'))       c.querySelector('.spot-id').name = `subList[${i}].contentId`;
+            if(c.querySelector('.rating-value'))  c.querySelector('.rating-value').name = `subList[${i}].rating`;
+            if(c.querySelector('textarea'))       c.querySelector('textarea').name = `subList[${i}].travelSubContent`;
+            if(c.querySelector('.spot-img-path'))  c.querySelector('.spot-img-path').name = `subList[${i}].imagePath`;
+            if(c.querySelector('input[type="file"]')) c.querySelector('input[type="file"]').name = `subList[${i}].imageFiles`;
+            if(c.querySelector('.spot-num'))       c.querySelector('.spot-num').textContent = i + 1;
         });
     }
 
-    // ── 관광지 직접 추가 버튼 ─────────────────
     document.getElementById('addSpotBtn').addEventListener('click', () => addSpotCard());
 
-    // ── 폼 최종 전송 버튼 ─────────────────────────────
-    document.getElementById('submitBtn').addEventListener('click', () => {
+    // ════════════════════════════════════════
+    //  [FormData 전송 전환] 사진까지 전송 가능한 핸들러
+    // ════════════════════════════════════════
+
+    // ════════════════════════════════════════
+    //  [400 에러 방어 최고 존엄 버젼] FormData 전송 핸들러
+    // ════════════════════════════════════════
+    document.getElementById('submitBtn').addEventListener('click', function(e) {
+        e.preventDefault(); 
+        
+        const titleInput = document.getElementById('travelTitle');
+        if (!titleInput || !titleInput.value.trim()) {
+            alert("여행 제목을 입력해 주세요.");
+            titleInput.focus();
+            return;
+        }
+
+        const cards = document.querySelectorAll('.spot-card');
+        if (cards.length === 0) {
+            alert("최소 한 개 이상의 관광지 후기를 추가해 주세요.");
+            return;
+        }
+
+        const formData = new FormData();
+        
+        // 1. 메인 Review 테이블 데이터 적재
+        const travelNoVal = parseInt(document.querySelector('input[name="travelNo"]')?.value);
+        formData.append("travelNo", isNaN(travelNoVal) ? 0 : travelNoVal);
+        formData.append("travelTitle", titleInput.value.trim());
+        formData.append("region", document.getElementById('region')?.value || '');
+        formData.append("travelStartDate", document.getElementById('startDate')?.value || '');
+        formData.append("travelEndDate", document.getElementById('endDate')?.value || '');
+        formData.append("visibility", document.querySelector('input[name="visibility"]:checked')?.value || 'PUBLIC');
+
+        // 2. 서브 리스트 루프 돌며 철저하게 수치 검증 후 적재
+        cards.forEach((card, i) => {
+            // 숫자형 데이터들은 파싱 후 NaN 검사를 거쳐 에러 소지를 완전히 박멸합니다.
+            const subNo = parseInt(card.querySelector('.spot-sub-no')?.value);
+            const lat   = parseFloat(card.querySelector('.spot-lat')?.value);
+            const lng   = parseFloat(card.querySelector('.spot-lng')?.value);
+            const rtg   = parseInt(card.querySelector('.rating-value')?.value);
+
+            formData.append(`subList[${i}].travelSubNo`, isNaN(subNo) ? 0 : subNo);
+            formData.append(`subList[${i}].lat`, isNaN(lat) ? 0.0 : lat);
+            formData.append(`subList[${i}].lng`, isNaN(lng) ? 0.0 : lng);
+            formData.append(`subList[${i}].rating`, isNaN(rtg) ? 0 : rtg);
+            
+            // 문자열 데이터 적재
+            formData.append(`subList[${i}].contentTitle`, card.querySelector('.spot-title')?.value || '');
+            formData.append(`subList[${i}].contentId`, card.querySelector('.spot-id')?.value || '');
+            formData.append(`subList[${i}].travelSubContent`, card.querySelector('textarea')?.value || '');
+            formData.append(`subList[${i}].imagePath`, card.querySelector('.spot-img-path')?.value || '');
+
+            // 새 이미지 파일 적재 (독립된 단일 key 'imageFiles' 명칭 사용)
+            const fileInput = card.querySelector('input[type="file"]');
+            if (fileInput && fileInput.files.length > 0) {
+                Array.from(fileInput.files).forEach(file => {
+                    formData.append('imageFiles', file); 
+                });
+            }
+        });
+
         const form = document.querySelector('form');
-        if (form) form.submit();
+        
+        // 🚨 절대 headers: {'Content-Type': ...} 를 선언하지 마세요!
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+       // 🌟 변경 후 코드 (등록 / 수정 상태에 따른 동적 알림 메시지 배정)
+		.then(res => {
+		    // 현재 숨겨진 travelNo 값을 가져와서 등록인지 수정인지 판별합니다.
+		    const isUpdate = parseInt(document.querySelector('input[name="travelNo"]')?.value) > 0;
+		    
+		    if(res.ok) {
+		        if (isUpdate) {
+		            alert("리뷰가 성공적으로 수정되었습니다.");
+		            location.href = "/reviews/detail?travelNo=" + document.querySelector('input[name="travelNo"]')?.value;
+		        } else {
+		            alert("리뷰가 성공적으로 등록되었습니다.");
+		            // 등록 성공 시에는 보통 전체 목록 페이지나 마이페이지 등으로 이동시킵니다. (프로젝트 경로에 맞게 변경 가능)
+		            location.href = "/reviews/list"; 
+		        }
+		    } else {
+		        alert(isUpdate ? "리뷰 수정에 실패했습니다." : "리뷰 등록에 실패했습니다.");
+		    }
+		})
+        .catch(err => {
+            console.error("에러 발생:", err);
+            alert("통신 중 오류가 발생했습니다.");
+        });
     });
+    // ════════════════════════════════════════
+    //  타임리프 데이터 연동 지도 마커 복원부
+    // ════════════════════════════════════════
+    const existingSubList = /*[[${review != null ? review.subList : null}]]*/ [];
+    
+    kakao.maps.event.addListener(map, 'tilesloaded', function() {
+        if (window.isMapRestored) return;
+        window.isMapRestored = true;
 
-}); 
+        console.log("==== [지도 로드 완료] 데이터 복원 시작 ====");
 
+        if (existingSubList && existingSubList.length > 0) {
+            const emptyMsg = document.getElementById('spotEmpty');
+            if(emptyMsg) emptyMsg.style.display = 'none';
+
+            existingSubList.forEach((sub, i) => {
+                const currentIdx = i + 1;
+
+                const spotLat = Number(sub.lat || sub.LAT || 0);
+                const spotLng = Number(sub.lng || sub.LNG || 0);
+                const spotTitle = sub.contentTitle || sub.CONTENT_TITLE || '';
+                const spotContent = sub.travelSubContent || sub.TRAVEL_SUB_CONTENT || '';
+                const spotSubNo = sub.travelSubNo || sub.TRAVEL_SUB_NO || 0;
+                const spotContentId = sub.contentId || sub.CONTENT_ID || '';
+                const spotRating = sub.rating || sub.RATING || 0;
+                const spotImgPath = sub.imagePath || sub.IMAGE_PATH || '';
+
+                addSpotCard(
+                    spotTitle, '', currentIdx, spotLat, spotLng, 
+                    spotContentId, spotRating, spotContent, spotSubNo, spotImgPath
+                );
+
+                if (spotLat > 0 && spotLng > 0) {
+                    addExistingPlaceToMap(spotTitle, spotLat, spotLng, spotContentId, currentIdx);
+                }
+            });
+
+            const firstSpot = existingSubList[0];
+            const firstLat = Number(firstSpot.lat || firstSpot.LAT || 0);
+            const firstLng = Number(firstSpot.lng || firstSpot.LNG || 0);
+
+            if (firstLat > 0 && firstLng > 0) {
+                const moveLatLng = new kakao.maps.LatLng(firstLat, firstLng);
+                map.setCenter(moveLatLng); 
+                map.setLevel(6);           
+                updatePolyline();          
+            }
+        }
+    });
+});
 </script>
-<script th:inline="javascript">
-const existingSubList = /*[[${review?.subList}]]*/ [];
-
-  document.addEventListener('DOMContentLoaded', () => {
-    if (existingSubList && existingSubList.length > 0) {
-      existingSubList.forEach((sub, i) => {
-        addSpotCard(
-          sub.contentTitle,
-          '',              // address (필요하면 sub에 있으면 넣기)
-          i + 1,
-          sub.lat,
-          sub.lng,
-          sub.contentId
-        );
-      });
-    }
-  });
-</script>
-
 </body>
 </html>
