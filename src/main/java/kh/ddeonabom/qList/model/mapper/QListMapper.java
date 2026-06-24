@@ -31,4 +31,10 @@ public interface QListMapper {
 	// 글 수정
 	int updateQList(QList q);
 
+	// 추천
+	int isLiked(HashMap<String, Object> map);
+	int insertLike(HashMap<String, Object> map);
+	int deleteLike(HashMap<String, Object> map);
+	int getLikeCount(int qNo);
+
 }

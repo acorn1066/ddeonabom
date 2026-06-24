@@ -90,6 +90,18 @@
     </div>
     -->
 
+    <!-- 추천 버튼 -->
+    <div class="flex justify-center py-8">
+      <button id="like-btn"
+              onclick="toggleLike()"
+              class="inline-flex items-center gap-2 rounded-full border-2 px-6 py-2.5 text-15 font-semibold transition"
+              th:classappend="${isLiked} ? 'border-brand bg-brand text-white' : 'border-line bg-white text-muted hover:border-brand hover:text-brand'">
+        <i class="far fa-thumbs-up"></i>
+        <span>추천</span>
+        <span id="like-count" th:text="${likeCount}">0</span>
+      </button>
+    </div>
+
     <!-- ════ 댓글 섹션 ════ -->
     <section class="mt-6">
 
@@ -333,6 +345,36 @@
       .then(data => {
         closeReportModal();
         openInfoModal(data.status === 'success' ? '신고 완료' : '알림', data.message);
+      });
+    }
+
+    // ─── 추천 toggle ─────────────────────────────────────────────
+    const qNo        = /*[[${q.qNo}]]*/ 0;
+    const isLoggedIn = /*[[${session.loginUser != null}]]*/ false;
+
+    function toggleLike() {
+      if (!isLoggedIn) {
+        openInfoModal('로그인이 필요합니다', '추천은 로그인 후 이용하실 수 있어요.');
+        return;
+      }
+      fetch('/qList/like', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'qNo=' + qNo
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) return;
+        const btn   = document.getElementById('like-btn');
+        const count = document.getElementById('like-count');
+        count.textContent = data.count;
+        if (data.liked) {
+          btn.classList.remove('border-line', 'bg-white', 'text-muted', 'hover:border-brand', 'hover:text-brand');
+          btn.classList.add('border-brand', 'bg-brand', 'text-white');
+        } else {
+          btn.classList.remove('border-brand', 'bg-brand', 'text-white');
+          btn.classList.add('border-line', 'bg-white', 'text-muted', 'hover:border-brand', 'hover:text-brand');
+        }
       });
     }
   </script>
