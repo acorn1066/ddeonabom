@@ -374,7 +374,7 @@ kakao.maps.load(function () {
             label.style.color = BRAND;
         }
 
-        // 🌟 [미리보기 치트키] 새로 추가한 사진의 썸네일 노출 및 파일 데이터 유지 로직
+        // 새로 추가한 사진의 썸네일 노출 및 파일 데이터 유지 로직
         const fileInput = div.querySelector('input[type="file"]');
         const fileNameList = div.querySelector('.file-name-list');
         let allFiles = [];
@@ -445,14 +445,6 @@ kakao.maps.load(function () {
     }
 
     document.getElementById('addSpotBtn').addEventListener('click', () => addSpotCard());
-
-    // ════════════════════════════════════════
-    //  [FormData 전송 전환] 사진까지 전송 가능한 핸들러
-    // ════════════════════════════════════════
-
-    // ════════════════════════════════════════
-    //  [400 에러 방어 최고 존엄 버젼] FormData 전송 핸들러
-    // ════════════════════════════════════════
     document.getElementById('submitBtn').addEventListener('click', function(e) {
         e.preventDefault(); 
         
@@ -510,12 +502,12 @@ kakao.maps.load(function () {
 
         const form = document.querySelector('form');
         
-        // 🚨 절대 headers: {'Content-Type': ...} 를 선언하지 마세요!
+
         fetch(form.action, {
             method: 'POST',
             body: formData
         })
-       // 🌟 변경 후 코드 (등록 / 수정 상태에 따른 동적 알림 메시지 배정)
+
 		.then(res => {
 		    // 현재 숨겨진 travelNo 값을 가져와서 등록인지 수정인지 판별합니다.
 		    const isUpdate = parseInt(document.querySelector('input[name="travelNo"]')?.value) > 0;
