@@ -93,7 +93,6 @@
 	    AND post_board = #{postBoard}
 	    AND status = 'Y'
 	</update>
-
-
+	
 
 </mapper>
