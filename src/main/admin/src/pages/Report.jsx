@@ -5,18 +5,24 @@ import Pagination from "../components/Pagination";
 import { useBoards } from "../hooks/useBoards";
 import AdminModal from "../components/AdminModal";
 
-const statusLabel = { N: "미처리", Y: "처리완료", C: "확인완료", R: "반려" };
+const statusLabel = { N: "미처리", Y: "처리완료", R: "반려" };
 const statusBadgeClass = {
     N: "bg-gray-100 text-gray-600",
     Y: "bg-blue-100 text-blue-700",
-    C: "bg-green-100 text-green-700",
     R: "bg-red-100 text-red-700"
 };
-const statusMap = { 전체: "", 미처리: "N", 처리완료: "Y", 확인완료: "C", 반려: "R" };
+const statusMap = { 전체: "", 미처리: "N", 처리완료: "Y", 반려: "R" };
 const boardTypeLabel = {
     review: "후기 게시판",
     question: "질문 게시판",
     reply: "댓글"
+};
+
+const reasonLabel = {
+    A: "광고",
+    B: "욕설",
+    C: "음란",
+    D: "도배"
 };
 
 const Report = () => {
@@ -45,6 +51,22 @@ const Report = () => {
             })
             .catch(err => console.log(err));
     };
+
+    const processReport = (reportNo, targetType, targetNo) => {
+        fetch(`/react/admin/reports/process`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reportNo, targetType, targetNo })
+        })
+            .then(res => res.json())
+            .then(() => {
+                setReports(prev =>
+                    prev.map(r => r.reportNo === reportNo ? { ...r, reportStatus: "Y" } : r)
+                );
+            })
+            .catch(err => console.log(err));
+    };
+
 
     const handleSearch = () => {
         if (currentPage === 1) {
@@ -144,7 +166,7 @@ const Report = () => {
                                         {report.reportStatus === "N" ? (
                                             <div className="flex justify-center gap-2">
                                                 <button
-                                                    onClick={() => changeReportStatus(report.reportNo, "Y", { reportStatus: "Y" })}
+                                                    onClick={() => processReport(report.reportNo, report.targetType, report.targetNo)}
                                                     className="cursor-pointer rounded-lg border border-green-500 bg-green-500 px-3 py-1 text-sm font-semibold text-white transition hover:bg-green-600 "
                                                 >
                                                     처리
@@ -180,10 +202,31 @@ const Report = () => {
                     onClose={closeModal}
                     footer={
                         <>
+
+                            {/* ✅ 이 부분만 교체 */}
+                            {(selectReport.targetType === "review" || selectReport.targetType === "question") && (() => {
+                                const urlMap = {
+                                    review: `http://localhost:8080/reviews/detail?travelNo=${selectReport.targetNo}`,
+                                    question: `http://localhost:8080/qList/detail?qNo=${selectReport.targetNo}`,
+                                };
+                                const isDisabled = selectReport.reportStatus === "Y";
+                                return (
+                                    <button
+                                        onClick={() => !isDisabled && (window.location.href = urlMap[selectReport.targetType])}
+                                        disabled={isDisabled}
+                                        className={`rounded-lg px-4 py-2 text-white ${isDisabled
+                                            ? "bg-indigo-300 cursor-not-allowed"
+                                            : "bg-indigo-500 hover:bg-indigo-600 cursor-pointer"
+                                            }`}
+                                    >
+                                        게시글 보기
+                                    </button>
+                                );
+                            })()}
                             {selectReport.reportStatus === "N" && (
                                 <>
                                     <button
-                                        onClick={() => { changeReportStatus(selectReport.reportNo, "Y", { reportStatus: "Y" }); closeModal(); }}
+                                        onClick={() => { processReport(selectReport.reportNo, selectReport.targetType, selectReport.targetNo); closeModal(); }}
                                         className="rounded-lg bg-green-600 px-4 py-2 text-white cursor-pointer"
                                     >
                                         처리
@@ -196,6 +239,8 @@ const Report = () => {
                                     </button>
                                 </>
                             )}
+
+
                             <button onClick={closeModal} className="rounded-lg bg-gray-200 px-4 py-2 cursor-pointer">닫기</button>
                         </>
                     }
@@ -207,8 +252,7 @@ const Report = () => {
                         <p><strong>신고자 :</strong> {selectReport.reporterName}</p>
                         <p><strong>신고일 :</strong> {selectReport.reportDate.split('T')[0]}</p>
                         <p><strong>상태 :</strong> {statusLabel[selectReport.reportStatus]}</p>
-                        <p><strong>신고사유 :</strong></p>
-                        <div className="rounded-lg bg-gray-50 p-3">{selectReport.reason || "내용 없음"}</div>
+                        <p><strong>신고사유 :</strong> {selectReport.reason} - {reasonLabel[selectReport.reason]}</p>
                     </div>
                 </AdminModal>
             )}
