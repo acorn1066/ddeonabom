@@ -44,4 +44,12 @@ public interface ShareMapper {
 
     /** 찜 취소 */
     int deleteWish(HashMap<String, Object> map);
+
+	int getWishPlanCount(int memberNo);
+
+	ArrayList<Share> selectMyWishPlanList(HashMap<String, Object> map);
+
+	int selectMyShareCount(int memberNo);
+
+	ArrayList<Share> selectMyShareList(HashMap<String, Object> map);
 }
