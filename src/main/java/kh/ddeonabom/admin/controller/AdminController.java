@@ -271,13 +271,18 @@ public class AdminController {
 		@ResponseBody
 		@PatchMapping("reports")
 		public int updateReportStatus(@RequestBody AdminReport report) {
+		    if ("R".equals(report.getReportStatus())) {
+		        return aService.updateStatusByTarget(report);
+		    }
 		    return aService.updateReportStatus(report);
 		}
 		
 		@ResponseBody
 		@PatchMapping("reports/process")
 		public int processReport(@RequestBody AdminReport report) {
-		    return aService.processReport(report);
+			report.setReportStatus("Y");
+		    aService.updateTargetStatus(report);
+		    return aService.updateStatusByTarget(report);
 		}
 
 	

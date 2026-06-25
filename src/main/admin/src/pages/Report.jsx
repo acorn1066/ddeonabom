@@ -61,7 +61,27 @@ const Report = () => {
             .then(res => res.json())
             .then(() => {
                 setReports(prev =>
-                    prev.map(r => r.reportNo === reportNo ? { ...r, reportStatus: "Y" } : r)
+                    prev.map(r => r.targetType === targetType && r.targetNo === targetNo
+                        ? { ...r, reportStatus: "Y" }
+                        : r)
+                );
+            })
+            .catch(err => console.log(err));
+    };
+    const rejectReport = (targetType, targetNo) => {
+        fetch(`/react/admin/reports`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ targetType, targetNo, reportStatus: "R" })
+        })
+            .then(res => res.json())
+            .then(() => {
+                setReports(prev =>
+                    prev.map(r =>
+                        r.targetType === targetType && r.targetNo === targetNo
+                            ? { ...r, reportStatus: "R" }
+                            : r
+                    )
                 );
             })
             .catch(err => console.log(err));
@@ -172,7 +192,7 @@ const Report = () => {
                                                     처리
                                                 </button>
                                                 <button
-                                                    onClick={() => changeReportStatus(report.reportNo, "R", { reportStatus: "R" })}
+                                                    onClick={() => rejectReport(report.targetType, report.targetNo)}
                                                     className="cursor-pointer rounded-lg border border-gray-300 bg-white px-3 py-1 text-sm font-semibold text-gray-600 transition hover:bg-gray-100"
                                                 >
                                                     반려
@@ -202,8 +222,6 @@ const Report = () => {
                     onClose={closeModal}
                     footer={
                         <>
-
-                            {/* ✅ 이 부분만 교체 */}
                             {(selectReport.targetType === "review" || selectReport.targetType === "question") && (() => {
                                 const urlMap = {
                                     review: `http://localhost:8080/reviews/detail?travelNo=${selectReport.targetNo}`,
@@ -232,7 +250,7 @@ const Report = () => {
                                         처리
                                     </button>
                                     <button
-                                        onClick={() => { changeReportStatus(selectReport.reportNo, "R", { reportStatus: "R" }); closeModal(); }}
+                                        onClick={() => { rejectReport(selectReport.targetType, selectReport.targetNo); closeModal(); }}
                                         className="rounded-lg bg-red-600 px-4 py-2 text-white cursor-pointer"
                                     >
                                         반려

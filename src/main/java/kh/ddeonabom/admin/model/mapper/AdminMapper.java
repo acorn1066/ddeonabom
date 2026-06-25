@@ -85,6 +85,8 @@ public interface AdminMapper {
 	ArrayList<HashMap<String, Object>> selectQlistActivity();
 
 	ArrayList<HashMap<String, Object>> selectTravelActivity();
+
+	int updateStatusByTarget(AdminReport report);
 	
 	
 }
