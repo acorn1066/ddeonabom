@@ -97,8 +97,8 @@
                 AND r.post_board = 'S'
                 AND r.status     = 'Y') AS replyCount,
 
-            <!-- 첫 번째 장소 썸네일 (LANDMARK.FIRSTIMAGE2) -->
-            (SELECT l.firstimage2
+            <!-- 첫 번째 장소 썸네일 (LANDMARK.FIRSTIMAGE) -->
+            (SELECT l.firstimage
                FROM schedule_sub ss
                JOIN landmark l ON l.content_id = ss.content_id
               WHERE ss.schedule_no = sm.schedule_no
