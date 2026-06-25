@@ -510,11 +510,11 @@ public class MemberController {
 	        return "redirect:/member/login";
 	    }
 	    
-	    // \타임리프 화면에서 상단 탭 메뉴의 active 클래스를 켜주기 위해 최상단에서 무조건 주입
+	    // 타임리프 화면에서 상단 탭 메뉴의 active 클래스를 켜주기 위해 최상단에서 무조건 주입
 	    model.addAttribute("tab", tab);
 
 	 // ==========================================
-	    // 1. [wishlist] 관심 일정/관광지 목록 탭 (기본값)
+	    //  관심 일정/관광지 목록 탭 (기본값)
 	    // ==========================================
 	    if("wishlist".equals(tab)) {
 	        // 관심 목록 탭의 기본 sub-type은 'spot' (관광지)
@@ -531,7 +531,7 @@ public class MemberController {
 	            int listCount = lService.getWishListCount(loginUser.getMemberNo()); 
 	            PageInfo pi = Pagination.getPageInfo(page, listCount, 5, 8);
 	            
-	            // 💡 pi가 생성된 직후에 map에 담아주어야 안전합니다.
+	            //  pi가 생성된 직후에 map에 담아주어야 안전합니다.
 	            map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
 	            map.put("listLimit", pi.getBoardLimit());
 	            
@@ -544,7 +544,7 @@ public class MemberController {
 	            int listCount = shareService.getWishPlanCount(loginUser.getMemberNo()); 
 	            PageInfo pi = Pagination.getPageInfo(page, listCount, 5, 8);
 	            
-	            // 💡 순서 정정: pi를 먼저 만들고 변수 계산을 해서 map에 매핑
+	            //  순서 정정: pi를 먼저 만들고 변수 계산을 해서 map에 매핑
 	            map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
 	            map.put("listLimit", pi.getBoardLimit());
 	            
@@ -569,7 +569,7 @@ public class MemberController {
 	    }
 
 	    // ==========================================
-	    // 2. [posts] 내가 작성한 글 보기 탭
+	    // 내가 작성한 글 보기 탭
 	    // ==========================================
 	    else if("posts".equals(tab)) {
 	        if(type == null || type.isEmpty()) {
@@ -609,7 +609,7 @@ public class MemberController {
 	    }
 
 	    // ==========================================
-	    // 3. [comments] 내가 작성한 댓글 보기 탭
+	    //  내가 작성한 댓글 보기 탭
 	    // ==========================================
 	    else if("comments".equals(tab)) {
 	        if(type == null || type.isEmpty()) {
@@ -623,7 +623,9 @@ public class MemberController {
 	        if("qna".equals(type)) {
 	            map.put("postBoard", "Q"); 
 	        } else if("review".equals(type)) {
-	            map.put("postBoard", "R"); 
+	            map.put("postBoard", "T"); 
+	        } else if("share".equals(type)) {
+	        	map.put("postBoard", "S");
 	        }
 
 	        int listCount = replyService.getMyCommentCount(map);
@@ -639,7 +641,7 @@ public class MemberController {
 	    }
 
 	    // ==========================================
-	    // 4. [edit] 내 정보 수정 탭
+	    // [edit] 내 정보 수정 탭
 	    // ==========================================
 	    else if("edit".equals(tab)) {
 	        model.addAttribute("loginUser", loginUser);

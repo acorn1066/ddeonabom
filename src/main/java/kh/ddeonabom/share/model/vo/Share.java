@@ -36,4 +36,5 @@ public class Share {
     private String firstImage;          // LANDMARK.FIRSTIMAGE2 (카드 썸네일)
     private String firstAddr;           // LANDMARK.ADDR1 (지역 뱃지용)
     private String coords;              // "mapx,mapy;mapx,mapy;..." (SVG 루트용)
+    private String reportStatus;
 }
