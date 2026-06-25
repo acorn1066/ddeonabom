@@ -24,7 +24,7 @@
       <input type="hidden" name="region"      id="region-input" th:value="${region}" />
       <input type="hidden" name="searchInput" id="search-hidden" th:value="${searchInput}" />
 
-      <div class="flex items-center gap-2 border-b border-line pb-5">
+      <div class="flex items-center gap-2 pb-5">
 
         <!-- 지역 필터 탭 -->
         <span th:each="tab : ${ {'전체','제주','수도권','강원','경상','전라'} }"
