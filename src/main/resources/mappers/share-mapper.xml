@@ -232,5 +232,59 @@
           AND post_board_fx = 'SJ'
           AND member_no     = #{memberNo}
     </delete>
+<select id="getWishPlanCount" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+          FROM nice n
+          JOIN schedule_main sm ON n.post_no = sm.schedule_no
+         WHERE n.member_no = #{memberNo}
+           AND n.post_board_fx = 'SJ'       AND sm.schedule_status = 'Y'
+           </select>
 
+    <select id="selectMyWishPlanList" parameterType="hashmap" resultType="Share">
+        SELECT
+            sm.schedule_no,
+            sm.schedule_title,
+            TO_CHAR(sm.schedule_startdate, 'yyyy.mm.dd') AS scheduleStartdate,
+            TO_CHAR(sm.schedule_enddate,   'yyyy.mm.dd') AS scheduleEnddate,
+            sm.schedule_visibility,
+            sm.create_date AS createDate,
+            sm.member_no,
+            m.nickname     AS memberNickname,
+
+            (SELECT COUNT(*)
+               FROM schedule_sub ss
+              WHERE ss.schedule_no = sm.schedule_no) AS placeCount,
+
+            (SELECT COUNT(*)
+               FROM nice n_like
+              WHERE n_like.post_no       = sm.schedule_no
+                AND n_like.post_board_fx = 'SR') AS likeCount,
+
+            (SELECT COUNT(*)
+               FROM reply r
+              WHERE r.post_no    = sm.schedule_no
+                AND r.post_board = 'S'
+                AND r.status     = 'Y') AS replyCount,
+
+            (SELECT l.firstimage2
+               FROM schedule_sub ss
+               JOIN landmark l ON l.content_id = ss.content_id
+              WHERE ss.schedule_no = sm.schedule_no
+              ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq
+              FETCH FIRST 1 ROWS ONLY) AS firstImage,
+
+            (SELECT l.addr1
+               FROM schedule_sub ss
+               JOIN landmark l ON l.content_id = ss.content_id
+              WHERE ss.schedule_no = sm.schedule_no
+              ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq
+              FETCH FIRST 1 ROWS ONLY) AS firstAddr
+
+        FROM nice n
+        JOIN schedule_main sm ON n.post_no = sm.schedule_no
+        JOIN member m         ON sm.member_no = m.member_no
+        WHERE n.member_no = #{memberNo}
+          AND n.post_board_fx = 'SJ'          AND sm.schedule_status = 'Y'
+        ORDER BY n.nice_no DESC               OFFSET #{startRow} ROWS FETCH NEXT #{listLimit} ROWS ONLY
+    </select>
 </mapper>

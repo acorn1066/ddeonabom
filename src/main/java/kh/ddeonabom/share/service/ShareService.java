@@ -99,4 +99,12 @@ public class ShareService {
             return true;
         }
     }
+
+	public int getWishPlanCount(int memberNo) {
+		return shareMapper.getWishPlanCount(memberNo);
+	}
+
+	public ArrayList<Share> selectMyWishPlanList(HashMap<String, Object> map) {
+		return shareMapper.selectMyWishPlanList(map);
+	}
 }
