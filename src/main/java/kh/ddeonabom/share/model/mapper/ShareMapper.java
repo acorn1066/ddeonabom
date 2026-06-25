@@ -29,4 +29,19 @@ public interface ShareMapper {
 
     /** 찜 여부 (0 or 1) */
     int isWished(HashMap<String, Object> map);
+
+    /** 추천 등록 */
+    int insertLike(HashMap<String, Object> map);
+
+    /** 추천 취소 */
+    int deleteLike(HashMap<String, Object> map);
+
+    /** 전체 추천 수 */
+    int getLikeCount(int scheduleNo);
+
+    /** 찜 등록 */
+    int insertWish(HashMap<String, Object> map);
+
+    /** 찜 취소 */
+    int deleteWish(HashMap<String, Object> map);
 }
