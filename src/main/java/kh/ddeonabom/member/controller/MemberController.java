@@ -606,6 +606,19 @@ public class MemberController {
 	            model.addAttribute("reviewlist", reviewlist);
 	            model.addAttribute("pi", pi);
 	        }
+	        else if("share".equals(type)) {
+	        	int listCount =shareService.selectMyShareCount(loginUser.getMemberNo());
+	        	PageInfo pi = Pagination.getPageInfo(page, listCount, 5, 8);
+
+	            HashMap<String, Object> map = new HashMap<>();
+	            map.put("memberNo", loginUser.getMemberNo());
+	            map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
+	            map.put("listLimit", pi.getBoardLimit());
+	            ArrayList<Share> sharelist = shareService.selectMyShareList(map);
+
+	            model.addAttribute("sharelist", sharelist);
+	            model.addAttribute("pi", pi);
+	        }
 	    }
 
 	    // ==========================================

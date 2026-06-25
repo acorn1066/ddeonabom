@@ -287,4 +287,38 @@
           AND n.post_board_fx = 'SJ'          AND sm.schedule_status = 'Y'
         ORDER BY n.nice_no DESC               OFFSET #{startRow} ROWS FETCH NEXT #{listLimit} ROWS ONLY
     </select>
+   <select id="selectMyShareCount" parameterType="int" resultType="_int">
+    SELECT COUNT(*)
+    FROM SCHEDULE_MAIN
+    WHERE MEMBER_NO = #{memberNo}
+      AND SCHEDULE_STATUS = 'Y'
+</select>
+
+<select id="selectMyShareList" parameterType="map" resultType="Share">
+    SELECT 
+        p.*,
+        p.SCHEDULE_TITLE AS title, 
+        p.CREATE_DATE AS createDate, 
+        p.REPORT_STATUS AS reportStatus
+    FROM (
+        SELECT 
+            S.SCHEDULE_NO,
+            S.SCHEDULE_TITLE,
+            S.SCHEDULE_STATUS,
+            S.CREATE_DATE,
+            S.MEMBER_NO,
+            RP.REPORT_STATUS 
+        FROM SCHEDULE_MAIN S
+        LEFT JOIN REPORT RP
+          ON S.SCHEDULE_NO = RP.TARGET_NO 
+         AND RP.TARGET_TYPE = 'share' 
+         AND RP.REPORT_STATUS = 'N' 
+        WHERE S.MEMBER_NO = #{memberNo}
+          AND S.SCHEDULE_STATUS = 'Y'
+        ORDER BY S.SCHEDULE_NO DESC
+        OFFSET #{startRow} ROWS
+        FETCH NEXT #{listLimit} ROWS ONLY
+    ) p
+    ORDER BY p.SCHEDULE_NO DESC
+</select>
 </mapper>

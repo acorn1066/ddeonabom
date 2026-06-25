@@ -249,6 +249,7 @@
                 <div class="flex gap-2 mb-6">
                     <a th:href="@{/member/mypage(tab='posts',type='qna')}" class="px-4 py-2 rounded-lg border text-sm font-medium" th:classappend="${type == 'qna'} ? 'bg-brand text-white border-brand' : 'bg-white border-line text-muted hover:bg-sunk'">질문글</a>
                     <a th:href="@{/member/mypage(tab='posts',type='review')}" class="px-4 py-2 rounded-lg border text-sm font-medium" th:classappend="${type == 'review'} ? 'bg-brand text-white border-brand' : 'bg-white border-line text-muted hover:bg-sunk'">리뷰글</a>
+                    <a th:href="@{/member/mypage(tab='posts',type='share')}" class="px-4 py-2 rounded-lg border text-sm font-medium" th:classappend="${type == 'share'} ? 'bg-brand text-white border-brand' : 'bg-white border-line text-muted hover:bg-sunk'">일정 공유글</a>
                 </div>
 
                 <div th:if="${type == 'qna'}">
@@ -288,6 +289,25 @@
                             </div>
                         </a>
                         <div th:if="${#lists.isEmpty(reviewlist)}" class="text-center py-16 border border-dashed border-line rounded-xl"><p class="text-sm text-faint">작성한 리뷰글이 없습니다.</p></div>
+                    </div>
+                </div>
+                <div th:if="${type == 'share'}">
+                    <h2 class="text-xl font-bold text-ink mb-4"><i class="fa-solid fa-pen-to-square"></i> 내가 작성한 일정 공유글</h2>
+                    <div class="space-y-3 min-h-[300px]">
+                        <a th:each="share : ${sharelist}" th:href="${share.reportStatus == 'N'} ? 'javascript:void(0);' : @{/share/detail/{no}(no=${share.scheduleNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition cursor-pointer bg-white flex justify-between items-center gap-4">
+                            <div class="flex-1 min-w-0">
+                            <div class="flex items-center flex-wrap gap-y-1">
+                                    <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded mr-2 shrink-0">여행후기</span>
+                                    <p class="text-sm font-semibold text-ink truncate" th:text="${share.scheduleTitle}"></p>
+                                </div>
+                               <span class="text-xs text-faint block mt-1">일정 공유</span>
+                            </div>
+                            <div class="flex items-center gap-3 shrink-0">
+                                <span th:if="${share.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 수정/삭제 제한</span>
+                                <span class="text-xs text-faint whitespace-nowrap" th:text="${#dates.format(share.createDate,'yyyy-MM-dd')}"></span>
+                            </div>
+                        </a>
+                        <div th:if="${#lists.isEmpty(sharelist)}" class="text-center py-16 border border-dashed border-line rounded-xl"><p class="text-sm text-faint">작성한 일정 공유 글이 없습니다.</p></div>
                     </div>
                 </div>
 

@@ -48,4 +48,8 @@ public interface ShareMapper {
 	int getWishPlanCount(int memberNo);
 
 	ArrayList<Share> selectMyWishPlanList(HashMap<String, Object> map);
+
+	int selectMyShareCount(int memberNo);
+
+	ArrayList<Share> selectMyShareList(HashMap<String, Object> map);
 }
