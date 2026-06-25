@@ -10,6 +10,16 @@
     <sql id="shareWhereClause">
         WHERE sm.schedule_status = 'Y'
 
+        <!-- 공개 범위: 비로그인 → Y(전체공개)만, 로그인 → Y·M(회원공개) -->
+        <choose>
+            <when test="memberNo != null and memberNo > 0">
+                AND sm.schedule_visibility IN ('Y', 'M')
+            </when>
+            <otherwise>
+                AND sm.schedule_visibility = 'Y'
+            </otherwise>
+        </choose>
+
         <!-- 지역 필터: 일정 내 장소 중 해당 지역 포함 여부 -->
         <if test="region != null and region != '전체'">
             AND EXISTS (

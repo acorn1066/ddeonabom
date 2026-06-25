@@ -38,11 +38,16 @@ public class ShareController {
             @RequestParam(value = "page",        defaultValue = "1")   int currentPage,
             @RequestParam(value = "region",      defaultValue = "전체") String region,
             @RequestParam(value = "searchInput", defaultValue = "")    String searchInput,
+            HttpSession session,
             ModelAndView mv) {
 
         HashMap<String, Object> map = new HashMap<>();
         map.put("region",      region);
         map.put("searchInput", searchInput);
+
+        // 로그인 여부에 따라 visibility 조건 분기용
+        Member loginUser = (Member) session.getAttribute("loginUser");
+        map.put("memberNo", loginUser != null ? loginUser.getMemberNo() : 0);
 
         // 1) 총 게시글 수 → 페이징 계산 (페이지 번호 최대 5개, 한 페이지 9개)
         int listCount = shareService.getShareListCount(map);
