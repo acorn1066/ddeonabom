@@ -46,6 +46,15 @@
 		    <button type="button" th:onclick="|deleteReview(${review.travelNo})|">삭제</button>
 		</form>
       </div>
+      
+<!-- =================================================================	신고 ============================================================================ -->
+		<div class="ml-auto flex gap-2 text-13 text-muted"
+		     th:if="${session.loginUser != null and session.loginUser.memberNo != review.memberNo}">
+		  <button type="button" class="hover:text-red-500"
+		          th:onclick="|openReportModal('review', [[${review.travelNo}]])|">신고</button>
+		</div>
+<!-- =================================================================	신고 ============================================================================ -->
+
     </div>
   </div>
 
@@ -166,9 +175,15 @@
 	    <div class="flex items-center gap-2">
 	      <span class="font-bold" th:text="${r.writer}">작성자</span>
 	      <span class="text-xs text-muted" th:text="${r.createDate}">날짜</span>
+	      
+<!-- =================================================================	신고 ============================================================================ -->
+	     <div th:if="${session.loginUser != null and r.memberNo != null and session.loginUser.memberNo != r.memberNo}"
+	           class="ml-auto flex gap-2 text-xs text-muted">
+	        <button type="button" class="hover:text-red-500"
+	                th:onclick="|openReportModal('reply', [[${r.replyNo}]])|">신고</button>
+	      </div>
+ <!-- =================================================================	신고 ============================================================================ -->   
 	    </div>
-	
-	    <p class="mt-2 text-15" th:text="${r.content}">댓글 내용</p>
 	    <div th:if="${session.loginUser != null and session.loginUser.memberNo == r.memberNo}" class="flex gap-2 mt-2 text-xs">
 	
 	      <button type="button" class="text-blue-500 hover:underline"  th:data-replyno="${r.replyNo}"
@@ -177,6 +192,7 @@
 	      <button type="button" class="text-red-500 hover:underline" th:data-replyno="${r.replyNo}"
         			th:data-postno="${r.postNo}" onclick="openReplyDeleteModal(this)">삭제</button>
 	    </div>
+    	<p class="mt-2 text-15" th:text="${r.content}">댓글 내용</p>
 	  </div>
 	</div>
 	<div id="replyEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
@@ -221,6 +237,28 @@
   </section>
 </main>
 
+<!-- =================================================================	신고 ============================================================================ -->
+	<div id="modal-report" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
+	  <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+	    <h2 class="mb-4 text-lg font-bold">신고하기</h2>
+	    <p class="mb-3 text-sm text-muted">신고 사유를 선택해주세요.</p>
+	    <select id="report-reason"
+	            class="mb-5 w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand">
+	      <option value="">-- 사유 선택 --</option>
+	      <option value="A">광고</option>
+	      <option value="B">욕설</option>
+	      <option value="C">음란</option>
+	      <option value="D">도배</option>
+	    </select>
+	    <div class="flex justify-end gap-2">
+	      <button type="button" onclick="closeReportModal()"
+	              class="inline-flex h-9 items-center rounded-lg border border-line px-4 text-sm text-muted hover:bg-sunk">취소</button>
+	      <button type="button" onclick="submitReport()"
+	              class="inline-flex h-9 items-center rounded-lg bg-red-500 px-4 text-sm font-semibold text-white hover:bg-red-600">신고</button>
+	    </div>
+	  </div>
+	</div>
+<!-- =================================================================	신고 ============================================================================ -->
 <footer th:replace="~{views/common/footer :: footer}"></footer>
 
 <script th:src="@{'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${kakaoApiKey} + '&libraries=services'}"></script>
@@ -370,16 +408,57 @@ function closeReplyDeleteModal() {
     document.getElementById("replyDeleteModal").classList.add("hidden");
 }
 
-function deleteReview(travelNo) {
-    openDangerModal(
-        "게시글 삭제",
-        "정말 삭제하시겠습니까?",
-        () => {
-            document.getElementById("deleteForm").submit();
-        },
-        "삭제"
-    );
-}
+//=================================================================	신고 ============================================================================ 
+	let reportTargetType = null;
+	let reportTargetNo   = null;
+
+	function openReportModal(targetType, targetNo) {
+	  reportTargetType = targetType;
+	  reportTargetNo   = targetNo;
+	  document.getElementById('report-reason').value = '';
+	  const modal = document.getElementById('modal-report');
+	  modal.classList.remove('hidden');
+	  modal.classList.add('flex');
+	}
+	
+	function closeReportModal() {
+	  const modal = document.getElementById('modal-report');
+	  modal.classList.add('hidden');
+	  modal.classList.remove('flex');
+	}
+	
+	function submitReport() {
+	  const reason = document.getElementById('report-reason').value;
+	  if (!reason) {
+	    openInfoModal('알림', '신고 사유를 선택해주세요.');
+	    return;
+	  }
+	  fetch('/report/insert', {
+	    method: 'POST',
+	    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+	    body: 'targetType=' + reportTargetType
+	        + '&targetNo='  + reportTargetNo
+	        + '&reason='    + encodeURIComponent(reason)
+	  })
+	  .then(r => r.json())
+	  .then(data => {
+	    closeReportModal();
+	    openInfoModal(data.status === 'success' ? '신고 완료' : '알림', data.message);
+	  });
+	  
+	}
+	function deleteReview(travelNo) {
+	    openDangerModal(
+	        "게시글 삭제",
+	        "정말 삭제하시겠습니까?",
+	        () => {
+	            document.getElementById("deleteForm").submit();
+	        },
+	        "삭제"
+	    );
+	
+	}
+
 
 </script>
 
