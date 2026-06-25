@@ -540,61 +540,74 @@ const updateRegionBadge = () => {
 ////////////저장
 
 const saveSchedule = async () => {
-    const title = document.getElementById('schedule_title').textContent.trim();
-    const startDate = document.getElementById('start_date_input').value;
-    const endDate = document.getElementById('end_date_input').value;
-
-    if (!startDate || !endDate) {
-        showToast('여행 날짜를 선택해 주세요.', false);
-        return;
-    }
-
-    const places = [];
-    Object.keys(placesByDate).forEach(dateKey => {
-        placesByDate[dateKey].forEach((place, idx) => {
-            places.push({
-                scheduleSubDate: dateKey,
-                scheduleSubSeq: idx + 1,
-                contentId: place.contentId
-            });
-        });
-    });
-
-    if (places.length === 0) {
-        showToast('장소를 한 곳 이상 담아 주세요.', false);
-        return;
-    }
-
-    const payload = {
-   	    scheduleTitle: title,
-   	    scheduleStartdate: startDate,
-   	    scheduleEnddate: endDate,
-   	    places: places
-   	};
     
-    if (initialData && initialData.scheduleNo) {
-        payload.scheduleNo = initialData.scheduleNo;
-    }
-    
+	const btn = document.querySelector('button[onclick="saveSchedule()"]');
+    if (!btn || btn.disabled) return;
+    btn.disabled = true;
     
     try {
-    	//console.log(payload);
-        const res = await fetch('/schedule/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (handleNeedLogin(data)) return;
-        if (data.success) {
-            showToast('일정이 저장되었어요.');
-            location.href = '/schedule/list';
-        } else {
-            showToast(data.message || '저장에 실패했어요.', false);
+    	const title = document.getElementById('schedule_title').textContent.trim();
+        const startDate = document.getElementById('start_date_input').value;
+        const endDate = document.getElementById('end_date_input').value;
+
+        if (!startDate || !endDate) {
+            showToast('여행 날짜를 선택해 주세요.', false);
+            return;
         }
-    } catch (e) {
+
+        const places = [];
+        Object.keys(placesByDate).forEach(dateKey => {
+            placesByDate[dateKey].forEach((place, idx) => {
+                places.push({
+                    scheduleSubDate: dateKey,
+                    scheduleSubSeq: idx + 1,
+                    contentId: place.contentId
+                });
+            });
+        });
+
+        if (places.length === 0) {
+            showToast('장소를 한 곳 이상 담아 주세요.', false);
+            return;
+        }
+
+        const payload = {
+       	    scheduleTitle: title,
+       	    scheduleStartdate: startDate,
+       	    scheduleEnddate: endDate,
+       	    places: places
+       	};
+        
+        if (initialData && initialData.scheduleNo) {
+            payload.scheduleNo = initialData.scheduleNo;
+        }
+        
+        
+        try {
+        	//console.log(payload);
+            const res = await fetch('/schedule/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (handleNeedLogin(data)) return;
+            if (data.success) {
+                showToast('일정이 저장되었어요.');
+                location.href = '/schedule/list';
+            } else {
+                showToast(data.message || '저장에 실패했어요.', false);
+            }
+        } catch (e) {
+            showToast('저장 중 오류가 발생했어요.', false);
+        }
+    }catch (e) {
         showToast('저장 중 오류가 발생했어요.', false);
+    }finally {
+        btn.disabled = false;
     }
+	
+	
 };
 
 
