@@ -41,9 +41,10 @@
            th:if="${session.loginUser != null and session.loginUser.memberNo == review.memberNo}">
         <a th:href="@{/reviews/update(travelNo=${review.travelNo})}" class="hover:text-brand">수정</a>
         <span class="text-line">·</span>
-        <a th:href="@{/reviews/delete(travelNo=${review.travelNo})}"
-           onclick="return confirm('정말 삭제하시겠습니까?')"
-           class="hover:text-brand">삭제</a>
+        <form id="deleteForm" action="/reviews/delete" method="post">
+		    <input type="hidden" name="travelNo" th:value="${review.travelNo}">
+		    <button type="button" th:onclick="|deleteReview(${review.travelNo})|">삭제</button>
+		</form>
       </div>
       
 <!-- =================================================================	신고 ============================================================================ -->
@@ -407,44 +408,57 @@ function closeReplyDeleteModal() {
     document.getElementById("replyDeleteModal").classList.add("hidden");
 }
 
-<!-- =================================================================	신고 ============================================================================ -->
-let reportTargetType = null;
-let reportTargetNo   = null;
+//=================================================================	신고 ============================================================================ 
+	let reportTargetType = null;
+	let reportTargetNo   = null;
 
-function openReportModal(targetType, targetNo) {
-  reportTargetType = targetType;
-  reportTargetNo   = targetNo;
-  document.getElementById('report-reason').value = '';
-  const modal = document.getElementById('modal-report');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-}
+	function openReportModal(targetType, targetNo) {
+	  reportTargetType = targetType;
+	  reportTargetNo   = targetNo;
+	  document.getElementById('report-reason').value = '';
+	  const modal = document.getElementById('modal-report');
+	  modal.classList.remove('hidden');
+	  modal.classList.add('flex');
+	}
+	
+	function closeReportModal() {
+	  const modal = document.getElementById('modal-report');
+	  modal.classList.add('hidden');
+	  modal.classList.remove('flex');
+	}
+	
+	function submitReport() {
+	  const reason = document.getElementById('report-reason').value;
+	  if (!reason) {
+	    openInfoModal('알림', '신고 사유를 선택해주세요.');
+	    return;
+	  }
+	  fetch('/report/insert', {
+	    method: 'POST',
+	    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+	    body: 'targetType=' + reportTargetType
+	        + '&targetNo='  + reportTargetNo
+	        + '&reason='    + encodeURIComponent(reason)
+	  })
+	  .then(r => r.json())
+	  .then(data => {
+	    closeReportModal();
+	    openInfoModal(data.status === 'success' ? '신고 완료' : '알림', data.message);
+	  });
+	  
+	}
+	function deleteReview(travelNo) {
+	    openDangerModal(
+	        "게시글 삭제",
+	        "정말 삭제하시겠습니까?",
+	        () => {
+	            document.getElementById("deleteForm").submit();
+	        },
+	        "삭제"
+	    );
+	
+	}
 
-function closeReportModal() {
-  const modal = document.getElementById('modal-report');
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
-}
-
-function submitReport() {
-  const reason = document.getElementById('report-reason').value;
-  if (!reason) {
-    openInfoModal('알림', '신고 사유를 선택해주세요.');
-    return;
-  }
-  fetch('/report/insert', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'targetType=' + reportTargetType
-        + '&targetNo='  + reportTargetNo
-        + '&reason='    + encodeURIComponent(reason)
-  })
-  .then(r => r.json())
-  .then(data => {
-    closeReportModal();
-    openInfoModal(data.status === 'success' ? '신고 완료' : '알림', data.message);
-  });
-}
 
 </script>
 

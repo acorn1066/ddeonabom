@@ -157,6 +157,8 @@ public class ReviewController {
 	                reviewService.insertReviewSub(sub); 
 
 	                List<MultipartFile> cardFiles = sub.getImageFiles();
+	                System.out.println("cardFiles = " + cardFiles);
+	                System.out.println("size = " + (cardFiles == null ? "null" : cardFiles.size()));
 	                if (cardFiles != null) {
 	                    for (MultipartFile file : cardFiles) {
 	                        if (file != null && !file.isEmpty()) {
@@ -344,6 +346,14 @@ public class ReviewController {
 	    } else {
 	        return ResponseEntity.status(500).body("fail");
 	    }
+	}
+	
+	
+	@PostMapping("/reviews/delete")
+	public String deleteReview(@RequestParam("travelNo") int travelNo) {
+		
+		reviewService.deleteReview(travelNo);
+		return "redirect:/reviews/list";
 	}
 	
 }
