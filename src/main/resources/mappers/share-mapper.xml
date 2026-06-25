@@ -200,4 +200,37 @@
           AND member_no     = #{memberNo}
     </select>
 
+    <!-- 추천 등록 -->
+    <insert id="insertLike" parameterType="hashmap">
+        INSERT INTO NICE VALUES (SEQ_NICE_NO.NEXTVAL, 'SR', #{scheduleNo}, #{memberNo})
+    </insert>
+
+    <!-- 추천 취소 -->
+    <delete id="deleteLike" parameterType="hashmap">
+        DELETE FROM NICE
+        WHERE post_no       = #{scheduleNo}
+          AND post_board_fx = 'SR'
+          AND member_no     = #{memberNo}
+    </delete>
+
+    <!-- 전체 추천 수 -->
+    <select id="getLikeCount" parameterType="_int" resultType="int">
+        SELECT COUNT(*) FROM NICE
+        WHERE post_no       = #{scheduleNo}
+          AND post_board_fx = 'SR'
+    </select>
+
+    <!-- 찜 등록 -->
+    <insert id="insertWish" parameterType="hashmap">
+        INSERT INTO NICE VALUES (SEQ_NICE_NO.NEXTVAL, 'SJ', #{scheduleNo}, #{memberNo})
+    </insert>
+
+    <!-- 찜 취소 -->
+    <delete id="deleteWish" parameterType="hashmap">
+        DELETE FROM NICE
+        WHERE post_no       = #{scheduleNo}
+          AND post_board_fx = 'SJ'
+          AND member_no     = #{memberNo}
+    </delete>
+
 </mapper>
