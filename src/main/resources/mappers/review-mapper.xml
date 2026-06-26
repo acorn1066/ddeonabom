@@ -127,12 +127,14 @@
                 AND T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
             </when>
             <when test="searchType == 'region'">
-                AND TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%'
+                AND (TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%' 
+                     OR TS.TRAVEL_SUB_CONTENT LIKE '%' || #{keyword} || '%')
             </when>
             <otherwise>
                 AND (
                     T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
                     OR TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%'
+                    OR TS.TRAVEL_SUB_CONTENT LIKE '%' || #{keyword} || '%'
                 )
             </otherwise>
         </choose>
@@ -162,12 +164,14 @@
                 AND T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
             </when>
             <when test="searchType == 'region'">
-                AND TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%'
+                AND (TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%' 
+                     OR TS.TRAVEL_SUB_CONTENT LIKE '%' || #{keyword} || '%')
             </when>
             <otherwise>
                 AND (
                     T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
                     OR TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%'
+                    OR TS.TRAVEL_SUB_CONTENT LIKE '%' || #{keyword} || '%'
                 )
             </otherwise>
         </choose>
