@@ -16,8 +16,11 @@
 
 	<!-- 댓글 등록 -->
 	<insert id="insertReply" parameterType="Reply">
+		<selectKey keyProperty="replyNo" resultType="int" order="BEFORE">
+			SELECT SEQ_RNO.NEXTVAL FROM DUAL
+		</selectKey>
 		INSERT INTO reply (reply_no, content, create_date, status, post_board, post_no, member_no)
-		VALUES (SEQ_RNO.NEXTVAL, #{content}, SYSDATE, 'Y', #{postBoard}, #{postNo}, #{memberNo})
+		VALUES (#{replyNo}, #{content}, SYSDATE, 'Y', #{postBoard}, #{postNo}, #{memberNo})
 	</insert>
 
 	<!-- 댓글 수정 -->
