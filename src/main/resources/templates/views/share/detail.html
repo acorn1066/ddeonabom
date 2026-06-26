@@ -125,7 +125,7 @@
 
       <!-- 댓글 수 -->
       <h3 class="mb-5 text-lg font-bold">
-        댓글 <span class="text-brand tabular-nums" th:text="${replyCount}">0</span>
+        댓글 <span id="reply-count" class="text-brand tabular-nums" th:text="${replyCount}">0</span>
       </h3>
 
       <!-- 댓글 작성 폼 -->
@@ -206,7 +206,8 @@
                 <button type="button"
                         class="inline-flex h-9 items-center rounded-lg border border-line px-4 text-sm text-muted hover:bg-sunk"
                         th:onclick="|cancelReplyEdit([[${reply.replyNo}]])|">취소</button>
-                <button type="submit"
+                <button type="button"
+                        th:onclick="|submitReplyEdit([[${reply.replyNo}]])|"
                         class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink">저장</button>
               </div>
             </div>
@@ -218,12 +219,6 @@
     </section>
   </main>
 
-  <!-- 댓글 삭제 hidden form -->
-  <form id="reply-delete-form" th:action="@{/reply/delete}" method="post" style="display:none">
-    <input type="hidden" id="delete-replyNo"      name="replyNo" />
-    <input type="hidden" id="delete-reply-postNo"    name="postNo" />
-    <input type="hidden" id="delete-reply-postBoard" name="postBoard" />
-  </form>
 
   <!-- ════════════ SCRIPT ════════════ -->
   <script th:inline="javascript">
@@ -378,12 +373,60 @@
         openInfoModal('로그인이 필요합니다', '로그인 후 댓글을 작성할 수 있어요.');
         return;
       }
-      const content = document.getElementById('reply-content').value;
-      if (!content.trim()) {
-        openInfoModal('알림', '댓글 내용을 입력해주세요.');
-        return;
-      }
-      document.getElementById('reply-form').submit();
+      submitReplyInsert();
+    }
+
+    function submitReplyInsert() {
+      const content = document.getElementById('reply-content').value.trim();
+      if (!content) { openInfoModal('알림', '댓글 내용을 입력해주세요.'); return; }
+
+      fetch('/reply/ajax/insert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+        body: JSON.stringify({ content: content, postNo: scheduleNo, postBoard: 'S' })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (!data.success) { openInfoModal('알림', data.message); return; }
+        document.getElementById('reply-content').value = '';
+        const countEl = document.getElementById('reply-count');
+        countEl.textContent = parseInt(countEl.textContent) + 1;
+        appendReplyDOM(data);
+      });
+    }
+
+    function appendReplyDOM(d) {
+      document.querySelector('section').insertAdjacentHTML('beforeend', `
+        <div id="reply-${d.replyNo}" class="flex gap-3 border-t border-line py-4">
+          <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-sunk font-bold text-muted">
+            ${d.writer.charAt(0)}
+          </span>
+          <div class="flex-1">
+            <div class="mb-1 flex items-center gap-2">
+              <span class="text-sm font-bold">${d.writer}</span>
+              <span class="text-xs text-faint tabular-nums">${d.createDate}</span>
+              <span class="ml-auto flex gap-2.5 text-xs text-muted">
+                <button type="button" class="hover:text-brand"
+                        onclick="toggleReplyEdit(${d.replyNo})">수정</button>
+                <button type="button" class="hover:text-red-500"
+                        onclick="openReplyDeleteModal(${d.replyNo}, ${scheduleNo})">삭제</button>
+              </span>
+            </div>
+            <p id="reply-text-${d.replyNo}" class="text-sm leading-relaxed text-ink/85">${d.content}</p>
+            <form id="reply-edit-form-${d.replyNo}" class="hidden mt-2">
+              <div class="overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
+                <textarea id="reply-edit-ta-${d.replyNo}"
+                          class="block min-h-[80px] w-full resize-none border-none bg-transparent px-4 py-3 text-sm leading-relaxed outline-none">${d.content}</textarea>
+                <div class="flex justify-end gap-2 border-t border-line py-2 pr-2">
+                  <button type="button" class="inline-flex h-9 items-center rounded-lg border border-line px-4 text-sm text-muted hover:bg-sunk"
+                          onclick="cancelReplyEdit(${d.replyNo})">취소</button>
+                  <button type="button" class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-ink"
+                          onclick="submitReplyEdit(${d.replyNo})">저장</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>`);
     }
 
     /* ─── 댓글 수정/취소 ─── */
@@ -405,24 +448,39 @@
         '댓글을 삭제할까요?',
         '삭제한 댓글은 되돌릴 수 없어요.',
         function () {
-          document.getElementById('delete-replyNo').value         = replyNo;
-          document.getElementById('delete-reply-postNo').value    = postNo;
-          document.getElementById('delete-reply-postBoard').value = 'S';
-          document.getElementById('reply-delete-form').submit();
+          fetch('/reply/ajax/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+            body: JSON.stringify({ replyNo: replyNo })
+          })
+          .then(r => r.json())
+          .then(data => {
+            if (!data.success) { openInfoModal('알림', data.message); return; }
+            document.getElementById('reply-' + replyNo)?.remove();
+            const countEl = document.getElementById('reply-count');
+            countEl.textContent = parseInt(countEl.textContent) - 1;
+          });
         }
       );
     }
 
-    /* ─── 댓글 수정 폼 빈값 차단 ─── */
-    document.querySelectorAll('form[id^="reply-edit-form-"]').forEach(function (form) {
-      form.addEventListener('submit', function (e) {
-        const ta = form.querySelector('textarea[name="content"]');
-        if (!ta.value.trim()) {
-          e.preventDefault();
-          openInfoModal('알림', '댓글 내용을 입력해주세요.');
-        }
+    /* ─── 댓글 수정 저장 ─── */
+    function submitReplyEdit(replyNo) {
+      const ta = document.getElementById('reply-edit-ta-' + replyNo);
+      if (!ta.value.trim()) { openInfoModal('알림', '댓글 내용을 입력해주세요.'); return; }
+
+      fetch('/reply/ajax/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+        body: JSON.stringify({ replyNo: replyNo, content: ta.value.trim() })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (!data.success) { openInfoModal('알림', data.message); return; }
+        document.getElementById('reply-text-' + replyNo).textContent = ta.value.trim();
+        cancelReplyEdit(replyNo);
       });
-    });
+    }
 
     /* ─── 추천 토글 ─── */
     async function toggleLike(scheduleNo) {
