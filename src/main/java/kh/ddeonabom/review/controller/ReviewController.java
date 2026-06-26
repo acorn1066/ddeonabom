@@ -20,10 +20,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import kh.ddeonabom.admin.model.service.AdminService;
+import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.member.model.vo.Member;
@@ -44,7 +45,7 @@ import lombok.RequiredArgsConstructor;
 public class ReviewController {
 	private final ReviewService reviewService;
 	private final ReplyService replyService;
-	
+	private final AdminService aService;
 	private final ScheduleService sService;
 
 	@Value("${kakao.api.key}")
@@ -52,11 +53,21 @@ public class ReviewController {
 	
 	
 	@GetMapping("/reviews/list")
-    
-    public String reviewListPage() {
-       
+	public String reviewListPage(Model model) {
+        ArrayList<AdminNotice> noticeList = aService.selectTopNotice();
+        model.addAttribute("noticeList", noticeList);   
         return "views/review/reviews";
     }
+	
+// ==================================================================== 공지사항 ==============================================================
+	@GetMapping("/reviews/notice")
+	public String noticeDetail(@RequestParam("noticeNo") int noticeNo, Model model) {
+	    AdminNotice notice = aService.selectNotice(noticeNo);
+	    model.addAttribute("notice", notice);
+	    model.addAttribute("from", "reviews");
+	    return "views/admin/memberNotice";
+	}
+// ==================================================================== 공지사항 ==============================================================
 	
 	@GetMapping("/selectReviewList")
     @ResponseBody 

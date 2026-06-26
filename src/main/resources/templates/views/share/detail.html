@@ -41,12 +41,6 @@
           </div>
         </div>
 
-        <!-- 내 일정으로 복사 버튼 -->
-        <button type="button"
-                th:onclick="|copySchedule([[${schedule.scheduleNo}]])|"
-                class="ml-auto inline-flex h-11 items-center rounded-lg bg-brand px-5 text-sm font-semibold text-white transition hover:bg-brand-ink">
-          내 일정으로 복사 →
-        </button>
       </div>
     </div>
 
@@ -116,8 +110,9 @@
         ☆ 찜
       </button>
 
-      <!-- 내 일정으로 복사 -->
+      <!-- 내 일정으로 복사: 본인 글이면 미노출 -->
       <button type="button"
+              th:if="${session.loginUser == null or session.loginUser.memberNo != schedule.memberNo}"
               th:onclick="|copySchedule([[${schedule.scheduleNo}]])|"
               class="inline-flex h-12 items-center rounded-full bg-brand px-6 text-15 font-bold text-white transition hover:bg-brand-ink">
         내 일정으로 복사 →

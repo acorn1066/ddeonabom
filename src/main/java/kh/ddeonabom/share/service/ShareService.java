@@ -66,4 +66,53 @@ public class ShareService {
         map.put("memberNo",   memberNo);
         return shareMapper.isWished(map) > 0;
     }
+
+    /** 추천 toggle: true = 추천됨, false = 취소됨 */
+    public boolean toggleLike(int scheduleNo, int memberNo) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("scheduleNo", scheduleNo);
+        map.put("memberNo",   memberNo);
+        if (shareMapper.isLiked(map) > 0) {
+            shareMapper.deleteLike(map);
+            return false;
+        } else {
+            shareMapper.insertLike(map);
+            return true;
+        }
+    }
+
+    /** 전체 추천 수 */
+    public int getLikeCount(int scheduleNo) {
+        return shareMapper.getLikeCount(scheduleNo);
+    }
+
+    /** 찜 toggle: true = 찜됨, false = 취소됨 */
+    public boolean toggleWish(int scheduleNo, int memberNo) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("scheduleNo", scheduleNo);
+        map.put("memberNo",   memberNo);
+        if (shareMapper.isWished(map) > 0) {
+            shareMapper.deleteWish(map);
+            return false;
+        } else {
+            shareMapper.insertWish(map);
+            return true;
+        }
+    }
+
+	public int getWishPlanCount(int memberNo) {
+		return shareMapper.getWishPlanCount(memberNo);
+	}
+
+	public ArrayList<Share> selectMyWishPlanList(HashMap<String, Object> map) {
+		return shareMapper.selectMyWishPlanList(map);
+	}
+
+	public int selectMyShareCount(int memberNo) {
+		return shareMapper.selectMyShareCount(memberNo);
+	}
+
+	public ArrayList<Share> selectMyShareList(HashMap<String, Object> map) {
+		return shareMapper.selectMyShareList(map);
+	}
 }

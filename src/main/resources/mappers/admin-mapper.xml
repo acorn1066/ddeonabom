@@ -469,5 +469,14 @@
 	        </when>
 	    </choose>
 	</update>
+	
+	<!-- 같은 대상 신고 전체 상태 변경 -->
+	<update id="updateStatusByTarget" parameterType="AdminReport">
+	    UPDATE REPORT
+	    SET REPORT_STATUS = #{reportStatus}
+	    WHERE TARGET_TYPE = #{targetType}
+	      AND TARGET_NO   = #{targetNo}
+	      AND REPORT_STATUS = 'N'
+	</update>
 
 </mapper>

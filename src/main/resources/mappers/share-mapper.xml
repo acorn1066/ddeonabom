@@ -10,6 +10,16 @@
     <sql id="shareWhereClause">
         WHERE sm.schedule_status = 'Y'
 
+        <!-- 공개 범위: 비로그인 → Y(전체공개)만, 로그인 → Y·M(회원공개) -->
+        <choose>
+            <when test="memberNo != null and memberNo > 0">
+                AND sm.schedule_visibility IN ('Y', 'M')
+            </when>
+            <otherwise>
+                AND sm.schedule_visibility = 'Y'
+            </otherwise>
+        </choose>
+
         <!-- 지역 필터: 일정 내 장소 중 해당 지역 포함 여부 -->
         <if test="region != null and region != '전체'">
             AND EXISTS (
@@ -87,8 +97,8 @@
                 AND r.post_board = 'S'
                 AND r.status     = 'Y') AS replyCount,
 
-            <!-- 첫 번째 장소 썸네일 (LANDMARK.FIRSTIMAGE2) -->
-            (SELECT l.firstimage2
+            <!-- 첫 번째 장소 썸네일 (LANDMARK.FIRSTIMAGE) -->
+            (SELECT l.firstimage
                FROM schedule_sub ss
                JOIN landmark l ON l.content_id = ss.content_id
               WHERE ss.schedule_no = sm.schedule_no
@@ -200,4 +210,125 @@
           AND member_no     = #{memberNo}
     </select>
 
+    <!-- 추천 등록 -->
+    <insert id="insertLike" parameterType="hashmap">
+        INSERT INTO NICE VALUES (SEQ_NICE_NO.NEXTVAL, 'SR', #{scheduleNo}, #{memberNo})
+    </insert>
+
+    <!-- 추천 취소 -->
+    <delete id="deleteLike" parameterType="hashmap">
+        DELETE FROM NICE
+        WHERE post_no       = #{scheduleNo}
+          AND post_board_fx = 'SR'
+          AND member_no     = #{memberNo}
+    </delete>
+
+    <!-- 전체 추천 수 -->
+    <select id="getLikeCount" parameterType="_int" resultType="int">
+        SELECT COUNT(*) FROM NICE
+        WHERE post_no       = #{scheduleNo}
+          AND post_board_fx = 'SR'
+    </select>
+
+    <!-- 찜 등록 -->
+    <insert id="insertWish" parameterType="hashmap">
+        INSERT INTO NICE VALUES (SEQ_NICE_NO.NEXTVAL, 'SJ', #{scheduleNo}, #{memberNo})
+    </insert>
+
+    <!-- 찜 취소 -->
+    <delete id="deleteWish" parameterType="hashmap">
+        DELETE FROM NICE
+        WHERE post_no       = #{scheduleNo}
+          AND post_board_fx = 'SJ'
+          AND member_no     = #{memberNo}
+    </delete>
+<select id="getWishPlanCount" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+          FROM nice n
+          JOIN schedule_main sm ON n.post_no = sm.schedule_no
+         WHERE n.member_no = #{memberNo}
+           AND n.post_board_fx = 'SJ'       AND sm.schedule_status = 'Y'
+           </select>
+
+    <select id="selectMyWishPlanList" parameterType="hashmap" resultType="Share">
+        SELECT
+            sm.schedule_no,
+            sm.schedule_title,
+            TO_CHAR(sm.schedule_startdate, 'yyyy.mm.dd') AS scheduleStartdate,
+            TO_CHAR(sm.schedule_enddate,   'yyyy.mm.dd') AS scheduleEnddate,
+            sm.schedule_visibility,
+            sm.create_date AS createDate,
+            sm.member_no,
+            m.nickname     AS memberNickname,
+
+            (SELECT COUNT(*)
+               FROM schedule_sub ss
+              WHERE ss.schedule_no = sm.schedule_no) AS placeCount,
+
+            (SELECT COUNT(*)
+               FROM nice n_like
+              WHERE n_like.post_no       = sm.schedule_no
+                AND n_like.post_board_fx = 'SR') AS likeCount,
+
+            (SELECT COUNT(*)
+               FROM reply r
+              WHERE r.post_no    = sm.schedule_no
+                AND r.post_board = 'S'
+                AND r.status     = 'Y') AS replyCount,
+
+            (SELECT l.firstimage2
+               FROM schedule_sub ss
+               JOIN landmark l ON l.content_id = ss.content_id
+              WHERE ss.schedule_no = sm.schedule_no
+              ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq
+              FETCH FIRST 1 ROWS ONLY) AS firstImage,
+
+            (SELECT l.addr1
+               FROM schedule_sub ss
+               JOIN landmark l ON l.content_id = ss.content_id
+              WHERE ss.schedule_no = sm.schedule_no
+              ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq
+              FETCH FIRST 1 ROWS ONLY) AS firstAddr
+
+        FROM nice n
+        JOIN schedule_main sm ON n.post_no = sm.schedule_no
+        JOIN member m         ON sm.member_no = m.member_no
+        WHERE n.member_no = #{memberNo}
+          AND n.post_board_fx = 'SJ'          AND sm.schedule_status = 'Y'
+        ORDER BY n.nice_no DESC               OFFSET #{startRow} ROWS FETCH NEXT #{listLimit} ROWS ONLY
+    </select>
+   <select id="selectMyShareCount" parameterType="int" resultType="_int">
+    SELECT COUNT(*)
+    FROM SCHEDULE_MAIN
+    WHERE MEMBER_NO = #{memberNo}
+      AND SCHEDULE_STATUS = 'Y'
+</select>
+
+<select id="selectMyShareList" parameterType="map" resultType="Share">
+    SELECT 
+        p.*,
+        p.SCHEDULE_TITLE AS title, 
+        p.CREATE_DATE AS createDate, 
+        p.REPORT_STATUS AS reportStatus
+    FROM (
+        SELECT 
+            S.SCHEDULE_NO,
+            S.SCHEDULE_TITLE,
+            S.SCHEDULE_STATUS,
+            S.CREATE_DATE,
+            S.MEMBER_NO,
+            RP.REPORT_STATUS 
+        FROM SCHEDULE_MAIN S
+        LEFT JOIN REPORT RP
+          ON S.SCHEDULE_NO = RP.TARGET_NO 
+         AND RP.TARGET_TYPE = 'share' 
+         AND RP.REPORT_STATUS = 'N' 
+        WHERE S.MEMBER_NO = #{memberNo}
+          AND S.SCHEDULE_STATUS = 'Y'
+        ORDER BY S.SCHEDULE_NO DESC
+        OFFSET #{startRow} ROWS
+        FETCH NEXT #{listLimit} ROWS ONLY
+    ) p
+    ORDER BY p.SCHEDULE_NO DESC
+</select>
 </mapper>
