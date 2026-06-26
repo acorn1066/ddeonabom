@@ -393,7 +393,8 @@
 
 <select id="getReportCount" parameterType="map" resultType="_int">
     SELECT COUNT(*)
-    FROM REPORT
+    FROM REPORT R
+    JOIN MEMBER M ON R.MEMBER_NO = M.MEMBER_NO
     WHERE 1=1
     <choose>
         <when test="targetType == 'reply'">
@@ -405,6 +406,9 @@
     </choose>
     <if test="status != null and status != ''">
         AND REPORT_STATUS = #{status}
+    </if>
+    <if test="keyword != null and keyword != ''">
+        AND M.NICKNAME LIKE '%' || #{keyword} || '%'
     </if>
 </select>
 
@@ -443,6 +447,9 @@
 	            <if test="status != null and status != ''">
 	                AND R.REPORT_STATUS = #{status}
 	            </if>
+	            <if test="keyword != null and keyword != ''">
+				    AND M.NICKNAME LIKE '%' || #{keyword} || '%'
+				</if>
 	            ORDER BY R.REPORT_DATE DESC
 	        ) A
 	        <![CDATA[ WHERE ROWNUM <= #{pi.currentPage} * #{pi.boardLimit}

@@ -119,17 +119,19 @@ public class AdminService {
 		return mapper.selectTopNotice();
 	}
 
-	public int getReportCount(String targetType, String status) {
+	public int getReportCount(String targetType, String status, String keyword) {
 		   HashMap<String, Object> map = new HashMap<>();
 		    map.put("targetType", targetType);
 		    map.put("status", status);
+		    map.put("keyword", keyword);
 		    return mapper.getReportCount(map);
 		}
 
-	public ArrayList<AdminReport> selectReportList(String targetType, String status, PageInfo pi) {
+	public ArrayList<AdminReport> selectReportList(String targetType, String status, String keyword, PageInfo pi) {
 		 HashMap<String, Object> map = new HashMap<>();
 		    map.put("targetType", targetType);
 		    map.put("status", status);
+		    map.put("keyword", keyword);
 		    map.put("pi", pi);
 		    return mapper.selectReportList(map);
 		}

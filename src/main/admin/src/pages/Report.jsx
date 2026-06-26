@@ -30,20 +30,19 @@ const Report = () => {
         boards: reports, setBoards: setReports, setPageInfo,
         pageInfo, currentPage, changePage, resetToFirstPage,
         handleStatusToggle: changeReportStatus,
-        selectBoard: selectReport, showModal,
-        handleBoardClick: handleReportClick, closeModal
+        selectBoard: selectReport, showModal, keyword, setKeyword,
+        handleSearch: triggerSearch, handleBoardClick: handleReportClick, closeModal
     } = useBoards("reports", "reportNo");
 
     const [reportType, setReportType] = useState("board");
-    const [keyword, setKeyword] = useState("");
-    const [status, setStatus] = useState("전체");
+    const [searchType, setSearchType] = useState("전체");
 
     useEffect(() => {
         fetchReports(currentPage);
     }, [currentPage, reportType]);
 
     const fetchReports = (page) => {
-        fetch(`/react/admin/reports?targetType=${reportType}&status=${statusMap[status]}&page=${page}`)
+        fetch(`/react/admin/reports?targetType=${reportType}&status=${statusMap[searchType]}&keyword=${keyword}&page=${page}`)
             .then(res => res.json())
             .then(data => {
                 setReports(data.list || []);
@@ -88,14 +87,6 @@ const Report = () => {
     };
 
 
-    const handleSearch = () => {
-        if (currentPage === 1) {
-            fetchReports(1);
-        } else {
-            resetToFirstPage();
-        }
-    };
-
     return (
         <section className="flex-1 p-8">
 
@@ -129,21 +120,25 @@ const Report = () => {
                 <h2 className="mb-4 text-lg font-semibold">신고 검색</h2>
                 <div className="flex gap-3">
                     <select
-                        value={status}
-                        onChange={(e) => setStatus(e.target.value)}
+                        value={searchType}
+                        onChange={(e) => setSearchType(e.target.value)}
                         className="cursor-pointer rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
-                        {Object.keys(statusMap).map(s => <option key={s}>{s}</option>)}
+                        <option>전체</option>
+                        <option>미처리</option>
+                        <option>처리완료</option>
+                        <option>반려</option>
                     </select>
                     <input
                         type="text"
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && triggerSearch(fetchReports)}
                         placeholder="신고자 검색"
                         className="flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
                     />
                     <button
-                        onClick={handleSearch}
+                        onClick={() => triggerSearch(fetchReports)}
                         className="cursor-pointer rounded-lg bg-red-600 px-6 py-2 text-white hover:bg-red-700"
                     >
                         검색
