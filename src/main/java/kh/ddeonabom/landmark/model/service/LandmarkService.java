@@ -75,5 +75,6 @@ public class LandmarkService {
 	public int getWishListCountByParam(Map<String, Object> param) {
 	    return mapper.getWishListCountByParam(param);
 	}
+	
 
 }

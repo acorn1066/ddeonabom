@@ -162,13 +162,20 @@
 	</select>
 
 	<select id="getMyListCount" resultType="_int" parameterType="map">
-
     SELECT COUNT(*)
-    FROM QLIST
-    WHERE MEMBER_NO = #{memberNo}
-      AND STATUS = 'Y'
-
-	</select>
+    FROM QLIST Q  WHERE Q.MEMBER_NO = #{memberNo}
+      AND Q.STATUS = 'Y'
+    <if test="keyword != null and keyword != ''">
+        <choose>
+            <when test="searchType == 'title'">
+                AND Q.TITLE LIKE '%' || #{keyword} || '%'
+            </when>
+            <otherwise>
+                AND (Q.TITLE LIKE '%' || #{keyword} || '%' OR Q.CONTENT LIKE '%' || #{keyword} || '%')
+            </otherwise>
+        </choose>
+    </if>
+</select>
 	
 	<select id="selectMyBoardList" resultType="QList" parameterType="map">
     SELECT 
@@ -190,6 +197,16 @@
          AND RP.REPORT_STATUS = 'N'
         WHERE Q.MEMBER_NO = #{memberNo}
           AND Q.STATUS = 'Y'
+          <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="searchType == 'title'">
+                    AND Q.TITLE LIKE '%' || #{keyword} || '%'
+                </when>
+                <otherwise>
+                    AND (Q.TITLE LIKE '%' || #{keyword} || '%' OR Q.CONTENT LIKE '%' || #{keyword} || '%')
+                </otherwise>
+            </choose>
+        </if>
         ORDER BY Q.Q_NO DESC
         OFFSET #{startRow} ROWS
         FETCH NEXT #{listLimit} ROWS ONLY

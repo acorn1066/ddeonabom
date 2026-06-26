@@ -53,18 +53,24 @@ body {
 		    <span data-region="충청" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">충청</span>
 		    <span data-region="경상" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">경상</span>
 		    <span data-region="전라" class="region-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink">전라</span>
-		    
-		    <div class="relative ml-auto">
-		        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-faint" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6">
-		            <circle cx="8" cy="8" r="5.5" /><path d="M12.5 12.5L16 16" />
-		        </svg>
-		        <input class="h-9 w-56 rounded-full border border-line bg-white pl-9 pr-3 text-13 outline-none transition placeholder:text-faint focus:border-brand" placeholder="여행·관광지 검색" id="searchInput"/>
-		    </div>
-		    <select id="sortSelect" class="ml-2 h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none">
-		        <option value="latest">최신순</option>
-		        <option value="like">추천 많은 순</option>
-		        <option value="view">조회수 높은 순</option>
-		    </select>
+		    <select id="sortSelect"
+			        class="ml-auto h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none">
+			    <option value="latest">최신순</option>
+			    <option value="like">추천 많은 순</option>
+			    <option value="view">조회수 높은 순</option>
+			</select>
+			
+			<div class="relative ml-2">
+			    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-faint"
+			         width="16" height="16" viewBox="0 0 18 18"
+			         fill="none" stroke="currentColor" stroke-width="1.6">
+			        <circle cx="8" cy="8" r="5.5" />
+			        <path d="M12.5 12.5L16 16" />
+			    </svg>
+			    <input class="h-9 w-56 rounded-full border border-line bg-white pl-9 pr-3 text-13 outline-none transition placeholder:text-faint focus:border-brand"
+			           placeholder="검색"
+			           id="searchInput"/>
+			</div>
 		</div>
 
 
@@ -203,7 +209,7 @@ body {
 	                      <div class="text-13 text-faint">등록일: ${displayDate}</div>
 	                      <div class="mt-auto flex items-center gap-2 border-t border-line pt-3 text-13">
 	                        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-brand-soft text-11 font-bold text-brand-ink">M</span>
-	                        <span class="font-semibold text-muted">회원 ${travel.nickname} </span>
+	                        <span class="font-semibold text-muted"> ${travel.nickname} </span>
 	                        <span class="ml-auto text-muted text-xs">조회수 <span class="font-bold text-ink">${travel.count}</span></span>
 	                        / 추천 <span class="font-bold text-ink">${travel.likeCount ?? 0}</span>
 	                      </div>

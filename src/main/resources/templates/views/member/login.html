@@ -45,8 +45,11 @@
             </div>
         </form>
         <div th:if="${param.error}" class="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg text-center font-medium">
-    아이디 또는 비밀번호가 일치하지 않습니다.
-</div>
+		    아이디 또는 비밀번호가 일치하지 않습니다.
+		</div><div th:if="${param.blocked}"
+		     class="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg text-center font-medium">
+		    관리자에 의해 차단된 계정입니다.
+		</div>
 		
         <!-- 하단 링크 영역 (아이디 찾기, 비밀번호 찾기, 회원가입) -->
         <div class="mt-8 pt-6 border-t border-gray-100 text-sm text-center text-gray-500">

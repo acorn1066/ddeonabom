@@ -88,7 +88,13 @@
 	                OR NICKNAME   LIKE '%' || #{keyword} || '%'
 	                OR EMAIL      LIKE '%' || #{keyword} || '%')
 	            </if>
-	            ORDER BY ENROLL_DATE DESC
+	            ORDER BY 
+ 					CASE STATUS
+                    WHEN 'Y' THEN 1
+                    WHEN 'B' THEN 2
+                    WHEN 'N' THEN 3
+                END,
+                ENROLL_DATE DESC
 	        ) <![CDATA[ A WHERE ROWNUM <= #{startRow} + #{listLimit}
 	    ) WHERE RN > #{startRow} ]]>
 	</select>
@@ -393,7 +399,8 @@
 
 <select id="getReportCount" parameterType="map" resultType="_int">
     SELECT COUNT(*)
-    FROM REPORT
+    FROM REPORT R
+    JOIN MEMBER M ON R.MEMBER_NO = M.MEMBER_NO
     WHERE 1=1
     <choose>
         <when test="targetType == 'reply'">
@@ -405,6 +412,9 @@
     </choose>
     <if test="status != null and status != ''">
         AND REPORT_STATUS = #{status}
+    </if>
+    <if test="keyword != null and keyword != ''">
+        AND M.NICKNAME LIKE '%' || #{keyword} || '%'
     </if>
 </select>
 
@@ -443,6 +453,9 @@
 	            <if test="status != null and status != ''">
 	                AND R.REPORT_STATUS = #{status}
 	            </if>
+	            <if test="keyword != null and keyword != ''">
+				    AND M.NICKNAME LIKE '%' || #{keyword} || '%'
+				</if>
 	            ORDER BY R.REPORT_DATE DESC
 	        ) A
 	        <![CDATA[ WHERE ROWNUM <= #{pi.currentPage} * #{pi.boardLimit}

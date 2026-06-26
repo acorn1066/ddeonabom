@@ -43,7 +43,6 @@ public interface ReviewMapper {
 	
 	ArrayList<Review> selectMyReviewList(HashMap<String, Object> reviewMap);
 
-	int getMyReviewCount(int memberNo);
 
 	Review getTravelWithSubList(Long travelNo);
 
@@ -63,6 +62,8 @@ public interface ReviewMapper {
 	void updateReviewSub(ReviewSub sub);
 
 	void deleteReview(int travelNo);
+
+	int getMyReviewCount(HashMap<String, Object> map);
 
 	
 

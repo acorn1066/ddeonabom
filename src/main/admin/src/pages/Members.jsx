@@ -142,13 +142,14 @@ const Members = () => {
 
                                         <button
                                             onClick={() =>
-                                                item.status === "N"
+                                                item.status === "B"
                                                     ? handleStatusToggle(item, "Y")
                                                     : null
                                             }
-                                            className={`rounded-lg px-4 py-1 text-sm font-semibold border transition cursor-pointer ${item.status === "Y"
-                                                ? "border-green-500 bg-green-500 text-white"
-                                                : "border-gray-300 bg-white text-gray-500"
+                                            className={`rounded-lg px-4 py-1 text-sm font-semibold border transition ${item.status === "N" ? "cursor-not-allowed opacity-40" : "cursor-pointer"
+                                                } ${item.status === "Y"
+                                                    ? "border-green-500 bg-green-500 text-white"
+                                                    : "border-gray-300 bg-white text-gray-500"
                                                 }`}
                                         >
                                             활동
@@ -157,15 +158,26 @@ const Members = () => {
                                         <button
                                             onClick={() =>
                                                 item.status === "Y"
-                                                    ? handleStatusToggle(item, "N")
+                                                    ? handleStatusToggle(item, "B")
                                                     : null
                                             }
-                                            className={`rounded-lg px-4 py-1 text-sm font-semibold border transition cursor-pointer ${item.status === "N"
-                                                ? "border-red-500 bg-red-500 text-white"
-                                                : "border-gray-300 bg-white text-gray-500"
+                                            className={`rounded-lg px-4 py-1 text-sm font-semibold border transition ${item.status === "N" ? "cursor-not-allowed opacity-40" : "cursor-pointer"
+                                                } ${item.status === "B"
+                                                    ? "border-red-500 bg-red-500 text-white"
+                                                    : "border-gray-300 bg-white text-gray-500"
                                                 }`}
                                         >
                                             정지
+                                        </button>
+
+                                        <button
+                                            disabled
+                                            className={`rounded-lg px-4 py-1 text-sm font-semibold border cursor-not-allowed ${item.status === "N"
+                                                ? "border-gray-500 bg-gray-500 text-white"
+                                                : "border-gray-200 bg-white text-gray-300"
+                                                }`}
+                                        >
+                                            탈퇴
                                         </button>
                                     </div>
                                 </td>

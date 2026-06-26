@@ -114,41 +114,72 @@
 	    VALUES (SEQ_IMAGE_NO.NEXTVAL, #{imagePath}, #{fileName}, #{renameFile}, #{travelSubNo})
 	</insert>
 	
-	<select id="getMyReviewCount" parameterType="int" resultType="_int">
+	<select id="getMyReviewCount" parameterType="map" resultType="_int">
+    SELECT COUNT(DISTINCT T.TRAVEL_NO)
+    FROM TRAVEL_LIST T
+    LEFT JOIN TRAVEL_LIST_SUB TS ON T.TRAVEL_NO = TS.TRAVEL_NO
+    WHERE T.MEMBER_NO = #{memberNo}
+      AND T.STATUS = 'Y'
 
+    <if test="keyword != null and keyword != ''">
+        <choose>
+            <when test="searchType == 'title'">
+                AND T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
+            </when>
+            <when test="searchType == 'region'">
+                AND (TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%' 
+                     OR TS.TRAVEL_SUB_CONTENT LIKE '%' || #{keyword} || '%')
+            </when>
+            <otherwise>
+                AND (
+                    T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
+                    OR TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%'
+                    OR TS.TRAVEL_SUB_CONTENT LIKE '%' || #{keyword} || '%'
+                )
+            </otherwise>
+        </choose>
+    </if>
+</select>
 
-	    SELECT COUNT(*)
-	    FROM TRAVEL_LIST
-	    WHERE MEMBER_NO = #{value}
-	      AND STATUS = 'Y'
-	
-	</select>
-	
-	<select id="selectMyReviewList" parameterType="map" resultType="Review">
-	    SELECT 
-	        p.*,
-	        p.TRAVEL_TITLE AS title, p.CREATE_DATE AS createDate, p.REPORT_STATUS AS reportStatus
-	    FROM (
-	        SELECT 
-	            T.TRAVEL_NO,
-	            T.TRAVEL_TITLE,
-	            T.STATUS,
-	            T.CREATE_DATE,
-	            T.COUNT,
-	            T.MEMBER_NO,
-	            T.REGION,
-	            RP.REPORT_STATUS FROM TRAVEL_LIST T
-	        LEFT JOIN REPORT RP
-	          ON T.TRAVEL_NO = RP.TARGET_NO 
-	         AND RP.TARGET_TYPE = 'travel' 
-	         AND RP.REPORT_STATUS = 'N' WHERE T.MEMBER_NO = #{memberNo}
-	          AND T.STATUS = 'Y'
-	        ORDER BY T.TRAVEL_NO DESC
-	        OFFSET #{startRow} ROWS
-	        FETCH NEXT #{listLimit} ROWS ONLY
-	    ) p
-	    ORDER BY p.TRAVEL_NO DESC
-	</select>
+<select id="selectMyReviewList" parameterType="map" resultType="Review">
+    SELECT DISTINCT
+        T.TRAVEL_NO,
+        T.TRAVEL_TITLE AS travelTitle,
+        T.CREATE_DATE AS createDate,
+        RP.REPORT_STATUS AS reportStatus
+    FROM TRAVEL_LIST T
+    LEFT JOIN REPORT RP 
+           ON T.TRAVEL_NO = RP.TARGET_NO 
+          AND RP.TARGET_TYPE = 'travel' 
+          AND RP.REPORT_STATUS = 'N'
+    LEFT JOIN TRAVEL_LIST_SUB TS 
+           ON T.TRAVEL_NO = TS.TRAVEL_NO
+    
+    WHERE T.MEMBER_NO = #{memberNo}
+      AND T.STATUS = 'Y'
+
+    <if test="keyword != null and keyword != ''">
+        <choose>
+            <when test="searchType == 'title'">
+                AND T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
+            </when>
+            <when test="searchType == 'region'">
+                AND (TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%' 
+                     OR TS.TRAVEL_SUB_CONTENT LIKE '%' || #{keyword} || '%')
+            </when>
+            <otherwise>
+                AND (
+                    T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
+                    OR TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%'
+                    OR TS.TRAVEL_SUB_CONTENT LIKE '%' || #{keyword} || '%'
+                )
+            </otherwise>
+        </choose>
+    </if>
+    ORDER BY T.TRAVEL_NO DESC
+    OFFSET #{startRow} ROWS
+    FETCH NEXT #{listLimit} ROWS ONLY
+</select>
 	
 	<select id="getReviewDetail" parameterType="int" resultType="kh.ddeonabom.review.model.vo.Review">
 	    SELECT 
@@ -285,14 +316,17 @@
     </update>
     
     <update id="reviewSubUpdate" parameterType="kh.ddeonabom.review.model.vo.ReviewSub">
-        UPDATE TRAVEL_LIST_SUB 
-        SET 
-            CONTENT_TITLE      = #{contentTitle, jdbcType=VARCHAR},
-            RATING             = #{rating, jdbcType=INTEGER},
-            TRAVEL_SUB_CONTENT = #{travelSubContent, jdbcType=VARCHAR},
-            LAT                = #{lat, jdbcType=DOUBLE}, LNG                = #{lng, jdbcType=DOUBLE}  WHERE 
-            TRAVEL_SUB_NO      = #{travelSubNo, jdbcType=INTEGER}
-    </update>
+	    UPDATE TRAVEL_LIST_SUB 
+	    SET 
+	        CONTENT_TITLE = #{contentTitle, jdbcType=VARCHAR},
+	        RATING = #{rating, jdbcType=INTEGER},
+	
+	        TRAVEL_SUB_CONTENT = NVL(#{travelSubContent, jdbcType=VARCHAR}, TRAVEL_SUB_CONTENT),
+	
+	        LAT = #{lat, jdbcType=DOUBLE},
+	        LNG = #{lng, jdbcType=DOUBLE}
+	    WHERE TRAVEL_SUB_NO = #{travelSubNo, jdbcType=INTEGER}
+	</update>
     
     <update id="deleteReview">
 	    UPDATE TRAVEL_LIST

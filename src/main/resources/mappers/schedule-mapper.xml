@@ -11,6 +11,11 @@
 	           m.schedule_visibility,
 	           m.member_no,
 	           (select count(*) from schedule_sub s where s.schedule_no = m.schedule_no) as placeCount,
+	           (select count(*)
+	              from nice n
+	             where n.post_no       = m.schedule_no
+	               and n.post_board_fx = 'SR'
+	           ) as likeCount,
 	           (select l.addr1
 	              from schedule_sub s
 	              join landmark l on l.content_id = s.content_id
