@@ -203,6 +203,10 @@ public class MemberController {
 
         // 비밀번호 검증
         if (loginUser != null && bcrypt.matches(m.getPwd(), loginUser.getPwd())) {
+        	
+        	if("B".equals(loginUser.getStatus())) {
+        		return "redirect:/member/login?blocked";
+        	}
 
             session.setAttribute("loginUser", loginUser);
             

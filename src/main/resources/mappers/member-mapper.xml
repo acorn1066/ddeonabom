@@ -43,7 +43,7 @@
 
 <select id="login" resultType="Member">
     select * from member
-    where id=#{id} and status ='Y'
+    where id=#{id}
 </select>
 
 <select id="selectOneMember" resultType="Member">
