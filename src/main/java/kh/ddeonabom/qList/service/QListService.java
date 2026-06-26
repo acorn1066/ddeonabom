@@ -53,4 +53,30 @@ public class QListService {
 	public int updateQList(QList q) {
 		return qMapper.updateQList(q);
 	}
+
+	// 추천 toggle: true = 추천됨, false = 취소됨
+	public boolean toggleLike(int qNo, int memberNo) {
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("qNo",      qNo);
+		map.put("memberNo", memberNo);
+
+		if (qMapper.isLiked(map) > 0) {
+			qMapper.deleteLike(map);
+			return false;
+		} else {
+			qMapper.insertLike(map);
+			return true;
+		}
+	}
+
+	public int getLikeCount(int qNo) {
+		return qMapper.getLikeCount(qNo);
+	}
+
+	public boolean isLiked(int qNo, int memberNo) {
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("qNo",      qNo);
+		map.put("memberNo", memberNo);
+		return qMapper.isLiked(map) > 0;
+	}
 }

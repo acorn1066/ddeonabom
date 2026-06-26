@@ -428,7 +428,7 @@
 	                END AS targetTitle
 	            FROM REPORT R
 	            JOIN MEMBER M              ON R.MEMBER_NO  = M.MEMBER_NO
-	            LEFT JOIN TRAVEL_LIST T    ON R.TARGET_TYPE = 'travel'   AND R.TARGET_NO = T.TRAVEL_NO
+	            LEFT JOIN TRAVEL_LIST T    ON R.TARGET_TYPE = 'review'   AND R.TARGET_NO = T.TRAVEL_NO
 	            LEFT JOIN QLIST Q          ON R.TARGET_TYPE = 'question' AND R.TARGET_NO = Q.Q_NO
 	            LEFT JOIN REPLY RP         ON R.TARGET_TYPE = 'reply'    AND R.TARGET_NO = RP.REPLY_NO
 	            WHERE 1=1
@@ -468,6 +468,15 @@
 	            UPDATE REPLY SET STATUS = 'N' WHERE REPLY_NO = #{targetNo}
 	        </when>
 	    </choose>
+	</update>
+	
+	<!-- 같은 대상 신고 전체 상태 변경 -->
+	<update id="updateStatusByTarget" parameterType="AdminReport">
+	    UPDATE REPORT
+	    SET REPORT_STATUS = #{reportStatus}
+	    WHERE TARGET_TYPE = #{targetType}
+	      AND TARGET_NO   = #{targetNo}
+	      AND REPORT_STATUS = 'N'
 	</update>
 
 </mapper>

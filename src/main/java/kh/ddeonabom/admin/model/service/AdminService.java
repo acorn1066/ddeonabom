@@ -139,10 +139,9 @@ public class AdminService {
 	}
 
 	public int processReport(AdminReport report) {
-		report.setReportStatus("Y");
-	    mapper.updateReportStatus(report);
+	    report.setReportStatus("Y");
+	    mapper.updateStatusByTarget(report);
 	    return mapper.updateTargetStatus(report);
-
 	}
 
 	// 중복 신고 시 -1 반환
@@ -162,6 +161,16 @@ public class AdminService {
 	public ArrayList<HashMap<String, Object>> selectTravelActivity() {
 	    return mapper.selectTravelActivity();
 	}
+
+	public int updateStatusByTarget(AdminReport report) {
+	    return mapper.updateStatusByTarget(report);
+	}
+
+	public int updateTargetStatus(AdminReport report) {
+		 return mapper.updateTargetStatus(report);
+		
+	}
+
 
 
 	

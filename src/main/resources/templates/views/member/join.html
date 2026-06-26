@@ -74,6 +74,25 @@
         #addStopModal {
         display: none !important;
     }
+    #visibilityModal {
+    display: none !important; /* 기본 상태는 무조건 숨김 */
+}
+
+/* 나중에 JS로 모달을 보여줄 때 사용할 전용 활성화 클래스 */
+#visibilityModal.show-modal {
+    display: flex !important;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4); /* bg-black/40 */
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+/* 내부 흰색 박스 정렬 보완 */
+.custom-tailwind-modal .bg-white {
+    background-color: #ffffff !important;
+}
 
         /* 테일윈드 모달 스타일을 부트스트랩 환경에 맞게 강제 추출/이식 */
         #dim-background {

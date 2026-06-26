@@ -20,10 +20,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import kh.ddeonabom.admin.model.service.AdminService;
+import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.member.model.vo.Member;
@@ -44,7 +45,7 @@ import lombok.RequiredArgsConstructor;
 public class ReviewController {
 	private final ReviewService reviewService;
 	private final ReplyService replyService;
-	
+	private final AdminService aService;
 	private final ScheduleService sService;
 
 	@Value("${kakao.api.key}")
@@ -52,11 +53,21 @@ public class ReviewController {
 	
 	
 	@GetMapping("/reviews/list")
-    
-    public String reviewListPage() {
-       
+	public String reviewListPage(Model model) {
+        ArrayList<AdminNotice> noticeList = aService.selectTopNotice();
+        model.addAttribute("noticeList", noticeList);   
         return "views/review/reviews";
     }
+	
+// ==================================================================== 공지사항 ==============================================================
+	@GetMapping("/reviews/notice")
+	public String noticeDetail(@RequestParam("noticeNo") int noticeNo, Model model) {
+	    AdminNotice notice = aService.selectNotice(noticeNo);
+	    model.addAttribute("notice", notice);
+	    model.addAttribute("from", "reviews");
+	    return "views/admin/memberNotice";
+	}
+// ==================================================================== 공지사항 ==============================================================
 	
 	@GetMapping("/selectReviewList")
     @ResponseBody 
@@ -157,6 +168,8 @@ public class ReviewController {
 	                reviewService.insertReviewSub(sub); 
 
 	                List<MultipartFile> cardFiles = sub.getImageFiles();
+	                System.out.println("cardFiles = " + cardFiles);
+	                System.out.println("size = " + (cardFiles == null ? "null" : cardFiles.size()));
 	                if (cardFiles != null) {
 	                    for (MultipartFile file : cardFiles) {
 	                        if (file != null && !file.isEmpty()) {
@@ -263,8 +276,6 @@ public class ReviewController {
 	@ResponseBody
 	public ResponseEntity<String> reviewUpdate(MultipartHttpServletRequest request) {
 	    
-	    System.out.println("====== [400 에러 절대 방어 수동 수집 시작] ======");
-	    
 	    Review review = new Review();
 	    
 	    // 1. 메인 정보 추출
@@ -293,7 +304,7 @@ public class ReviewController {
 	            review.setTravelEndDate(sqlEndDate); // ➔ 변수명 매칭 완료!
 	        }
 	    } catch (Exception e) {
-	        System.out.println("❌ [날짜 파싱 에러] 시작일 또는 종료일 형식이 잘못되었습니다.");
+	        
 	        e.printStackTrace();
 	    }
 
@@ -344,6 +355,14 @@ public class ReviewController {
 	    } else {
 	        return ResponseEntity.status(500).body("fail");
 	    }
+	}
+	
+	
+	@PostMapping("/reviews/delete")
+	public String deleteReview(@RequestParam("travelNo") int travelNo) {
+		
+		reviewService.deleteReview(travelNo);
+		return "redirect:/reviews/list";
 	}
 	
 }
