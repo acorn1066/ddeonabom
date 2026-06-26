@@ -501,9 +501,11 @@ public class MemberController {
 	        @RequestParam(value="tab", defaultValue="wishlist") String tab,
 	        @RequestParam(value="type", required=false) String type, 
 	        @RequestParam(value="page", defaultValue="1") int page,
+	        @RequestParam(value="keyword", defaultValue="") String keyword,
+	        @RequestParam(value="searchType", defaultValue="title") String searchType,
 	        Model model,
 	        HttpSession session) {
-
+		model.addAttribute("keyword", keyword);
 	    Member loginUser = (Member) session.getAttribute("loginUser");
 
 	    if(loginUser == null) {
@@ -526,6 +528,7 @@ public class MemberController {
 	        // 공통으로 사용할 map 선언 및 회원번호 주입
 	        HashMap<String, Object> map = new HashMap<>();
 	        map.put("memberNo", loginUser.getMemberNo());
+	        map.put("keyword", keyword);
 	        
 	        if("spot".equals(type)) {
 	            int listCount = lService.getWishListCount(loginUser.getMemberNo()); 
@@ -572,15 +575,19 @@ public class MemberController {
 	    // 내가 작성한 글 보기 탭
 	    // ==========================================
 	    else if("posts".equals(tab)) {
-	        if(type == null || type.isEmpty()) {
-	            type = "qna";
-	        }
-	        model.addAttribute("type", type);
+	        if(type == null || type.isEmpty()) {type = "qna";
 
+	        }
+	        
+            model.addAttribute("type", type);
+            model.addAttribute("searchType", searchType);
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("memberNo", loginUser.getMemberNo());
+            map.put("keyword", keyword); // 검색어 추가
+            map.put("searchType", searchType);
 	        if("qna".equals(type)) {
-	            HashMap<String, Object> map = new HashMap<>();
-	            map.put("memberNo", loginUser.getMemberNo());
-	                
+	          
+	           
 	            int listCount = qListService.getMyListCount(map);
 	            PageInfo pi = Pagination.getPageInfo(page, listCount, 5, 8);
 
@@ -593,11 +600,9 @@ public class MemberController {
 	            model.addAttribute("pi", pi);
 	        }
 	        else if("review".equals(type)) {
-	            int listCount = rListService.getMyReviewCount(loginUser.getMemberNo());
+	            int listCount = rListService.getMyReviewCount(map);
 	            PageInfo pi = Pagination.getPageInfo(page, listCount, 5, 8);
 
-	            HashMap<String, Object> map = new HashMap<>();
-	            map.put("memberNo", loginUser.getMemberNo());
 	            map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
 	            map.put("listLimit", pi.getBoardLimit());
 
@@ -607,11 +612,11 @@ public class MemberController {
 	            model.addAttribute("pi", pi);
 	        }
 	        else if("share".equals(type)) {
-	        	int listCount =shareService.selectMyShareCount(loginUser.getMemberNo());
+	        	int listCount =shareService.selectMyShareCount(map);
 	        	PageInfo pi = Pagination.getPageInfo(page, listCount, 5, 8);
 
-	            HashMap<String, Object> map = new HashMap<>();
-	            map.put("memberNo", loginUser.getMemberNo());
+	            
+	            
 	            map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
 	            map.put("listLimit", pi.getBoardLimit());
 	            ArrayList<Share> sharelist = shareService.selectMyShareList(map);

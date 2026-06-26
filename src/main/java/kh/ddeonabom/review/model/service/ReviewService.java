@@ -82,10 +82,6 @@ public class ReviewService {
 		return reviewMapper.selectMyReviewList(reviewMap);
 	}
 
-	public int getMyReviewCount(int memberNo) {
-		
-		return reviewMapper.getMyReviewCount(memberNo);
-	}
 
 	public Review getTravelWithSubList(Long travelNo) {
 		return reviewMapper.getTravelWithSubList(travelNo);
@@ -157,6 +153,10 @@ public class ReviewService {
 
 	public void deleteReview(int travelNo) {
 		reviewMapper.deleteReview(travelNo);
+	}
+
+	public int getMyReviewCount(HashMap<String, Object> map) {
+		return reviewMapper.getMyReviewCount(map);
 	}
 
 	
