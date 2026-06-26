@@ -297,41 +297,33 @@
           AND n.post_board_fx = 'SJ'          AND sm.schedule_status = 'Y'
         ORDER BY n.nice_no DESC               OFFSET #{startRow} ROWS FETCH NEXT #{listLimit} ROWS ONLY
     </select>
-      <select id="selectMyShareCount" parameterType="map" resultType="_int">
-
+     <select id="selectMyShareCount" parameterType="map" resultType="_int">
     SELECT COUNT(DISTINCT S.SCHEDULE_NO)
-FROM SCHEDULE_MAIN S
+    FROM SCHEDULE_MAIN S
+    LEFT JOIN SCHEDULE_SUB SS ON S.SCHEDULE_NO = SS.SCHEDULE_NO
+    LEFT JOIN LANDMARK L ON SS.CONTENT_ID = L.CONTENT_ID
+    WHERE S.MEMBER_NO = #{memberNo}
+      AND S.SCHEDULE_STATUS = 'Y'
 
-LEFT JOIN SCHEDULE_SUB SS
-  ON S.SCHEDULE_NO = SS.SCHEDULE_NO
-
-LEFT JOIN LANDMARK L
-  ON SS.CONTENT_ID = L.CONTENT_ID
-
-WHERE S.MEMBER_NO = #{memberNo}
-  AND S.SCHEDULE_STATUS = 'Y'
-
-<if test="keyword != null and keyword != ''">
-  <choose>
-
-    <when test="searchType == 'title'">
-      AND S.SCHEDULE_TITLE LIKE '%' || #{keyword} || '%'
-    </when>
-
-    <when test="searchType == 'region'">
-      AND L.ADDR1 LIKE '%' || #{keyword} || '%'
-    </when>
-
-    <otherwise>
-      AND (
-        S.SCHEDULE_TITLE LIKE '%' || #{keyword} || '%'
-        OR L.ADDR1 LIKE '%' || #{keyword} || '%'
-      )
-    </otherwise>
-
-  </choose>
-</if>
+    <if test="keyword != null and keyword != ''">
+        <choose>
+            <when test="searchType == 'title'">
+                AND S.SCHEDULE_TITLE LIKE '%' || #{keyword} || '%'
+            </when>
+            <when test="searchType == 'region'">
+                AND (L.TITLE LIKE '%' || #{keyword} || '%' OR L.ADDR1 LIKE '%' || #{keyword} || '%')
+            </when>
+            <otherwise>
+                AND (
+                    S.SCHEDULE_TITLE LIKE '%' || #{keyword} || '%'
+                    OR L.TITLE LIKE '%' || #{keyword} || '%'
+                    OR L.ADDR1 LIKE '%' || #{keyword} || '%'
+                )
+            </otherwise>
+        </choose>
+    </if>
 </select>
+
 <select id="selectMyShareList" parameterType="map" resultType="Share">
     SELECT DISTINCT
            S.SCHEDULE_NO,
@@ -348,19 +340,22 @@ WHERE S.MEMBER_NO = #{memberNo}
            ON S.SCHEDULE_NO = SS.SCHEDULE_NO
     LEFT JOIN LANDMARK L
            ON SS.CONTENT_ID = L.CONTENT_ID
+    
     WHERE  S.MEMBER_NO = #{memberNo}
       AND  S.SCHEDULE_STATUS = 'Y'
+      
     <if test="keyword != null and keyword != ''">
         <choose>
             <when test="searchType == 'title'">
                 AND S.SCHEDULE_TITLE LIKE '%' || #{keyword} || '%'
             </when>
             <when test="searchType == 'region'">
-                AND L.ADDR1 LIKE '%' || #{keyword} || '%'
+                AND (L.TITLE LIKE '%' || #{keyword} || '%' OR L.ADDR1 LIKE '%' || #{keyword} || '%')
             </when>
             <otherwise>
                 AND (
                     S.SCHEDULE_TITLE LIKE '%' || #{keyword} || '%'
+                    OR L.TITLE LIKE '%' || #{keyword} || '%'
                     OR L.ADDR1 LIKE '%' || #{keyword} || '%'
                 )
             </otherwise>
