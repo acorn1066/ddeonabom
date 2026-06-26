@@ -155,6 +155,10 @@ public class ReviewService {
 		return result; 
 	}
 
+	public void deleteReview(int travelNo) {
+		reviewMapper.deleteReview(travelNo);
+	}
+
 	
 	
 

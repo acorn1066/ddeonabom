@@ -293,4 +293,10 @@
             LAT                = #{lat, jdbcType=DOUBLE}, LNG                = #{lng, jdbcType=DOUBLE}  WHERE 
             TRAVEL_SUB_NO      = #{travelSubNo, jdbcType=INTEGER}
     </update>
+    
+    <update id="deleteReview">
+	    UPDATE TRAVEL_LIST
+	    SET status = 'N'
+	    WHERE travel_no = #{travelNo}
+	</update>
 </mapper>

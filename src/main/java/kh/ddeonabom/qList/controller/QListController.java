@@ -132,10 +132,18 @@ public class QListController {
 
 	    ArrayList<Reply> replyList = replyService.getReplyList(qNo, "Q");
 
+	    int likeCount = qListService.getLikeCount(qNo);
+	    boolean isLiked = false;
+	    if (session.getAttribute("loginUser") != null) {
+	        isLiked = qListService.isLiked(qNo, ((Member) session.getAttribute("loginUser")).getMemberNo());
+	    }
+
 	    mv.addObject("q", q)
 	    	.addObject("replyList",  replyList)
 	    	.addObject("replyCount", replyList.size())
 	    	.addObject("loginRequired", loginRequired)
+	    	.addObject("likeCount",  likeCount)
+	    	.addObject("isLiked",    isLiked)
 	    	.setViewName("views/qList/detail");
 	    
 	    return mv;
