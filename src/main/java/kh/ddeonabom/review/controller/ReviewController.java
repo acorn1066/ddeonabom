@@ -263,8 +263,6 @@ public class ReviewController {
 	@ResponseBody
 	public ResponseEntity<String> reviewUpdate(MultipartHttpServletRequest request) {
 	    
-	    System.out.println("====== [400 에러 절대 방어 수동 수집 시작] ======");
-	    
 	    Review review = new Review();
 	    
 	    // 1. 메인 정보 추출
@@ -293,7 +291,7 @@ public class ReviewController {
 	            review.setTravelEndDate(sqlEndDate); // ➔ 변수명 매칭 완료!
 	        }
 	    } catch (Exception e) {
-	        System.out.println("❌ [날짜 파싱 에러] 시작일 또는 종료일 형식이 잘못되었습니다.");
+	        
 	        e.printStackTrace();
 	    }
 
