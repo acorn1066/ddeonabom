@@ -1,8 +1,10 @@
 package kh.ddeonabom.review.model.service;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -99,60 +101,62 @@ public class ReviewService {
 		return reviewMapper.ReviewDetail(travelNo);
 	}
 
-	@Transactional(rollbackFor = Exception.class)
-	public int reviewUpdateAction(Review review, List<MultipartFile> imageFiles) {
-		
-		// 1. 메인 테이블 수정
-		int result = reviewMapper.reviewUpdateAction(review);
-		
-		if (result > 0) {
-			List<ReviewSub> subList = review.getSubList();
-			
-			if (subList != null && !subList.isEmpty()) {
-				int fileIdx = 0; 
-				
-				for (int i = 0; i < subList.size(); i++) {
-					ReviewSub sub = subList.get(i);
-					
-					sub.setTravelNo(review.getTravelNo()); 
-					sub.setTravelSubSeq(i + 1);            
-					
-					// 2. 관광지 기본 정보 수정 (위度, 경도 등)
-					reviewMapper.reviewSubUpdate(sub); 
-					if (imageFiles != null && imageFiles.size() > fileIdx) {
-						MultipartFile file = imageFiles.get(fileIdx);
-						
-						// 비어있지 않은 진짜 파일인지 체크
-						if (file != null && !file.isEmpty()) {
-							String savePath = "C:/reviews/"; // 실제 물리 경로
-							
-							try {
-							    String originalName = file.getOriginalFilename();
-							    String ext = originalName.substring(originalName.lastIndexOf("."));
-							    String rename = java.util.UUID.randomUUID().toString() + ext;
-							    
-							    // 하드디스크에 실물 파일 물리 저장
-							    file.transferTo(new java.io.File(savePath + rename));
-							    Image img = new Image();
-							    
-							    img.setTravelSubNo(sub.getTravelSubNo());
-							    img.setImagePath("/uploads");              
-							    img.setFileName(originalName);  
-							    img.setRenameFile(rename);               
-							    
-							    // 이미지 레벨 세터는 VO에 없으므로 과감히 제외합니다.
-							    
-							    this.insertImage(img);						    
-							} catch (Exception e) {							  
-							    e.printStackTrace();
-							}
-						}
-						fileIdx++; 
-					}
-				}
-			}
-		}
-		return result; 
+	@Transactional
+	public int updateReview(Review review, List<MultipartFile> imageFiles) {
+
+	    // 1. 메인 업데이트
+	    reviewMapper.reviewUpdateAction(review);
+
+	    int result = 1;
+
+	    for (ReviewSub sub : review.getSubList()) {
+
+	        // =========================
+	        // INSERT / UPDATE 분기
+	        // =========================
+	        if (sub.getTravelSubNo() == 0) {
+
+	            // INSERT
+	            reviewMapper.insertReviewSub(sub);
+
+	        } else {
+
+	            // UPDATE
+	            reviewMapper.reviewSubUpdate(sub);
+	        }
+
+	        // =========================
+	        // 이미지 처리 (FK 중요)
+	        // =========================
+	        if (imageFiles != null) {
+	            for (MultipartFile file : imageFiles) {
+
+	                if (file != null && !file.isEmpty()) {
+
+	                    try {
+	                        String original = file.getOriginalFilename();
+	                        String saved = UUID.randomUUID() + "_" + original;
+
+	                        file.transferTo(new File("C:/reviews/" + saved));
+
+	                        Image img = new Image();
+	                        img.setFileName(original);
+	                        img.setRenameFile(saved);
+	                        img.setImagePath("/uploads");
+	                        img.setTravelSubNo(sub.getTravelSubNo()); // ★ FK 핵심
+
+	                        reviewMapper.insertImage(img);
+
+	                    } catch (Exception e) {
+	                        e.printStackTrace();
+	                        result = 0;
+	                    }
+	                }
+	            }
+	        }
+	    }
+
+	    return result;
 	}
 
 	public void deleteReview(int travelNo) {
