@@ -204,6 +204,7 @@ public class MemberController {
         // 비밀번호 검증
         if (loginUser != null && bcrypt.matches(m.getPwd(), loginUser.getPwd())) {
         	
+        	//계정 정지 회원 구분
         	if("B".equals(loginUser.getStatus())) {
         		return "redirect:/member/login?blocked";
         	}
