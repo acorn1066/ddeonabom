@@ -316,14 +316,17 @@
     </update>
     
     <update id="reviewSubUpdate" parameterType="kh.ddeonabom.review.model.vo.ReviewSub">
-        UPDATE TRAVEL_LIST_SUB 
-        SET 
-            CONTENT_TITLE      = #{contentTitle, jdbcType=VARCHAR},
-            RATING             = #{rating, jdbcType=INTEGER},
-            TRAVEL_SUB_CONTENT = #{travelSubContent, jdbcType=VARCHAR},
-            LAT                = #{lat, jdbcType=DOUBLE}, LNG                = #{lng, jdbcType=DOUBLE}  WHERE 
-            TRAVEL_SUB_NO      = #{travelSubNo, jdbcType=INTEGER}
-    </update>
+	    UPDATE TRAVEL_LIST_SUB 
+	    SET 
+	        CONTENT_TITLE = #{contentTitle, jdbcType=VARCHAR},
+	        RATING = #{rating, jdbcType=INTEGER},
+	
+	        TRAVEL_SUB_CONTENT = NVL(#{travelSubContent, jdbcType=VARCHAR}, TRAVEL_SUB_CONTENT),
+	
+	        LAT = #{lat, jdbcType=DOUBLE},
+	        LNG = #{lng, jdbcType=DOUBLE}
+	    WHERE TRAVEL_SUB_NO = #{travelSubNo, jdbcType=INTEGER}
+	</update>
     
     <update id="deleteReview">
 	    UPDATE TRAVEL_LIST
