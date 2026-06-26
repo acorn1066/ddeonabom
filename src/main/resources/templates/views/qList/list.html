@@ -12,7 +12,7 @@
 	      <h1 class="mt-2 text-3xl font-extrabold tracking-tight">여행 전, 무엇이든 물어보세요</h1>
 	      <p class="mt-2 text-15 text-muted">먼저 다녀온 여행자들이 답해드려요.</p>
 	    </div>
-	    <a href="write" class="inline-flex h-12 items-center rounded-lg bg-brand px-8 text-15 font-semibold text-white transition hover:bg-brand-ink" th:if="${session.loginUser != null}">질문하기</a>
+	    <a href="write" class="inline-flex h-12 items-center rounded-lg bg-brand px-8 text-15 font-semibold text-white transition hover:bg-brand-ink" onclick="return checkWriteAccess()">질문하기</a>
 	  </div>
 	
 	  <!-- 카테고리 버튼들: data-category 속성 추가, onclick 연결 -->
@@ -98,16 +98,11 @@
 		    </svg>
 		    <!-- name="searchInput" 으로 수정 + 검색 후 값 유지 th:value="${searchInput}" -->
 		    <input id="searchKeyword"
-		           class="h-full w-40 bg-transparent pl-9 pr-3 text-13 outline-none placeholder:text-faint"
+		           class="h-full w-52 bg-transparent pl-9 pr-3 text-13 outline-none placeholder:text-faint"
 		           placeholder="검색어 입력"
 		           name="searchInput"
 		           th:value="${searchInput}" />
 		  </div>
-		
-		  <button type="submit"
-		          class="flex h-full items-center rounded-r-full bg-brand px-4 text-13 font-semibold text-white transition hover:bg-brand-ink">
-		    검색
-		  </button>
 		
 		  <!-- 카테고리 hidden input: 컨트롤러 기본값 "전체"에 맞게 -->
 		  <input type="hidden" name="category" id="categoryValue" th:value="${category}" />
@@ -322,6 +317,15 @@
 		  }
 		})();
 	  
+		/* ★ 질문 작성 접근 차단 */
+		function checkWriteAccess() {
+		  if (!isLoggedIn) {
+		    showToast('로그인이 필요한 기능이에요', false);
+		    return false;
+		  }
+		  return true;
+		}
+
 		/* ★ 회원 공개 글 접근 차단 */
 		function checkAccess(el) {
 		  if (!isLoggedIn && el.dataset.visibility === 'MEMBER') {
