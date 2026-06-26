@@ -145,61 +145,102 @@ public class ReviewController {
 	}
 
 	@PostMapping("/reviews/insert")
-	public String insertReviews(@ModelAttribute Review r, HttpServletRequest request, HttpSession session) {
+	public String insertReviews(MultipartHttpServletRequest request, HttpSession session) {
 
 		Member loginUser = (Member) session.getAttribute("loginUser");
-	    if (loginUser != null) {
-	        r.setMemberNo(loginUser.getMemberNo());
-	    }
-	    int result = reviewService.insertReview(r);
-	    if (result > 0) {
-	    	String uploadPath = "C:/reviews"; 
-	        
-	        File uploadDir = new File(uploadPath);
-	        if (!uploadDir.exists()) {
-	            uploadDir.mkdirs();
-	        }
-	        if (r.getSubList() != null) {
-	            for (int i = 0; i < r.getSubList().size(); i++) {
-	                ReviewSub sub = r.getSubList().get(i);
-	                sub.setTravelNo(r.getTravelNo());   
-	                sub.setTravelSubSeq(i + 1);
+		if (loginUser == null) {
+			return "redirect:/reviews/write";
+		}
 
-	                reviewService.insertReviewSub(sub); 
+		Review r = new Review();
+		r.setMemberNo(loginUser.getMemberNo());
 
-	                List<MultipartFile> cardFiles = sub.getImageFiles();
-	                System.out.println("cardFiles = " + cardFiles);
-	                System.out.println("size = " + (cardFiles == null ? "null" : cardFiles.size()));
-	                if (cardFiles != null) {
-	                    for (MultipartFile file : cardFiles) {
-	                        if (file != null && !file.isEmpty()) {
-	                            String original = file.getOriginalFilename();
-	                            String saved = UUID.randomUUID().toString() + "_" + original;
-	                            
-	                            try {
-	                                file.transferTo(new File(uploadPath + "/" + saved));
+		// 메인 정보 수동 파싱
+		r.setTravelTitle(request.getParameter("travelTitle"));
+		r.setRegion(request.getParameter("region"));
+		r.setVisibility(request.getParameter("visibility"));
 
-	                                Image img = new Image();
-	                                img.setFileName(original);
-	                                img.setRenameFile(saved);
-	                                img.setImagePath("/uploads");
-	                                img.setTravelSubNo(sub.getTravelSubNo()); 
-	                                reviewService.insertImage(img);
-	                            } catch (Exception e) {
-	                                e.printStackTrace();
-	                            }
-	                        }
-	                    }
-	                }
-	            }
-	            
-	        }
+		java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+		String startDateStr = request.getParameter("travelStartDate");
+		String endDateStr   = request.getParameter("travelEndDate");
+		try {
+			if (startDateStr != null && !startDateStr.trim().isEmpty()) {
+				r.setTravelStartDate(new java.sql.Date(dateFormat.parse(startDateStr.trim()).getTime()));
+			}
+			if (endDateStr != null && !endDateStr.trim().isEmpty()) {
+				r.setTravelEndDate(new java.sql.Date(dateFormat.parse(endDateStr.trim()).getTime()));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	        return "redirect:/reviews/list";
-	    } else {
-	        return "redirect:/reviews/write";
-	    }
-	   
+		// 서브 리스트 수동 파싱
+		List<ReviewSub> subList = new ArrayList<>();
+		int i = 0;
+		while (request.getParameter("subList[" + i + "].contentTitle") != null) {
+			ReviewSub sub = new ReviewSub();
+			sub.setContentTitle(request.getParameter("subList[" + i + "].contentTitle"));
+			String rawContent = request.getParameter("subList[" + i + "].travelSubContent");
+		sub.setTravelSubContent((rawContent != null && !rawContent.trim().isEmpty()) ? rawContent : " ");
+
+			String rawContentId = request.getParameter("subList[" + i + "].contentId");
+			sub.setContentId(rawContentId != null && !rawContentId.trim().isEmpty() ? Integer.parseInt(rawContentId.trim()) : 0);
+
+			String latStr = request.getParameter("subList[" + i + "].lat");
+			String lngStr = request.getParameter("subList[" + i + "].lng");
+			String rtgStr = request.getParameter("subList[" + i + "].rating");
+
+			sub.setLat(latStr != null && !latStr.trim().isEmpty() ? Double.parseDouble(latStr.trim()) : 0.0);
+			sub.setLng(lngStr != null && !lngStr.trim().isEmpty() ? Double.parseDouble(lngStr.trim()) : 0.0);
+			sub.setRating(rtgStr != null && !rtgStr.trim().isEmpty() ? Integer.parseInt(rtgStr.trim()) : 0);
+
+			subList.add(sub);
+			i++;
+		}
+		r.setSubList(subList);
+
+		int result = reviewService.insertReview(r);
+		if (result > 0) {
+			String uploadPath = "C:/reviews";
+			File uploadDir = new File(uploadPath);
+			if (!uploadDir.exists()) {
+				uploadDir.mkdirs();
+			}
+
+			List<MultipartFile> imageFiles = request.getFiles("imageFiles");
+			int fileIdx = 0;
+
+			for (int j = 0; j < r.getSubList().size(); j++) {
+				ReviewSub sub = r.getSubList().get(j);
+				sub.setTravelNo(r.getTravelNo());
+				sub.setTravelSubSeq(j + 1);
+				reviewService.insertReviewSub(sub);
+
+				// imageFiles는 단일 키로 모아져 있으므로 순서대로 배분
+				if (imageFiles != null && fileIdx < imageFiles.size()) {
+					MultipartFile file = imageFiles.get(fileIdx);
+					if (file != null && !file.isEmpty()) {
+						String original = file.getOriginalFilename();
+						String saved = UUID.randomUUID().toString() + "_" + original;
+						try {
+							file.transferTo(new File(uploadPath + "/" + saved));
+							Image img = new Image();
+							img.setFileName(original);
+							img.setRenameFile(saved);
+							img.setImagePath("/uploads");
+							img.setTravelSubNo(sub.getTravelSubNo());
+							reviewService.insertImage(img);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						fileIdx++;
+					}
+				}
+			}
+			return "redirect:/reviews/list";
+		} else {
+			return "redirect:/reviews/write";
+		}
 	}
 	
 	@GetMapping("/reviews/detail")

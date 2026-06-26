@@ -130,7 +130,6 @@ kakao.maps.load(function () {
         level: 10
     });
 
-    const ps = new kakao.maps.services.Places();
     const markers = [];   // 지도 위 마커 목록
     
     // 동선 폴리라인 초기화
@@ -178,32 +177,35 @@ kakao.maps.load(function () {
     function searchPlaces() {
         const keyword = searchInput.value.trim();
         if (!keyword) return;
-        
-        ps.keywordSearch(keyword, (data, status) => {
-            resultsList.innerHTML = '';
-            if (status !== kakao.maps.services.Status.OK) {
-                resultsList.innerHTML = '<li class="px-3 py-2 text-muted">검색 결과가 없습니다.</li>';
+
+        fetch(`/landmark/search?q=${encodeURIComponent(keyword)}&size=10`)
+            .then(res => res.json())
+            .then(data => {
+                resultsList.innerHTML = '';
+                const list = data.content || [];
+                if (list.length === 0) {
+                    resultsList.innerHTML = '<li class="px-3 py-2 text-muted">검색 결과가 없습니다.</li>';
+                    resultsList.classList.remove('hidden');
+                    resultsList.classList.add('flex');
+                    return;
+                }
+                list.forEach(land => {
+                    const li = document.createElement('li');
+                    li.className = 'flex cursor-pointer flex-col rounded-lg px-3 py-2 hover:bg-brand-soft';
+                    li.innerHTML = `
+                        <span class="font-semibold text-ink">${land.title}</span>
+                        <span class="text-xs text-muted">${land.addr1 || ''}</span>`;
+                    li.addEventListener('click', () => {
+                        addPlaceToMap(land);
+                        resultsList.classList.add('hidden');
+                        resultsList.classList.remove('flex');
+                        searchInput.value = '';
+                    });
+                    resultsList.appendChild(li);
+                });
                 resultsList.classList.remove('hidden');
                 resultsList.classList.add('flex');
-                return;
-            }
-            data.forEach(place => {
-                const li = document.createElement('li');
-                li.className = 'flex cursor-pointer flex-col rounded-lg px-3 py-2 hover:bg-brand-soft';
-                li.innerHTML = `
-                    <span class="font-semibold text-ink">${place.place_name}</span>
-                    <span class="text-xs text-muted">${place.address_name}</span>`;
-                li.addEventListener('click', () => {
-                    addPlaceToMap(place);
-                    resultsList.classList.add('hidden');
-                    resultsList.classList.remove('flex');
-                    searchInput.value = '';
-                });
-                resultsList.appendChild(li);
             });
-            resultsList.classList.remove('hidden');
-            resultsList.classList.add('flex');
-        });
     }
 
     searchBtn.addEventListener('click', searchPlaces);
@@ -219,8 +221,8 @@ kakao.maps.load(function () {
     // ════════════════════════════════════════
     //  지도에 장소 추가 + 카드 생성
     // ════════════════════════════════════════
-    function addPlaceToMap(place) {
-        const latlng = new kakao.maps.LatLng(place.y, place.x);
+    function addPlaceToMap(land) {
+        const latlng = new kakao.maps.LatLng(land.mapy, land.mapx);
         const index  = markers.length + 1;
 
         const marker = new kakao.maps.Marker({
@@ -233,12 +235,12 @@ kakao.maps.load(function () {
         updatePolyline();
 
         addSpotCard(
-            place.place_name,   
-            place.address_name,
+            land.title,
+            land.addr1 || '',
             index,
-            place.y,
-            place.x,
-            place.id           
+            land.mapy,
+            land.mapx,
+            land.contentId
         );
     }
 
@@ -487,7 +489,7 @@ kakao.maps.load(function () {
             
             // 문자열 데이터 적재
             formData.append(`subList[${i}].contentTitle`, card.querySelector('.spot-title')?.value || '');
-            formData.append(`subList[${i}].contentId`, card.querySelector('.spot-id')?.value || '');
+            formData.append(`subList[${i}].contentId`, card.querySelector('.spot-id')?.value || '0');
             formData.append(`subList[${i}].travelSubContent`, card.querySelector('textarea')?.value || '');
             formData.append(`subList[${i}].imagePath`, card.querySelector('.spot-img-path')?.value || '');
 

@@ -73,7 +73,11 @@ public class LandmarkController {
 	public String landmarkDetail(@PathVariable("contentId") int contentId, @PathVariable("page") int page,
 									Model model, HttpSession session) {
 		Landmark land = lService.landmarkDetail(contentId);
-		//System.out.println(land);
+
+		if (land == null) {
+			return "redirect:/landmark/list";
+		}
+
 		Map<Integer, String> contentType = new HashMap<>();
 		contentType.put(12, "관광지");
 		contentType.put(14, "문화시설");

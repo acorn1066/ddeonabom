@@ -112,7 +112,7 @@
           </div>
           
         </div>
-        <a th:href="@{/landmark/{id}/1(id=${sub.contentId})}" class="mt-3 inline-flex items-center gap-1.5 text-13 font-semibold text-brand"> 
+        <a th:if="${sub.contentId != 0}" th:href="@{/landmark/{id}/1(id=${sub.contentId})}" class="mt-3 inline-flex items-center gap-1.5 text-13 font-semibold text-brand">
         	<span th:text="${sub.contentTitle}"></span>관광지 정보 →</a>
       </div>
     </div>
