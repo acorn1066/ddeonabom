@@ -92,7 +92,8 @@ public class LandmarkController {
 			model.addAttribute("isNice", isNice);			
 		} 
 		
-		
+		System.out.println("contentId = " + contentId);
+		System.out.println("land = " + land);
 		model.addAttribute("contentType", contentType);
 		
 		model.addAttribute("land", land);
@@ -135,8 +136,6 @@ public class LandmarkController {
 		
 		return newState;
 	}
-	
-	
 	
 	
 }

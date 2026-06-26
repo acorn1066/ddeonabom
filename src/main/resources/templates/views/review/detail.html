@@ -113,7 +113,7 @@
           </div>
           
         </div>
-        <a th:if="${sub.contentId != 0}" th:href="@{/landmark/{id}/1(id=${sub.contentId})}" class="mt-3 inline-flex items-center gap-1.5 text-13 font-semibold text-brand">
+        <a th:href="@{/landmark/{id}/1(id=${sub.contentId})}" class="mt-3 inline-flex items-center gap-1.5 text-13 font-semibold text-brand"> 
         	<span th:text="${sub.contentTitle}"></span>관광지 정보 →</a>
       </div>
     </div>
@@ -280,7 +280,7 @@
 </main>
 
 <!-- =================================================================	신고 ============================================================================ -->
-	<div id="modal-report" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
+	<div id="modal-report" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/40">
 	  <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
 	    <h2 class="mb-4 text-lg font-bold">신고하기</h2>
 	    <p class="mb-3 text-sm text-muted">신고 사유를 선택해주세요.</p>
