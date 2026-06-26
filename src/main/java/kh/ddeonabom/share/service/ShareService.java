@@ -108,11 +108,12 @@ public class ShareService {
 		return shareMapper.selectMyWishPlanList(map);
 	}
 
-	public int selectMyShareCount(int memberNo) {
-		return shareMapper.selectMyShareCount(memberNo);
-	}
 
 	public ArrayList<Share> selectMyShareList(HashMap<String, Object> map) {
 		return shareMapper.selectMyShareList(map);
+	}
+
+	public int selectMyShareCount(HashMap<String, Object> map) {
+		return shareMapper.selectMyShareCount(map);
 	}
 }
