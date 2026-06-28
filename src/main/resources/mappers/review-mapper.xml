@@ -33,16 +33,13 @@
     <!-- 목록 조회 -->
 	<select id="selectReviewList" resultType="kh.ddeonabom.review.model.vo.Review">
 	    SELECT
-	        T.TRAVEL_NO, T.TRAVEL_TITLE, T.STATUS,
+	        T.TRAVEL_NO, T.TRAVEL_TITLE, T.VISIBILITY, T.STATUS,
 	        T.CREATE_DATE, T.MODIFY_DATE, T.COUNT,
 	        T.MEMBER_NO, T.SCHEDULE_NO, M.NICKNAME AS NICKNAME,
 	        (SELECT COUNT(*) FROM NICE N WHERE N.POST_NO = T.TRAVEL_NO) AS LIKE_COUNT
 	    FROM TRAVEL_LIST T JOIN MEMBER M ON T.MEMBER_NO = M.MEMBER_NO
 	    WHERE T.STATUS = 'Y'
-	    AND (
-	        T.VISIBILITY = 'PUBLIC'
-	        OR (T.VISIBILITY = 'MEMBER' AND #{loginUserNo, jdbcType=NUMERIC} IS NOT NULL)
-	    )
+		AND T.VISIBILITY IN ('PUBLIC','MEMBER')
 	    <if test="keyword != null and keyword != ''">
 	        AND T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
 	    </if>
@@ -69,10 +66,7 @@
 	    SELECT COUNT(*)
 	    FROM TRAVEL_LIST T
 	    WHERE T.STATUS = 'Y'
-	    AND (
-	        T.VISIBILITY = 'PUBLIC'
-	        OR (T.VISIBILITY = 'MEMBER' AND #{loginUserNo} IS NOT NULL)
-	    )
+		AND T.VISIBILITY IN ('PUBLIC','MEMBER')
 	    <if test="keyword != null and keyword != ''">
 	        AND T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
 	    </if>
@@ -127,12 +121,14 @@
                 AND T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
             </when>
             <when test="searchType == 'region'">
-                AND TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%'
+                AND (TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%' 
+                     OR TS.TRAVEL_SUB_CONTENT LIKE '%' || #{keyword} || '%')
             </when>
             <otherwise>
                 AND (
                     T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
                     OR TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%'
+                    OR TS.TRAVEL_SUB_CONTENT LIKE '%' || #{keyword} || '%'
                 )
             </otherwise>
         </choose>
@@ -162,12 +158,14 @@
                 AND T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
             </when>
             <when test="searchType == 'region'">
-                AND TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%'
+                AND (TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%' 
+                     OR TS.TRAVEL_SUB_CONTENT LIKE '%' || #{keyword} || '%')
             </when>
             <otherwise>
                 AND (
                     T.TRAVEL_TITLE LIKE '%' || #{keyword} || '%'
                     OR TS.CONTENT_TITLE LIKE '%' || #{keyword} || '%'
+                    OR TS.TRAVEL_SUB_CONTENT LIKE '%' || #{keyword} || '%'
                 )
             </otherwise>
         </choose>
@@ -186,10 +184,7 @@
 	    FROM TRAVEL_LIST T
 	    WHERE T.TRAVEL_NO = #{travelNo}
 	    AND T.STATUS = 'Y'
-	    AND (
-        T.VISIBILITY = 'PUBLIC'
-        OR (T.VISIBILITY = 'MEMBER' AND #{loginUserNo} IS NOT NULL)
-      )
+	   
 	</select>
 	
 	<select id="getReviewSubList" parameterType="int" resultType="kh.ddeonabom.review.model.vo.ReviewSub">
@@ -312,14 +307,17 @@
     </update>
     
     <update id="reviewSubUpdate" parameterType="kh.ddeonabom.review.model.vo.ReviewSub">
-        UPDATE TRAVEL_LIST_SUB 
-        SET 
-            CONTENT_TITLE      = #{contentTitle, jdbcType=VARCHAR},
-            RATING             = #{rating, jdbcType=INTEGER},
-            TRAVEL_SUB_CONTENT = #{travelSubContent, jdbcType=VARCHAR},
-            LAT                = #{lat, jdbcType=DOUBLE}, LNG                = #{lng, jdbcType=DOUBLE}  WHERE 
-            TRAVEL_SUB_NO      = #{travelSubNo, jdbcType=INTEGER}
-    </update>
+	    UPDATE TRAVEL_LIST_SUB 
+	    SET 
+	        CONTENT_TITLE = #{contentTitle, jdbcType=VARCHAR},
+	        RATING = #{rating, jdbcType=INTEGER},
+	
+	        TRAVEL_SUB_CONTENT = NVL(#{travelSubContent, jdbcType=VARCHAR}, TRAVEL_SUB_CONTENT),
+	
+	        LAT = #{lat, jdbcType=DOUBLE},
+	        LNG = #{lng, jdbcType=DOUBLE}
+	    WHERE TRAVEL_SUB_NO = #{travelSubNo, jdbcType=INTEGER}
+	</update>
     
     <update id="deleteReview">
 	    UPDATE TRAVEL_LIST

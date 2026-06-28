@@ -10,7 +10,8 @@
     <!-- 브레드크럼 -->
     <div class="mb-5 text-13 text-muted">
 	    <a th:if="${from == 'share'}"     th:href="@{/share/list}"  class="hover:text-brand">일정 공유 게시판</a>
-	    <a th:unless="${from == 'share'}" th:href="@{/qList/list}"  class="hover:text-brand">질문 게시판</a>
+	    <a th:if="${from == 'qList'}" th:href="@{/qList/list}"  class="hover:text-brand">질문 게시판</a>
+	    <a th:if="${from == 'reviews'}" th:href="@{/reviews/list}"  class="hover:text-brand">후기 게시판</a>
 	    	<span>› 공지</span>
 	</div>
 

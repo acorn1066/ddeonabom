@@ -41,4 +41,5 @@ public interface LandmarkMapper {
 	Set<Integer> niceList(int memberNo);
 
 	int getWishListCountByParam(Map<String, Object> param);
+
 }
