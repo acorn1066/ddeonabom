@@ -10,7 +10,7 @@
   <h1 class="mb-2 text-3xl font-extrabold tracking-tight">여행 후기 작성</h1>
   <p class="mb-12 text-15 text-muted">한 번의 여행에서 들른 관광지들의 후기를 모아 한 편의 글로 남겨보세요.</p>
 
-  <form action="/reviews/insert" method="post" enctype="multipart/form-data">
+  <form id="reviewForm" action="/reviews/insert" method="post" enctype="multipart/form-data">
     <!-- 1. 여행 정보 -->
     <div class="mb-5 rounded-xl border border-line bg-white p-6 shadow-soft">
       <h2 class="mb-5 flex items-center gap-2 text-base font-bold">
@@ -27,12 +27,23 @@
 				  <select name="region" id="region"
 				    class="h-12 rounded-lg border border-line bg-white px-4 text-sm outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft">
 				    <option value="">지역 선택</option>
-				    <option value="제주">제주</option>
-				    <option value="수도권">수도권</option>
+				    <option value="서울">서울</option>
+				    <option value="부산">부산</option>
+				    <option value="대구">대구</option>
+				    <option value="인천">인천</option>
+				    <option value="광주">광주</option>
+				    <option value="대전">울산</option>
+				    <option value="세종">세종</option>
+				    <option value="경기도">경기도</option>
 				    <option value="강원">강원</option>
-				    <option value="충청">충청</option>
-				    <option value="경상">경상</option>
-				    <option value="전라">전라</option>
+				    <option value="충북">충북</option>
+				    <option value="충남">충남</option>
+				    <option value="전북">전북</option>
+				    <option value="전남">전남</option>
+				    <option value="경북">경북</option>
+				    <option value="경남">경남</option>
+				    <option value="제주">제주</option>
+				    
 		
 				  </select>
 				</div>
@@ -443,7 +454,72 @@ kakao.maps.load(function () {
 		  form.submit();
 		});
 });
+const form = document.getElementById("reviewForm");
 
+document.getElementById("submitBtn").addEventListener("click", function () {
+
+    // 제목
+    const title = document.getElementById("travelTitle");
+    if (title.value.trim() === "") {
+        alert("여행 제목을 입력해주세요.");
+        title.focus();
+        return;
+    }
+
+    // 지역
+    const region = document.getElementById("region");
+    if (region.value === "") {
+        alert("지역을 선택해주세요.");
+        region.focus();
+        return;
+    }
+
+    // 시작일
+    const startDate = document.getElementById("startDate");
+    if (startDate.value === "") {
+        alert("여행 시작일을 선택해주세요.");
+        startDate.focus();
+        return;
+    }
+
+    // 종료일
+    const endDate = document.getElementById("endDate");
+    if (endDate.value === "") {
+        alert("여행 종료일을 선택해주세요.");
+        endDate.focus();
+        return;
+    }
+
+    // 관광지
+    const cards = document.querySelectorAll(".spot-card");
+
+    if (cards.length === 0) {
+        alert("관광지를 한 곳 이상 추가해주세요.");
+        return;
+    }
+
+    // 각 관광지 검사
+    for (let i = 0; i < cards.length; i++) {
+
+        const rating = cards[i].querySelector(".rating-value");
+        const review = cards[i].querySelector("textarea");
+
+        if (rating.value == "0") {
+            alert((i + 1) + "번째 관광지의 별점을 선택해주세요.");
+            return;
+        }
+
+        if (review.value.trim() === "") {
+            alert((i + 1) + "번째 관광지의 후기를 작성해주세요.");
+            review.focus();
+            return;
+        }
+    }
+
+    // 모든 검사 통과
+    form.submit();
+
+});
 
 </script>
 
