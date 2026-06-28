@@ -29,7 +29,6 @@ import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.landmark.model.service.LandmarkService;
-import kh.ddeonabom.landmark.model.vo.Landmark;
 import kh.ddeonabom.member.model.vo.Member;
 import kh.ddeonabom.reply.model.vo.Reply;
 import kh.ddeonabom.reply.service.ReplyService;
@@ -51,6 +50,8 @@ public class ReviewController {
 	private final AdminService aService;
 	private final ScheduleService sService;
 	private final LandmarkService landmarkService;
+	@Value("${cloud.aws.s3.bucket}")
+	private String bucket;
 
 	@Value("${kakao.api.key}")
 	private String kakaoApiKey;
@@ -213,9 +214,14 @@ public class ReviewController {
 
 	    reviewService.increaseCount(travelNo);
 	    Review review = reviewService.getReviewDetail(travelNo, loginUserNo);
+	    
 
 	    if (review == null) {
 	        return "redirect:/reviews/list";
+	    }
+	    if ("MEMBER".equals(review.getVisibility()) && loginUser == null) {
+	        model.addAttribute("alertMsg", "회원 전용 게시글입니다. 로그인 후 이용해주세요.");
+	        return "member/login";
 	    }
 	    ArrayList<Reply> replyList = replyService.getReplyList(travelNo, "T");
 	    model.addAttribute("replyList", replyList);
