@@ -289,12 +289,13 @@
 	        S.CONTENT_ID, 
 	        S.RATING, 
 	        S.CONTENT_TITLE,
-	        S.LAT,
-	        S.LNG,
+           L.MAPY AS LAT,
+    		L.MAPX AS LNG,
 	        I.IMAGE_PATH 
 	    FROM TRAVEL_LIST M
 	    LEFT JOIN TRAVEL_LIST_SUB S ON M.TRAVEL_NO = S.TRAVEL_NO
-	    LEFT JOIN TB_IMAGE I ON S.TRAVEL_SUB_NO = I.TRAVEL_SUB_NO 
+		LEFT JOIN LANDMARK L ON S.CONTENT_ID = L.CONTENT_ID
+		LEFT JOIN TB_IMAGE I ON S.TRAVEL_SUB_NO = I.TRAVEL_SUB_NO
 	    WHERE M.TRAVEL_NO = #{travelNo}
 	</select>
     
@@ -313,10 +314,8 @@
 	        CONTENT_TITLE = #{contentTitle, jdbcType=VARCHAR},
 	        RATING = #{rating, jdbcType=INTEGER},
 	
-	        TRAVEL_SUB_CONTENT = NVL(#{travelSubContent, jdbcType=VARCHAR}, TRAVEL_SUB_CONTENT),
-	
-	        LAT = #{lat, jdbcType=DOUBLE},
-	        LNG = #{lng, jdbcType=DOUBLE}
+	        TRAVEL_SUB_CONTENT = NVL(#{travelSubContent, jdbcType=VARCHAR}, TRAVEL_SUB_CONTENT)
+
 	    WHERE TRAVEL_SUB_NO = #{travelSubNo, jdbcType=INTEGER}
 	</update>
     
