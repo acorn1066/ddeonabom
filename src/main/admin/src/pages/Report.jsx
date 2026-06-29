@@ -52,6 +52,8 @@ const Report = () => {
     };
 
     const processReport = (reportNo, targetType, targetNo) => {
+        if (!window.confirm("정말 처리하시겠습니까?\n해당 글이 삭제됩니다.")) return;
+
         fetch(`/react/admin/reports/process`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
@@ -68,6 +70,7 @@ const Report = () => {
             .catch(err => console.log(err));
     };
     const rejectReport = (targetType, targetNo) => {
+        if (!window.confirm("정말 반려하시겠습니까?")) return;
         fetch(`/react/admin/reports`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
