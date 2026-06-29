@@ -308,49 +308,97 @@
 
 const spotCoords = /*[[${review.subList}]]*/ [];
 
-function initDetailMap() {
+async function initDetailMap() {
+	  const mapContainer = document.getElementById('map');
+	  if (!mapContainer) return;
 
-  const mapContainer = document.getElementById('map');
-  if (!mapContainer) return;
+	  const validSpots = spotCoords.filter(s =>
+	    s.lat != null && s.lng != null && s.lat != 0 && s.lng != 0
+	  );
 
-  const validSpots = spotCoords.filter(s =>
-    s.lat != null && s.lng != null && s.lat != 0 && s.lng != 0
-  );
+	  if (validSpots.length === 0) {
+	    mapContainer.innerHTML = '등록된 위치 정보 없음';
+	    return;
+	  }
 
-  if (validSpots.length === 0) {
-    mapContainer.innerHTML = '등록된 위치 정보 없음';
-    return;
-  }
+	  const map = new kakao.maps.Map(mapContainer, {
+	    center: new kakao.maps.LatLng(validSpots[0].lat, validSpots[0].lng),
+	    level: 9
+	  });
 
-  const map = new kakao.maps.Map(mapContainer, {
-    center: new kakao.maps.LatLng(validSpots[0].lat, validSpots[0].lng),
-    level: 9
-  });
+	  const bounds = new kakao.maps.LatLngBounds();
 
-  const bounds = new kakao.maps.LatLngBounds();
-  const path = [];
+	  validSpots.forEach((spot, i) => {
+	    const latlng = new kakao.maps.LatLng(spot.lat, spot.lng);
 
-  validSpots.forEach((spot, i) => {
-    const latlng = new kakao.maps.LatLng(spot.lat, spot.lng);
+	    new kakao.maps.Marker({ map, position: latlng });
 
-    new kakao.maps.Marker({
-      map,
-      position: latlng
-    });
+	    new kakao.maps.CustomOverlay({
+	      map,
+	      position: latlng,
+	      yAnchor: 2.1,
+	      content: `<div style="background:#1F47E6;color:#fff;width:22px;height:22px;
+	                border-radius:50%;display:flex;align-items:center;justify-content:center;
+	                font-size:12px;font-weight:700;border:2px solid #fff;
+	                box-shadow:0 1px 3px rgba(0,0,0,.3)">${i + 1}</div>`
+	    });
 
-    bounds.extend(latlng);
-    path.push(latlng);
-  });
+	    bounds.extend(latlng);
+	  });
 
-  new kakao.maps.Polyline({
-    map,
-    path,
-    strokeWeight: 3,
-    strokeColor: '#1F47E6'
-  });
+	  map.setBounds(bounds);
 
-  map.setBounds(bounds);
-}
+	  if (validSpots.length >= 2) {
+	    await drawRoadPath(map, validSpots);
+	  }
+	}
+
+	async function drawRoadPath(map, spots) {
+	  const points = spots.map(s => ({ lat: s.lat, lng: s.lng }));
+
+	  const MAX_POINTS_PER_CALL = 7;
+	  const segments = [];
+	  for (let i = 0; i < points.length - 1; i += (MAX_POINTS_PER_CALL - 1)) {
+	    const slice = points.slice(i, i + MAX_POINTS_PER_CALL);
+	    if (slice.length >= 2) segments.push(slice);
+	  }
+
+	  for (const seg of segments) {
+	    try {
+	      const res = await fetch('/schedule/route', {
+	        method: 'POST',
+	        headers: { 'Content-Type': 'application/json' },
+	        body: JSON.stringify({ points: seg })
+	      });
+	      if (!res.ok) throw new Error('route ' + res.status);
+	      const data = await res.json();
+
+	      const linePath = (data.path || []).map(
+	        c => new kakao.maps.LatLng(c.lat, c.lng)
+	      );
+	      if (linePath.length < 2) continue;
+
+	      new kakao.maps.Polyline({
+	        map,
+	        path: linePath,
+	        strokeWeight: 5,
+	        strokeColor: '#1F47E6',
+	        strokeOpacity: 0.85,
+	        strokeStyle: 'solid'
+	      });
+
+	    } catch (e) {
+	      new kakao.maps.Polyline({
+	        map,
+	        path: seg.map(p => new kakao.maps.LatLng(p.lat, p.lng)),
+	        strokeWeight: 4,
+	        strokeColor: '#94a3b8',
+	        strokeOpacity: 0.7,
+	        strokeStyle: 'shortdash'
+	      });
+	    }
+	  }
+	}
 
 /* ⭐ 핵심: "SDK 준비될 때까지 기다리는 단 하나의 루프" */
 function waitForKakao() {

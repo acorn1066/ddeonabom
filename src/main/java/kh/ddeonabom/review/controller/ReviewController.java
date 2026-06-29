@@ -121,15 +121,15 @@ public class ReviewController {
 	    	        List<ScheduleSub> subList = sService.selectScheduleSubList(scheduleNo);
 	    	        
 	    	        //일정이랑 후기랑 이름이 안맞는 구간이 있어서 수정용
+	    	       
 	    	        List<Map<String, Object>> mappedList = subList.stream().map(sub -> {
 	    	            Map<String, Object> m = new HashMap<>();
 	    	            m.put("contentTitle", sub.getTitle());
 	    	            m.put("contentId", sub.getContentId());
-	    	            m.put("lat", sub.getMapy());
-	    	            m.put("lng", sub.getMapx());
+	    	            m.put("lat", sub.getMapy() != null ? Double.parseDouble(sub.getMapy()) : 0.0);  // String → double
+	    	            m.put("lng", sub.getMapx() != null ? Double.parseDouble(sub.getMapx()) : 0.0);  // String → double
 	    	            return m;
 	    	        }).collect(Collectors.toList());
-
 	    	        Map<String, Object> review = new HashMap<>();
 	    	        review.put("subList", mappedList);
 	    	        
