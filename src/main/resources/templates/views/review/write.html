@@ -308,7 +308,7 @@ kakao.maps.load(function () {
 	// ════════════════════════════════════════
 	//  관광지 카드 생성
 	// ════════════════════════════════════════
-	function addSpotCard(name = '', address = '', index, lat = '', lng = '', contentId = '', kakaoPlaceId='') {
+	function addSpotCard(name = '', address = '', index, lat = '', lng = '', contentId = 0, kakaoPlaceId='') {
 	  document.getElementById('spotEmpty')?.remove();
 	
 	  const list = document.getElementById('spotList');
@@ -327,7 +327,13 @@ kakao.maps.load(function () {
 	      <div class="spot-name font-bold">
 	        ${name}
 	      </div>
-	      <input type="hidden" name="subList[${idx}].contentTitle" value="${name}" />
+	      <div class="flex-1">
+	        <input type="text" 
+	               name="subList[${idx}].contentTitle" 
+	               class="spot-title-input w-full rounded-lg border border-line bg-white px-3 py-2 text-base font-bold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft"
+	               placeholder="관광지 이름을 입력하세요"
+	               value="${name}" />
+	      </div>
 	      <input type="hidden"
 	             name="subList[${idx}].contentId"
 	        class="spot-name-input flex-1 rounded-lg border border-line bg-white px-3 py-2 text-base font-bold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft"
@@ -443,83 +449,78 @@ kakao.maps.load(function () {
 		    if (lngInput) lngInput.name = `subList[${i}].lng`;
 		  });
 		}
+	
+	
+	const form = document.getElementById("reviewForm");
+
+	document.getElementById("submitBtn").addEventListener("click", function () {
+
+	    // 제목
+	    const title = document.getElementById("travelTitle");
+	    if (title.value.trim() === "") {
+	        alert("여행 제목을 입력해주세요.");
+	        title.focus();
+	        return;
+	    }
+
+	    // 지역
+	    const region = document.getElementById("region");
+	    if (region.value === "") {
+	        alert("지역을 선택해주세요.");
+	        region.focus();
+	        return;
+	    }
+
+	    // 시작일
+	    const startDate = document.getElementById("startDate");
+	    if (startDate.value === "") {
+	        alert("여행 시작일을 선택해주세요.");
+	        startDate.focus();
+	        return;
+	    }
+
+	    // 종료일
+	    const endDate = document.getElementById("endDate");
+	    if (endDate.value === "") {
+	        alert("여행 종료일을 선택해주세요.");
+	        endDate.focus();
+	        return;
+	    }
+
+	    // 관광지
+	    const cards = document.querySelectorAll(".spot-card");
+
+	    if (cards.length === 0) {
+	        alert("관광지를 한 곳 이상 추가해주세요.");
+	        return;
+	    }
+
+	    // 각 관광지 검사
+	    for (let i = 0; i < cards.length; i++) {
+
+	        const rating = cards[i].querySelector(".rating-value");
+	        const review = cards[i].querySelector("textarea");
+
+	        if (rating.value == "0") {
+	            alert((i + 1) + "번째 관광지의 별점을 선택해주세요.");
+	            return;
+	        }
+
+	        if (review.value.trim() === "") {
+	            alert((i + 1) + "번째 관광지의 후기를 작성해주세요.");
+	            review.focus();
+	            return;
+	        }
+	    }
+
+	    // 모든 검사 통과
+	    form.submit();
+
+	});
 	// ── 관광지 직접 추가 버튼 ─────────────────
 	document.getElementById('addSpotBtn').addEventListener('click', () => addSpotCard());
-	
-	
-	document.getElementById('submitBtn').addEventListener('click', () => {
-		  console.log('버튼 클릭됨');
-		  const form = document.querySelector('form');
-		  console.log('form:', form);
-		  form.submit();
-		});
 });
-const form = document.getElementById("reviewForm");
 
-document.getElementById("submitBtn").addEventListener("click", function () {
-
-    // 제목
-    const title = document.getElementById("travelTitle");
-    if (title.value.trim() === "") {
-        alert("여행 제목을 입력해주세요.");
-        title.focus();
-        return;
-    }
-
-    // 지역
-    const region = document.getElementById("region");
-    if (region.value === "") {
-        alert("지역을 선택해주세요.");
-        region.focus();
-        return;
-    }
-
-    // 시작일
-    const startDate = document.getElementById("startDate");
-    if (startDate.value === "") {
-        alert("여행 시작일을 선택해주세요.");
-        startDate.focus();
-        return;
-    }
-
-    // 종료일
-    const endDate = document.getElementById("endDate");
-    if (endDate.value === "") {
-        alert("여행 종료일을 선택해주세요.");
-        endDate.focus();
-        return;
-    }
-
-    // 관광지
-    const cards = document.querySelectorAll(".spot-card");
-
-    if (cards.length === 0) {
-        alert("관광지를 한 곳 이상 추가해주세요.");
-        return;
-    }
-
-    // 각 관광지 검사
-    for (let i = 0; i < cards.length; i++) {
-
-        const rating = cards[i].querySelector(".rating-value");
-        const review = cards[i].querySelector("textarea");
-
-        if (rating.value == "0") {
-            alert((i + 1) + "번째 관광지의 별점을 선택해주세요.");
-            return;
-        }
-
-        if (review.value.trim() === "") {
-            alert((i + 1) + "번째 관광지의 후기를 작성해주세요.");
-            review.focus();
-            return;
-        }
-    }
-
-    // 모든 검사 통과
-    form.submit();
-
-});
 
 </script>
 
