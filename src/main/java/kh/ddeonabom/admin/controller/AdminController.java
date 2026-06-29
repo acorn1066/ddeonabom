@@ -256,11 +256,12 @@ public class AdminController {
 		public HashMap<String, Object> reportList(
 		        @RequestParam("targetType") String targetType,
 		        @RequestParam(value = "status", defaultValue = "") String status,
+		        @RequestParam(value = "keyword", defaultValue = "") String keyword,
 		        @RequestParam(value = "page", defaultValue = "1") int page) {
 
-		    int listCount = aService.getReportCount(targetType, status);
+		    int listCount = aService.getReportCount(targetType, status, keyword);
 		    PageInfo pi = Pagination.getPageInfo(page, listCount, 10, 10);
-		    ArrayList<AdminReport> list = aService.selectReportList(targetType, status, pi);
+		    ArrayList<AdminReport> list = aService.selectReportList(targetType, status, keyword, pi);
 
 		    HashMap<String, Object> data = new HashMap<>();
 		    data.put("list", list);

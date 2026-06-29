@@ -95,13 +95,14 @@
 		       th:text="${sub.contentTitle}">
 		    관광지명
 		  </div>
-		  <div class="flex items-center gap-1 text-sm">
+		 <div class="flex items-center gap-1 text-sm">
 			  <span th:each="i : ${#numbers.sequence(1,5)}"
-			        th:text="${i <= sub.rating} ? '★' : '☆'"
-			        th:class="${i <= sub.rating} ? 'text-yellow-400' : 'text-gray-300'">
+			        th:text="${i <= (sub.rating != null ? sub.rating : 0)} ? '★' : '☆'"
+			        th:class="${i <= (sub.rating != null ? sub.rating : 0)} ? 'text-yellow-400' : 'text-gray-300'">
 			  </span>
 			  <span class="ml-1 text-muted" th:text="${sub.rating}">5</span>
 			</div>
+			
 		</div>
         <p class="mb-4 text-15 leading-loose text-ink/85" th:text="${sub.travelSubContent}">내용</p>
 
@@ -185,60 +186,101 @@
  <!-- =================================================================	신고 ============================================================================ -->   
 	    </div>
 	    <div th:if="${session.loginUser != null and session.loginUser.memberNo == r.memberNo}" class="flex gap-2 mt-2 text-xs">
-	
-	      <button type="button" class="text-blue-500 hover:underline"  th:data-replyno="${r.replyNo}"
-        			th:data-content="${r.content}" th:onclick="openReplyEditModal(this)">수정</button>
-	
-	      <button type="button" class="text-red-500 hover:underline" th:data-replyno="${r.replyNo}"
-        			th:data-postno="${r.postNo}" onclick="openReplyDeleteModal(this)">삭제</button>
-	    </div>
-    	<p class="mt-2 text-15" th:text="${r.content}">댓글 내용</p>
+		
+		   <!-- 수정/삭제 버튼 -->
+		    <div th:if="${session.loginUser != null and session.loginUser.memberNo == r.memberNo}"
+		         class="ml-auto flex gap-2 text-xs text-muted">
+		
+		      <button type="button"
+		              class="hover:text-brand"
+		              th:onclick="|toggleEdit(${r.replyNo})|">
+		        수정
+		      </button>
+		
+		      <button type="button"
+		              class="hover:text-red-500"
+		              th:onclick="|openReplyDeleteModal(${r.replyNo})|">
+		        삭제
+		      </button>
+		
+		    </div>
+		  </div>
+		
+		  <!-- ================= 일반 텍스트 ================= -->
+		  <div th:id="|reply-view-${r.replyNo}|">
+		    <p class="text-15 leading-relaxed text-ink/85"
+		       th:text="${r.content}">
+		    </p>
+		  </div>
+		
+		  <!-- ================= 수정 폼 ================= -->
+		  <form th:id="|reply-edit-${r.replyNo}|"
+		        th:action="@{/reply/update}"
+		        method="post"
+		        class="hidden mt-3" style="display:none;">
+		
+		    <input type="hidden" name="replyNo" th:value="${r.replyNo}">
+		    <input type="hidden" name="postNo" th:value="${r.postNo}">
+		    <input type="hidden" name="postBoard" value="T">
+		
+		    <!-- 🔥 작성폼이랑 완전히 동일 UI -->
+		    <div class="overflow-hidden rounded-xl border border-line bg-white
+		                focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
+		
+		      <textarea name="content"
+		                class="block min-h-16 w-full resize-none border-none bg-transparent
+		                       px-4 py-3 text-sm leading-relaxed outline-none"
+		                th:text="${r.content}">
+		      </textarea>
+		
+		      <div class="flex items-center justify-end gap-2 border-t border-line py-2 px-3">
+		
+		        <button type="button"
+		                class="inline-flex h-9 items-center rounded-lg border border-line px-4 text-sm text-muted hover:bg-sunk"
+		                th:onclick="|toggleEdit(${r.replyNo})|">
+		          취소
+		        </button>
+		
+		        <button type="submit"
+		                class="inline-flex h-9 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-white">
+		          저장
+		        </button>
+		
+		      </div>
+		
+		    </div>
+		  </form>
+		
+		</div>
 	  </div>
 	</div>
-	<div id="replyEditModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
+	<!-- ⭐ 공용 모달은 딱 1개만 -->
+	<div id="commonModal"
+	     class="hidden fixed inset-0 bg-black/40 items-center justify-center">
 	
-	  <div class="bg-white p-5 rounded-lg w-96">
-	
-	    <form method="post" th:action="@{/reply/update}">
-	      
-	      <input type="hidden" name="replyNo">
-	      <input type="hidden" name="postNo"    th:value="${review.travelNo}">
-	      <input type="hidden" name="postBoard" value="T">
-	
-	      <textarea name="content" class="w-full border p-2 rounded" rows="4"></textarea>
-	
-	      <div class="flex justify-end gap-2 mt-3">
-	        <button type="button" onclick="closeReplyEditModal()">취소</button>
-	        <button type="submit" class="text-blue-500">수정</button>
-	      </div>
-	
-	    </form>
-	
-	  </div>
-	</div>
-	<div id="replyDeleteModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
-
 	  <div class="bg-white p-5 rounded-lg w-80">
 	
-	    <p class="mb-4 text-center">댓글을 삭제하시겠습니까?</p>
+	    <p class="mb-4 text-center">삭제하시겠습니까?</p>
 	
-	    <form id="replyDeleteForm" method="post">
-	      <input type="hidden" name="replyNo">
-	      <input type="hidden" name="postNo">
-	      <input type="hidden" name="postBoard" value="T">
+	    <form id="modalForm" method="post">
+	
+	      <input type="hidden" name="replyNo" id="modalReplyNo">
+	      <input type="hidden" name="postNo" id="modalPostNo">
 	
 	      <div class="flex justify-end gap-2">
-	        <button type="button" onclick="closeReplyDeleteModal()">취소</button>
+	        <button type="button" onclick="closeCommonModal()">취소</button>
 	        <button type="submit" class="text-red-500">삭제</button>
 	      </div>
+	
 	    </form>
+	
 	  </div>
 	</div>
   </section>
 </main>
 
 <!-- =================================================================	신고 ============================================================================ -->
-	<div id="modal-report" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
+	<div id="modal-report" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/40">
 	  <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
 	    <h2 class="mb-4 text-lg font-bold">신고하기</h2>
 	    <p class="mb-3 text-sm text-muted">신고 사유를 선택해주세요.</p>
@@ -370,43 +412,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-function openReplyEditModal(btn) {
+function openReplyDeleteModal(replyNo, postNo) {
+	  document.getElementById("modalReplyNo").value = replyNo;
+	  document.getElementById("modalPostNo").value = postNo;
 
-    const replyNo = btn.dataset.replyno;
-    const content = btn.dataset.content;
+	  document.getElementById("modalForm").action = "/reply/delete";
 
-    const modal = document.getElementById("replyEditModal");
+	  const modal = document.getElementById("commonModal");
+	  modal.classList.remove("hidden");
+	  modal.classList.add("flex");
+	}
 
-    modal.querySelector('input[name="replyNo"]').value = replyNo;
-    modal.querySelector('textarea[name="content"]').value = content;
-
-    modal.classList.remove("hidden");
-}
-
-function closeReplyEditModal() {
-    document.getElementById("replyEditModal").classList.add("hidden");
-}
+	function closeCommonModal() {
+	  const modal = document.getElementById("commonModal");
+	  modal.classList.add("hidden");
+	  modal.classList.remove("flex");
+	}
 
 
-function openReplyDeleteModal(btn) {
+	function openReplyDeleteModal(btn) {
 
-    const replyNo = btn.dataset.replyno;
-    const postNo = btn.dataset.postno;
+	    const replyNo = btn.dataset.replyno;
+	    const postNo = btn.dataset.postno;
 
-    const modal = document.getElementById("replyDeleteModal");
-    const form = document.getElementById("replyDeleteForm");
+	    const modal = document.getElementById("commonModal");
+	    const form = document.getElementById("modalForm");
 
-    form.action = "/reply/delete";
+	    form.action = "/reply/delete";
 
-    form.querySelector('input[name="replyNo"]').value = replyNo;
-    form.querySelector('input[name="postNo"]').value = postNo;
+	    form.querySelector('input[name="replyNo"]').value = replyNo;
+	    form.querySelector('input[name="postNo"]').value = postNo;
 
-    modal.classList.remove("hidden");
-}
+	    document.getElementById("modalMessage").innerText = "댓글을 삭제하시겠습니까?";
 
-function closeReplyDeleteModal() {
-    document.getElementById("replyDeleteModal").classList.add("hidden");
-}
+	    modal.classList.remove("hidden");
+	    modal.classList.add("flex");
+	}
+
+	function closeCommonModal() {
+	    const modal = document.getElementById("commonModal");
+	    modal.classList.add("hidden");
+	    modal.classList.remove("flex");
+	}
 
 //=================================================================	신고 ============================================================================ 
 	let reportTargetType = null;

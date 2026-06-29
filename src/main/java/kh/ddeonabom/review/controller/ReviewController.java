@@ -1,6 +1,7 @@
 package kh.ddeonabom.review.controller;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import kh.ddeonabom.admin.model.service.AdminService;
 import kh.ddeonabom.admin.model.vo.AdminNotice;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
+import kh.ddeonabom.landmark.model.service.LandmarkService;
 import kh.ddeonabom.member.model.vo.Member;
 import kh.ddeonabom.reply.model.vo.Reply;
 import kh.ddeonabom.reply.service.ReplyService;
@@ -47,6 +49,9 @@ public class ReviewController {
 	private final ReplyService replyService;
 	private final AdminService aService;
 	private final ScheduleService sService;
+	private final LandmarkService landmarkService;
+	@Value("${cloud.aws.s3.bucket}")
+	private String bucket;
 
 	@Value("${kakao.api.key}")
 	private String kakaoApiKey;
@@ -209,9 +214,14 @@ public class ReviewController {
 
 	    reviewService.increaseCount(travelNo);
 	    Review review = reviewService.getReviewDetail(travelNo, loginUserNo);
+	    
 
 	    if (review == null) {
 	        return "redirect:/reviews/list";
+	    }
+	    if ("MEMBER".equals(review.getVisibility()) && loginUser == null) {
+	        model.addAttribute("alertMsg", "회원 전용 게시글입니다. 로그인 후 이용해주세요.");
+	        return "member/login";
 	    }
 	    ArrayList<Reply> replyList = replyService.getReplyList(travelNo, "T");
 	    model.addAttribute("replyList", replyList);
@@ -269,91 +279,111 @@ public class ReviewController {
 	    model.addAttribute("review", review);
 
 	    // 후기 작성 폼(write.html)을 함께 쓰거나 별도의 update.html을 리턴합니다.
-	    return "views/review/write"; 
+	    return "views/review/rewrite"; 
 	}
 	
 	@PostMapping("/reviews/update")
 	@ResponseBody
 	public ResponseEntity<String> reviewUpdate(MultipartHttpServletRequest request) {
-	    
-	    Review review = new Review();
-	    
-	    // 1. 메인 정보 추출
-	    String travelNoStr = request.getParameter("travelNo");
-	    int travelNo = (travelNoStr != null && !travelNoStr.trim().isEmpty()) ? Integer.parseInt(travelNoStr.trim()) : 0;
-	    
-	    review.setTravelNo(travelNo);
-	    review.setTravelTitle(request.getParameter("travelTitle"));
-	    review.setRegion(request.getParameter("region"));
-	    review.setVisibility(request.getParameter("visibility"));
 
-	    //문자열 포맷을 java.sql.Date로 안전하게 파싱하여 정확한 변수명으로 매핑!
-	    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
-	    String startDateStr = request.getParameter("travelStartDate");
-	    String endDateStr = request.getParameter("travelEndDate");
-	    
 	    try {
-	        if (startDateStr != null && !startDateStr.trim().isEmpty()) {
-	            java.util.Date parsedDate = dateFormat.parse(startDateStr.trim());
-	            java.sql.Date sqlStartDate = new java.sql.Date(parsedDate.getTime());
-	            review.setTravelStartDate(sqlStartDate); // ➔ 변수명 매칭 완료!
+	        Review review = new Review();
+
+	        int travelNo = Integer.parseInt(request.getParameter("travelNo"));
+	        review.setTravelNo(travelNo);
+	        review.setTravelTitle(request.getParameter("travelTitle"));
+	        review.setRegion(request.getParameter("region"));
+	        review.setVisibility(request.getParameter("visibility"));
+
+	        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+	        String start = request.getParameter("travelStartDate");
+	        String end = request.getParameter("travelEndDate");
+
+	        if (start != null && !start.isEmpty()) {
+	            review.setTravelStartDate(new java.sql.Date(df.parse(start).getTime()));
 	        }
-	        if (endDateStr != null && !endDateStr.trim().isEmpty()) {
-	            java.util.Date parsedDate = dateFormat.parse(endDateStr.trim());
-	            java.sql.Date sqlEndDate = new java.sql.Date(parsedDate.getTime());
-	            review.setTravelEndDate(sqlEndDate); // ➔ 변수명 매칭 완료!
+	        if (end != null && !end.isEmpty()) {
+	            review.setTravelEndDate(new java.sql.Date(df.parse(end).getTime()));
 	        }
+
+	        // =========================
+	        // SUB LIST
+	        // =========================
+	        List<ReviewSub> subList = new ArrayList<>();
+
+	        for (int i = 0; i < 100; i++) {
+
+	            String title = request.getParameter("subList[" + i + "].contentTitle");
+	            if (title == null) continue;
+
+	            String contentIdStr = request.getParameter("subList[" + i + "].contentId");
+
+	            ReviewSub sub = new ReviewSub();
+
+	            sub.setContentTitle(title);
+
+	            sub.setTravelSubNo(parseIntSafe(request.getParameter("subList[" + i + "].travelSubNo")));
+	            sub.setLat(parseDoubleSafe(request.getParameter("subList[" + i + "].lat")));
+	            sub.setLng(parseDoubleSafe(request.getParameter("subList[" + i + "].lng")));
+
+	            sub.setTravelSubContent(
+	                request.getParameter("subList[" + i + "].travelSubContent") == null
+	                    ? ""
+	                    : request.getParameter("subList[" + i + "].travelSubContent")
+	            );
+
+	            sub.setRating(parseIntSafe(request.getParameter("subList[" + i + "].rating")));
+	            sub.setImagePath(request.getParameter("subList[" + i + "].imagePath"));
+
+	            // =========================
+	            // 🔥 핵심: contentId 안전 처리
+	            // =========================
+	            int contentId = parseIntSafe(contentIdStr);
+
+	            if (contentId <= 0) {
+	                // 잘못된 데이터는 아예 저장 안 함
+	                continue;
+	            }
+
+	            sub.setContentId(contentId);
+
+	            subList.add(sub);
+	        }
+
+	        review.setSubList(subList);
+
+	        // =========================
+	        // 이미지
+	        // =========================
+	        List<MultipartFile> imageFiles = request.getFiles("imageFiles");
+
+	        int result = reviewService.updateReview(review, imageFiles);
+
+	        if (result > 0) {
+	            return ResponseEntity.ok("success");
+	        } else {
+	            return ResponseEntity.status(500).body("fail");
+	        }
+
 	    } catch (Exception e) {
-	        
 	        e.printStackTrace();
+	        return ResponseEntity.status(500).body("error");
 	    }
+	}
 
-	    // 2. 서브 리스트(관광지 카드) 수동 빌드
-	    List<ReviewSub> subList = new ArrayList<>();
-	    int i = 0;
-	    
-	    while (request.getParameter("subList[" + i + "].contentTitle") != null) {
-	        ReviewSub sub = new ReviewSub();
-	        
-	        sub.setContentTitle(request.getParameter("subList[" + i + "].contentTitle"));
-	        sub.setTravelSubContent(request.getParameter("subList[" + i + "].travelSubContent"));
-	        sub.setImagePath(request.getParameter("subList[" + i + "].imagePath"));
-	        
-
-	        String rawContentId = request.getParameter("subList[" + i + "].contentId");
-	        int contentId = (rawContentId != null && !rawContentId.trim().isEmpty()) ? Integer.parseInt(rawContentId.trim()) : 0;
-	        sub.setContentId(contentId); 
-	        
-	        // 에러를 유발하는 수치형 파싱 안전장치 완비
-	        String subNoStr = request.getParameter("subList[" + i + "].travelSubNo");
-	        String latStr   = request.getParameter("subList[" + i + "].lat");
-	        String lngStr   = request.getParameter("subList[" + i + "].lng");
-	        String rtgStr   = request.getParameter("subList[" + i + "].rating");
-	        
-	        sub.setTravelSubNo(subNoStr != null && !subNoStr.trim().isEmpty() ? Integer.parseInt(subNoStr.trim()) : 0);
-	        sub.setLat(latStr != null && !latStr.trim().isEmpty() ? Double.parseDouble(latStr.trim()) : 0.0);
-	        sub.setLng(lngStr != null && !lngStr.trim().isEmpty() ? Double.parseDouble(lngStr.trim()) : 0.0);
-	        sub.setRating(rtgStr != null && !rtgStr.trim().isEmpty() ? Integer.parseInt(rtgStr.trim()) : 0);
-	        
-	        subList.add(sub);
-	        i++;
+	private int parseIntSafe(String v) {
+	    try {
+	        return (v == null || v.isBlank()) ? 0 : Integer.parseInt(v);
+	    } catch (Exception e) {
+	        return 0;
 	    }
-	    review.setSubList(subList);
-
-	    // 3. 📸 사진 리스트 가로채기
-	    List<MultipartFile> imageFiles = request.getFiles("imageFiles");
-	    
-	    System.out.println("▶ 메인 제목: " + review.getTravelTitle());
-	    System.out.println("▶ 장소 개수: " + subList.size());
-	    System.out.println("📸 사진 개수: " + (imageFiles != null ? imageFiles.size() : 0));
-
-	    // 서비스 호출
-	    int result = reviewService.reviewUpdateAction(review, imageFiles); 
-	    
-	    if(result > 0) {
-	        return ResponseEntity.ok("success");
-	    } else {
-	        return ResponseEntity.status(500).body("fail");
+	}
+	private double parseDoubleSafe(String v) {
+	    try {
+	        return (v == null || v.isBlank()) ? 0.0 : Double.parseDouble(v);
+	    } catch (Exception e) {
+	        return 0.0;
 	    }
 	}
 	
