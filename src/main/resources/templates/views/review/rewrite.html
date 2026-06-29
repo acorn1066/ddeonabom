@@ -238,7 +238,11 @@ kakao.maps.load(function () {
             index,
             place.y,
             place.x,
-            place.id           
+            place.id,
+            0,
+            '',
+            0,
+            ''
         );
     }
 
@@ -294,77 +298,108 @@ kakao.maps.load(function () {
     //  [업그레이드된] 관광지 리뷰 카드 동적 생성 및 사진 미리보기 함수
     // ════════════════════════════════════════
     function addSpotCard(name = '', address = '', index, lat = '', lng = '', contentId = '', rating = 0, textContent = '', travelSubNo = 0, imagePath = '') {
-        document.getElementById('spotEmpty')?.remove();
+    document.getElementById('spotEmpty')?.remove();
 
-        const list = document.getElementById('spotList');
-        const num  = index ?? list.querySelectorAll('.spot-card').length + 1;
-        const idx  = num - 1;
+    const list = document.getElementById('spotList');
+    const num  = index ?? list.querySelectorAll('.spot-card').length + 1;
+    const idx  = num - 1;
 
-        const div = document.createElement('div');
-        div.className = 'spot-card rounded-xl border border-line p-5';
+    const div = document.createElement('div');
+    div.className = 'spot-card rounded-xl border border-line p-5';
+    
+    // 🔥 [디버깅용 로그] S3 경로가 어떻게 들어오는지 콘솔에서 꼭 확인해보세요!
+    // console.log("들어온 이미지 경로:", imagePath);
+
+    div.innerHTML = `
+        <input type="hidden" class="spot-lat" name="subList[${idx}].lat" value="${lat}" />
+        <input type="hidden" class="spot-lng" name="subList[${idx}].lng" value="${lng}" />
+        <input type="hidden" class="spot-sub-no" name="subList[${idx}].travelSubNo" value="${travelSubNo}" />
+
+        <div class="mb-4 flex items-center gap-3">
+            <span class="spot-num flex h-7 w-7 flex-none items-center justify-center rounded-full bg-brand-soft text-13 font-bold text-brand-ink">${num}</span>
+            <div class="spot-name font-bold">${name}</div>
+            <input type="hidden" class="spot-title" name="subList[${idx}].contentTitle" value="${name}" />
+            <input type="hidden" class="spot-id" name="subList[${idx}].contentId" value="${contentId}" />
+            <button type="button" class="remove-spot ml-2 text-xl text-faint transition hover:text-red-400" title="장소 삭제">✕</button>
+        </div>
+        ${address ? `<div class="mb-3 text-xs text-muted">${address}</div>` : ''}
+        <div class="mb-3 flex items-center gap-2">
+            <div class="stars-wrap flex gap-0.5 text-2xl" style="color:#D1D5DB">
+                <span class="star-btn select-none cursor-pointer" data-val="1">★</span>
+                <span class="star-btn select-none cursor-pointer" data-val="2">★</span>
+                <span class="star-btn select-none cursor-pointer" data-val="3">★</span>
+                <span class="star-btn select-none cursor-pointer" data-val="4">★</span>
+                <span class="star-btn select-none cursor-pointer" data-val="5">★</span>
+            </div>
+            <span class="rating-label text-13 font-semibold text-muted">별점을 선택해주세요</span>
+            <input type="hidden" class="rating-value" name="subList[${idx}].rating" value="${rating}" />
+        </div>
+        <textarea
+            name="subList[${idx}].travelSubContent"
+            class="min-h-24 w-full rounded-lg border border-line bg-white p-3 text-sm leading-relaxed outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft"
+            placeholder="관광지에 대한 후기를 작성해주세요.">${textContent}</textarea>
         
-        div.innerHTML = `
-            <input type="hidden" class="spot-lat" name="subList[${idx}].lat" value="${lat}" />
-            <input type="hidden" class="spot-lng" name="subList[${idx}].lng" value="${lng}" />
-            	<input type="hidden" class="spot-sub-no" name="subList[${idx}].travelSubNo" value="${travelSubNo}" />
-            	
-
-            <div class="mb-4 flex items-center gap-3">
-                <span class="spot-num flex h-7 w-7 flex-none items-center justify-center rounded-full bg-brand-soft text-13 font-bold text-brand-ink">${num}</span>
-                <div class="spot-name font-bold">${name}</div>
-                <input type="hidden" class="spot-title" name="subList[${idx}].contentTitle" value="${name}" />
-                <input type="hidden" class="spot-id" name="subList[${idx}].contentId" value="${contentId}" />
-                <button type="button" class="remove-spot ml-2 text-xl text-faint transition hover:text-red-400" title="삭제">✕</button>
-            </div>
-            ${address ? `<div class="mb-3 text-xs text-muted">${address}</div>` : ''}
-            <div class="mb-3 flex items-center gap-2">
-                <div class="stars-wrap flex gap-0.5 text-2xl" style="color:#D1D5DB">
-                    <span class="star-btn select-none cursor-pointer" data-val="1">★</span>
-                    <span class="star-btn select-none cursor-pointer" data-val="2">★</span>
-                    <span class="star-btn select-none cursor-pointer" data-val="3">★</span>
-                    <span class="star-btn select-none cursor-pointer" data-val="4">★</span>
-                    <span class="star-btn select-none cursor-pointer" data-val="5">★</span>
+        <div class="mt-3 flex flex-col gap-2">
+            ${imagePath && imagePath !== '/' && imagePath !== 'null' ? `
+                <div class="existing-img-wrap flex items-center gap-3 mb-1 p-2 rounded-lg bg-gray-50 border border-line">
+                    <div class="relative h-18 w-18 overflow-hidden rounded-lg border border-line bg-white flex-none">
+                        <img src="${imagePath}" class="h-full w-full object-cover" alt="기존 등록 사진" />
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-xs text-muted font-medium">기존 등록된 사진이 있습니다.</span>
+                        <button type="button" class="delete-existing-img text-left text-xs text-red-500 font-semibold hover:underline">
+                            ✕ 사진 지우기
+                        </button>
+                    </div>
+                    <input type="hidden" class="spot-img-path" name="subList[${idx}].imagePath" value="${imagePath}" />
                 </div>
-                <span class="rating-label text-13 font-semibold text-muted">별점을 선택해주세요</span>
-                <input type="hidden" class="rating-value" name="subList[${idx}].rating" value="${rating}" />
-            </div>
-            <textarea
-                name="subList[${idx}].travelSubContent"
-                class="min-h-24 w-full rounded-lg border border-line bg-white p-3 text-sm leading-relaxed outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft"
-                placeholder="관광지에 대한 후기를 작성해주세요.">${textContent}</textarea>
-            
-            <div class="mt-3 flex flex-col gap-2">
-	            ${imagePath && imagePath !== '/' ? `
-	            	    <div class="existing-image-preview flex items-center gap-2 mb-1 existing-img-wrap">
-	            	        <div class="relative h-18 w-18 overflow-hidden rounded-lg border border-line">
-	            	            <img src="${imagePath}" class="h-full w-full object-cover" alt="기존 등록 사진" />
-	            	        </div>
-	            	        <span class="text-xs text-muted">기존 등록된 사진이 있습니다.</span>
-	            	        <input type="hidden" class="spot-img-path" name="subList[${idx}].imagePath" value="${imagePath}" />
-	            	    </div>
-	            	` : ''}
+            ` : ''}
 
-                <label class="flex h-18 w-18 flex-col items-center justify-center gap-0.5 rounded-lg border border-dashed border-line bg-sunk text-faint transition hover:border-brand hover:text-brand cursor-pointer">
-                    <span class="text-lg">＋</span>
-                    <span class="text-xs">사진</span>
-                    <input type="file" name="subList[${idx}].imageFiles" accept="image/*" class="hidden" multiple />
-                </label>
-                <div class="file-name-list flex flex-wrap gap-2 mt-2"></div>
-            </div>
-            
-        `;
+            <label class="flex h-18 w-18 flex-col items-center justify-center gap-0.5 rounded-lg border border-dashed border-line bg-sunk text-faint transition hover:border-brand hover:text-brand cursor-pointer">
+                <span class="text-lg">＋</span>
+                <span class="text-xs">새 사진</span>
+                <input type="file" name="subList[${idx}].imageFiles" accept="image/*" class="hidden" multiple />
+            </label>
+            <div class="file-name-list flex flex-wrap gap-2 mt-2"></div>
+        </div>
+    `;
 
-        div.querySelector('.remove-spot').addEventListener('click', () => {
-            const idx = Array.from(list.querySelectorAll('.spot-card')).indexOf(div);
-            if (idx >= 0 && markers[idx]) {
-                markers[idx].setMap(null);
-                markers.splice(idx, 1);
-                reindexMarkers();
-                updatePolyline();
+    // ════════════════════════════════════════════════════════════
+    // 🛠️ [이벤트 추가] 기존 사진 개별 삭제 처리 버튼 기능
+    // ════════════════════════════════════════════════════════════
+    const deleteImgBtn = div.querySelector('.delete-existing-img');
+    if (deleteImgBtn) {
+        deleteImgBtn.addEventListener('click', () => {
+            if (confirm("기존 등록된 사진을 삭제하시겠습니까?\n(수정 완료 시 반영됩니다)")) {
+                const imgWrap = div.querySelector('.existing-img-wrap');
+                const imgPathInput = div.querySelector('.spot-img-path');
+                
+                if (imgPathInput) {
+                    // 1. 서버에 "이 사진 지워졌다"고 알려주기 위해 값을 빈값("")으로 만듭니다.
+                    imgPathInput.value = ""; 
+                }
+                // 2. 화면에서 기존 이미지 영역을 깔끔하게 숨겨줍니다.
+                if (imgWrap) imgWrap.style.display = 'none'; 
             }
-            div.remove();
-            reindexCards();   
         });
+    }
+
+    // [기존 장소 삭제 이벤트]
+    div.querySelector('.remove-spot').addEventListener('click', () => {
+        const idx = Array.from(list.querySelectorAll('.spot-card')).indexOf(div);
+        if (idx >= 0 && markers[idx]) {
+            markers[idx].setMap(null);
+            markers.splice(idx, 1);
+            reindexMarkers();
+            updatePolyline();
+        }
+        div.remove();
+        reindexCards();   
+    });
+
+    // (※ 뒤이어 작성되어 있을 별점 제어 스크립트나 파일 리스트 핸들러가 있다면 이 아래에 배치하시면 됩니다)
+    list.appendChild(div);
+
 
         initStars(div);
         
