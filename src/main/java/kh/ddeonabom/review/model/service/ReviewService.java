@@ -109,9 +109,8 @@ public class ReviewService {
 	}
 
 	@Transactional
-	public int updateReview(Review review, List<MultipartFile> imageFiles) {
+	public int updateReview(Review review) {
 
-	    // 1. 메인 업데이트
 	    reviewMapper.reviewUpdateAction(review);
 
 	    int result = 1;
@@ -119,38 +118,39 @@ public class ReviewService {
 	    for (ReviewSub sub : review.getSubList()) {
 
 	        if (sub.getTravelSubNo() == 0) {
-	            // INSERT
 	            reviewMapper.insertReviewSub(sub);
 	        } else {
-	            // UPDATE
 	            reviewMapper.reviewSubUpdate(sub);
 	        }
 
-	        if (imageFiles != null) {
-	            for (MultipartFile file : imageFiles) {
+	        // sub별 파일만 처리
+	        List<MultipartFile> files = sub.getImageFiles();
 
-	                if (file != null && !file.isEmpty()) {
+	        if (files != null && !files.isEmpty()) {
+
+	            for (MultipartFile file : files) {
+
+	                if (!file.isEmpty()) {
 
 	                    try {
 	                        String original = file.getOriginalFilename();
 	                        String saved = UUID.randomUUID() + "_" + original;
 
-	                        // ⭕ [변경] 1. S3 업로드를 위한 메타데이터 설정
 	                        ObjectMetadata metadata = new ObjectMetadata();
 	                        metadata.setContentLength(file.getSize());
 	                        metadata.setContentType(file.getContentType());
 
-	                        //2. AWS S3로 파일 업로드 실행
-	                        amazonS3.putObject(new PutObjectRequest(bucket, saved, file.getInputStream(), metadata));
+	                        amazonS3.putObject(
+	                            new PutObjectRequest(bucket, saved, file.getInputStream(), metadata)
+	                        );
 
-	                        // 3. S3에 저장된 파일의 실제 인터넷 주소(URL) 가져오기
 	                        String s3Url = amazonS3.getUrl(bucket, saved).toString();
 
 	                        Image img = new Image();
 	                        img.setFileName(original);
 	                        img.setRenameFile(saved);
-	                        img.setImagePath(s3Url); //완성된 S3 URL 주소를 그대로 저장!
-	                        img.setTravelSubNo(sub.getTravelSubNo()); 
+	                        img.setImagePath(s3Url);
+	                        img.setTravelSubNo(sub.getTravelSubNo());
 
 	                        reviewMapper.insertImage(img);
 

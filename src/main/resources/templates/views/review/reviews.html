@@ -196,44 +196,73 @@
 	            }
 
 	            data.forEach(travel => {
-	            	const rawDate = travel.modifyDate ?? travel.createDate;
-	            	const displayDate = rawDate ? rawDate.substring(0, 10) : '';
+
+	                const rawDate = travel.modifyDate ?? travel.createDate;
+	                const displayDate = rawDate ? rawDate.substring(0, 10) : '';
+
+	                const isMemberOnly = travel.visibility === 'MEMBER';
+
 	                const cardHtml = `
-	                  <a href="/reviews/detail?travelNo=${travel.travelNo}" class="flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card">
+	                  <div 
+	                    class="flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card cursor-pointer"
+	                    onclick="goDetail(${travel.travelNo}, '${travel.visibility}')"
+	                  >
 	                    <div class="flex flex-1 flex-col gap-2 p-4">
+
 	                      <div class="flex items-center gap-1.5 text-xs font-bold text-brand">
-	                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
-	                          <path d="M8 14s5-4.5 5-8A5 5 0 0 0 3 6c0 3.5 5 8 5 8Z"/><circle cx="8" cy="6" r="1.6"/>
-	                        </svg>
 	                        No. ${travel.travelNo}
 	                      </div>
+
 	                      <div class="flex items-center gap-2">
-	                      <div class="text-lg font-bold tracking-tight text-ink line-clamp-1">
+	                        <div class="text-lg font-bold tracking-tight text-ink line-clamp-1">
 	                          ${travel.travelTitle}
+	                        </div>
+
+	                        ${isMemberOnly
+	                          ? '<span class="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700">🔒 회원</span>'
+	                          : ''
+	                        }
 	                      </div>
 
-	                      ${travel.visibility === 'MEMBER'
-	                          ? '<span class="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700">🔒 회원</span>'
-	                          : ''}
-	                  	  </div>
 	                      <div class="text-13 text-faint">등록일: ${displayDate}</div>
-	                      <div class="mt-auto flex items-center gap-2 border-t border-line pt-3 text-13">
-	                        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-brand-soft text-11 font-bold text-brand-ink">M</span>
-	                        <span class="font-semibold text-muted"> ${travel.nickname} </span>
-	                        <span class="ml-auto text-muted text-xs">조회수 <span class="font-bold text-ink">${travel.count}</span></span>
-	                        / 추천 <span class="font-bold text-ink">${travel.likeCount ?? 0}</span>
-	                      </div>
+
 	                    </div>
-	                  </a>
+	                  </div>
 	                `;
+
 	                container.insertAdjacentHTML('beforeend', cardHtml);
 	            });
 	            drawPagination(pi);
 	        },
-	        error: function(err) {
-	            console.error("데이터 로딩 실패", err);
+	        error: function(xhr) {
+	            if (xhr.status === 401) {
+	                openInfoModal(
+	                    "로그인이 필요합니다",
+	                    "로그인 후 이용 가능합니다."
+	                );
+	                return;
+	            }
+
+	            console.error("데이터 로딩 실패", xhr);
 	        }
 	    });
+	}
+	function goDetail(travelNo, visibility) {
+
+	    // 🔒 회원전용 게시글
+	    if (visibility === 'MEMBER') {
+
+	        // 로그인 체크 (세션 값 있으면 서버에서 내려줘야 정확하지만 프론트 간단 처리)
+	        const loginUser = /*[[${session.loginUser}]]*/ null;
+
+	        if (!loginUser) {
+	            showToast('로그인이 필요한 게시글입니다', false);
+	            return;
+	        }
+	    }
+
+	    // 일반 or 로그인 사용자
+	    location.href = `/reviews/detail?travelNo=${travelNo}`;
 	}
 
 	function drawPagination(pi) {

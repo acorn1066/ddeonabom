@@ -94,7 +94,7 @@ public class ReviewController {
 	    
         int listCount = reviewService.selectListCount(keyword, region, loginUserNo); 
         int pageLimit = 5;   
-        int boardLimit = 9;  
+        int boardLimit = 12;  
 
         PageInfo pi = Pagination.getPageInfo(currentPage, listCount, pageLimit, boardLimit);
         ArrayList<Review> list = reviewService.selectReviewList(pi, keyword, region, loginUserNo, sort);
@@ -332,12 +332,9 @@ public class ReviewController {
 	            String title = request.getParameter("subList[" + i + "].contentTitle");
 	            if (title == null) continue;
 
-	            String contentIdStr = request.getParameter("subList[" + i + "].contentId");
-
 	            ReviewSub sub = new ReviewSub();
 
 	            sub.setContentTitle(title);
-
 	            sub.setTravelSubNo(parseIntSafe(request.getParameter("subList[" + i + "].travelSubNo")));
 	            sub.setLat(parseDoubleSafe(request.getParameter("subList[" + i + "].lat")));
 	            sub.setLng(parseDoubleSafe(request.getParameter("subList[" + i + "].lng")));
@@ -351,35 +348,27 @@ public class ReviewController {
 	            sub.setRating(parseIntSafe(request.getParameter("subList[" + i + "].rating")));
 	            sub.setImagePath(request.getParameter("subList[" + i + "].imagePath"));
 
-	            // =========================
-	            // 🔥 핵심: contentId 안전 처리
-	            // =========================
-	            int contentId = parseIntSafe(contentIdStr);
-
-	            if (contentId <= 0) {
-	                // 잘못된 데이터는 아예 저장 안 함
-	                continue;
-	            }
+	            int contentId = parseIntSafe(request.getParameter("subList[" + i + "].contentId"));
+	            if (contentId <= 0) continue;
 
 	            sub.setContentId(contentId);
+
+	            // 🔥 핵심: 여기 추가해야 사진 들어감
+	            List<MultipartFile> files =
+	                request.getFiles("subList[" + i + "].imageFiles");
+
+	            sub.setImageFiles(files);   // ⭐⭐⭐ 이거 없으면 사진 안 들어감
 
 	            subList.add(sub);
 	        }
 
 	        review.setSubList(subList);
 
-	        // =========================
-	        // 이미지
-	        // =========================
-	        List<MultipartFile> imageFiles = request.getFiles("imageFiles");
+	        int result = reviewService.updateReview(review);
 
-	        int result = reviewService.updateReview(review, imageFiles);
-
-	        if (result > 0) {
-	            return ResponseEntity.ok("success");
-	        } else {
-	            return ResponseEntity.status(500).body("fail");
-	        }
+	        return result > 0
+	            ? ResponseEntity.ok("success")
+	            : ResponseEntity.status(500).body("fail");
 
 	    } catch (Exception e) {
 	        e.printStackTrace();

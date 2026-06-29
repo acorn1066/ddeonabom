@@ -499,8 +499,12 @@ kakao.maps.load(function () {
             formData.append(`subList[${i}].travelSubContent`, card.querySelector('textarea')?.value || '');
             formData.append(`subList[${i}].imagePath`, card.querySelector('.spot-img-path')?.value || '');
             const fileInput = card.querySelector('input[type="file"]');
+
             if (fileInput && fileInput.files.length > 0) {
-                Array.from(fileInput.files).forEach(file => formData.append('imageFiles', file));
+                Array.from(fileInput.files).forEach(file => {
+                    formData.append("imageFiles", file);
+                    formData.append("imageIndex", i);
+                });
             }
         });
 
