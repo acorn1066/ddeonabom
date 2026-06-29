@@ -22,6 +22,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.admin.model.service.AdminService;
@@ -50,11 +54,14 @@ public class ReviewController {
 	private final AdminService aService;
 	private final ScheduleService sService;
 	private final LandmarkService landmarkService;
+	
+	private final AmazonS3 amazonS3;
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
 
 	@Value("${kakao.api.key}")
 	private String kakaoApiKey;
+	
 	
 	
 	@GetMapping("/reviews/list")
@@ -149,63 +156,71 @@ public class ReviewController {
 	    return "views/review/write";
 	}
 
-	@PostMapping("/reviews/insert")
-	public String insertReviews(@ModelAttribute Review r, HttpServletRequest request, HttpSession session) {
+    @PostMapping("/reviews/insert")
+    public String insertReviews(@ModelAttribute Review r, HttpServletRequest request, HttpSession session) {
 
-		Member loginUser = (Member) session.getAttribute("loginUser");
-	    if (loginUser != null) {
-	        r.setMemberNo(loginUser.getMemberNo());
-	    }
-	    int result = reviewService.insertReview(r);
-	    if (result > 0) {
-	    	String uploadPath = "C:/reviews"; 
-	        
-	        File uploadDir = new File(uploadPath);
-	        if (!uploadDir.exists()) {
-	            uploadDir.mkdirs();
-	        }
-	        if (r.getSubList() != null) {
-	            for (int i = 0; i < r.getSubList().size(); i++) {
-	                ReviewSub sub = r.getSubList().get(i);
-	                sub.setTravelNo(r.getTravelNo());   
-	                sub.setTravelSubSeq(i + 1);
+        Member loginUser = (Member) session.getAttribute("loginUser");
+        if (loginUser != null) {
+            r.setMemberNo(loginUser.getMemberNo());
+        }
+        
+        int result = reviewService.insertReview(r);
+        if (result > 0) {
+            // [변경] 더 이상 로컬 디렉토리(C:/reviews)를 생성할 필요가 없습니다.
+            
+            if (r.getSubList() != null) {
+                for (int i = 0; i < r.getSubList().size(); i++) {
+                    ReviewSub sub = r.getSubList().get(i);
+                    sub.setTravelNo(r.getTravelNo());   
+                    sub.setTravelSubSeq(i + 1);
 
-	                reviewService.insertReviewSub(sub); 
+                    reviewService.insertReviewSub(sub); 
 
-	                List<MultipartFile> cardFiles = sub.getImageFiles();
-	                System.out.println("cardFiles = " + cardFiles);
-	                System.out.println("size = " + (cardFiles == null ? "null" : cardFiles.size()));
-	                if (cardFiles != null) {
-	                    for (MultipartFile file : cardFiles) {
-	                        if (file != null && !file.isEmpty()) {
-	                            String original = file.getOriginalFilename();
-	                            String saved = UUID.randomUUID().toString() + "_" + original;
-	                            
-	                            try {
-	                                file.transferTo(new File(uploadPath + "/" + saved));
+                    List<MultipartFile> cardFiles = sub.getImageFiles();
+                    if (cardFiles != null) {
+                        for (MultipartFile file : cardFiles) {
+                            if (file != null && !file.isEmpty()) {
+                                String original = file.getOriginalFilename();
+                                // S3에 저장될 중복 없는 파일명 생성
+                                String saved = UUID.randomUUID().toString() + "_" + original;
+                                
+                                try {
+                                    // [변경] 1. S3 업로드를 위한 메타데이터 설정
+                                    ObjectMetadata metadata = new ObjectMetadata();
+                                    metadata.setContentLength(file.getSize());
+                                    metadata.setContentType(file.getContentType());
 
-	                                Image img = new Image();
-	                                img.setFileName(original);
-	                                img.setRenameFile(saved);
-	                                img.setImagePath("/uploads");
-	                                img.setTravelSubNo(sub.getTravelSubNo()); 
-	                                reviewService.insertImage(img);
-	                            } catch (Exception e) {
-	                                e.printStackTrace();
-	                            }
-	                        }
-	                    }
-	                }
-	            }
-	            
-	        }
+                                    // [변경] 2. AWS S3로 파일 업로드 실행
+                                    amazonS3.putObject(new PutObjectRequest(bucket, saved, file.getInputStream(), metadata));
 
-	        return "redirect:/reviews/list";
-	    } else {
-	        return "redirect:/reviews/write";
-	    }
-	   
-	}
+                                    // [변경] 3. S3에 저장된 파일의 실제 인터넷 주소(URL) 가져오기
+                                    String s3Url = amazonS3.getUrl(bucket, saved).toString();
+
+                                    // [변경] 4. DB에 이미지 정보 저장
+                                    Image img = new Image();
+                                    img.setFileName(original);    // 원본 파일명
+                                    img.setRenameFile(saved);     // S3에 저장된 파일명
+                                    img.setImagePath(s3Url);      // [핵심] 로컬 경로 대신 S3 URL 주소를 통째로 저장!
+                                    img.setTravelSubNo(sub.getTravelSubNo()); 
+                                    
+                                    reviewService.insertImage(img);
+                                    
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    // 실패 시 예외 처리 로직 (필요시 추가)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return "redirect:/reviews/list";
+        } else {
+            return "redirect:/reviews/write";
+        }
+    }
+
+	
 	
 	@GetMapping("/reviews/detail")
 	public String reviewDetail(@RequestParam("travelNo") int travelNo, HttpSession session, Model model) {

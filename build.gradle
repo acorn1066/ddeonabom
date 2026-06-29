@@ -40,6 +40,9 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	
+	// Source: https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-aws
+	implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
+	
 }
 
 tasks.named('test') {
