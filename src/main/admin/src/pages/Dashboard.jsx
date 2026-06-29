@@ -8,6 +8,7 @@ const Dashboard = () => {
         boardCount: 0,
         replyCount: 0,
         reportCount: 0,
+        todayMemberCount: 0,
     });
 
     const [activity, setActivity] = useState({
@@ -47,7 +48,7 @@ const Dashboard = () => {
                 관리자 대시보드
             </h1>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-3 gap-6">
 
                 {/* 총 회원 수 */}
                 <div className="rounded-xl bg-white p-6 shadow-sm border">
@@ -56,10 +57,16 @@ const Dashboard = () => {
                         {stats.memberCount}
                     </p>
                 </div>
+                
+                {/* 오늘 가입자 수 */}
+                <div className="rounded-xl bg-white p-6 shadow-sm border">
+                    <p className="text-gray-500">오늘 가입자 수</p>
+                    <p className="mt-3 text-4xl font-bold text-blue-500">{stats.todayMemberCount}</p>
+                </div>
 
                 {/* 총 게시글 수 */}
                 <div className="rounded-xl bg-white p-6 shadow-sm border">
-                    <p className="text-gray-500">총 게시글 수</p>
+                    <p className="text-gray-500">총 공유된 게시글 수</p>
                     <p className="mt-3 text-4xl font-bold">
                         {stats.boardCount}
                     </p>
@@ -75,7 +82,7 @@ const Dashboard = () => {
 
                 {/* 신고 건 수 */}
                 <div className="rounded-xl bg-white p-6 shadow-sm border">
-                    <p className="text-gray-500">신고 건 수</p>
+                    <p className="text-gray-500">미처리 신고 건 수</p>
                     <p className="mt-3 text-4xl font-bold text-red-500">
                         {stats.reportCount}
                     </p>
