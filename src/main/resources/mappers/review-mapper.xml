@@ -99,8 +99,8 @@
 	    <selectKey keyProperty="travelSubNo" resultType="int" order="BEFORE">
 	        SELECT SEQ_TRAVEL_SUB_NO.NEXTVAL FROM DUAL
 	    </selectKey>
-	    INSERT INTO TRAVEL_LIST_SUB (TRAVEL_SUB_NO, TRAVEL_SUB_CONTENT, TRAVEL_SUB_SEQ, TRAVEL_SUB_DATE, TRAVEL_NO, CONTENT_ID, RATING, LAT, LNG, CONTENT_TITLE)
-		VALUES (#{travelSubNo}, #{travelSubContent}, #{travelSubSeq}, SYSDATE, #{travelNo}, #{contentId}, #{rating, jdbcType=INTEGER}, #{lat}, #{lng}, #{contentTitle})
+	    INSERT INTO TRAVEL_LIST_SUB (TRAVEL_SUB_NO, TRAVEL_SUB_CONTENT, TRAVEL_SUB_SEQ, TRAVEL_SUB_DATE, TRAVEL_NO, CONTENT_ID, RATING, CONTENT_TITLE)
+		VALUES (#{travelSubNo}, #{travelSubContent}, #{travelSubSeq}, SYSDATE, #{travelNo}, #{contentId}, #{rating, jdbcType=INTEGER}, #{contentTitle})
 	</insert>
 	
 	<insert id="insertImage" parameterType="kh.ddeonabom.review.model.vo.Image">
@@ -188,20 +188,21 @@
 	</select>
 	
 	<select id="getReviewSubList" parameterType="int" resultType="kh.ddeonabom.review.model.vo.ReviewSub">
-	    SELECT 
-	        TRAVEL_SUB_NO,
-	        TRAVEL_SUB_CONTENT,
-	        TRAVEL_SUB_SEQ,
-	        TRAVEL_SUB_DATE,
-	        TRAVEL_NO,
-	        CONTENT_ID,
-	        RATING,
-	        CONTENT_TITLE,
-	        LAT,
-        	LNG
-	    FROM TRAVEL_LIST_SUB 
-	    WHERE TRAVEL_NO = #{travelNo} 
-	    ORDER BY TRAVEL_SUB_SEQ
+	    select
+	        s.travel_sub_no,
+	        s.travel_sub_content,
+	        s.travel_sub_seq,
+	        s.travel_sub_date,
+	        s.travel_no,
+	        s.content_id,
+	        s.rating,
+	        s.content_title,
+	        l.mapy as lat,
+	        l.mapx as lng
+	    from travel_list_sub s
+	    left join landmark l on s.content_id = l.content_id
+	    where s.travel_no = #{travelNo}
+	    order by s.travel_sub_seq
 	</select>
 	
 	<select id="getImageListBySubNo" parameterType="int" resultType="kh.ddeonabom.review.model.vo.Image">
