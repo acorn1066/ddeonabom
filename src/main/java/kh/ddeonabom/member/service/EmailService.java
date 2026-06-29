@@ -22,6 +22,7 @@ public class EmailService {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
+        message.setFrom("saundayy@gmail.com");
         message.setSubject("이메일 인증번호");
         message.setText("인증번호: " + code);
 
