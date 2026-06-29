@@ -65,6 +65,8 @@ public interface ReviewMapper {
 
 	int getMyReviewCount(HashMap<String, Object> map);
 
-	
+	void deleteImageBySubNo(int travelSubNo);
+
+
 
 }

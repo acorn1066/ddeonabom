@@ -290,9 +290,7 @@ kakao.maps.load(function () {
 		  updatePolyline();
 
 		  // ⭐ DB에서 contentId 받아오기
-		  fetch(`/landmark/match?title=${place.place_name}`)
-		    .then(res => res.json())
-		    .then(data => {
+		 
 		      addSpotCard(
 		        place.place_name,
 		        place.address_name,
@@ -302,7 +300,7 @@ kakao.maps.load(function () {
 		        data.contentId,
 		        place.id  
 		      );
-		    });
+		  
 		}
 	
 	// ════════════════════════════════════════
