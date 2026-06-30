@@ -26,15 +26,29 @@
 
       <div class="flex items-center gap-2 pb-5">
 
-        <!-- 지역 필터 탭 -->
-        <span th:each="tab : ${ {'전체','제주','수도권','강원','경상','전라'} }"
-              th:text="${tab}"
-              th:attr="data-region=${tab}"
-              th:class="${tab == region} ?
-                'filter-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-ink bg-ink px-4 text-13 font-semibold text-white' :
-                'filter-tab inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-13 font-semibold text-muted transition hover:border-muted hover:text-ink'"
-              onclick="selectRegion(this)">
-        </span>
+        <!-- 지역 필터 select -->
+        <select id="regionSelect"
+                class="h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none"
+                onchange="selectRegion(this.value)">
+          <option value="">전체</option>
+          <option value="서울"   th:selected="${region == '서울'}">서울</option>
+          <option value="부산"   th:selected="${region == '부산'}">부산</option>
+          <option value="대구"   th:selected="${region == '대구'}">대구</option>
+          <option value="인천"   th:selected="${region == '인천'}">인천</option>
+          <option value="광주"   th:selected="${region == '광주'}">광주</option>
+          <option value="대전"   th:selected="${region == '대전'}">대전</option>
+          <option value="울산"   th:selected="${region == '울산'}">울산</option>
+          <option value="세종"   th:selected="${region == '세종'}">세종</option>
+          <option value="경기도" th:selected="${region == '경기도'}">경기도</option>
+          <option value="강원"   th:selected="${region == '강원'}">강원</option>
+          <option value="충북"   th:selected="${region == '충북'}">충북</option>
+          <option value="충남"   th:selected="${region == '충남'}">충남</option>
+          <option value="전북"   th:selected="${region == '전북'}">전북</option>
+          <option value="전남"   th:selected="${region == '전남'}">전남</option>
+          <option value="경북"   th:selected="${region == '경북'}">경북</option>
+          <option value="경남"   th:selected="${region == '경남'}">경남</option>
+          <option value="제주"   th:selected="${region == '제주'}">제주</option>
+        </select>
 
         <!-- 검색 -->
         <div class="relative ml-auto">
@@ -183,8 +197,8 @@
 
   <script>
     /* ─── 지역 필터 탭 클릭 → hidden input 변경 후 폼 제출 ─── */
-    function selectRegion(tab) {
-      document.getElementById('region-input').value = tab.dataset.region;
+    function selectRegion(value) {
+      document.getElementById('region-input').value = value;
       document.getElementById('search-hidden').value = document.getElementById('search-input').value;
       document.getElementById('filter-form').submit();
     }
