@@ -199,7 +199,7 @@
 		
 		      <button type="button"
 		              class="hover:text-red-500"
-		              th:onclick="|openReplyDeleteModal(${r.replyNo})|">
+		              th:onclick="|openReplyDeleteModal(${r.replyNo}, ${r.postNo})|">
 		        삭제
 		      </button>
 		
@@ -223,7 +223,6 @@
 		    <input type="hidden" name="postNo" th:value="${r.postNo}">
 		    <input type="hidden" name="postBoard" value="T">
 		
-		    <!-- 🔥 작성폼이랑 완전히 동일 UI -->
 		    <div class="overflow-hidden rounded-xl border border-line bg-white
 		                focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
 		
@@ -266,6 +265,7 @@
 	
 	      <input type="hidden" name="replyNo" id="modalReplyNo">
 	      <input type="hidden" name="postNo" id="modalPostNo">
+	      <input type="hidden" name="postBoard" id="modalPostBoard" value="T">
 	
 	      <div class="flex justify-end gap-2">
 	        <button type="button" onclick="closeCommonModal()">취소</button>
@@ -459,17 +459,43 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 });
+function toggleEdit(replyNo) {
+
+    const view = document.getElementById(`reply-view-${replyNo}`);
+    const edit = document.getElementById(`reply-edit-${replyNo}`);
+
+    if (!view || !edit) return;
+
+    if (edit.style.display === "none" || edit.classList.contains("hidden")) {
+        view.style.display = "none";
+        edit.style.display = "block";
+        edit.classList.remove("hidden");
+    } 
+    else {
+        view.style.display = "block";
+        edit.style.display = "none";
+        edit.classList.add("hidden");
+    }
+}
 
 function openReplyDeleteModal(replyNo, postNo) {
-	  document.getElementById("modalReplyNo").value = replyNo;
-	  document.getElementById("modalPostNo").value = postNo;
 
-	  document.getElementById("modalForm").action = "/reply/delete";
+    const modal = document.getElementById("commonModal");
+    const form = document.getElementById("modalForm");
 
-	  const modal = document.getElementById("commonModal");
-	  modal.classList.remove("hidden");
-	  modal.classList.add("flex");
-	}
+    form.action = "/reply/delete";
+
+    form.querySelector('input[name="replyNo"]').value = replyNo;
+    form.querySelector('input[name="postNo"]').value = postNo;
+
+    const boardInput = form.querySelector('input[name="postBoard"]');
+    if (boardInput) {
+        boardInput.value = "T";
+    }
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
 
 	function closeCommonModal() {
 	  const modal = document.getElementById("commonModal");
@@ -478,30 +504,6 @@ function openReplyDeleteModal(replyNo, postNo) {
 	}
 
 
-	function openReplyDeleteModal(btn) {
-
-	    const replyNo = btn.dataset.replyno;
-	    const postNo = btn.dataset.postno;
-
-	    const modal = document.getElementById("commonModal");
-	    const form = document.getElementById("modalForm");
-
-	    form.action = "/reply/delete";
-
-	    form.querySelector('input[name="replyNo"]').value = replyNo;
-	    form.querySelector('input[name="postNo"]').value = postNo;
-
-	    document.getElementById("modalMessage").innerText = "댓글을 삭제하시겠습니까?";
-
-	    modal.classList.remove("hidden");
-	    modal.classList.add("flex");
-	}
-
-	function closeCommonModal() {
-	    const modal = document.getElementById("commonModal");
-	    modal.classList.add("hidden");
-	    modal.classList.remove("flex");
-	}
 
 //=================================================================	신고 ============================================================================ 
 	let reportTargetType = null;

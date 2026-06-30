@@ -4,6 +4,7 @@
 <body class="bg-white text-ink">
 
 <div th:replace="~{views/common/navbar :: navbar}"></div>
+<div th:replace="~{views/common/modal :: modal}"></div>
 
 <!-- ════════════ MAIN ════════════ -->
 <main class="mx-auto max-w-3xl px-6 pb-24 pt-16">
@@ -32,7 +33,8 @@
 				    <option value="대구">대구</option>
 				    <option value="인천">인천</option>
 				    <option value="광주">광주</option>
-				    <option value="대전">울산</option>
+				    <option value="대전">대전</option>
+				    <option value="울산">울산</option>
 				    <option value="세종">세종</option>
 				    <option value="경기도">경기도</option>
 				    <option value="강원">강원</option>
@@ -520,7 +522,7 @@ kakao.maps.load(function () {
 	    // 제목
 	    const title = document.getElementById("travelTitle");
 	    if (title.value.trim() === "") {
-	        alert("여행 제목을 입력해주세요.");
+	        openInfoModal("입력 오류", "여행 제목을 입력해주세요.");
 	        title.focus();
 	        return;
 	    }
@@ -528,7 +530,7 @@ kakao.maps.load(function () {
 	    // 지역
 	    const region = document.getElementById("region");
 	    if (region.value === "") {
-	        alert("지역을 선택해주세요.");
+	        openInfoModal("입력 오류", "지역을 선택해주세요.");
 	        region.focus();
 	        return;
 	    }
@@ -536,7 +538,7 @@ kakao.maps.load(function () {
 	    // 시작일
 	    const startDate = document.getElementById("startDate");
 	    if (startDate.value === "") {
-	        alert("여행 시작일을 선택해주세요.");
+	        openInfoModal("입력 오류", "여행 시작일을 선택해주세요.");
 	        startDate.focus();
 	        return;
 	    }
@@ -544,7 +546,7 @@ kakao.maps.load(function () {
 	    // 종료일
 	    const endDate = document.getElementById("endDate");
 	    if (endDate.value === "") {
-	        alert("여행 종료일을 선택해주세요.");
+	        openInfoModal("입력 오류", "여행 종료일을 선택해주세요.");
 	        endDate.focus();
 	        return;
 	    }
@@ -553,7 +555,7 @@ kakao.maps.load(function () {
 	    const cards = document.querySelectorAll(".spot-card");
 
 	    if (cards.length === 0) {
-	        alert("관광지를 한 곳 이상 추가해주세요.");
+	        openInfoModal("입력 오류", "관광지를 한 곳 이상 추가해주세요.");
 	        return;
 	    }
 
@@ -564,20 +566,18 @@ kakao.maps.load(function () {
 	        const review = cards[i].querySelector("textarea");
 
 	        if (rating.value == "0") {
-	            alert((i + 1) + "번째 관광지의 별점을 선택해주세요.");
+	            openInfoModal("입력 오류", `${i + 1}번째 관광지의 별점을 선택해주세요.`);
 	            return;
 	        }
 
 	        if (review.value.trim() === "") {
-	            alert((i + 1) + "번째 관광지의 후기를 작성해주세요.");
+	            openInfoModal("입력 오류", `${i + 1}번째 관광지의 후기를 작성해주세요.`);
 	            review.focus();
 	            return;
 	        }
 	    }
 
-	    // 모든 검사 통과
 	    form.submit();
-
 	});
 	// ── 관광지 직접 추가 버튼 ─────────────────
 	document.getElementById('addSpotBtn').addEventListener('click', () => addSpotCard());
