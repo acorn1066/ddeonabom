@@ -100,9 +100,10 @@
         ♥ 추천 <b id="like-count" class="tabular-nums" th:text="${schedule.likeCount}">184</b>
       </button>
 
-      <!-- 찜(스크랩) 버튼 -->
+      <!-- 찜(스크랩) 버튼 : 본인 글이면 미노출 -->
       <button type="button"
               id="wish-btn"
+              th:if="${session.loginUser == null or session.loginUser.memberNo != schedule.memberNo}"
               th:onclick="|toggleWish([[${schedule.scheduleNo}]])|"
               th:class="${isWished} ?
                 'inline-flex h-12 items-center gap-2 rounded-full border border-brand bg-brand-soft px-6 text-15 font-bold text-brand transition hover:bg-brand hover:text-white' :

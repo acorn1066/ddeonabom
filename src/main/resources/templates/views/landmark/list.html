@@ -258,4 +258,20 @@
 							if(data > 0){
 								heart.setAttribute("fill", "blue");
 								nice.classList.add("text-brand");
-								nice.c   
+								nice.classList.remove("text-muted");
+							} else{
+								heart.setAttribute("fill", "none");
+								nice.classList.add("text-muted");
+								nice.classList.remove("text-brand");
+							}
+							
+							
+						},
+						error: data => console.log(data)
+					})
+				})
+			}
+		}
+	</script>
+</body>
+</html>
