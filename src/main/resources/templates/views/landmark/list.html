@@ -3,6 +3,25 @@
 <head th:replace="~{views/common/head :: head}"></head>
 <style>
 	.overflow-hidden{cursor: pointer;}
+	.lm-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+	.lm-placeholder .ph-icon { font-size: 110px; }
+	.lm-placeholder .ph-title { font-size: 18px; font-weight: 500; text-align: center; padding: 0 12px; line-height: 1.4; }
+	.lm-placeholder[data-type="12"] { background: #E6F1FB; }
+	.lm-placeholder[data-type="12"] .ph-icon, .lm-placeholder[data-type="12"] .ph-title { color: #0C447C; }
+	.lm-placeholder[data-type="14"] { background: #EEEDFE; }
+	.lm-placeholder[data-type="14"] .ph-icon, .lm-placeholder[data-type="14"] .ph-title { color: #3C3489; }
+	.lm-placeholder[data-type="15"] { background: #FBEAF0; }
+	.lm-placeholder[data-type="15"] .ph-icon, .lm-placeholder[data-type="15"] .ph-title { color: #72243E; }
+	.lm-placeholder[data-type="25"] { background: #E1F5EE; }
+	.lm-placeholder[data-type="25"] .ph-icon, .lm-placeholder[data-type="25"] .ph-title { color: #085041; }
+	.lm-placeholder[data-type="28"] { background: #EAF3DE; }
+	.lm-placeholder[data-type="28"] .ph-icon, .lm-placeholder[data-type="28"] .ph-title { color: #27500A; }
+	.lm-placeholder[data-type="32"] { background: #FAEEDA; }
+	.lm-placeholder[data-type="32"] .ph-icon, .lm-placeholder[data-type="32"] .ph-title { color: #633806; }
+	.lm-placeholder[data-type="38"] { background: #FAECE7; }
+	.lm-placeholder[data-type="38"] .ph-icon, .lm-placeholder[data-type="38"] .ph-title { color: #712B13; }
+	.lm-placeholder[data-type="39"] { background: #FCEBEB; }
+	.lm-placeholder[data-type="39"] .ph-icon, .lm-placeholder[data-type="39"] .ph-title { color: #791F1F; }
 </style>
 <body>
 	<div th:replace="~{views/common/navbar :: navbar}"></div>
@@ -112,7 +131,20 @@
 	        <img class="absolute inset-0 h-full w-full object-cover flex items-center justify-center bg-sunk" th:src="${l.firstimage}"/>
 	      </th:block>
 	      <th:block th:unless="${l.firstimage != null and !#strings.isEmpty(l.firstimage)}">
-	      	<div class="absolute inset-0 flex items-center justify-center bg-sunk"><span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">[[${l.title}]]</span></div>
+	        <div class="lm-placeholder" th:data-type="${l.contentTypeId}">
+	          <th:block th:switch="${l.contentTypeId}">
+	            <i th:case="12"  class="ph-icon ti ti-building-arch"         aria-hidden="true"></i>
+	            <i th:case="14"  class="ph-icon ti ti-building" aria-hidden="true"></i>
+	            <i th:case="15"  class="ph-icon ti ti-confetti"           aria-hidden="true"></i>
+	            <i th:case="25"  class="ph-icon ti ti-route"            aria-hidden="true"></i>
+	            <i th:case="28"  class="ph-icon ti ti-tent"       aria-hidden="true"></i>
+	            <i th:case="32"  class="ph-icon ti ti-bed"              aria-hidden="true"></i>
+	            <i th:case="38"  class="ph-icon ti ti-shopping-bag"     aria-hidden="true"></i>
+	            <i th:case="39"  class="ph-icon ti ti-tools-kitchen-2"         aria-hidden="true"></i>
+	            <i th:case="*"   class="ph-icon ti ti-map-2" aria-hidden="true"></i>
+	          </th:block>
+	          <span class="ph-title">[[${l.title}]]</span>
+	        </div>
 	      </th:block>
 	      <th:block th:if="${session.loginUser != null}">
 	        <span th:if="${niceList != null and niceList.contains(l.contentId)}" class="nice absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-brand"><svg width="17" height="17" viewBox="0 0 18 18" fill="currentColor" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span>
@@ -121,11 +153,11 @@
 	      <th:block th:if="${session.loginUser == null}">	      
 	        <span class="nice absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-muted"><svg id="heart" width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span>
 	      </th:block>
-	        <span class="absolute bottom-2.5> left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">[[${contentType[l.contentTypeId]}]]</span>
+	        <span class="absolute top-2.5 left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">[[${contentType[l.contentTypeId]}]]</span>
 	      </div>
-	      <div class="px-0.5 pb-1 pt-3" >
-	        <div class="text-base font-bold">[[${l.title}]]</div>
-	        <div class="mt-1 flex items-center justify-between">
+	      <div class="p-4">
+	        <div class="text-17 font-bold tracking-tight">[[${l.title}]]</div>
+	        <div class="mt-4 flex items-center justify-between border-t border-line pt-4">
 	        <th:block th:if="${l.addr1 != null and !#strings.isEmpty(l.addr1)}">
 	          <span class="text-13 text-muted">
 	          [[${l.addr1}]]</span>
@@ -226,20 +258,4 @@
 							if(data > 0){
 								heart.setAttribute("fill", "blue");
 								nice.classList.add("text-brand");
-								nice.classList.remove("text-muted");
-							} else{
-								heart.setAttribute("fill", "none");
-								nice.classList.add("text-muted");
-								nice.classList.remove("text-brand");
-							}
-							
-							
-						},
-						error: data => console.log(data)
-					})
-				})
-			}
-		}
-	</script>
-</body>
-</html>
+								nice.c   

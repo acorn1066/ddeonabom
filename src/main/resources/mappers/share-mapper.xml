@@ -106,6 +106,22 @@
               ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq
               FETCH FIRST 1 ROWS ONLY) AS firstImage,
 
+            <!-- 첫 번째 장소 카테고리 (플레이스홀더용) -->
+            (SELECT l.content_type_id
+               FROM schedule_sub ss
+               JOIN landmark l ON l.content_id = ss.content_id
+              WHERE ss.schedule_no = sm.schedule_no
+              ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq
+              FETCH FIRST 1 ROWS ONLY) AS firstContentTypeId,
+
+            <!-- 첫 번째 장소명 (플레이스홀더 텍스트용) -->
+            (SELECT l.title
+               FROM schedule_sub ss
+               JOIN landmark l ON l.content_id = ss.content_id
+              WHERE ss.schedule_no = sm.schedule_no
+              ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq
+              FETCH FIRST 1 ROWS ONLY) AS firstTitle,
+
             <!-- 첫 번째 장소 주소 (지역 뱃지용) -->
             (SELECT l.addr1
                FROM schedule_sub ss
@@ -283,6 +299,20 @@
               WHERE ss.schedule_no = sm.schedule_no
               ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq
               FETCH FIRST 1 ROWS ONLY) AS firstImage,
+
+            (SELECT l.content_type_id
+               FROM schedule_sub ss
+               JOIN landmark l ON l.content_id = ss.content_id
+              WHERE ss.schedule_no = sm.schedule_no
+              ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq
+              FETCH FIRST 1 ROWS ONLY) AS firstContentTypeId,
+
+            (SELECT l.title
+               FROM schedule_sub ss
+               JOIN landmark l ON l.content_id = ss.content_id
+              WHERE ss.schedule_no = sm.schedule_no
+              ORDER BY ss.schedule_sub_date, ss.schedule_sub_seq
+              FETCH FIRST 1 ROWS ONLY) AS firstTitle,
 
             (SELECT l.addr1
                FROM schedule_sub ss

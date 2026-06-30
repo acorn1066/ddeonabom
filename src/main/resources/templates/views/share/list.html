@@ -1,6 +1,27 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{views/common/head :: head}"></head>
+<style>
+  .lm-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+  .lm-placeholder .ph-icon { font-size: 80px; }
+  .lm-placeholder .ph-title { font-size: 14px; font-weight: 500; text-align: center; padding: 0 12px; line-height: 1.4; }
+  .lm-placeholder[data-type="12"] { background: #E6F1FB; }
+  .lm-placeholder[data-type="12"] .ph-icon, .lm-placeholder[data-type="12"] .ph-title { color: #0C447C; }
+  .lm-placeholder[data-type="14"] { background: #EEEDFE; }
+  .lm-placeholder[data-type="14"] .ph-icon, .lm-placeholder[data-type="14"] .ph-title { color: #3C3489; }
+  .lm-placeholder[data-type="15"] { background: #FBEAF0; }
+  .lm-placeholder[data-type="15"] .ph-icon, .lm-placeholder[data-type="15"] .ph-title { color: #72243E; }
+  .lm-placeholder[data-type="25"] { background: #E1F5EE; }
+  .lm-placeholder[data-type="25"] .ph-icon, .lm-placeholder[data-type="25"] .ph-title { color: #085041; }
+  .lm-placeholder[data-type="28"] { background: #EAF3DE; }
+  .lm-placeholder[data-type="28"] .ph-icon, .lm-placeholder[data-type="28"] .ph-title { color: #27500A; }
+  .lm-placeholder[data-type="32"] { background: #FAEEDA; }
+  .lm-placeholder[data-type="32"] .ph-icon, .lm-placeholder[data-type="32"] .ph-title { color: #633806; }
+  .lm-placeholder[data-type="38"] { background: #FAECE7; }
+  .lm-placeholder[data-type="38"] .ph-icon, .lm-placeholder[data-type="38"] .ph-title { color: #712B13; }
+  .lm-placeholder[data-type="39"] { background: #FCEBEB; }
+  .lm-placeholder[data-type="39"] .ph-icon, .lm-placeholder[data-type="39"] .ph-title { color: #791F1F; }
+</style>
 <body>
   <div th:replace="~{views/common/navbar :: navbar}"></div>
 
@@ -135,6 +156,22 @@
                th:src="${share.firstImage}"
                class="h-full w-full object-cover"
                alt="">
+          <!-- 이미지 없으면 카테고리 플레이스홀더 -->
+          <div th:unless="${share.firstImage != null}"
+               class="lm-placeholder" th:data-type="${share.firstContentTypeId}">
+            <th:block th:switch="${share.firstContentTypeId}">
+              <i th:case="12"  class="ph-icon ti ti-building-arch"         aria-hidden="true"></i>
+              <i th:case="14"  class="ph-icon ti ti-building" aria-hidden="true"></i>
+              <i th:case="15"  class="ph-icon ti ti-confetti"           aria-hidden="true"></i>
+              <i th:case="25"  class="ph-icon ti ti-route"            aria-hidden="true"></i>
+              <i th:case="28"  class="ph-icon ti ti-tent"       aria-hidden="true"></i>
+              <i th:case="32"  class="ph-icon ti ti-bed"              aria-hidden="true"></i>
+              <i th:case="38"  class="ph-icon ti ti-shopping-bag"     aria-hidden="true"></i>
+              <i th:case="39"  class="ph-icon ti ti-tools-kitchen-2"         aria-hidden="true"></i>
+              <i th:case="*"   class="ph-icon ti ti-map-2" aria-hidden="true"></i>
+            </th:block>
+            <span class="ph-title" th:text="${share.firstTitle}"></span>
+          </div>
           <!-- 지역 뱃지 -->
           <div class="absolute bottom-2.5 left-2.5">
             <span class="region-badge inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white"
@@ -196,63 +233,4 @@
   <footer th:replace="~{views/common/footer :: footer}"></footer>
 
   <script>
-    /* ─── 지역 필터 탭 클릭 → hidden input 변경 후 폼 제출 ─── */
-    function selectRegion(value) {
-      document.getElementById('region-input').value = value;
-      document.getElementById('search-hidden').value = document.getElementById('search-input').value;
-      document.getElementById('filter-form').submit();
-    }
-
-    /* ─── 검색 Enter ─── */
-    function submitSearch() {
-      document.getElementById('search-hidden').value = document.getElementById('search-input').value;
-      document.getElementById('filter-form').submit();
-    }
-
-    /* ─── 지역 뱃지 단축 (my-list.html 동일 방식) ─── */
-    const REGION_MAP = {
-      '서울': '서울', '부산': '부산', '대구': '대구', '인천': '인천',
-      '광주': '광주', '대전': '대전', '울산': '울산', '세종': '세종',
-      '경기': '경기', '강원': '강원', '제주': '제주',
-      '충청북도': '충북', '충청남도': '충남',
-      '전라북도': '전북', '전라남도': '전남',
-      '경상북도': '경북', '경상남도': '경남',
-      '충북': '충북', '충남': '충남', '전북': '전북', '전남': '전남',
-      '경북': '경북', '경남': '경남', '강원특별자치도': '강원',
-      '제주특별자치도': '제주', '전북특별자치도': '전북'
-    };
-
-    function extractRegion(addr1) {
-      if (!addr1) return null;
-      const head = addr1.trim().split(' ')[0];
-      const keys = Object.keys(REGION_MAP).sort((a, b) => b.length - a.length);
-      for (const key of keys) {
-        if (head.startsWith(key)) return REGION_MAP[key];
-      }
-      return head;
-    }
-
-    document.querySelectorAll('.region-badge').forEach(badge => {
-      const region = extractRegion(badge.dataset.addr);
-      if (region) badge.textContent = region;
-    });
-    
-	/* ============================================================ 공지사항 =================================================================  */
-    function toggleNoticeBar() {
-        const body    = document.getElementById('notice-body');
-        const label   = document.getElementById('notice-toggle-label');
-        const chevron = document.getElementById('notice-chevron');
-        const isOpen  = body.style.display !== 'none';
-        body.style.display      = isOpen ? 'none' : '';
-        chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-        label.childNodes[0].textContent = isOpen ? '펼치기 ' : '접기 ';
-      }
-    
-    /* ============================================================ 공지사항 =================================================================  */
-    
-    
-
-  </script>
-
-</body>
-</html>
+    /* ─── 지역 필터 탭 
