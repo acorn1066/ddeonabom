@@ -21,29 +21,30 @@
         </choose>
 
         <!-- 지역 필터: 일정 내 장소 중 해당 지역 포함 여부 -->
-        <if test="region != null and region != '전체'">
+        <if test="region != null and region != ''">
             AND EXISTS (
                 SELECT 1
                   FROM schedule_sub ss
                   JOIN landmark l ON l.content_id = ss.content_id
                  WHERE ss.schedule_no = sm.schedule_no
                 <choose>
-                    <when test="region == '제주'">
-                        AND l.addr1 LIKE '%제주%'
-                    </when>
-                    <when test="region == '수도권'">
-                        AND (l.addr1 LIKE '%서울%' OR l.addr1 LIKE '%경기%' OR l.addr1 LIKE '%인천%')
-                    </when>
-                    <when test="region == '강원'">
-                        AND l.addr1 LIKE '%강원%'
-                    </when>
-                    <when test="region == '경상'">
-                        AND (l.addr1 LIKE '%경상%' OR l.addr1 LIKE '%부산%'
-                          OR l.addr1 LIKE '%대구%' OR l.addr1 LIKE '%울산%')
-                    </when>
-                    <when test="region == '전라'">
-                        AND (l.addr1 LIKE '%전라%' OR l.addr1 LIKE '%광주%')
-                    </when>
+                    <when test="region == '서울'">AND l.addr1 LIKE '%서울%'</when>
+                    <when test="region == '부산'">AND l.addr1 LIKE '%부산%'</when>
+                    <when test="region == '대구'">AND l.addr1 LIKE '%대구%'</when>
+                    <when test="region == '인천'">AND l.addr1 LIKE '%인천%'</when>
+                    <when test="region == '광주'">AND l.addr1 LIKE '%광주%'</when>
+                    <when test="region == '대전'">AND l.addr1 LIKE '%대전%'</when>
+                    <when test="region == '울산'">AND l.addr1 LIKE '%울산%'</when>
+                    <when test="region == '세종'">AND l.addr1 LIKE '%세종%'</when>
+                    <when test="region == '경기도'">AND l.addr1 LIKE '%경기%'</when>
+                    <when test="region == '강원'">AND l.addr1 LIKE '%강원%'</when>
+                    <when test="region == '충북'">AND (l.addr1 LIKE '%충청북%' OR l.addr1 LIKE '%충북%')</when>
+                    <when test="region == '충남'">AND (l.addr1 LIKE '%충청남%' OR l.addr1 LIKE '%충남%')</when>
+                    <when test="region == '전북'">AND (l.addr1 LIKE '%전라북%' OR l.addr1 LIKE '%전북%')</when>
+                    <when test="region == '전남'">AND (l.addr1 LIKE '%전라남%' OR l.addr1 LIKE '%전남%')</when>
+                    <when test="region == '경북'">AND (l.addr1 LIKE '%경상북%' OR l.addr1 LIKE '%경북%')</when>
+                    <when test="region == '경남'">AND (l.addr1 LIKE '%경상남%' OR l.addr1 LIKE '%경남%')</when>
+                    <when test="region == '제주'">AND l.addr1 LIKE '%제주%'</when>
                 </choose>
             )
         </if>
