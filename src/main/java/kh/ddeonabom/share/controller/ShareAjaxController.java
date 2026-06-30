@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.member.model.vo.Member;
 import kh.ddeonabom.schedule.service.ScheduleService;
+import kh.ddeonabom.share.model.vo.ShareDetail;
 import kh.ddeonabom.share.service.ShareService;
 import lombok.RequiredArgsConstructor;
 
@@ -45,6 +46,12 @@ public class ShareAjaxController {
         Member loginUser = (Member) session.getAttribute("loginUser");
         if (loginUser == null) {
             return Map.of("success", false, "message", "로그인이 필요합니다.");
+        }
+
+        // 본인 글 찜 방지
+        ShareDetail schedule = shareService.selectShareDetail(scheduleNo);
+        if (schedule != null && schedule.getMemberNo() == loginUser.getMemberNo()) {
+            return Map.of("success", false, "message", "내 글은 찜할 수 없어요.");
         }
 
         boolean wished = shareService.toggleWish(scheduleNo, loginUser.getMemberNo());
