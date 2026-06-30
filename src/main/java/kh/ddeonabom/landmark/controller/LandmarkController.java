@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.common.paging.Pagination;
 import kh.ddeonabom.landmark.model.service.LandmarkService;
+import kh.ddeonabom.landmark.model.vo.LandReview;
 import kh.ddeonabom.landmark.model.vo.Landmark;
 import kh.ddeonabom.member.model.vo.Member;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,9 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/landmark")
 public class LandmarkController {
 	private final LandmarkService lService;
+	
+	@Value("${kakao.map.api-key}")
+	private String kakaoMapApiKey;
 	
 	// 관광지 리스트 가져오기
 	@GetMapping("list")
@@ -71,10 +76,18 @@ public class LandmarkController {
 	// 관광지 세부사항 가져오기
 	@GetMapping("/{contentId}/{page}")
 	public String landmarkDetail(@PathVariable("contentId") int contentId, @PathVariable("page") int page,
-									Model model, HttpSession session) {
-		Landmark land = lService.landmarkDetail(contentId);
+									Model model, HttpSession session, @RequestParam(value="page", defaultValue="1") int currentPage,
+									HttpServletRequest request) {
+		Landmark land = lService.landmarkDetail(contentId); 
+		int reviewCount = lService.reviewCount(contentId);
+		double reviewRating = lService.rating(contentId);
+//		System.out.println(reviewRating);
+//		System.out.println(reviewCount);
+		PageInfo pi = Pagination.getPageInfo(currentPage, reviewCount, 5, 6);
+		ArrayList<LandReview> landReview = lService.review(contentId, pi);
 		
-		//System.out.println(land);
+//		System.out.println(landReview);
+		
 		Map<Integer, String> contentType = new HashMap<>();
 		contentType.put(12, "관광지");
 		contentType.put(14, "문화시설");
@@ -92,10 +105,11 @@ public class LandmarkController {
 			model.addAttribute("isNice", isNice);			
 		} 
 		
-		System.out.println("contentId = " + contentId);
-		System.out.println("land = " + land);
-		model.addAttribute("contentType", contentType);
-		
+		model.addAttribute("reviewRating", reviewRating);
+		model.addAttribute("loc", request.getRequestURI());
+		model.addAttribute("landReview", landReview).addAttribute("pi", pi);
+		model.addAttribute("contentType", contentType);		
+		model.addAttribute("kakaoMapApiKey", kakaoMapApiKey);
 		model.addAttribute("land", land);
 		return "views/landmark/detail";			
 		
@@ -136,6 +150,8 @@ public class LandmarkController {
 		
 		return newState;
 	}
+	
+	
 	
 	
 }

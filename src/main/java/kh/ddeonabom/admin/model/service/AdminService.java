@@ -48,7 +48,7 @@ public class AdminService {
     }
 	
 
-	public ArrayList<AdminNotice> selectNoticeList() {
+	public ArrayList<AdminNotice> selectNoticeList() { 
 		return mapper.selectNoticeList();
 	}
 
