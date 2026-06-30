@@ -367,13 +367,13 @@
                 <div th:if="${type == 'review'}">
                     <h2 class="text-xl font-bold text-ink mb-4"><i class="fa-regular fa-comment"></i> 내가 작성한 리뷰 댓글</h2>
                     <div class="space-y-3 min-h-[300px]">
-                        <a th:each="comment : ${commentlist}" th:href="${comment.reportStatus == 'Y'} ? 'javascript:void(0);' : @{/reviews/detail(travelNo=${comment.postNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition bg-white flex justify-between items-center gap-4 shadow-sm">
+                        <a th:each="comment : ${commentlist}" th:href="${comment.reportStatus == 'N'} ? 'javascript:void(0);' : @{/reviews/detail(travelNo=${comment.postNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition bg-white flex justify-between items-center gap-4 shadow-sm">
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-semibold text-ink truncate" th:text="${comment.content}">댓글 내용</p>
                                 <span class="text-xs text-faint block mt-1">여행후기</span>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
-                                <span th:if="${comment.reportStatus == 'Y'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 수정/삭제 제한</span>
+                                <span th:if="${comment.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 수정/삭제 제한</span>
                                 <span class="text-xs text-faint whitespace-nowrap" th:text="${#dates.format(comment.createDate, 'yyyy-MM-dd')}"></span>
                             </div>
                         </a>
@@ -383,13 +383,13 @@
 				<div th:if="${type == 'share'}">
                     <h2 class="text-xl font-bold text-ink mb-4"><i class="fa-regular fa-comment"></i> 내가 작성한 일정공유 댓글</h2>
                     <div class="space-y-3 min-h-[300px]">
-                        <a th:each="comment : ${commentlist}" th:href="${comment.reportStatus == 'Y'} ? 'javascript:void(0);' : @{/share/detail/{no}(no=${comment.postNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition bg-white flex justify-between items-center gap-4 shadow-sm">
+                        <a th:each="comment : ${commentlist}" th:href="${comment.reportStatus == 'N'} ? 'javascript:void(0);' : @{/share/detail/{no}(no=${comment.postNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition bg-white flex justify-between items-center gap-4 shadow-sm">
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-semibold text-ink truncate" th:text="${comment.content}">댓글 내용</p>
                                 <span class="text-xs text-faint block mt-1">일정공유</span>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
-                                <span th:if="${comment.reportStatus == 'Y'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 수정/삭제 제한</span>
+                                <span th:if="${comment.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 수정/삭제 제한</span>
                                 <span class="text-xs text-faint whitespace-nowrap" th:text="${#dates.format(comment.createDate, 'yyyy-MM-dd')}"></span>
                             </div>
                         </a>
