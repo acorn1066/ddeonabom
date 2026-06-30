@@ -7,9 +7,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.review.model.mappers.ReviewMapper;
@@ -23,6 +28,10 @@ import lombok.RequiredArgsConstructor;
 public class ReviewService {
 	
 	private final ReviewMapper reviewMapper;
+	private final AmazonS3 amazonS3;
+	
+	@Value("${cloud.aws.s3.bucket}") 
+	private String bucket;
 
     public ArrayList<Review> selectReviewList(PageInfo pi, String keyword, String region, Integer loginUserNo, String sort) {
         return reviewMapper.selectReviewList(pi, keyword, region, loginUserNo, sort);
@@ -45,11 +54,12 @@ public class ReviewService {
 		reviewMapper.insertImage(img);
 	}
 
+	// ⭕ 올바르게 수정한 getReviewDetail 메서드
 	public Review getReviewDetail(int travelNo, Integer loginUserNo) {
-		Review review = reviewMapper.getReviewDetail(travelNo, loginUserNo);   
-		if(review == null) {
-			return null;
-		}
+	    Review review = reviewMapper.getReviewDetail(travelNo, loginUserNo);   
+	    if(review == null) {
+	        return null;
+	    }
 	    List<ReviewSub> subList = reviewMapper.getReviewSubList(travelNo); 
 	    for (ReviewSub sub : subList) {
 	        List<Image> images = reviewMapper.getImageListBySubNo(sub.getTravelSubNo());
@@ -57,7 +67,8 @@ public class ReviewService {
 	            images = new ArrayList<>();
 	        }
 	        sub.setImages(images.stream()
-	                            .map(img -> img.getImagePath() + "/" + img.getRenameFile())
+	                            // 🔥 수정 완료: 뒤에 파일명을 붙이지 않고 S3 URL 주소 그대로 가져옵니다.
+	                            .map(img -> img.getImagePath()) 
 	                            .collect(Collectors.toList()));
 	    }
 	    review.setSubList(subList); 
@@ -98,48 +109,48 @@ public class ReviewService {
 	}
 
 	@Transactional
-	public int updateReview(Review review, List<MultipartFile> imageFiles) {
+	public int updateReview(Review review) {
 
-	    // 1. 메인 업데이트
 	    reviewMapper.reviewUpdateAction(review);
 
 	    int result = 1;
 
 	    for (ReviewSub sub : review.getSubList()) {
 
-	        // =========================
-	        // INSERT / UPDATE 분기
-	        // =========================
 	        if (sub.getTravelSubNo() == 0) {
-
-	            // INSERT
 	            reviewMapper.insertReviewSub(sub);
-
 	        } else {
-
-	            // UPDATE
 	            reviewMapper.reviewSubUpdate(sub);
 	        }
 
-	        // =========================
-	        // 이미지 처리 (FK 중요)
-	        // =========================
-	        if (imageFiles != null) {
-	            for (MultipartFile file : imageFiles) {
+	        // sub별 파일만 처리
+	        List<MultipartFile> files = sub.getImageFiles();
 
-	                if (file != null && !file.isEmpty()) {
+	        if (files != null && !files.isEmpty()) {
+
+	            for (MultipartFile file : files) {
+
+	                if (!file.isEmpty()) {
 
 	                    try {
 	                        String original = file.getOriginalFilename();
 	                        String saved = UUID.randomUUID() + "_" + original;
 
-	                        file.transferTo(new File("C:/reviews/" + saved));
+	                        ObjectMetadata metadata = new ObjectMetadata();
+	                        metadata.setContentLength(file.getSize());
+	                        metadata.setContentType(file.getContentType());
+
+	                        amazonS3.putObject(
+	                            new PutObjectRequest(bucket, saved, file.getInputStream(), metadata)
+	                        );
+
+	                        String s3Url = amazonS3.getUrl(bucket, saved).toString();
 
 	                        Image img = new Image();
 	                        img.setFileName(original);
 	                        img.setRenameFile(saved);
-	                        img.setImagePath("/uploads");
-	                        img.setTravelSubNo(sub.getTravelSubNo()); // ★ FK 핵심
+	                        img.setImagePath(s3Url);
+	                        img.setTravelSubNo(sub.getTravelSubNo());
 
 	                        reviewMapper.insertImage(img);
 
@@ -164,8 +175,5 @@ public class ReviewService {
 	}
 
 	
-	
-
-
 
 }

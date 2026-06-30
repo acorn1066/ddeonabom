@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="ko">
 <head th:replace="~{views/common/head :: head}"></head>
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=bc2203afc9aba0a5253c96f937497e0d&libraries=services"></script>
 <body class="bg-white text-ink">
 
 <div th:replace="~{views/common/navbar :: navbar}"></div>
@@ -124,32 +123,73 @@
 <script th:inline="javascript">
 kakao.maps.load(function () {
 
-    // 1. 지도 초기화
     const map = new kakao.maps.Map(document.getElementById('map'), {
-        center: new kakao.maps.LatLng(33.3617, 126.5292), // 제주도 중심
+        center: new kakao.maps.LatLng(33.3617, 126.5292),
         level: 10
     });
 
-    const ps = new kakao.maps.services.Places();
-    const markers = [];   // 지도 위 마커 목록
-    
-    // 동선 폴리라인 초기화
+    const markers = [];
+    const polylines = [];
     const polyline = new kakao.maps.Polyline({
-        map,
-        path: [],
-        strokeWeight: 2.5,
-        strokeColor: '#1F47E6',
-        strokeOpacity: 0.9,
-        strokeStyle: 'solid'
+        map, path: [],
+        strokeWeight: 2.5, strokeColor: '#1F47E6',
+        strokeOpacity: 0.9, strokeStyle: 'solid'
     });
 
-    // 동선 폴리라인 갱신
     function updatePolyline() {
-        const path = markers.map(m => m.getPosition());
-        polyline.setPath(path);
+        polylines.forEach(p => p.setMap(null));
+        polylines.length = 0;
+        polyline.setPath([]);
+        if (markers.length < 2) return;
+        const points = markers.map(m => ({
+            lat: m.getPosition().getLat(),
+            lng: m.getPosition().getLng()
+        }));
+        drawRoadPath(points);
     }
 
-    // 마커 번호 이미지 생성 
+    function fitBounds() {
+        if (markers.length === 0) return;
+        const bounds = new kakao.maps.LatLngBounds();
+        markers.forEach(m => bounds.extend(m.getPosition()));
+        map.setBounds(bounds);
+    }
+
+    async function drawRoadPath(points) {
+        const MAX_POINTS_PER_CALL = 7;
+        const segments = [];
+        for (let i = 0; i < points.length - 1; i += (MAX_POINTS_PER_CALL - 1)) {
+            const slice = points.slice(i, i + MAX_POINTS_PER_CALL);
+            if (slice.length >= 2) segments.push(slice);
+        }
+        for (const seg of segments) {
+            try {
+                const res = await fetch('/schedule/route', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ points: seg })
+                });
+                if (!res.ok) throw new Error('route ' + res.status);
+                const data = await res.json();
+                const linePath = (data.path || []).map(c => new kakao.maps.LatLng(c.lat, c.lng));
+                if (linePath.length < 2) continue;
+                const pl = new kakao.maps.Polyline({
+                    map, path: linePath,
+                    strokeWeight: 5, strokeColor: '#1F47E6',
+                    strokeOpacity: 0.85, strokeStyle: 'solid'
+                });
+                polylines.push(pl);
+            } catch (e) {
+                const pl = new kakao.maps.Polyline({
+                    map, path: seg.map(p => new kakao.maps.LatLng(p.lat, p.lng)),
+                    strokeWeight: 4, strokeColor: '#94a3b8',
+                    strokeOpacity: 0.7, strokeStyle: 'shortdash'
+                });
+                polylines.push(pl);
+            }
+        }
+    }
+
     function makeMarkerImage(num) {
         const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
@@ -163,14 +203,11 @@ kakao.maps.load(function () {
         );
     }
 
-    // ── 마커 전체 번호 이미지 갱신 ───────────
     function reindexMarkers() {
         markers.forEach((m, i) => m.setImage(makeMarkerImage(i + 1)));
     }
 
-    // ════════════════════════════════════════
-    //  장소 검색 및 결과 바인딩
-    // ════════════════════════════════════════
+    // ════ 검색: 카카오 ps → DB 검색으로 교체 ════
     const searchInput = document.getElementById('mapSearchInput');
     const searchBtn   = document.getElementById('mapSearchBtn');
     const resultsList = document.getElementById('mapSearchResults');
@@ -178,21 +215,26 @@ kakao.maps.load(function () {
     function searchPlaces() {
         const keyword = searchInput.value.trim();
         if (!keyword) return;
-        
-        ps.keywordSearch(keyword, (data, status) => {
+
+        fetch('/landmark/search?wished=false'
+            + '&q=' + encodeURIComponent(keyword)
+            + '&region=&page=0&size=10')
+        .then(res => res.json())
+        .then(data => {
             resultsList.innerHTML = '';
-            if (status !== kakao.maps.services.Status.OK) {
+            const items = data.content || [];
+            if (items.length === 0) {
                 resultsList.innerHTML = '<li class="px-3 py-2 text-muted">검색 결과가 없습니다.</li>';
                 resultsList.classList.remove('hidden');
                 resultsList.classList.add('flex');
                 return;
             }
-            data.forEach(place => {
+            items.forEach(place => {
                 const li = document.createElement('li');
                 li.className = 'flex cursor-pointer flex-col rounded-lg px-3 py-2 hover:bg-brand-soft';
                 li.innerHTML = `
-                    <span class="font-semibold text-ink">${place.place_name}</span>
-                    <span class="text-xs text-muted">${place.address_name}</span>`;
+                    <span class="font-semibold text-ink">${place.title}</span>
+                    <span class="text-xs text-muted">${place.addr1 || ''}</span>`;
                 li.addEventListener('click', () => {
                     addPlaceToMap(place);
                     resultsList.classList.add('hidden');
@@ -203,12 +245,16 @@ kakao.maps.load(function () {
             });
             resultsList.classList.remove('hidden');
             resultsList.classList.add('flex');
+        })
+        .catch(() => {
+            resultsList.innerHTML = '<li class="px-3 py-2 text-muted">검색 중 오류가 발생했습니다.</li>';
+            resultsList.classList.remove('hidden');
+            resultsList.classList.add('flex');
         });
     }
 
     searchBtn.addEventListener('click', searchPlaces);
     searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') searchPlaces(); });
-
     document.addEventListener('click', e => {
         if (!searchInput.contains(e.target) && !searchBtn.contains(e.target) && !resultsList.contains(e.target)) {
             resultsList.classList.add('hidden');
@@ -216,48 +262,32 @@ kakao.maps.load(function () {
         }
     });
 
-    // ════════════════════════════════════════
-    //  지도에 장소 추가 + 카드 생성
-    // ════════════════════════════════════════
     function addPlaceToMap(place) {
-        const latlng = new kakao.maps.LatLng(place.y, place.x);
+        const lat = place.mapy;
+        const lng = place.mapx;
+        if (!lat || !lng) { alert('위치 정보가 없는 관광지입니다.'); return; }
+
+        const latlng = new kakao.maps.LatLng(lat, lng);
         const index  = markers.length + 1;
-
-        const marker = new kakao.maps.Marker({
-            map,
-            position: latlng,
-            image: makeMarkerImage(index)
-        });
+        const marker = new kakao.maps.Marker({ map, position: latlng, image: makeMarkerImage(index) });
         markers.push(marker);
-        map.panTo(latlng);
         updatePolyline();
+        fitBounds();
 
-        addSpotCard(
-            place.place_name,   
-            place.address_name,
-            index,
-            place.y,
-            place.x,
-            place.id           
-        );
+        addSpotCard(place.title, place.addr1 || '', index, lat, lng, place.contentId, 0, '', 0, '');
     }
 
     function addExistingPlaceToMap(title, lat, lng, contentId, index) {
-        if(!lat || !lng) return;
-        const latlng = new kakao.maps.LatLng(lat, lng);
-
+        if (!lat || !lng) return;
         const marker = new kakao.maps.Marker({
             map,
-            position: latlng,
+            position: new kakao.maps.LatLng(lat, lng),
             image: makeMarkerImage(index)
         });
         markers.push(marker);
-        updatePolyline();
     }
 
-    // ════════════════════════════════════════
-    //  별점 시스템 로직
-    // ════════════════════════════════════════
+    // ════ 별점 ════
     const RATING_LABELS = ['', '별로예요', '그저그래요', '괜찮아요', '좋아요', '최고예요'];
     const BRAND = '#1F47E6';
 
@@ -268,11 +298,8 @@ kakao.maps.load(function () {
         const stars  = wrap.querySelectorAll('.star-btn');
 
         function paint(val) {
-            stars.forEach(s => {
-                s.style.color = parseInt(s.dataset.val) <= val ? BRAND : '#D1D5DB';
-            });
+            stars.forEach(s => { s.style.color = parseInt(s.dataset.val) <= val ? BRAND : '#D1D5DB'; });
         }
-
         wrap.addEventListener('mousemove', e => {
             const v = parseInt(e.target.dataset.val); if (!v) return;
             paint(v); label.textContent = RATING_LABELS[v]; label.style.color = BRAND;
@@ -290,31 +317,24 @@ kakao.maps.load(function () {
         });
     }
 
-    // ════════════════════════════════════════
-    //  [업그레이드된] 관광지 리뷰 카드 동적 생성 및 사진 미리보기 함수
-    // ════════════════════════════════════════
+    // ════ 카드 생성 (기존 유지) ════
     function addSpotCard(name = '', address = '', index, lat = '', lng = '', contentId = '', rating = 0, textContent = '', travelSubNo = 0, imagePath = '') {
         document.getElementById('spotEmpty')?.remove();
-
         const list = document.getElementById('spotList');
         const num  = index ?? list.querySelectorAll('.spot-card').length + 1;
         const idx  = num - 1;
-
-        const div = document.createElement('div');
+        const div  = document.createElement('div');
         div.className = 'spot-card rounded-xl border border-line p-5';
-        
         div.innerHTML = `
             <input type="hidden" class="spot-lat" name="subList[${idx}].lat" value="${lat}" />
             <input type="hidden" class="spot-lng" name="subList[${idx}].lng" value="${lng}" />
-            	<input type="hidden" class="spot-sub-no" name="subList[${idx}].travelSubNo" value="${travelSubNo}" />
-            	
-
+            <input type="hidden" class="spot-sub-no" name="subList[${idx}].travelSubNo" value="${travelSubNo}" />
             <div class="mb-4 flex items-center gap-3">
                 <span class="spot-num flex h-7 w-7 flex-none items-center justify-center rounded-full bg-brand-soft text-13 font-bold text-brand-ink">${num}</span>
                 <div class="spot-name font-bold">${name}</div>
                 <input type="hidden" class="spot-title" name="subList[${idx}].contentTitle" value="${name}" />
                 <input type="hidden" class="spot-id" name="subList[${idx}].contentId" value="${contentId}" />
-                <button type="button" class="remove-spot ml-2 text-xl text-faint transition hover:text-red-400" title="삭제">✕</button>
+                <button type="button" class="remove-spot ml-2 text-xl text-faint transition hover:text-red-400" title="장소 삭제">✕</button>
             </div>
             ${address ? `<div class="mb-3 text-xs text-muted">${address}</div>` : ''}
             <div class="mb-3 flex items-center gap-2">
@@ -328,31 +348,42 @@ kakao.maps.load(function () {
                 <span class="rating-label text-13 font-semibold text-muted">별점을 선택해주세요</span>
                 <input type="hidden" class="rating-value" name="subList[${idx}].rating" value="${rating}" />
             </div>
-            <textarea
-                name="subList[${idx}].travelSubContent"
+            <textarea name="subList[${idx}].travelSubContent"
                 class="min-h-24 w-full rounded-lg border border-line bg-white p-3 text-sm leading-relaxed outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-soft"
                 placeholder="관광지에 대한 후기를 작성해주세요.">${textContent}</textarea>
-            
             <div class="mt-3 flex flex-col gap-2">
-	            ${imagePath && imagePath !== '/' ? `
-	            	    <div class="existing-image-preview flex items-center gap-2 mb-1 existing-img-wrap">
-	            	        <div class="relative h-18 w-18 overflow-hidden rounded-lg border border-line">
-	            	            <img src="${imagePath}" class="h-full w-full object-cover" alt="기존 등록 사진" />
-	            	        </div>
-	            	        <span class="text-xs text-muted">기존 등록된 사진이 있습니다.</span>
-	            	        <input type="hidden" class="spot-img-path" name="subList[${idx}].imagePath" value="${imagePath}" />
-	            	    </div>
-	            	` : ''}
-
+                ${imagePath && imagePath !== '/' && imagePath !== 'null' ? `
+                    <div class="existing-img-wrap flex items-center gap-3 mb-1 p-2 rounded-lg bg-gray-50 border border-line">
+                        <div class="relative h-18 w-18 overflow-hidden rounded-lg border border-line bg-white flex-none">
+                            <img src="${imagePath}" class="h-full w-full object-cover" alt="기존 등록 사진" />
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-xs text-muted font-medium">기존 등록된 사진이 있습니다.</span>
+                            <button type="button" class="delete-existing-img text-left text-xs text-red-500 font-semibold hover:underline">✕ 사진 지우기</button>
+                        </div>
+                        <input type="hidden" class="spot-img-path" name="subList[${idx}].imagePath" value="${imagePath}" />
+                    </div>
+                ` : ''}
                 <label class="flex h-18 w-18 flex-col items-center justify-center gap-0.5 rounded-lg border border-dashed border-line bg-sunk text-faint transition hover:border-brand hover:text-brand cursor-pointer">
                     <span class="text-lg">＋</span>
-                    <span class="text-xs">사진</span>
+                    <span class="text-xs">새 사진</span>
                     <input type="file" name="subList[${idx}].imageFiles" accept="image/*" class="hidden" multiple />
                 </label>
                 <div class="file-name-list flex flex-wrap gap-2 mt-2"></div>
             </div>
-            
         `;
+
+        const deleteImgBtn = div.querySelector('.delete-existing-img');
+        if (deleteImgBtn) {
+            deleteImgBtn.addEventListener('click', () => {
+                if (confirm("기존 등록된 사진을 삭제하시겠습니까?\n(수정 완료 시 반영됩니다)")) {
+                    const imgWrap = div.querySelector('.existing-img-wrap');
+                    const imgPathInput = div.querySelector('.spot-img-path');
+                    if (imgPathInput) imgPathInput.value = '';
+                    if (imgWrap) imgWrap.style.display = 'none';
+                }
+            });
+        }
 
         div.querySelector('.remove-spot').addEventListener('click', () => {
             const idx = Array.from(list.querySelectorAll('.spot-card')).indexOf(div);
@@ -361,14 +392,16 @@ kakao.maps.load(function () {
                 markers.splice(idx, 1);
                 reindexMarkers();
                 updatePolyline();
+                fitBounds();
             }
             div.remove();
-            reindexCards();   
+            reindexCards();
         });
 
+        list.appendChild(div);
         initStars(div);
-        
-        if(rating > 0) {
+
+        if (rating > 0) {
             const stars = div.querySelectorAll('.star-btn');
             stars.forEach(s => { s.style.color = parseInt(s.dataset.val) <= rating ? BRAND : '#D1D5DB'; });
             const label = div.querySelector('.rating-label');
@@ -376,16 +409,13 @@ kakao.maps.load(function () {
             label.style.color = BRAND;
         }
 
-        // 새로 추가한 사진의 썸네일 노출 및 파일 데이터 유지 로직
         const fileInput = div.querySelector('input[type="file"]');
         const fileNameList = div.querySelector('.file-name-list');
         let allFiles = [];
 
         fileInput.addEventListener('change', function() {
             Array.from(this.files).forEach(file => {
-                if (!allFiles.find(f => f.name === file.name && f.size === file.size)) {
-                    allFiles.push(file);
-                }
+                if (!allFiles.find(f => f.name === file.name && f.size === file.size)) allFiles.push(file);
             });
             const dt = new DataTransfer();
             allFiles.forEach(file => dt.items.add(file));
@@ -394,12 +424,10 @@ kakao.maps.load(function () {
         });
 
         function renderFileList() {
-            fileNameList.innerHTML = ''; // 초기화
+            fileNameList.innerHTML = '';
             allFiles.forEach((file, i) => {
                 const container = document.createElement('div');
                 container.className = 'flex items-center gap-2 p-1.5 border border-line rounded-lg bg-sunk relative';
-                
-                // FileReader를 이용하여 실시간 파일 데이터 시각화
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     container.innerHTML = `
@@ -412,11 +440,8 @@ kakao.maps.load(function () {
                         </div>
                         <button type="button" class="text-red-400 font-bold ml-1 px-1 text-xs hover:bg-white rounded" data-index="${i}">✕</button>
                     `;
-                    
-                    // 미리보기 상자 내부 삭제 버튼 기동
                     container.querySelector('button').addEventListener('click', function() {
-                        const idx = parseInt(this.dataset.index);
-                        allFiles.splice(idx, 1);
+                        allFiles.splice(parseInt(this.dataset.index), 1);
                         const dt = new DataTransfer();
                         allFiles.forEach(file => dt.items.add(file));
                         fileInput.files = dt.files;
@@ -427,48 +452,31 @@ kakao.maps.load(function () {
                 fileNameList.appendChild(container);
             });
         }
-
-        list.appendChild(div);
     }
 
     function reindexCards() {
         document.querySelectorAll('.spot-card').forEach((c, i) => {
-
             c.querySelector('.spot-lat').name = `subList[${i}].lat`;
             c.querySelector('.spot-lng').name = `subList[${i}].lng`;
-
             c.querySelector('.spot-title').name = `subList[${i}].contentTitle`;
             c.querySelector('.spot-id').name = `subList[${i}].contentId`;
             c.querySelector('.rating-value').name = `subList[${i}].rating`;
             c.querySelector('textarea').name = `subList[${i}].travelSubContent`;
-
             const file = c.querySelector('input[type="file"]');
             if (file) file.name = `subList[${i}].imageFiles`;
-
             c.querySelector('.spot-num').textContent = i + 1;
         });
     }
 
     document.getElementById('addSpotBtn').addEventListener('click', () => addSpotCard());
     document.getElementById('submitBtn').addEventListener('click', function(e) {
-        e.preventDefault(); 
-        
+        e.preventDefault();
         const titleInput = document.getElementById('travelTitle');
-        if (!titleInput || !titleInput.value.trim()) {
-            alert("여행 제목을 입력해 주세요.");
-            titleInput.focus();
-            return;
-        }
-
+        if (!titleInput || !titleInput.value.trim()) { alert("여행 제목을 입력해 주세요."); titleInput.focus(); return; }
         const cards = document.querySelectorAll('.spot-card');
-        if (cards.length === 0) {
-            alert("최소 한 개 이상의 관광지 후기를 추가해 주세요.");
-            return;
-        }
+        if (cards.length === 0) { alert("최소 한 개 이상의 관광지 후기를 추가해 주세요."); return; }
 
         const formData = new FormData();
-        
-        // 1. 메인 Review 테이블 데이터 적재
         const travelNoVal = parseInt(document.querySelector('input[name="travelNo"]')?.value);
         formData.append("travelNo", isNaN(travelNoVal) ? 0 : travelNoVal);
         formData.append("travelTitle", titleInput.value.trim());
@@ -477,82 +485,56 @@ kakao.maps.load(function () {
         formData.append("travelEndDate", document.getElementById('endDate')?.value || '');
         formData.append("visibility", document.querySelector('input[name="visibility"]:checked')?.value || 'PUBLIC');
 
-        // 2. 서브 리스트 루프 돌며 철저하게 수치 검증 후 적재
         cards.forEach((card, i) => {
-            // 숫자형 데이터들은 파싱 후 NaN 검사를 거쳐 에러 소지를 완전히 박멸합니다.
             const subNo = parseInt(card.querySelector('.spot-sub-no')?.value);
             const lat   = parseFloat(card.querySelector('.spot-lat')?.value);
             const lng   = parseFloat(card.querySelector('.spot-lng')?.value);
             const rtg   = parseInt(card.querySelector('.rating-value')?.value);
-
             formData.append(`subList[${i}].travelSubNo`, isNaN(subNo) ? 0 : subNo);
             formData.append(`subList[${i}].lat`, isNaN(lat) ? 0.0 : lat);
             formData.append(`subList[${i}].lng`, isNaN(lng) ? 0.0 : lng);
             formData.append(`subList[${i}].rating`, isNaN(rtg) ? 0 : rtg);
-            
-            // 문자열 데이터 적재
             formData.append(`subList[${i}].contentTitle`, card.querySelector('.spot-title')?.value || '');
             formData.append(`subList[${i}].contentId`, card.querySelector('.spot-id')?.value || '');
             formData.append(`subList[${i}].travelSubContent`, card.querySelector('textarea')?.value || '');
             formData.append(`subList[${i}].imagePath`, card.querySelector('.spot-img-path')?.value || '');
-
-            // 새 이미지 파일 적재 (독립된 단일 key 'imageFiles' 명칭 사용)
             const fileInput = card.querySelector('input[type="file"]');
+
             if (fileInput && fileInput.files.length > 0) {
                 Array.from(fileInput.files).forEach(file => {
-                    formData.append('imageFiles', file); 
+                    formData.append("imageFiles", file);
+                    formData.append("imageIndex", i);
                 });
             }
         });
 
-        const form = document.querySelector('form');
-        
-
-        fetch(form.action, {
-            method: 'POST',
-            body: formData
+        fetch(document.querySelector('form').action, { method: 'POST', body: formData })
+        .then(res => {
+            const isUpdate = parseInt(document.querySelector('input[name="travelNo"]')?.value) > 0;
+            if (res.ok) {
+                alert(isUpdate ? "리뷰가 성공적으로 수정되었습니다." : "리뷰가 성공적으로 등록되었습니다.");
+                location.href = isUpdate
+                    ? "/reviews/detail?travelNo=" + document.querySelector('input[name="travelNo"]')?.value
+                    : "/reviews/list";
+            } else {
+                alert(isUpdate ? "리뷰 수정에 실패했습니다." : "리뷰 등록에 실패했습니다.");
+            }
         })
-
-		.then(res => {
-		    // 현재 숨겨진 travelNo 값을 가져와서 등록인지 수정인지 판별합니다.
-		    const isUpdate = parseInt(document.querySelector('input[name="travelNo"]')?.value) > 0;
-		    
-		    if(res.ok) {
-		        if (isUpdate) {
-		            alert("리뷰가 성공적으로 수정되었습니다.");
-		            location.href = "/reviews/detail?travelNo=" + document.querySelector('input[name="travelNo"]')?.value;
-		        } else {
-		            alert("리뷰가 성공적으로 등록되었습니다.");
-		            // 등록 성공 시에는 보통 전체 목록 페이지나 마이페이지 등으로 이동시킵니다. (프로젝트 경로에 맞게 변경 가능)
-		            location.href = "/reviews/list"; 
-		        }
-		    } else {
-		        alert(isUpdate ? "리뷰 수정에 실패했습니다." : "리뷰 등록에 실패했습니다.");
-		    }
-		})
-        .catch(err => {
-            console.error("에러 발생:", err);
-            alert("통신 중 오류가 발생했습니다.");
-        });
+        .catch(err => { console.error("에러 발생:", err); alert("통신 중 오류가 발생했습니다."); });
     });
-    // ════════════════════════════════════════
-    //  타임리프 데이터 연동 지도 마커 복원부
-    // ════════════════════════════════════════
+
+    // ════ 기존 데이터 복원 ════
     const existingSubList = /*[[${review != null ? review.subList : null}]]*/ [];
-    
+
     kakao.maps.event.addListener(map, 'tilesloaded', function() {
         if (window.isMapRestored) return;
         window.isMapRestored = true;
 
-        console.log("==== [지도 로드 완료] 데이터 복원 시작 ====");
-
         if (existingSubList && existingSubList.length > 0) {
             const emptyMsg = document.getElementById('spotEmpty');
-            if(emptyMsg) emptyMsg.style.display = 'none';
+            if (emptyMsg) emptyMsg.style.display = 'none';
 
             existingSubList.forEach((sub, i) => {
-                const currentIdx = i + 1;
-
                 const spotLat = Number(sub.lat || sub.LAT || 0);
                 const spotLng = Number(sub.lng || sub.LNG || 0);
                 const spotTitle = sub.contentTitle || sub.CONTENT_TITLE || '';
@@ -562,26 +544,15 @@ kakao.maps.load(function () {
                 const spotRating = sub.rating || sub.RATING || 0;
                 const spotImgPath = sub.imagePath || sub.IMAGE_PATH || '';
 
-                addSpotCard(
-                    spotTitle, '', currentIdx, spotLat, spotLng, 
-                    spotContentId, spotRating, spotContent, spotSubNo, spotImgPath
-                );
+                addSpotCard(spotTitle, '', i + 1, spotLat, spotLng, spotContentId, spotRating, spotContent, spotSubNo, spotImgPath);
 
                 if (spotLat > 0 && spotLng > 0) {
-                    addExistingPlaceToMap(spotTitle, spotLat, spotLng, spotContentId, currentIdx);
+                    addExistingPlaceToMap(spotTitle, spotLat, spotLng, spotContentId, i + 1);
                 }
             });
 
-            const firstSpot = existingSubList[0];
-            const firstLat = Number(firstSpot.lat || firstSpot.LAT || 0);
-            const firstLng = Number(firstSpot.lng || firstSpot.LNG || 0);
-
-            if (firstLat > 0 && firstLng > 0) {
-                const moveLatLng = new kakao.maps.LatLng(firstLat, firstLng);
-                map.setCenter(moveLatLng); 
-                map.setLevel(6);           
-                updatePolyline();          
-            }
+            updatePolyline();
+            fitBounds();
         }
     });
 });

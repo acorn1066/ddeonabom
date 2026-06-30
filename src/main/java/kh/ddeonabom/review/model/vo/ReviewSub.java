@@ -28,8 +28,8 @@ public class ReviewSub {
     private int rating;    
     // 이미지 업로드 파일
     private List<MultipartFile> imageFiles;
-    private double lat;
-    private double lng;
+    private Double lat;
+    private Double lng;
     // 관광지이름
     private String contentTitle;
     // DB 테이블에는 없지만, JOIN 결과를 담기 위해 자바 객체에만 추가하는 필드!

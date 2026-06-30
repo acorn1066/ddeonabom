@@ -173,6 +173,10 @@ public class AdminService {
 		
 	}
 
+	public int getTodayMemberCount() {
+		return mapper.getTodayMemberCount();
+	}
+
 
 
 	

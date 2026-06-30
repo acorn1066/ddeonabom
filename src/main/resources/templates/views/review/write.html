@@ -125,19 +125,21 @@
 
 <footer th:replace="~{views/common/footer :: footer}"></footer>
 
-<script>
+<script th:inline="javascript">
 
 // ════════════════════════════════════════
 //  카카오맵 초기화
 // ════════════════════════════════════════
+
+
 kakao.maps.load(function () {
 	const map = new kakao.maps.Map(document.getElementById('map'), {
 	  center: new kakao.maps.LatLng(33.3617, 126.5292), // 제주도 중심
 	  level: 10
 	});
 	
-	const ps = new kakao.maps.services.Places();
-	const markers = [];   // 지도 위 마커 목록
+	const markers = [];
+	const polylines = [];
 	const polyline = new kakao.maps.Polyline({
 	  map,
 	  path: [],
@@ -147,10 +149,69 @@ kakao.maps.load(function () {
 	  strokeStyle: 'solid'
 	});
 	
-	// ── 동선 폴리라인 갱신 ──────────────────
 	function updatePolyline() {
-	  const path = markers.map(m => m.getPosition());
-	  polyline.setPath(path);
+	    polylines.forEach(p => p.setMap(null));
+	    polylines.length = 0;
+	    polyline.setPath([]); // 직선도 초기화
+
+	    if (markers.length < 2) return;
+
+	    const points = markers.map(m => ({
+	        lat: m.getPosition().getLat(),
+	        lng: m.getPosition().getLng()
+	    }));
+
+	    drawRoadPath(points);
+	}
+	function fitBounds() {
+	    if (markers.length === 0) return;
+	    const bounds = new kakao.maps.LatLngBounds();
+	    markers.forEach(m => bounds.extend(m.getPosition()));
+	    map.setBounds(bounds);
+	}
+	async function drawRoadPath(points) {
+	    const MAX_POINTS_PER_CALL = 7;
+	    const segments = [];
+	    for (let i = 0; i < points.length - 1; i += (MAX_POINTS_PER_CALL - 1)) {
+	        const slice = points.slice(i, i + MAX_POINTS_PER_CALL);
+	        if (slice.length >= 2) segments.push(slice);
+	    }
+
+	    for (const seg of segments) {
+	        try {
+	            const res = await fetch('/schedule/route', {
+	                method: 'POST',
+	                headers: { 'Content-Type': 'application/json' },
+	                body: JSON.stringify({ points: seg })
+	            });
+	            if (!res.ok) throw new Error('route ' + res.status);
+	            const data = await res.json();
+
+	            const linePath = (data.path || []).map(
+	                c => new kakao.maps.LatLng(c.lat, c.lng)
+	            );
+	            if (linePath.length < 2) continue;
+	            
+	            const pl = new kakao.maps.Polyline({
+	            	map,
+	                path: linePath,
+	                strokeWeight: 5,
+	                strokeColor: '#1F47E6',
+	                strokeOpacity: 0.85,
+	                strokeStyle: 'solid'});
+	            polylines.push(pl);
+
+	        } catch (e) {
+	            new kakao.maps.Polyline({
+	                map,
+	                path: seg.map(p => new kakao.maps.LatLng(p.lat, p.lng)),
+	                strokeWeight: 4,
+	                strokeColor: '#94a3b8',
+	                strokeOpacity: 0.7,
+	                strokeStyle: 'shortdash'
+	            });
+	        }
+	    }
 	}
 	
 	// ── 마커 번호 이미지 생성 ────────────────
@@ -180,33 +241,81 @@ kakao.maps.load(function () {
 	const resultsList = document.getElementById('mapSearchResults');
 	
 	function searchPlaces() {
-	  const keyword = searchInput.value.trim();
-	  if (!keyword) return;
-	  ps.keywordSearch(keyword, (data, status) => {
-	    resultsList.innerHTML = '';
-	    if (status !== kakao.maps.services.Status.OK) {
-	      resultsList.innerHTML = '<li class="px-3 py-2 text-muted">검색 결과가 없습니다.</li>';
-	      resultsList.classList.remove('hidden');
-	      resultsList.classList.add('flex');
-	      return;
-	    }
-	    data.forEach(place => {
-	      const li = document.createElement('li');
-	      li.className = 'flex cursor-pointer flex-col rounded-lg px-3 py-2 hover:bg-brand-soft';
-	      li.innerHTML = `
-	        <span class="font-semibold text-ink">${place.place_name}</span>
-	        <span class="text-xs text-muted">${place.address_name}</span>`;
-	      li.addEventListener('click', () => {
-	        addPlaceToMap(place);
-	        resultsList.classList.add('hidden');
-	        resultsList.classList.remove('flex');
-	        searchInput.value = '';
-	      });
-	      resultsList.appendChild(li);
+	    const keyword = searchInput.value.trim();
+	    if (!keyword) return;
+
+	    fetch('/landmark/search?wished=false'
+	        + '&q=' + encodeURIComponent(keyword)
+	        + '&region=&page=0&size=10')
+	    .then(res => res.json())
+	    .then(data => {
+	        resultsList.innerHTML = '';
+	        const items = data.content || [];
+
+	        if (items.length === 0) {
+	            resultsList.innerHTML = '<li class="px-3 py-2 text-muted">검색 결과가 없습니다.</li>';
+	            resultsList.classList.remove('hidden');
+	            resultsList.classList.add('flex');
+	            return;
+	        }
+
+	        items.forEach(place => {
+	            const li = document.createElement('li');
+	            li.className = 'flex cursor-pointer flex-col rounded-lg px-3 py-2 hover:bg-brand-soft';
+	            li.innerHTML = `
+	                <span class="font-semibold text-ink">${place.title}</span>
+	                <span class="text-xs text-muted">${place.addr1 || ''}</span>`;
+	            li.addEventListener('click', () => {
+	                addPlaceToMap(place);
+	                resultsList.classList.add('hidden');
+	                resultsList.classList.remove('flex');
+	                searchInput.value = '';
+	            });
+	            resultsList.appendChild(li);
+	        });
+
+	        resultsList.classList.remove('hidden');
+	        resultsList.classList.add('flex');
+	    })
+	    .catch(() => {
+	        resultsList.innerHTML = '<li class="px-3 py-2 text-muted">검색 중 오류가 발생했습니다.</li>';
+	        resultsList.classList.remove('hidden');
+	        resultsList.classList.add('flex');
 	    });
-	    resultsList.classList.remove('hidden');
-	    resultsList.classList.add('flex');
-	  });
+	}
+
+	function addPlaceToMap(place) {
+	    const lat = place.mapy;
+	    const lng = place.mapx;
+
+	    if (!lat || !lng) {
+	        alert('위치 정보가 없는 관광지입니다.');
+	        return;
+	    }
+
+	    const latlng = new kakao.maps.LatLng(lat, lng);
+	    const index  = markers.length + 1;
+
+	    const marker = new kakao.maps.Marker({
+	        map,
+	        position: latlng,
+	        image: makeMarkerImage(index)
+	    });
+	    markers.push(marker);
+	    map.panTo(latlng);
+	    updatePolyline();
+	    fitBounds();
+	    
+	    addSpotCard(
+    	    place.title,
+    	    place.addr1 || '',
+    	    index,
+    	    lat,
+    	    lng,
+    	    place.contentId
+    	);
+	    
+	    
 	}
 	
 	searchBtn.addEventListener('click', searchPlaces);
@@ -220,25 +329,7 @@ kakao.maps.load(function () {
 	  }
 	});
 	
-	// ════════════════════════════════════════
-	//  지도에 장소 추가 + 카드 생성
-	// ════════════════════════════════════════
-	function addPlaceToMap(place) {
-	  const latlng = new kakao.maps.LatLng(place.y, place.x);
-	  const index  = markers.length + 1;
 	
-	  const marker = new kakao.maps.Marker({
-	    map,
-	    position: latlng,
-	    image: makeMarkerImage(index)
-	  });
-	  markers.push(marker);
-	  map.panTo(latlng);
-	  updatePolyline();
-	
-	  // 관광지 카드 추가
-	  addSpotCard(place.place_name, place.address_name, index);
-	}
 	
 	// ════════════════════════════════════════
 	//  별점
@@ -275,40 +366,11 @@ kakao.maps.load(function () {
 	  });
 	}
 	
-	function addPlaceToMap(place) {
-		  const latlng = new kakao.maps.LatLng(place.y, place.x);
-		  const index  = markers.length + 1;
-
-		  const marker = new kakao.maps.Marker({
-		    map,
-		    position: latlng,
-		    image: makeMarkerImage(index)
-		  });
-
-		  markers.push(marker);
-		  map.panTo(latlng);
-		  updatePolyline();
-
-		  // ⭐ DB에서 contentId 받아오기
-		  fetch(`/landmark/match?title=${place.place_name}`)
-		    .then(res => res.json())
-		    .then(data => {
-		      addSpotCard(
-		        place.place_name,
-		        place.address_name,
-		        index,
-		        place.y,
-		        place.x,
-		        data.contentId,
-		        place.id  
-		      );
-		    });
-		}
 	
 	// ════════════════════════════════════════
 	//  관광지 카드 생성
 	// ════════════════════════════════════════
-	function addSpotCard(name = '', address = '', index, lat = '', lng = '', contentId = '', kakaoPlaceId='') {
+	function addSpotCard(name = '', address = '', index, lat = '', lng = '', contentId = 0) {
 	  document.getElementById('spotEmpty')?.remove();
 	
 	  const list = document.getElementById('spotList');
@@ -320,14 +382,19 @@ kakao.maps.load(function () {
 	  div.innerHTML = `
 	    <input type="hidden" name="subList[${idx}].lat" value="${lat}" />
 	    <input type="hidden" name="subList[${idx}].lng" value="${lng}" />
-	    	<input type="hidden" name="subList[${idx}].kakaoPlaceId" value="${kakaoPlaceId}" />
 	    <div class="mb-4 flex items-center gap-3">
 	      <span class="spot-num flex h-7 w-7 flex-none items-center justify-center rounded-full bg-brand-soft text-13 font-bold text-brand-ink">${num}</span>
 	      
 	      <div class="spot-name font-bold">
 	        ${name}
 	      </div>
-	      <input type="hidden" name="subList[${idx}].contentTitle" value="${name}" />
+	      <div class="flex-1">
+	        <input type="text" 
+	               name="subList[${idx}].contentTitle" 
+	               class="spot-title-input w-full rounded-lg border border-line bg-white px-3 py-2 text-base font-bold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft"
+	               placeholder="관광지 이름을 입력하세요"
+	               value="${name}" />
+	      </div>
 	      <input type="hidden"
 	             name="subList[${idx}].contentId"
 	        class="spot-name-input flex-1 rounded-lg border border-line bg-white px-3 py-2 text-base font-bold outline-none transition placeholder:font-normal placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand-soft"
@@ -370,6 +437,7 @@ kakao.maps.load(function () {
 	      markers.splice(idx, 1);
 	      reindexMarkers();
 	      updatePolyline();
+	      fitBounds();
 	    }
 	    div.remove();
 	    reindexCards();   // 전역에 있는 완전한 버전 호출
@@ -443,83 +511,120 @@ kakao.maps.load(function () {
 		    if (lngInput) lngInput.name = `subList[${i}].lng`;
 		  });
 		}
+	
+	
+	const form = document.getElementById("reviewForm");
+
+	document.getElementById("submitBtn").addEventListener("click", function () {
+
+	    // 제목
+	    const title = document.getElementById("travelTitle");
+	    if (title.value.trim() === "") {
+	        alert("여행 제목을 입력해주세요.");
+	        title.focus();
+	        return;
+	    }
+
+	    // 지역
+	    const region = document.getElementById("region");
+	    if (region.value === "") {
+	        alert("지역을 선택해주세요.");
+	        region.focus();
+	        return;
+	    }
+
+	    // 시작일
+	    const startDate = document.getElementById("startDate");
+	    if (startDate.value === "") {
+	        alert("여행 시작일을 선택해주세요.");
+	        startDate.focus();
+	        return;
+	    }
+
+	    // 종료일
+	    const endDate = document.getElementById("endDate");
+	    if (endDate.value === "") {
+	        alert("여행 종료일을 선택해주세요.");
+	        endDate.focus();
+	        return;
+	    }
+
+	    // 관광지
+	    const cards = document.querySelectorAll(".spot-card");
+
+	    if (cards.length === 0) {
+	        alert("관광지를 한 곳 이상 추가해주세요.");
+	        return;
+	    }
+
+	    // 각 관광지 검사
+	    for (let i = 0; i < cards.length; i++) {
+
+	        const rating = cards[i].querySelector(".rating-value");
+	        const review = cards[i].querySelector("textarea");
+
+	        if (rating.value == "0") {
+	            alert((i + 1) + "번째 관광지의 별점을 선택해주세요.");
+	            return;
+	        }
+
+	        if (review.value.trim() === "") {
+	            alert((i + 1) + "번째 관광지의 후기를 작성해주세요.");
+	            review.focus();
+	            return;
+	        }
+	    }
+
+	    // 모든 검사 통과
+	    form.submit();
+
+	});
 	// ── 관광지 직접 추가 버튼 ─────────────────
 	document.getElementById('addSpotBtn').addEventListener('click', () => addSpotCard());
 	
+	//일정에서 넘어온 경우 카드 복원
+	const scheduleSubList = /*[[${review != null ? review.subList : null}]]*/ null;
+	const scheduleTitle   = /*[[${scheduleTitle}]]*/ null;
+	const scheduleStart   = /*[[${scheduleStartdate}]]*/ null;
+	const scheduleEnd     = /*[[${scheduleEnddate}]]*/ null;
+
+	if (scheduleSubList && scheduleSubList.length > 0) {
+		// 제목/날짜 자동 채우기
+		if (scheduleTitle) {
+		    document.getElementById('travelTitle').value = scheduleTitle;
+		}
+		if (scheduleStart) {
+		    document.getElementById('startDate').value = scheduleStart;
+		}
+		if (scheduleEnd) {
+		    document.getElementById('endDate').value = scheduleEnd;
+		}
 	
-	document.getElementById('submitBtn').addEventListener('click', () => {
-		  console.log('버튼 클릭됨');
-		  const form = document.querySelector('form');
-		  console.log('form:', form);
-		  form.submit();
+		scheduleSubList.forEach((sub, i) => {
+		    const lat = parseFloat(sub.lat || sub.LAT || 0);  // parseFloat 추가
+		    const lng = parseFloat(sub.lng || sub.LNG || 0);  // parseFloat 추가
+		    const title = sub.contentTitle || sub.CONTENT_TITLE || '';
+		    const contentId = sub.contentId || sub.CONTENT_ID || 0;
+
+		    addSpotCard(title, '', i + 1, lat, lng, contentId);
+
+		    if (lat && lng) {
+		        const latlng = new kakao.maps.LatLng(lat, lng);
+		        const marker = new kakao.maps.Marker({
+		            map,
+		            position: latlng,
+		            image: makeMarkerImage(i + 1)
+		        });
+		        markers.push(marker);
+		    }
 		});
+	
+		updatePolyline();
+		fitBounds();
+		
+	}
 });
-const form = document.getElementById("reviewForm");
 
-document.getElementById("submitBtn").addEventListener("click", function () {
-
-    // 제목
-    const title = document.getElementById("travelTitle");
-    if (title.value.trim() === "") {
-        alert("여행 제목을 입력해주세요.");
-        title.focus();
-        return;
-    }
-
-    // 지역
-    const region = document.getElementById("region");
-    if (region.value === "") {
-        alert("지역을 선택해주세요.");
-        region.focus();
-        return;
-    }
-
-    // 시작일
-    const startDate = document.getElementById("startDate");
-    if (startDate.value === "") {
-        alert("여행 시작일을 선택해주세요.");
-        startDate.focus();
-        return;
-    }
-
-    // 종료일
-    const endDate = document.getElementById("endDate");
-    if (endDate.value === "") {
-        alert("여행 종료일을 선택해주세요.");
-        endDate.focus();
-        return;
-    }
-
-    // 관광지
-    const cards = document.querySelectorAll(".spot-card");
-
-    if (cards.length === 0) {
-        alert("관광지를 한 곳 이상 추가해주세요.");
-        return;
-    }
-
-    // 각 관광지 검사
-    for (let i = 0; i < cards.length; i++) {
-
-        const rating = cards[i].querySelector(".rating-value");
-        const review = cards[i].querySelector("textarea");
-
-        if (rating.value == "0") {
-            alert((i + 1) + "번째 관광지의 별점을 선택해주세요.");
-            return;
-        }
-
-        if (review.value.trim() === "") {
-            alert((i + 1) + "번째 관광지의 후기를 작성해주세요.");
-            review.focus();
-            return;
-        }
-    }
-
-    // 모든 검사 통과
-    form.submit();
-
-});
 
 </script>
 

@@ -57,6 +57,7 @@ public class AdminController {
 
 	    map.put("replyCount", aService.selectReplyCount());
 	    map.put("reportCount", aService.selectReportCount());
+	    map.put("todayMemberCount", aService.getTodayMemberCount());
 
 	    return map;
 	}

@@ -9,6 +9,12 @@
         FROM MEMBER
         WHERE STATUS = 'Y'
     </select>
+    
+    <select id="getTodayMemberCount" resultType="_int">
+	    SELECT COUNT(*)
+	    FROM MEMBER
+	    WHERE TRUNC(ENROLL_DATE) = TRUNC(SYSDATE)
+	</select>
 
     <select id="selectTravelCount" resultType="_int">
         SELECT COUNT(*)
@@ -456,7 +462,13 @@
 	            <if test="keyword != null and keyword != ''">
 				    AND M.NICKNAME LIKE '%' || #{keyword} || '%'
 				</if>
-	            ORDER BY R.REPORT_DATE DESC
+	            ORDER BY 
+	            CASE R.REPORT_STATUS
+			        WHEN 'N' THEN 1
+			        WHEN 'Y' THEN 2
+			        WHEN 'R' THEN 3
+			    END ASC,
+			    R.REPORT_DATE DESC
 	        ) A
 	        <![CDATA[ WHERE ROWNUM <= #{pi.currentPage} * #{pi.boardLimit}
 	    )

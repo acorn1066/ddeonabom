@@ -99,8 +99,8 @@
 	    <selectKey keyProperty="travelSubNo" resultType="int" order="BEFORE">
 	        SELECT SEQ_TRAVEL_SUB_NO.NEXTVAL FROM DUAL
 	    </selectKey>
-	    INSERT INTO TRAVEL_LIST_SUB (TRAVEL_SUB_NO, TRAVEL_SUB_CONTENT, TRAVEL_SUB_SEQ, TRAVEL_SUB_DATE, TRAVEL_NO, CONTENT_ID, RATING, LAT, LNG, CONTENT_TITLE)
-		VALUES (#{travelSubNo}, #{travelSubContent}, #{travelSubSeq}, SYSDATE, #{travelNo}, #{contentId}, #{rating, jdbcType=INTEGER}, #{lat}, #{lng}, #{contentTitle})
+	    INSERT INTO TRAVEL_LIST_SUB (TRAVEL_SUB_NO, TRAVEL_SUB_CONTENT, TRAVEL_SUB_SEQ, TRAVEL_SUB_DATE, TRAVEL_NO, CONTENT_ID, RATING, CONTENT_TITLE)
+		VALUES (#{travelSubNo}, #{travelSubContent}, #{travelSubSeq}, SYSDATE, #{travelNo}, #{contentId}, #{rating, jdbcType=INTEGER}, #{contentTitle})
 	</insert>
 	
 	<insert id="insertImage" parameterType="kh.ddeonabom.review.model.vo.Image">
@@ -188,20 +188,21 @@
 	</select>
 	
 	<select id="getReviewSubList" parameterType="int" resultType="kh.ddeonabom.review.model.vo.ReviewSub">
-	    SELECT 
-	        TRAVEL_SUB_NO,
-	        TRAVEL_SUB_CONTENT,
-	        TRAVEL_SUB_SEQ,
-	        TRAVEL_SUB_DATE,
-	        TRAVEL_NO,
-	        CONTENT_ID,
-	        RATING,
-	        CONTENT_TITLE,
-	        LAT,
-        	LNG
-	    FROM TRAVEL_LIST_SUB 
-	    WHERE TRAVEL_NO = #{travelNo} 
-	    ORDER BY TRAVEL_SUB_SEQ
+	    select
+	        s.travel_sub_no,
+	        s.travel_sub_content,
+	        s.travel_sub_seq,
+	        s.travel_sub_date,
+	        s.travel_no,
+	        s.content_id,
+	        s.rating,
+	        s.content_title,
+	        l.mapy as lat,
+	        l.mapx as lng
+	    from travel_list_sub s
+	    left join landmark l on s.content_id = l.content_id
+	    where s.travel_no = #{travelNo}
+	    order by s.travel_sub_seq
 	</select>
 	
 	<select id="getImageListBySubNo" parameterType="int" resultType="kh.ddeonabom.review.model.vo.Image">
@@ -274,28 +275,29 @@
 	</select>
 	
 	<select id="ReviewDetail" parameterType="int" resultMap="reviewDetailMap">
-        SELECT 
-            M.TRAVEL_NO, 
-            M.TRAVEL_TITLE, 
-            M.STATUS, 
-            M.CREATE_DATE, 
-            M.MEMBER_NO, 
-            M.TRAVEL_START_DATE, 
-            M.TRAVEL_END_DATE,
-            S.TRAVEL_SUB_NO, 
-            S.TRAVEL_SUB_CONTENT, 
-            S.TRAVEL_SUB_SEQ, 
-            S.CONTENT_ID, 
-            S.RATING, 
-            S.CONTENT_TITLE,
-            S.LAT,
-            S.LNG,
-            I.IMAGE_PATH || '/' || I.RENAME_FILE AS IMAGE_PATH 
-        FROM TRAVEL_LIST M
-        LEFT JOIN TRAVEL_LIST_SUB S ON M.TRAVEL_NO = S.TRAVEL_NO
-        LEFT JOIN TB_IMAGE I ON S.TRAVEL_SUB_NO = I.TRAVEL_SUB_NO 
-        WHERE M.TRAVEL_NO = #{travelNo}
-    </select>
+	    SELECT 
+	        M.TRAVEL_NO, 
+	        M.TRAVEL_TITLE, 
+	        M.STATUS, 
+	        M.CREATE_DATE, 
+	        M.MEMBER_NO, 
+	        M.TRAVEL_START_DATE, 
+	        M.TRAVEL_END_DATE,
+	        S.TRAVEL_SUB_NO, 
+	        S.TRAVEL_SUB_CONTENT, 
+	        S.TRAVEL_SUB_SEQ, 
+	        S.CONTENT_ID, 
+	        S.RATING, 
+	        S.CONTENT_TITLE,
+           L.MAPY AS LAT,
+    		L.MAPX AS LNG,
+	        I.IMAGE_PATH 
+	    FROM TRAVEL_LIST M
+	    LEFT JOIN TRAVEL_LIST_SUB S ON M.TRAVEL_NO = S.TRAVEL_NO
+		LEFT JOIN LANDMARK L ON S.CONTENT_ID = L.CONTENT_ID
+		LEFT JOIN TB_IMAGE I ON S.TRAVEL_SUB_NO = I.TRAVEL_SUB_NO
+	    WHERE M.TRAVEL_NO = #{travelNo}
+	</select>
     
     <update id="reviewUpdateAction" parameterType="kh.ddeonabom.review.model.vo.Review">
         UPDATE TRAVEL_LIST 
@@ -312,10 +314,8 @@
 	        CONTENT_TITLE = #{contentTitle, jdbcType=VARCHAR},
 	        RATING = #{rating, jdbcType=INTEGER},
 	
-	        TRAVEL_SUB_CONTENT = NVL(#{travelSubContent, jdbcType=VARCHAR}, TRAVEL_SUB_CONTENT),
-	
-	        LAT = #{lat, jdbcType=DOUBLE},
-	        LNG = #{lng, jdbcType=DOUBLE}
+	        TRAVEL_SUB_CONTENT = NVL(#{travelSubContent, jdbcType=VARCHAR}, TRAVEL_SUB_CONTENT)
+
 	    WHERE TRAVEL_SUB_NO = #{travelSubNo, jdbcType=INTEGER}
 	</update>
     
@@ -324,4 +324,10 @@
 	    SET status = 'N'
 	    WHERE travel_no = #{travelNo}
 	</update>
+	
+	<delete id="deleteImageBySubNo">
+	    DELETE FROM IMAGE_TABLE 
+	    WHERE TRAVEL_SUB_NO = #{travelSubNo}
+	</delete>
+
 </mapper>
