@@ -417,6 +417,16 @@ window.onload = waitForKakao;
 console.log(window.kakao)
 
 function toggleLike() {
+  const loginUser = /*[[${session.loginUser}]]*/ null;
+
+  if (!loginUser) {
+    openInfoModal(
+      "로그인이 필요합니다",
+      "좋아요는 로그인 후 이용 가능합니다."
+    );
+    return;
+  }
+
   const travelNo = document.getElementById('likeBtn').dataset.travelNo;
 
   fetch('/reviews/like', {
@@ -424,14 +434,11 @@ function toggleLike() {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({
-      travelNo: travelNo
-    })
+    body: JSON.stringify({ travelNo })
   })
   .then(res => res.json())
   .then(data => {
     document.getElementById('likeCount').textContent = data.likeCount;
-   
   });
 }
 document.addEventListener("DOMContentLoaded", () => {
