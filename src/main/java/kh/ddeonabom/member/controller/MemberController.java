@@ -62,9 +62,6 @@ public class MemberController {
 		
 		return "views/member/join";
 	}
-	// =========================================================
-	// [추가] 아이디 중복 체크 (Ajax)
-	// =========================================================
 	@ResponseBody
 	@GetMapping("/check-id")
 	public String checkId(@RequestParam("id") String id) {
