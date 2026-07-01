@@ -53,7 +53,6 @@ public class ReviewService {
 		reviewMapper.insertImage(img);
 	}
 
-	// ⭕ 올바르게 수정한 getReviewDetail 메서드
 	public Review getReviewDetail(int travelNo, Integer loginUserNo) {
 	    Review review = reviewMapper.getReviewDetail(travelNo, loginUserNo);   
 	    if(review == null) {
@@ -66,7 +65,7 @@ public class ReviewService {
 	            images = new ArrayList<>();
 	        }
 	        sub.setImages(images.stream()
-	                            // 🔥 수정 완료: 뒤에 파일명을 붙이지 않고 S3 URL 주소 그대로 가져옵니다.
+	                            // 뒤에 파일명을 붙이지 않고 S3 URL 주소 그대로 가져옵니다.
 	                            .map(img -> img.getImagePath()) 
 	                            .collect(Collectors.toList()));
 	    }

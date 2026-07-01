@@ -38,6 +38,7 @@
 			    <option value="인천">인천</option>
 			    <option value="광주">광주</option>
 			    <option value="대전">대전</option>
+			    <option value="울산">울산</option>
 			    <option value="세종">세종</option>
 			    <option value="경기도">경기도</option>
 			    <option value="강원">강원</option>
@@ -119,7 +120,7 @@
 
 	<footer th:replace="~{views/common/footer :: footer}"></footer>
 	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-<script>
+<script th:inline="javascript">
 	let currentPage = 1;
 	let currentRegion = "";
 	let currentKeyword = "";  
@@ -218,14 +219,23 @@
 	                          ${travel.travelTitle}
 	                        </div>
 
+	                        
 	                        ${isMemberOnly
 	                          ? '<span class="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700">🔒 회원</span>'
 	                          : ''
 	                        }
 	                      </div>
 
+	                      <div class="text-sm text-muted">
+	                      	${travel.nickname}
+	                      </div>
 	                      <div class="text-13 text-faint">등록일: ${displayDate}</div>
 
+	                      <div class="mt-auto flex justify-end gap-3 text-xs text-muted">
+		                      <span>👁 ${travel.count}</span>
+		                      <span>👍 ${travel.likeCount}</span>
+	
+		                    </div>
 	                    </div>
 	                  </div>
 	                `;
@@ -249,7 +259,7 @@
 	}
 	function goDetail(travelNo, visibility) {
 
-	    // 🔒 회원전용 게시글
+	    // 회원전용 게시글
 	    if (visibility === 'MEMBER') {
 
 	        // 로그인 체크 (세션 값 있으면 서버에서 내려줘야 정확하지만 프론트 간단 처리)
@@ -268,26 +278,52 @@
 	function drawPagination(pi) {
 	    const pContainer = document.getElementById('paginationContainer');
 	    if (!pContainer) return;
-
 	    pContainer.innerHTML = '';
-	    let html = '';
+	    let html = `<div class="flex items-center justify-center gap-2 mt-6">`;
 
-	    if (pi.currentPage > 1) {
-	        html += `<button onclick="loadTravelList(${pi.currentPage - 1})" class="px-3 py-1 border rounded hover:bg-slate-100">이전</button>`;
-	    }
+	    html += `
+	        <button
+	            onclick="loadTravelList(${pi.currentPage - 1})"
+	            ${pi.currentPage <= 1 ? 'disabled' : ''}
+	            class="px-2 text-gray-400 hover:text-gray-600 disabled:opacity-30"
+	        >
+	            ‹
+	        </button>
+	    `;
 
 	    for (let i = pi.startPage; i <= pi.endPage; i++) {
+
 	        if (i === pi.currentPage) {
-	            html += `<button class="px-3 py-1 border rounded bg-brand text-white font-bold">${i}</button>`;
+	            html += `
+	                <button
+	                    class="w-8 h-8 flex items-center justify-center rounded-md bg-blue-600 text-white font-semibold"
+	                >
+	                    ${i}
+	                </button>
+	            `;
 	        } else {
-	            html += `<button onclick="loadTravelList(${i})" class="px-3 py-1 border rounded hover:bg-slate-100">${i}</button>`;
+	            html += `
+	                <button
+	                	onclick="window.location.href='/reviews?page=${i}'"
+	                    class="w-8 h-8 flex items-center justify-center rounded-md text-gray-600 hover:bg-gray-100"
+	                >
+	                    ${i}
+	                </button>
+	            `;
 	        }
 	    }
 
-	    if (pi.currentPage < pi.maxPage) {
-	        html += `<button onclick="loadTravelList(${pi.currentPage + 1})" class="px-3 py-1 border rounded hover:bg-slate-100">다음</button>`;
-	    }
-
+	    // 다음 버튼
+	    html += `
+	        <button
+	            onclick="loadTravelList(${pi.currentPage + 1})"
+	            ${pi.currentPage >= pi.maxPage ? 'disabled' : ''}
+	            class="px-2 text-gray-400 hover:text-gray-600 disabled:opacity-30"
+	        >
+	            ›
+	        </button>
+	    `;
+	    html += `</div>`;
 	    pContainer.innerHTML = html;
 	}
 	

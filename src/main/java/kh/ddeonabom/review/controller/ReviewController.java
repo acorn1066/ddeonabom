@@ -166,7 +166,6 @@ public class ReviewController {
         
         int result = reviewService.insertReview(r);
         if (result > 0) {
-            // [변경] 더 이상 로컬 디렉토리(C:/reviews)를 생성할 필요가 없습니다.
             
             if (r.getSubList() != null) {
                 for (int i = 0; i < r.getSubList().size(); i++) {
@@ -185,29 +184,29 @@ public class ReviewController {
                                 String saved = UUID.randomUUID().toString() + "_" + original;
                                 
                                 try {
-                                    // [변경] 1. S3 업로드를 위한 메타데이터 설정
+                                    // 1. S3 업로드를 위한 메타데이터 설정
                                     ObjectMetadata metadata = new ObjectMetadata();
                                     metadata.setContentLength(file.getSize());
                                     metadata.setContentType(file.getContentType());
 
-                                    // [변경] 2. AWS S3로 파일 업로드 실행
+                                    // 2. AWS S3로 파일 업로드 실행
                                     amazonS3.putObject(new PutObjectRequest(bucket, saved, file.getInputStream(), metadata));
 
-                                    // [변경] 3. S3에 저장된 파일의 실제 인터넷 주소(URL) 가져오기
+                                    // 3. S3에 저장된 파일의 실제 인터넷 주소(URL) 가져오기
                                     String s3Url = amazonS3.getUrl(bucket, saved).toString();
 
-                                    // [변경] 4. DB에 이미지 정보 저장
+                                    // 4. DB에 이미지 정보 저장
                                     Image img = new Image();
                                     img.setFileName(original);    // 원본 파일명
                                     img.setRenameFile(saved);     // S3에 저장된 파일명
-                                    img.setImagePath(s3Url);      // [핵심] 로컬 경로 대신 S3 URL 주소를 통째로 저장!
+                                    img.setImagePath(s3Url);      // 로컬 경로 대신 S3 URL 주소를 통째로 저장
                                     img.setTravelSubNo(sub.getTravelSubNo()); 
                                     
                                     reviewService.insertImage(img);
                                     
                                 } catch (Exception e) {
                                     e.printStackTrace();
-                                    // 실패 시 예외 처리 로직 (필요시 추가)
+                                    
                                 }
                             }
                         }
@@ -238,6 +237,7 @@ public class ReviewController {
 	        model.addAttribute("alertMsg", "회원 전용 게시글입니다. 로그인 후 이용해주세요.");
 	        return "member/login";
 	    }
+	    
 	    ArrayList<Reply> replyList = replyService.getReplyList(travelNo, "T");
 	    model.addAttribute("replyList", replyList);
 	    model.addAttribute("review", review);
@@ -277,7 +277,6 @@ public class ReviewController {
 	    }
 
 	    // 2. DB에서 기존 게시글 정보 + 관광지 서브 리스트(subList)까지 싹 다 긁어오기
-	    // (보통 서비스 단에서 기존 상세조회 로직을 재활용합니다)
 	    Review review = reviewService.reviewUpdate(travelNo);
 	    
 	    System.out.println("====== [백엔드 점검 1] review 객체 전체: " + review);
@@ -322,9 +321,6 @@ public class ReviewController {
 	            review.setTravelEndDate(new java.sql.Date(df.parse(end).getTime()));
 	        }
 
-	        // =========================
-	        // SUB LIST
-	        // =========================
 	        List<ReviewSub> subList = new ArrayList<>();
 
 	        for (int i = 0; i < 100; i++) {
@@ -353,11 +349,10 @@ public class ReviewController {
 
 	            sub.setContentId(contentId);
 
-	            // 🔥 핵심: 여기 추가해야 사진 들어감
 	            List<MultipartFile> files =
 	                request.getFiles("subList[" + i + "].imageFiles");
 
-	            sub.setImageFiles(files);   // ⭐⭐⭐ 이거 없으면 사진 안 들어감
+	            sub.setImageFiles(files);
 
 	            subList.add(sub);
 	        }

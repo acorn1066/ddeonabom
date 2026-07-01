@@ -184,6 +184,7 @@
 	    FROM TRAVEL_LIST T
 	    WHERE T.TRAVEL_NO = #{travelNo}
 	    AND T.STATUS = 'Y'
+	    AND T.VISIBILITY IN ('PUBLIC','MEMBER')
 	   
 	</select>
 	

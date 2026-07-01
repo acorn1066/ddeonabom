@@ -36,7 +36,7 @@ public class ShareController {
     @GetMapping("list")
     public ModelAndView shareList(
             @RequestParam(value = "page",        defaultValue = "1")   int currentPage,
-            @RequestParam(value = "region",      defaultValue = "전체") String region,
+            @RequestParam(value = "region",      defaultValue = "")    String region,
             @RequestParam(value = "searchInput", defaultValue = "")    String searchInput,
             HttpSession session,
             ModelAndView mv) {

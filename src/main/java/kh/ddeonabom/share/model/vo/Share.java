@@ -34,6 +34,8 @@ public class Share {
 
     // ── LANDMARK (첫 번째 장소 기반) ──
     private String firstImage;          // LANDMARK.FIRSTIMAGE2 (카드 썸네일)
+    private int    firstContentTypeId;  // LANDMARK.CONTENT_TYPE_ID (플레이스홀더용)
+    private String firstTitle;          // LANDMARK.TITLE (플레이스홀더 장소명용)
     private String firstAddr;           // LANDMARK.ADDR1 (지역 뱃지용)
     private String coords;              // "mapx,mapy;mapx,mapy;..." (SVG 루트용)
     private String reportStatus;
