@@ -3,6 +3,7 @@ package kh.ddeonabom.review.controller;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -279,11 +280,6 @@ public class ReviewController {
 	    // 2. DB에서 기존 게시글 정보 + 관광지 서브 리스트(subList)까지 싹 다 긁어오기
 	    Review review = reviewService.reviewUpdate(travelNo);
 	    
-	    System.out.println("====== [백엔드 점검 1] review 객체 전체: " + review);
-	    if (review != null) {
-	        System.out.println("====== [백엔드 점검 2] subList 주머니 상태: " + review.getSubList());
-	    }
-
 	    // 3. 본인 글이 맞는지 검증
 	    if (review.getMemberNo() != loginUser.getMemberNo()) {
 	        return "redirect:/reviews/list";
@@ -343,6 +339,15 @@ public class ReviewController {
 
 	            sub.setRating(parseIntSafe(request.getParameter("subList[" + i + "].rating")));
 	            sub.setImagePath(request.getParameter("subList[" + i + "].imagePath"));
+	            
+	            String deleteImagesRaw = request.getParameter("subList[" + i + "].deleteImages");
+	            if (deleteImagesRaw != null && !deleteImagesRaw.trim().isEmpty()) {
+	                List<String> deleteImages = Arrays.stream(deleteImagesRaw.split(","))
+	                                                   .map(String::trim)
+	                                                   .filter(s -> !s.isEmpty())
+	                                                   .collect(Collectors.toList());
+	                sub.setDeleteImages(deleteImages);
+	            }
 
 	            int contentId = parseIntSafe(request.getParameter("subList[" + i + "].contentId"));
 	            if (contentId <= 0) continue;
