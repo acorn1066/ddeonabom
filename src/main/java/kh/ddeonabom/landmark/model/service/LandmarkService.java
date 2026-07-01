@@ -97,4 +97,8 @@ public class LandmarkService {
 		return mapper.rating(contentId);
 	}
 
+	public ArrayList<Image> image(int contentId) {
+		return mapper.image(contentId);
+	}
+
 }

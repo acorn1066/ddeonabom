@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.amazonaws.services.s3.AmazonS3;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kh.ddeonabom.common.paging.PageInfo;
@@ -24,6 +26,7 @@ import kh.ddeonabom.landmark.model.service.LandmarkService;
 import kh.ddeonabom.landmark.model.vo.LandReview;
 import kh.ddeonabom.landmark.model.vo.Landmark;
 import kh.ddeonabom.member.model.vo.Member;
+import kh.ddeonabom.review.model.vo.Image;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -34,6 +37,10 @@ public class LandmarkController {
 	
 	@Value("${kakao.map.api-key}")
 	private String kakaoMapApiKey;
+	
+	private final AmazonS3 amazonS3;
+	@Value("${cloud.aws.s3.bucket}") 
+	private String bucket;
 	
 	// 관광지 리스트 가져오기
 	@GetMapping("list")
@@ -46,7 +53,17 @@ public class LandmarkController {
 		int listCount = lService.getListCount(contentTypeId, area, keyword);
 		PageInfo pi = Pagination.getPageInfo(currentPage, listCount, 10, 20);
 		ArrayList<Landmark> list = lService.selectLandmarkList(pi, contentTypeId, area, keyword);
-		
+//		System.out.println(list);
+		Map<Integer, Double> rating = new HashMap<>();
+		Map<Integer, Integer> review = new HashMap<>();
+		for(Landmark l : list) {
+			double listRating = lService.rating(l.getContentId());
+			rating.put(l.getContentId(), listRating);
+
+			int reviewCount = lService.reviewCount(l.getContentId());
+			review.put(l.getContentId(), reviewCount);
+		}
+
 		Map<Integer, String> contentType = new HashMap<>();
 		contentType.put(12, "관광지");
 		contentType.put(14, "문화시설");
@@ -64,6 +81,8 @@ public class LandmarkController {
 			model.addAttribute("niceList", niceList);
 		}
 		
+		model.addAttribute("review", review);
+		model.addAttribute("rating", rating);
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("area", area);
 		model.addAttribute("contentTypeId", contentTypeId);
@@ -85,8 +104,9 @@ public class LandmarkController {
 //		System.out.println(reviewCount);
 		PageInfo pi = Pagination.getPageInfo(currentPage, reviewCount, 5, 6);
 		ArrayList<LandReview> landReview = lService.review(contentId, pi);
+		ArrayList<Image> reviewImage = lService.image(contentId); 
 		
-//		System.out.println(landReview);
+		System.out.println(landReview);
 		
 		Map<Integer, String> contentType = new HashMap<>();
 		contentType.put(12, "관광지");
@@ -105,6 +125,7 @@ public class LandmarkController {
 			model.addAttribute("isNice", isNice);			
 		} 
 		
+		model.addAttribute("reviewImage", reviewImage);
 		model.addAttribute("reviewRating", reviewRating);
 		model.addAttribute("loc", request.getRequestURI());
 		model.addAttribute("landReview", landReview).addAttribute("pi", pi);

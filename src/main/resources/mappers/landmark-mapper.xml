@@ -124,12 +124,10 @@
 	
 	<select id="review" resultType="kh.ddeonabom.landmark.model.vo.LandReview">
 		select m.nickname, tl.create_date, ts.rating, travel_No,
-            ts.travel_sub_content, tl.travel_title,
-            img.image_no, img.image_path, img.file_name, img.rename_file, travel_sub_no
+            ts.travel_sub_content, tl.travel_title, tl.visibility, travel_sub_no
 		from travel_list tl
 		    join travel_list_sub ts using(travel_no)
 		    join member m using(member_no)
-		    join tb_image img using(travel_sub_no)
 		where tl.status = 'Y' and content_id = ${contentId}
 	</select>
 	
@@ -137,5 +135,14 @@
 		select nvl(round(avg(rating), 1), 0)
 		from travel_list_sub
 		where content_id = ${contentId}
+	</select>
+	
+	<select id="image" resultType="kh.ddeonabom.review.model.vo.Image">
+		select *
+		from tb_image
+		where travel_sub_no in 
+		    (select travel_sub_no
+		    from travel_list_sub
+		    where content_id = ${contentId})
 	</select>
 </mapper>

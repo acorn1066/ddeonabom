@@ -54,6 +54,8 @@ public interface LandmarkMapper {
 	// 별점 평균
 	double rating(int contentId);
 
+	ArrayList<Image> image(int contentId);
+
 
 
 }
