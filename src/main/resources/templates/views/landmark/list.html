@@ -127,7 +127,11 @@
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	음식점</a>
 		    <div class="ml-auto">
-		      <select class="h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none"><option>추천순</option><option>조회순</option><option>후기 많은 순</option><option>평점 높은 순</option></select>
+		      <select class="h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none">
+		      	<option>조회순</option>
+		      	<option>후기 많은 순</option>
+		      	<option>평점 높은 순</option>
+		      </select>
 		    </div>
 	    </div>
 	  </div>
@@ -168,14 +172,16 @@
 	        <span class="absolute top-2.5 left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">[[${contentType[l.contentTypeId]}]]</span>
 	      </div>
 	      <div class="p-4">
-	        <div class="text-17 font-bold tracking-tight">[[${l.title}]]</div>
+	        <div class="flex items-center justify-between text-17 font-bold tracking-tight">[[${l.title}]]
+	        	<span class="text-sm text-muted tabular-nums">후기 [[${review[l.contentId]}]]개</span>
+	        </div>
 	        <div class="mt-4 flex items-center justify-between border-t border-line pt-4">
 	        <th:block th:if="${l.addr1 != null and !#strings.isEmpty(l.addr1)}">
 	          <span class="text-13 text-muted">
 	          [[${l.addr1}]]</span>
 	        </th:block>
 	          <div class="id" style="display: none">[[${l.contentId}]]</div>
-	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">4.6</span></span>
+	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">[[${rating[l.contentId]}]]</span></span>
 	        </div>
 	      </div>
 	    </div>

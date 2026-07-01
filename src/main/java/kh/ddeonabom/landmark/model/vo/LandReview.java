@@ -20,9 +20,7 @@ public class LandReview {
 	private int rating;
 	private String travelTitle;
 	private String travelSubContent;
-	private int imageNo;
-	private String imagePath;
-	private String fileName;
-	private String renameFile;
+	private String visibility;
 	private int travelSubNo;
+	
 }
