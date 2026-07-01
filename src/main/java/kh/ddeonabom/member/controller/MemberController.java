@@ -118,10 +118,10 @@ public class MemberController {
     }
 
  //  회원가입 처리
-    // - 이메일 인증 여부 확인 (필수)
-    // - 이메일 일치 여부 확인 (보안)
-    // - 이메일 중복 체크
-    // - 비밀번호 암호화 후 저장
+    // 이메일 인증 여부 확인 (필수)
+    // 이메일 일치 여부 확인 (보안)
+    // 이메일 중복 체크
+    // 비밀번호 암호화 후 저장
     // =========================================================
     @PostMapping("/join")
     @ResponseBody
@@ -208,7 +208,7 @@ public class MemberController {
 
             session.setAttribute("loginUser", loginUser);
             
-            //로그인 활동량을 위해 만든 파일 입니다
+            
         if (!"Y".equals(loginUser.getIsAdmin())) {
             String logPath = "C:/logs/ddeonabom/login/";
             File dir = new File(logPath);
@@ -245,24 +245,8 @@ public class MemberController {
     	return "redirect:/";
     }
     
-//    @GetMapping("/edit")
-//    public String editPage(HttpSession session,Model model) {
-//    	// 세션에서 로그인된 회원 정보 가져오기
-//        Member loginUser = (Member) session.getAttribute("loginUser");
-//        
-//        // 혹시나 세션이 끊긴 상태로 접근했다면 로그인 페이지로 튕겨내기
-//        if (loginUser == null) {
-//            return "redirect:/member/login";
-//        }
-//        
-//        // edit.html이 데이터를 꺼내 쓸 수 있도록 모델에 담아서 배달하기
-//        model.addAttribute("loginUser", loginUser);
-//        
-//       return "views/member/edit";
-//   
-//    
-//    }
- // =========================================================
+
+ //=========================================================
     // 회원정보 수정 최종 처리
     // =========================================================
     @ResponseBody
@@ -281,17 +265,14 @@ public class MemberController {
         }
         
         // [버그 해결 핵심]: 세션 대신 기존 로그인 로직(mService.login)을 재사용해서
-        // DB에 들어있는 오염되지 않은 진짜 암호 원본을 실시간으로 새로 가져옵니다.
+        // DB에 들어있는 오염되지 않은 진짜 암호 원본을 실시간으로 새로 가져옴
         Member dbUser = mService.selectOneMember(loginUser.getId()); 
         if (dbUser == null) {
             return "NOT_LOGGED_IN";
         }
-        System.out.println("★ 입력된 현재비번: " + currentPassword);
-        System.out.println("★ 입력된 새비번: " + newPassword);
-        System.out.println("★ DB의 암호문: " + (dbUser != null ? dbUser.getPwd() : "null"));
-        // ② 새로운 비밀번호를 입력하려 할 때 현재 비밀번호 검증 진행
+        
         if (newPassword != null && !newPassword.trim().isEmpty()) {
-            // 💡 갓 퍼온 진짜 암호문(dbUser.getPwd())과 화면 입력값(currentPassword)을 실시간 대조
+            //  갓 퍼온 진짜 암호문(dbUser.getPwd())과 화면 입력값(currentPassword)을 실시간 대조
             if (!bcrypt.matches(currentPassword, dbUser.getPwd())) {
                 return "WRONG_CURRENT_PASSWORD"; // 틀려도 세션이 오염되지 않고 여기서 즉시 안전하게 탈출
             }
@@ -379,9 +360,9 @@ public class MemberController {
             // 서비스 단에 "STATUS='N'이 된 유저의 MODIFY_DATE를 뽑아오는 로직"이 있다면 검증이 가능
             // 여기서는 본인 확인용 콘솔 로그로 기록을 남기기
             System.out.println("=================================================");
-            System.out.println("🔥 [회원 탈퇴 최종 성공 비즈니스 로그]");
+            System.out.println(" [회원 탈퇴 최종 성공 비즈니스 로그]");
             System.out.println("ID: " + originalId + " 회원이 서비스를 떠났습니다.");
-            System.out.println("📅 탈퇴 기록 일시: " + java.time.LocalDateTime.now() + " (DB MODIFY_DATE에 저장됨)");
+            System.out.println(" 탈퇴 기록 일시: " + java.time.LocalDateTime.now() + " (DB MODIFY_DATE에 저장됨)");
             System.out.println("=================================================");
 
             //탈퇴가 최종 성공했다면 현재 세션을 완전히 파기(로그아웃) 처리
@@ -418,7 +399,7 @@ public class MemberController {
         return "EMAIL_NOT_VERIFIED";
     }
 
-    // 이메일로 회원 ID 조회 (서비스단 구현 필요)
+    // 이메일로 회원 ID 조회
     String foundId = mService.findIdByEmail(email); 
     
     if (foundId != null) {
@@ -669,53 +650,5 @@ public class MemberController {
 
 	    return "views/member/mypage";
 	}
-//	@GetMapping("/mypage/wishlist")
-//    public String myWishlist(@RequestParam(value = "page", defaultValue = "1") int currentPage,
-//                             @RequestParam(value = "type", defaultValue = "spot") String type,
-//                             HttpSession session, Model model) {
-//        
-//        Member loginUser = (Member)session.getAttribute("loginUser");
-//        if(loginUser == null) {
-//            return "redirect:/member/login"; 
-//        }
-//        
-//        HashMap<String, Object> map = new HashMap<>();
-//        map.put("memberNo", loginUser.getMemberNo());
-//        
-//        if("spot".equals(type)) {
-//            int listCount = lService.getWishListCount(loginUser.getMemberNo()); 
-//            
-//            PageInfo pi = Pagination.getPageInfo(currentPage, listCount, 5, 8);
-//            
-//            map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
-//            map.put("listLimit", pi.getBoardLimit());
-//            
-//            ArrayList<Landmark> wishlist = lService.selectMyWishList(map);
-//            
-//            model.addAttribute("wishlist", wishlist);
-//            model.addAttribute("pi", pi);
-//        } 
-//        
-//        else if("plan".equals(type)) {
-//            ArrayList<Object> wishlist = new ArrayList<>();
-//            model.addAttribute("wishlist", wishlist);
-//        }
-//        
-//       
-//        Map<Integer, String> contentType = new HashMap<>();
-//        contentType.put(12, "관광지");
-//        contentType.put(14, "문화시설");
-//        contentType.put(15, "축제/공연/행사");
-//        contentType.put(25, "여행코스");
-//        contentType.put(28, "레포츠");
-//        contentType.put(32, "숙박");
-//        contentType.put(38, "쇼핑");
-//        contentType.put(39, "음식점");
-//        
-//        model.addAttribute("contentType", contentType);
-//        model.addAttribute("type", type);
-//        
-//        return "views/member/myWishlist"; 
-//    }
 	
 }

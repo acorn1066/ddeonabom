@@ -25,4 +25,11 @@ public class LandReview {
 	private String fileName;
 	private String renameFile;
 	private int travelSubNo;
+	
+	public String getNickName() {
+        if (this.nickName != null && this.nickName.contains("_")) {
+            return "(탈퇴회원)";
+        }
+        return this.nickName;
+    }
 }

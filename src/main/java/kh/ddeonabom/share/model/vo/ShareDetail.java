@@ -33,4 +33,11 @@ public class ShareDetail {
     // ── 집계 (서브쿼리) ──
     private int    likeCount;           // NICE WHERE POST_BOARD_FX='SR'
     private int    placeCount;          // SCHEDULE_SUB COUNT
+    
+    public String getMemberNickname() {
+        if (this.memberNickname != null && this.memberNickname.contains("_")) {
+            return "(탈퇴회원)";
+        }
+        return this.memberNickname;
+    }
 }
