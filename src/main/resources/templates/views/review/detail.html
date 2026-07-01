@@ -317,9 +317,14 @@ async function initDetailMap() {
 	  );
 
 	  if (validSpots.length === 0) {
+		    const mapSection = mapContainer.closest('.map-section') || mapContainer;
+		    mapSection.style.display = 'none';
+		    return;
+		}
+	  /*if (validSpots.length === 0) {
 	    mapContainer.innerHTML = '등록된 위치 정보 없음';
 	    return;
-	  }
+	  }*/
 
 	  const map = new kakao.maps.Map(mapContainer, {
 	    center: new kakao.maps.LatLng(validSpots[0].lat, validSpots[0].lng),
@@ -414,7 +419,7 @@ function waitForKakao() {
 }
 
 window.onload = waitForKakao;
-console.log(window.kakao)
+
 
 function toggleLike() {
   const loginUser = /*[[${session.loginUser}]]*/ null;
