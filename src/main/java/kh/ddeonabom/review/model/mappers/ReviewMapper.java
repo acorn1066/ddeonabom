@@ -63,6 +63,11 @@ public interface ReviewMapper {
 
 	void deleteImageBySubNo(int travelSubNo);
 
+	void deleteImageByPath(String path);
+	
+	void updateImagePath(@Param("travelSubNo") int travelSubNo,
+            @Param("imagePath") String imagePath);
+
 
 
 }

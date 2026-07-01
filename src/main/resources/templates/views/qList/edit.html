@@ -69,7 +69,7 @@
 	    <div class="flex items-center justify-between gap-2">
 	      <!-- ★ 삭제 버튼: detail과 동일하게 danger 모달 트리거 -->
 	      <button type="button" class="text-sm font-semibold text-err"
-	              th:onclick="|openDeleteModal([[${q.qNo}]])|">질문 삭제</button>
+	              th:onclick="|openDeleteModal(${q.qNo})|">질문 삭제</button>
 
 	      <div class="flex gap-2">
 	        <!-- ★ 취소 시 목록이 아닌 해당 글 상세로 복귀 -->
