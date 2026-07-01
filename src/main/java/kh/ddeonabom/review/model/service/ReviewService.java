@@ -1,6 +1,5 @@
 package kh.ddeonabom.review.model.service;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class ReviewService {
 	
 	private final ReviewMapper reviewMapper;
-	private final AmazonS3 amazonS3;
+	private final AmazonS3 amazonS3; 
 	
 	@Value("${cloud.aws.s3.bucket}") 
 	private String bucket;

@@ -46,7 +46,7 @@ import kh.ddeonabom.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequiredArgsConstructor
+@RequiredArgsConstructor 
 
 public class ReviewController {
 	private final ReviewService reviewService;
@@ -56,7 +56,7 @@ public class ReviewController {
 	private final LandmarkService landmarkService;
 	
 	private final AmazonS3 amazonS3;
-	@Value("${cloud.aws.s3.bucket}")
+	@Value("${cloud.aws.s3.bucket}") 
 	private String bucket;
 
 	@Value("${kakao.api.key}")
