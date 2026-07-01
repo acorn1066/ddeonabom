@@ -2,6 +2,27 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{views/common/head :: head}"></head>
+<style>
+  .lm-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+  .lm-placeholder .ph-icon { font-size: 110px; }
+  .lm-placeholder .ph-title { font-size: 18px; font-weight: 500; text-align: center; padding: 0 12px; line-height: 1.4; }
+  .lm-placeholder[data-type="12"] { background: #E6F1FB; }
+  .lm-placeholder[data-type="12"] .ph-icon, .lm-placeholder[data-type="12"] .ph-title { color: #0C447C; }
+  .lm-placeholder[data-type="14"] { background: #EEEDFE; }
+  .lm-placeholder[data-type="14"] .ph-icon, .lm-placeholder[data-type="14"] .ph-title { color: #3C3489; }
+  .lm-placeholder[data-type="15"] { background: #FBEAF0; }
+  .lm-placeholder[data-type="15"] .ph-icon, .lm-placeholder[data-type="15"] .ph-title { color: #72243E; }
+  .lm-placeholder[data-type="25"] { background: #E1F5EE; }
+  .lm-placeholder[data-type="25"] .ph-icon, .lm-placeholder[data-type="25"] .ph-title { color: #085041; }
+  .lm-placeholder[data-type="28"] { background: #EAF3DE; }
+  .lm-placeholder[data-type="28"] .ph-icon, .lm-placeholder[data-type="28"] .ph-title { color: #27500A; }
+  .lm-placeholder[data-type="32"] { background: #FAEEDA; }
+  .lm-placeholder[data-type="32"] .ph-icon, .lm-placeholder[data-type="32"] .ph-title { color: #633806; }
+  .lm-placeholder[data-type="38"] { background: #FAECE7; }
+  .lm-placeholder[data-type="38"] .ph-icon, .lm-placeholder[data-type="38"] .ph-title { color: #712B13; }
+  .lm-placeholder[data-type="39"] { background: #FCEBEB; }
+  .lm-placeholder[data-type="39"] .ph-icon, .lm-placeholder[data-type="39"] .ph-title { color: #791F1F; }
+</style>
 <body class="bg-white text-ink">
 
 <div th:replace="~{views/common/navbar :: navbar}"></div>
@@ -161,9 +182,21 @@
                  th:src="${landmark.firstimage}"
                  th:alt="${landmark.title}"
                  class="absolute inset-0 h-full w-full object-cover"/>
-            <span th:unless="${landmark.firstimage != null and !landmark.firstimage.isEmpty()}"
-                  class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted"
-                  th:text="'사진 · ' + ${landmark.title}">사진</span>
+            <div th:unless="${landmark.firstimage != null and !landmark.firstimage.isEmpty()}"
+                 class="lm-placeholder" th:data-type="${landmark.contentTypeId}">
+              <th:block th:switch="${landmark.contentTypeId}">
+                <i th:case="12"  class="ph-icon ti ti-building-arch"      aria-hidden="true"></i>
+                <i th:case="14"  class="ph-icon ti ti-building"            aria-hidden="true"></i>
+                <i th:case="15"  class="ph-icon ti ti-confetti"            aria-hidden="true"></i>
+                <i th:case="25"  class="ph-icon ti ti-route"               aria-hidden="true"></i>
+                <i th:case="28"  class="ph-icon ti ti-tent"                aria-hidden="true"></i>
+                <i th:case="32"  class="ph-icon ti ti-bed"                 aria-hidden="true"></i>
+                <i th:case="38"  class="ph-icon ti ti-shopping-bag"        aria-hidden="true"></i>
+                <i th:case="39"  class="ph-icon ti ti-tools-kitchen-2"     aria-hidden="true"></i>
+                <i th:case="*"   class="ph-icon ti ti-map-2"               aria-hidden="true"></i>
+              </th:block>
+              <span class="ph-title" th:text="${landmark.title}"></span>
+            </div>
           </div>
           <div>
             <div class="text-17 font-bold" th:text="${landmark.title}">관광지명</div>
@@ -172,35 +205,9 @@
         </a>
       </div>
 
-      <div class="grid grid-cols-4 gap-6" th:unless="${popularLandmarks != null and !popularLandmarks.isEmpty()}">
-        <a href="/landmark/detail" class="flex flex-col gap-3">
-          <div class="relative flex aspect-card items-center justify-center rounded-xl border border-line bg-sunk">
-            <span class="absolute left-3 top-3 inline-flex h-6.5 w-6.5 items-center justify-center rounded-lg bg-ink text-sm font-bold text-white">1</span>
-            <span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">사진 · 성산일출봉</span>
-          </div>
-          <div><div class="text-17 font-bold">성산일출봉</div><div class="text-sm text-muted">제주 서귀포시</div></div>
-        </a>
-        <a href="/landmark/detail" class="flex flex-col gap-3">
-          <div class="relative flex aspect-card items-center justify-center rounded-xl border border-line bg-sunk">
-            <span class="absolute left-3 top-3 inline-flex h-6.5 w-6.5 items-center justify-center rounded-lg bg-ink text-sm font-bold text-white">2</span>
-            <span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">사진 · 경복궁</span>
-          </div>
-          <div><div class="text-17 font-bold">경복궁</div><div class="text-sm text-muted">서울 종로구</div></div>
-        </a>
-        <a href="/landmark/detail" class="flex flex-col gap-3">
-          <div class="relative flex aspect-card items-center justify-center rounded-xl border border-line bg-sunk">
-            <span class="absolute left-3 top-3 inline-flex h-6.5 w-6.5 items-center justify-center rounded-lg bg-ink text-sm font-bold text-white">3</span>
-            <span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">사진 · 감천문화마을</span>
-          </div>
-          <div><div class="text-17 font-bold">감천문화마을</div><div class="text-sm text-muted">부산 사하구</div></div>
-        </a>
-        <a href="/landmark/detail" class="flex flex-col gap-3">
-          <div class="relative flex aspect-card items-center justify-center rounded-xl border border-line bg-sunk">
-            <span class="absolute left-3 top-3 inline-flex h-6.5 w-6.5 items-center justify-center rounded-lg bg-ink text-sm font-bold text-white">4</span>
-            <span class="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-muted">사진 · 한라산 영실</span>
-          </div>
-          <div><div class="text-17 font-bold">한라산 영실</div><div class="text-sm text-muted">제주 서귀포시</div></div>
-        </a>
+      <div th:unless="${popularLandmarks != null and !popularLandmarks.isEmpty()}"
+           class="flex items-center justify-center rounded-xl border border-line bg-sunk py-16 text-muted">
+        등록된 관광지가 없습니다.
       </div>
     </section>
   </div>
@@ -212,7 +219,7 @@
           <span class="inline-flex items-center gap-2 text-sm font-semibold text-brand before:h-0.5 before:w-4 before:rounded before:bg-brand">공유된 길</span>
           <h2 class="mt-3 text-h2 font-bold">다른 여행자의 <span class="text-brand">길</span></h2>
         </div>
-        <a href="/schedule/share" class="flex items-center gap-2 text-sm font-semibold text-brand">게시판으로 →</a>
+        <a href="/share/list" class="flex items-center gap-2 text-sm font-semibold text-brand">게시판으로 →</a>
       </div>
 
       <div class="overflow-hidden rounded-xl border border-line bg-white">
@@ -231,10 +238,11 @@
             <!-- 서버에서 recentSharedList (List, 최대 5개) 내려줄 경우 -->
             <tr th:each="item, stat : ${recentSharedList}"
                 th:classappend="${stat.last} ? '' : 'border-b border-line'"
+                th:onclick="|location.href='@{/share/detail/{no}(no=${item.scheduleNo})}'|"
                 class="transition hover:bg-sunk">
               <td class="p-4 tabular-nums text-muted" th:text="${item.scheduleNo}">312</td>
               <td class="p-4">
-                <a th:href="@{/schedule/share/{no}(no=${item.scheduleNo})}"
+                <a th:href="@{/share/detail/{no}(no=${item.scheduleNo})}"
                    class="font-bold"
                    th:text="${item.scheduleTitle}">제목</a>
               </td>
@@ -248,50 +256,9 @@
                 ♥ <span th:text="${item.likeCount}">0</span>
               </td>
             </tr>
-
-            <!-- 폴백: 데이터 없을 때 샘플 5행 -->
-            <th:block th:if="${recentSharedList == null or recentSharedList.isEmpty()}">
-              <tr class="border-b border-line transition hover:bg-sunk">
-                <td class="p-4 tabular-nums text-muted">312</td>
-                <td class="p-4"><a href="/schedule/share" class="font-bold">제주 동쪽 한 바퀴 · 3박 4일</a></td>
-                <td class="p-4 tabular-nums text-muted">2026.04.10 — 04.13</td>
-                <td class="p-4 text-muted">12곳</td>
-                <td class="p-4">별헤는밤</td>
-                <td class="p-4 text-right tabular-nums">♥ 184</td>
-              </tr>
-              <tr class="border-b border-line transition hover:bg-sunk">
-                <td class="p-4 tabular-nums text-muted">311</td>
-                <td class="p-4"><a href="/schedule/share" class="font-bold">경주 야경 코스</a></td>
-                <td class="p-4 tabular-nums text-muted">2026.04.05 — 04.07</td>
-                <td class="p-4 text-muted">7곳</td>
-                <td class="p-4">제주한바퀴</td>
-                <td class="p-4 text-right tabular-nums">♥ 142</td>
-              </tr>
-              <tr class="border-b border-line transition hover:bg-sunk">
-                <td class="p-4 tabular-nums text-muted">310</td>
-                <td class="p-4"><a href="/schedule/share" class="font-bold">속초 1박 2일, 바다와 산</a></td>
-                <td class="p-4 tabular-nums text-muted">2026.03.30 — 03.31</td>
-                <td class="p-4 text-muted">5곳</td>
-                <td class="p-4">노을수집가</td>
-                <td class="p-4 text-right tabular-nums">♥ 121</td>
-              </tr>
-              <tr class="border-b border-line transition hover:bg-sunk">
-                <td class="p-4 tabular-nums text-muted">309</td>
-                <td class="p-4"><a href="/schedule/share" class="font-bold">전주 한옥마을 + 익산 미륵사지</a></td>
-                <td class="p-4 tabular-nums text-muted">2026.03.22 — 03.24</td>
-                <td class="p-4 text-muted">9곳</td>
-                <td class="p-4">느린산책</td>
-                <td class="p-4 text-right tabular-nums">♥ 98</td>
-              </tr>
-              <tr class="transition hover:bg-sunk">
-                <td class="p-4 tabular-nums text-muted">308</td>
-                <td class="p-4"><a href="/schedule/share" class="font-bold">강원 동해안 ↔ 설악</a></td>
-                <td class="p-4 tabular-nums text-muted">2026.03.18 — 03.21</td>
-                <td class="p-4 text-muted">11곳</td>
-                <td class="p-4">길위의하루</td>
-                <td class="p-4 text-right tabular-nums">♥ 73</td>
-              </tr>
-            </th:block>
+            <tr th:if="${recentSharedList == null or #lists.isEmpty(recentSharedList)}">
+              <td colspan="6" class="p-6 text-center text-muted">공유된 일정이 없습니다.</td>
+            </tr>
           </tbody>
         </table>
       </div>

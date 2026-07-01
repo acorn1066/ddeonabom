@@ -181,16 +181,25 @@
 
         <!-- 카드 본문 -->
         <div class="p-4">
-          <div class="text-17 font-bold tracking-tight" th:text="${share.scheduleTitle}">제목</div>
+          <div class="flex items-center justify-between text-17 font-bold tracking-tight">
+            <span th:text="${share.scheduleTitle}">제목</span>
+            <span th:if="${share.scheduleVisibility == 'M'}"
+                  class="inline-flex items-center gap-0.5 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-11 font-medium text-blue-600 ml-1 shrink-0">
+              <i class="ti ti-lock" style="font-size:10px" aria-hidden="true"></i>회원
+            </span>
+          </div>
           <div class="mt-1 text-13 text-muted tabular-nums"
                th:text="${share.scheduleStartdate} + ' — ' + ${share.scheduleEnddate}">기간</div>
 
           <div class="mt-4 flex items-center gap-3 border-t border-line pt-4">
             <!-- 작성자 아바타 + 닉네임 -->
             <span class="flex items-center gap-2 text-13 font-semibold">
-              <span class="flex h-6.5 w-6.5 items-center justify-center rounded-full bg-brand-soft text-xs font-bold text-brand-ink"
-                    th:text="${#strings.substring(share.memberNickname, 0, 1)}">닉</span>
-              <span th:text="${share.memberNickname}">닉네임</span>
+              <span class="flex h-6.5 w-6.5 items-center justify-center rounded-full text-xs font-bold"
+                    th:classappend="${share.memberNickname == null or #strings.startsWith(share.memberNickname, '(')} ? 'bg-gray-200 text-gray-400' : 'bg-brand-soft text-brand-ink'">
+                <i th:if="${share.memberNickname == null or #strings.startsWith(share.memberNickname, '(')}" class="ti ti-user-x" style="font-size:12px"></i>
+                <th:block th:unless="${share.memberNickname == null or #strings.startsWith(share.memberNickname, '(')}" th:text="${#strings.substring(share.memberNickname, 0, 1)}">닉</th:block>
+              </span>
+              <span th:text="${share.memberNickname != null and !#strings.startsWith(share.memberNickname, '(') ? share.memberNickname : '(탈퇴회원)'}">닉네임</span>
             </span>
             <!-- 추천·댓글 수 -->
             <span class="ml-auto flex gap-3 text-13 text-muted">
@@ -233,4 +242,63 @@
   <footer th:replace="~{views/common/footer :: footer}"></footer>
 
   <script>
-    /* ─── 지역 필터 탭 
+    /* ─── 지역 필터 탭 클릭 → hidden input 변경 후 폼 제출 ─── */
+    function selectRegion(value) {
+      document.getElementById('region-input').value = value;
+      document.getElementById('search-hidden').value = document.getElementById('search-input').value;
+      document.getElementById('filter-form').submit();
+    }
+
+    /* ─── 검색 Enter ─── */
+    function submitSearch() {
+      document.getElementById('search-hidden').value = document.getElementById('search-input').value;
+      document.getElementById('filter-form').submit();
+    }
+
+    /* ─── 지역 뱃지 단축 (my-list.html 동일 렩식) ─── */
+    const REGION_MAP = {
+      '서울': '서울', '부산': '부산', '대구': '대구', '인천': '인천',
+      '광주': '광주', '대전': '대전', '울산': '울산', '세종': '세종',
+      '경기': '경기', '강원': '강원', '제주': '제주',
+      '출청북도': '출북', '출청남도': '출남',
+      '전라북도': '전북', '전라남도': '전남',
+      '경상북도': '경북', '경상남도': '경남',
+      '출북': '출북', '출남': '출남', '전북': '전북', '전남': '전남',
+      '경북': '경북', '경남': '경남', '강원특별자치도': '강원',
+      '제주특별자치도': '제주', '전북특별자치도': '전북'
+    };
+
+    function extractRegion(addr1) {
+      if (!addr1) return null;
+      const head = addr1.trim().split(' ')[0];
+      const keys = Object.keys(REGION_MAP).sort((a, b) => b.length - a.length);
+      for (const key of keys) {
+        if (head.startsWith(key)) return REGION_MAP[key];
+      }
+      return head;
+    }
+
+    document.querySelectorAll('.region-badge').forEach(badge => {
+      const region = extractRegion(badge.dataset.addr);
+      if (region) badge.textContent = region;
+    });
+
+	/* ============================================================ 공지사항 =================================================================  */
+    function toggleNoticeBar() {
+        const body    = document.getElementById('notice-body');
+        const label   = document.getElementById('notice-toggle-label');
+        const chevron = document.getElementById('notice-chevron');
+        const isOpen  = body.style.display !== 'none';
+        body.style.display      = isOpen ? 'none' : '';
+        chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        label.childNodes[0].textContent = isOpen ? '펼치기 ' : '접기 ';
+      }
+    
+    /* ============================================================ 공지사항 =================================================================  */
+    
+    
+
+  </script>
+
+</body>
+</html>
