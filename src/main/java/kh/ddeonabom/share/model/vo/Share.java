@@ -39,4 +39,12 @@ public class Share {
     private String firstAddr;           // LANDMARK.ADDR1 (지역 뱃지용)
     private String coords;              // "mapx,mapy;mapx,mapy;..." (SVG 루트용)
     private String reportStatus;
+
+    public String getMemberNickname() {
+        if (this.memberNickname != null && this.memberNickname.contains("_")) {
+            return "(탈퇴회원)";
+        }
+        return this.memberNickname;
+    }
+
 }

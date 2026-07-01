@@ -24,4 +24,11 @@ public class Reply {
 	private int memberNo;
 	private String writer;   // MEMBER 테이블 JOIN으로 가져올 nickname
 	private String reportStatus;
+	
+	public String getWriter() {
+        if (this.writer != null && this.writer.contains("_")) {
+            return "(탈퇴회원)";
+        }
+        return this.writer;
+    }
 }
