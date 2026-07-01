@@ -327,8 +327,12 @@
 	</update>
 	
 	<delete id="deleteImageBySubNo">
-	    DELETE FROM IMAGE_TABLE 
+	    DELETE FROM TB_IMAGE
 	    WHERE TRAVEL_SUB_NO = #{travelSubNo}
 	</delete>
 
+	<delete id="deleteImageByPath">
+	    DELETE FROM TB_IMAGE
+	    WHERE IMAGE_PATH = #{imagePath}
+	</delete>
 </mapper>

@@ -494,6 +494,7 @@ kakao.maps.load(function () {
 	      });
 	  });
 	  list.appendChild(div);
+	  
 	}
 	function reindexCards() {
 		  document.querySelectorAll('.spot-card').forEach((c, i) => {
@@ -513,7 +514,6 @@ kakao.maps.load(function () {
 		    if (lngInput) lngInput.name = `subList[${i}].lng`;
 		  });
 		}
-	
 	
 	const form = document.getElementById("reviewForm");
 
@@ -623,8 +623,49 @@ kakao.maps.load(function () {
 		fitBounds();
 		
 	}
-});
 
+	
+
+});
+document.addEventListener("DOMContentLoaded", function () {
+	  // 1. 한국 시간(KST) 기준으로 오늘 날짜를 정확하게 구합니다.
+	  
+	 const now = new Date();
+
+	const year = now.getFullYear();
+	const month = String(now.getMonth() + 1).padStart(2, "0");
+	const day = String(now.getDate()).padStart(2, "0");
+		
+	const today = `${year}-${month}-${day}`;
+	 
+	  const startDateInput = document.getElementById("startDate");
+	  const endDateInput = document.getElementById("endDate");
+	  
+	  console.log(document.getElementById("startDate").max);
+	  console.log(document.getElementById("endDate").max);
+
+	  // 둘 다 오늘 이후로는 선택 불가능하게 설정
+	  startDateInput.max = today;
+	  endDateInput.max = today;
+
+	  // 시작일이 바뀌면 종료일의 선택 가능 범위 제한
+	  startDateInput.addEventListener("change", function () {
+	    if (startDateInput.value) {
+	      endDateInput.min = startDateInput.value;
+	    } else {
+	      endDateInput.removeAttribute("min"); // 시작일 비워지면 제한 해제 (UX 보완)
+	    }
+	  });
+
+	  // 종료일이 바뀌면 시작일의 선택 가능 범위 제한
+	  endDateInput.addEventListener("change", function () {
+	    if (endDateInput.value) {
+	      startDateInput.max = endDateInput.value;
+	    } else {
+	      startDateInput.max = today; // 종료일이 비워지면 다시 오늘로 리셋
+	    }
+	  });
+	});
 
 </script>
 
