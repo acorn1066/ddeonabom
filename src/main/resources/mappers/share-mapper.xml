@@ -356,26 +356,19 @@
 </select>
 
 <select id="selectMyShareList" parameterType="map" resultType="Share">
-    SELECT DISTINCT
-           S.SCHEDULE_NO,
-           S.SCHEDULE_TITLE AS scheduleTitle,
-           S.SCHEDULE_STATUS,
-           S.CREATE_DATE AS createDate,
-           RP.REPORT_STATUS
+    SELECT 
+           S.SCHEDULE_NO, S.SCHEDULE_TITLE AS scheduleTitle, S.SCHEDULE_STATUS, S.CREATE_DATE AS createDate,
+           (SELECT CASE WHEN COUNT(*) > 0 THEN 'N' ELSE 'NONE' END
+            FROM REPORT 
+            WHERE TARGET_NO = S.SCHEDULE_NO 
+              AND TARGET_TYPE = 'share'
+              AND REPORT_STATUS = 'N') AS reportStatus
     FROM   SCHEDULE_MAIN S
-    LEFT JOIN REPORT RP
-           ON S.SCHEDULE_NO = RP.TARGET_NO
-          AND RP.TARGET_TYPE = 'share'
-          AND RP.REPORT_STATUS = 'N'
-    LEFT JOIN SCHEDULE_SUB SS
-           ON S.SCHEDULE_NO = SS.SCHEDULE_NO
-    LEFT JOIN LANDMARK L
-           ON SS.CONTENT_ID = L.CONTENT_ID
-    
+    LEFT JOIN SCHEDULE_SUB SS ON S.SCHEDULE_NO = SS.SCHEDULE_NO
+    LEFT JOIN LANDMARK L ON SS.CONTENT_ID = L.CONTENT_ID
     WHERE  S.MEMBER_NO = #{memberNo}
       AND  S.SCHEDULE_STATUS = 'Y'
-      
-    <if test="keyword != null and keyword != ''">
+      <if test="keyword != null and keyword != ''">
         <choose>
             <when test="searchType == 'title'">
                 AND S.SCHEDULE_TITLE LIKE '%' || #{keyword} || '%'
@@ -384,14 +377,11 @@
                 AND (L.TITLE LIKE '%' || #{keyword} || '%' OR L.ADDR1 LIKE '%' || #{keyword} || '%')
             </when>
             <otherwise>
-                AND (
-                    S.SCHEDULE_TITLE LIKE '%' || #{keyword} || '%'
-                    OR L.TITLE LIKE '%' || #{keyword} || '%'
-                    OR L.ADDR1 LIKE '%' || #{keyword} || '%'
-                )
+                AND (S.SCHEDULE_TITLE LIKE '%' || #{keyword} || '%' OR L.TITLE LIKE '%' || #{keyword} || '%' OR L.ADDR1 LIKE '%' || #{keyword} || '%')
             </otherwise>
         </choose>
     </if>
+    GROUP BY S.SCHEDULE_NO, S.SCHEDULE_TITLE, S.SCHEDULE_STATUS, S.CREATE_DATE
     ORDER BY S.SCHEDULE_NO DESC
     OFFSET #{startRow} ROWS
     FETCH NEXT #{listLimit} ROWS ONLY

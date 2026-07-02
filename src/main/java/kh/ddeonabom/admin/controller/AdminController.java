@@ -245,7 +245,20 @@ public class AdminController {
 		@ResponseBody
 		@PatchMapping("posts")
 	    public int updatePostStatus(@RequestBody AdminPost post) {
-	        return aService.updatePostStatus(post);
+			if("Y".equals(post.getStatus())) {
+				 switch (post.getBoardType()) {
+		            case "공유":
+		                if (aService.checkMemberStatusSchedule(post) > 0) return -1;
+		                break;
+		            case "후기":
+		                if (aService.checkMemberStatusReview(post) > 0) return -1;
+		                break;
+		            case "질문":
+		                if (aService.checkMemberStatusQuestion(post) > 0) return -1;
+		                break;
+		        }
+		    }
+		    return aService.updatePostStatus(post);
 	    }
 		
 		

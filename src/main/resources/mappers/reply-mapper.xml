@@ -57,13 +57,13 @@
     FROM (
         SELECT
             R.*,
-            RP.REPORT_STATUS AS reportStatus,
+            NVL(RP.REPORT_STATUS, 'NONE') AS reportStatus,
             ROW_NUMBER() OVER (ORDER BY R.CREATE_DATE DESC) AS rnum
         FROM REPLY R
         LEFT JOIN REPORT RP
-               ON R.POST_NO = RP.TARGET_NO
+               ON R.REPLY_NO = RP.TARGET_NO
               AND RP.TARGET_TYPE = 'reply'
-              AND RP.REPORT_STATUS = 'N'
+              AND RP.REPORT_STATUS = 'N' 
         WHERE R.MEMBER_NO = #{memberNo}
           AND R.POST_BOARD = #{postBoard}
           AND R.STATUS = 'Y'

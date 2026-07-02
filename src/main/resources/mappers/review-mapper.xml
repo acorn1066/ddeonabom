@@ -62,7 +62,7 @@
 	    FETCH NEXT #{pi.boardLimit} ROWS ONLY
 	</select>
 	
-	<select id="selectListCount" resultType="int">
+	<select id="selectListCount" resultType="_int">
 	    SELECT COUNT(*)
 	    FROM TRAVEL_LIST T
 	    WHERE T.STATUS = 'Y'
@@ -140,12 +140,13 @@
         T.TRAVEL_NO,
         T.TRAVEL_TITLE AS travelTitle,
         T.CREATE_DATE AS createDate,
-        RP.REPORT_STATUS AS reportStatus
+        CASE WHEN RP.REPORT_NO IS NULL THEN 'NONE' 
+             ELSE RP.REPORT_STATUS 
+        END AS reportStatus
     FROM TRAVEL_LIST T
     LEFT JOIN REPORT RP 
            ON T.TRAVEL_NO = RP.TARGET_NO 
-          AND RP.TARGET_TYPE = 'travel' 
-          AND RP.REPORT_STATUS = 'N'
+          AND RP.TARGET_TYPE = 'review'
     LEFT JOIN TRAVEL_LIST_SUB TS 
            ON T.TRAVEL_NO = TS.TRAVEL_NO
     
@@ -176,16 +177,16 @@
 </select>
 	
 	<select id="getReviewDetail" parameterType="int" resultType="kh.ddeonabom.review.model.vo.Review">
-	    SELECT 
-        T.*,
-        (SELECT COUNT(*) 
-         FROM NICE N 
+	    SELECT
+        T.*, M.NICKNAME AS NICKNAME,
+        (SELECT COUNT(*)
+         FROM NICE N
          WHERE N.POST_NO = T.TRAVEL_NO) AS LIKE_COUNT
-	    FROM TRAVEL_LIST T
+	    FROM TRAVEL_LIST T JOIN MEMBER M ON T.MEMBER_NO = M.MEMBER_NO
 	    WHERE T.TRAVEL_NO = #{travelNo}
 	    AND T.STATUS = 'Y'
 	    AND T.VISIBILITY IN ('PUBLIC','MEMBER')
-	   
+
 	</select>
 	
 	<select id="getReviewSubList" parameterType="int" resultType="kh.ddeonabom.review.model.vo.ReviewSub">
