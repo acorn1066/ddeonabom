@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{views/common/head :: head}"></head>
 <head>
     <meta charset="UTF-8">
     <title>회원가입</title>
@@ -10,6 +11,7 @@
     <style>
     /* 전체 배경 설정 */
     body {
+    font-family: inherit;
         background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
     min-height: 100vh;
     display: flex;
@@ -144,9 +146,11 @@
         .text-white { color: #ffffff; }
         .bg-indigo-600:hover { background-color: #4338ca; }
     </style>
+    
 </head>
 
 <body>
+
     <th:block th:replace="~{views/common/modal :: modal}"></th:block>
 
     <div class="join-wrapper">
@@ -209,7 +213,7 @@
             let isIdChecked = false;
             let checkedId = "";
 
-            // 중복 확인 버튼 클릭 이벤트
+            //중복 확인 버튼 클릭 이벤트
             $("#checkIdBtn").click(function() {
                 let id = $("#userId").val().trim();
                 let $idMsg = $("#idMsg");
@@ -251,44 +255,72 @@
                 }
             });
             
-            // 이메일 인증 초기화
-            initEmailVerification({
-                sendBtn: "#sendCodeBtn",
-                verifyBtn: "#verifyBtn",
-                authArea: "#authArea",
-                emailMsg: "#emailMsg",
-                authCodeInput: "#authCode",
-                getEmailFunction: function() {
-                    return $("#emailId").val() + "@" + $("#emailDomain").val();
-                }
-            });
+            // 이메일 인증 초기화 (중복 호출 제거 및 선제적 중복 체크 바인딩)
+			initEmailVerification({
+			    sendBtn: "#sendCodeBtn",
+			    verifyBtn: "#verifyBtn",
+			    authArea: "#authArea",
+			    emailMsg: "#emailMsg",
+			    authCodeInput: "#authCode",
+			    getEmailFunction: function() {
+			        return $("#emailId").val() + "@" + $("#emailDomain").val();
+			    },
+			    // 인증번호 발송 직전 실행될 인터셉터 콜백 함수
+			    beforeSendCallback: function() {
+			        let emailId = $("#emailId").val().trim();
+			        let email = emailId + "@" + $("#emailDomain").val();
+			        let $emailMsg = $("#emailMsg");
+			        
+			        if (emailId === "") {
+			            if (typeof openInfoModal === 'function') openInfoModal("알림", "이메일 아이디를 입력해 주세요.");
+			            $emailMsg.text("이메일 아이디를 입력해 주세요.").css("color", "red");
+			            return false; // 발송 중단
+			        }
+			
+			        let isAvailable = false;
+			
+			        // 동기(Sync) 방식으로 이메일 중복 검사를 먼저 수행
+			        $.ajax({
+			            url: "/member/check-email", 
+			            type: "GET",
+			            data: { email: email },
+			            async: false, // 결과를 기다려야 하므로 동기 처리
+			            success: function(res) {
+			                if (res === "AVAILABLE") {
+			                    isAvailable = true; // 가입 가능한 이메일일 때만 패스
+			                } else {
+                    			if (typeof openInfoModal === 'function') openInfoModal("경고", "이미 가입된 이메일 주소입니다.");
+			                    $emailMsg.text("이미 가입된 이메일 주소입니다.").css("color", "red");
+			                    isAvailable = false;
+			                }
+			            },
+			            error: function() {
+			                if (typeof openInfoModal === 'function') openInfoModal("오류", "이메일 중복 확인 중 서버 오류가 발생했습니다.");
+			                isAvailable = false;
+			            }
+			        });
+			
+			        return isAvailable; // true면 auth.js에서 SMTP 메일 발송 시작, false면 차단
+			    }
+			});
+
+           
+			$("#emailId, #emailDomain").on("input change", function () {
+			    // 인증 번호를 받았거나, 인증이 완료되었거나 상관없이 
+			    // 유저가 이메일을 한 글자라도 수정하면 즉시 버튼을 초기화하고 30초 락을 해제함
+			    resetEmailAuthUI(
+			        "#sendCodeBtn", 
+			        "#verifyBtn", 
+			        "#authArea", 
+			        "#authCode", 
+			        "#emailMsg"
+			    );
+			    
+			    // 추가로 이메일이 바뀌었으니 안내 메시지 하나 띄워주기
+			    $("#emailMsg").text("이메일 주소가 변경되었습니다. 다시 인증해 주세요.").css("color", "orange");
+			});
+
             
-            let certifiedEmail = "";
-
-            $("#emailId, #emailDomain").on("input change", function () {
-                let currentEmail = $("#emailId").val() + "@" + $("#emailDomain").val();
-                let isVerified = sessionStorage.getItem("emailVerified");
-
-                if (isVerified !== "true") {
-                    $("#emailMsg").text("");
-                    return;
-                }
-
-                if (isVerified === "true" && certifiedEmail === "") {
-                    certifiedEmail = currentEmail;
-                }
-
-                if (isVerified === "true" && currentEmail !== certifiedEmail) {
-                    sessionStorage.setItem("emailVerified", "false");
-                    $("#emailMsg").text("이메일이 변경되어 인증이 초기화되었습니다.").css("color", "red");
-                }
-                else if (currentEmail === certifiedEmail) {
-                    sessionStorage.setItem("emailVerified", "true");
-                    $("#emailMsg").text("이메일 인증이 완료되었습니다.").css("color", "green");
-                }
-            });
-
-            // submit 제어
             $("form").submit(function (e) {
                 e.preventDefault();
 

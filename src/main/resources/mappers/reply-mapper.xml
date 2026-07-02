@@ -5,7 +5,7 @@
 
 	<!-- 댓글 목록: POST_NO + POST_BOARD 기준, 등록 오래된 순 -->
 	<select id="getReplyList" parameterType="hashmap" resultType="Reply">
-		SELECT r.*, m.nickname AS writer
+		SELECT r.*, m.nickname AS writer, m.status AS writerStatus
 		FROM reply r
 		JOIN member m ON r.member_no = m.member_no
 		WHERE r.post_no    = #{postNo}

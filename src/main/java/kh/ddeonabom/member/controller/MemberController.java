@@ -65,7 +65,7 @@ public class MemberController {
 	@ResponseBody
 	@GetMapping("/check-id")
 	public String checkId(@RequestParam("id") String id) {
-		// 만약 STATUS='Y'인 회원이 이미 존재한다면 중복된 아이디
+		
 	    Member m = mService.selectOneMember(id);
 	    
 	    if (m != null) {
@@ -105,24 +105,38 @@ public class MemberController {
         String savedCode = (String) session.getAttribute("authCode");
         String email = (String) session.getAttribute("targetEmail");
 
-        // auth.js에서 넘겨준 code와 세션의 savedCode 비교
-        if (savedCode != null && savedCode.equals(code)) {
-            // 인증 성공 상태를 세션에 저장 (가입/수정 공통)
-            session.setAttribute("emailVerified", true);
-            session.setAttribute("verifiedEmail", email);
-
-            return "SUCCESS"; // success 반환
+       
+        if (savedCode == null || email == null) {
+            session.setAttribute("emailVerified", false);
+            return "FAIL";
         }
 
-        return "FAIL"; // fail 반환
+        
+        if (savedCode.equals(code.trim())) {
+            session.setAttribute("emailVerified", true);
+            session.setAttribute("verifiedEmail", email);
+            return "SUCCESS";
+        }
+
+        
+        session.setAttribute("emailVerified", false);
+        session.removeAttribute("verifiedEmail"); 
+
+        return "FAIL";
     }
 
- //  회원가입 처리
-    // 이메일 인증 여부 확인 (필수)
-    // 이메일 일치 여부 확인 (보안)
-    // 이메일 중복 체크
-    // 비밀번호 암호화 후 저장
-    // =========================================================
+    @ResponseBody
+	@GetMapping("/check-email")
+	public String checkEmail(@RequestParam("email") String email) {
+		
+		// 가입 로직에서 이미 사용 중인 mService의 이메일 중복 검사 메서드 활용
+		boolean isDuplicate = mService.existsByEmail(email);
+		
+		if (isDuplicate) {
+			return "DUPLICATE"; // 이미 가입된 이메일이 존재함
+		}
+		return "AVAILABLE"; // 사용 가능한 이메일 (가입된 내역 없음)
+	}
     @PostMapping("/join")
     @ResponseBody
     public String join(@ModelAttribute Member m, HttpSession session) {
@@ -137,17 +151,12 @@ public class MemberController {
             return "EMAIL_NOT_VERIFIED";
         }
 
-        // -------------------------------
-        // 인증된 이메일과 실제 가입 이메일 비교
-        // (중간 변조 방지)
-        // -------------------------------
+       
         if (verifiedEmail == null || !verifiedEmail.equals(m.getEmail())) {
             return "EMAIL_NOT_VERIFIED";
         }
 
-        // -------------------------------
-        // 이메일 중복 체크
-        // -------------------------------
+       
         if (mService.existsByEmail(m.getEmail())) {
             return "DUPLICATE_EMAIL";
         }
@@ -155,10 +164,8 @@ public class MemberController {
             return "DUPLICATE_nickname"; // 프론트엔드에 닉네임 중복 알림 전달
         }
 
-        // -------------------------------
-        // 비밀번호 암호화
-        // -------------------------------
-        m.setPwd(bcrypt.encode(m.getPwd())); // 👈 주입받은 'bcrypt' 객체를 그대로 사용
+        
+        m.setPwd(bcrypt.encode(m.getPwd())); 
         
         System.out.println("==============================================");
         System.out.println("★ [회원가입] 화면에서 서버로 넘어온 원본 비밀번호: [" + m.getPwd() + "]");
@@ -642,7 +649,7 @@ public class MemberController {
 	    }
 
 	    // ==========================================
-	    // [edit] 내 정보 수정 탭
+	    //내 정보 수정 탭
 	    // ==========================================
 	    else if("edit".equals(tab)) {
 	        model.addAttribute("loginUser", loginUser);

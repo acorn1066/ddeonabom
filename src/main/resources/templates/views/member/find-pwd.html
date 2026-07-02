@@ -8,7 +8,6 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script th:src="@{/js/tw.js}"></script>
-<script th:src="@{/js/tw.js}"></script>
 <script>
   tailwind.config = {
     theme: {
@@ -33,7 +32,7 @@
 <style> body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing:antialiased; letter-spacing:-0.01em; } </style>
 </head>
 <body class="bg-white text-ink">
-
+<th:block th:replace="~{views/common/modal :: modal}"></th:block>
 <header class="sticky top-0 z-50 h-header border-b border-line bg-white/80 backdrop-blur-md backdrop-saturate-150">
   <div class="mx-auto flex h-full max-w-wide items-center justify-between px-6">
     <a th:href="@{/}" class="flex items-center gap-2">
@@ -93,7 +92,7 @@
 $(document).ready(function() {
     let $msg = $("#statusMsg");
 
-    // 1. auth.js 모듈 연동 및 초기화 (계정 찾기 우회 전용 /member/find-account/send 활용)
+    //  auth.js 모듈 연동 및 초기화 (계정 찾기 우회 전용 /member/find-account/send 활용)
     initEmailVerification({
         sendBtn: "#btnSendCode",
         verifyBtn: "#btnVerifyCode",
@@ -113,32 +112,41 @@ $(document).ready(function() {
         }
     });
 
-    // 2. 최종 임시 비밀번호 발급 요청 (컨트롤러 @PostMapping("/find-pwd") 직통 타격)
+    //  최종 임시 비밀번호 발급 요청 (컨트롤러 @PostMapping("/find-pwd") 직통 타격)
     $("#btnSubmitFindPw").click(function() {
         let id = $("#userId").val().trim();
         let email = $("#userEmail").val().trim();
         
         if(!id) {
-            $msg.text("❌ 아이디를 입력해 주세요.").css("color", "red");
+            $msg.text("아이디를 입력해 주세요.").css("color", "red");
             return;
         }
         if(!email) {
-            $msg.text("❌ 이메일을 입력해 주세요.").css("color", "red");
+            $msg.text("이메일을 입력해 주세요.").css("color", "red");
             return;
         }
 
-        $msg.text("🔄 임시 비밀번호를 생성하여 메일을 발송 중입니다...").css("color", "orange");
+        $msg.text("임시 비밀번호를 생성하여 메일을 발송 중입니다...").css("color", "orange");
 
         $.post("/member/find-pwd", { id: id, email: email }, function(res) {
-            if(res === "SUCCESS") {
-                alert("✔ 임시 비밀번호가 이메일로 안전하게 발송되었습니다.\n로그인 후 마이페이지에서 비밀번호를 꼭 변경해 주세요!");
-                location.href = "/member/login"; 
-            } else if(res === "MEMBER_NOT_FOUND") {
-                $msg.text("❌ 입력하신 아이디와 이메일 정보가 일치하는 회원이 없습니다.").css("color", "red");
+        	if(res === "SUCCESS") {
+
+        	    openInfoModal(
+        	        "임시 비밀번호 발급 완료",
+        	        "임시 비밀번호가 이메일로 안전하게 발송되었습니다.\n로그인 후 마이페이지에서 비밀번호를 꼭 변경해 주세요!"
+        	    );
+        	    const okBtn = document.querySelector("#modal-info button");
+
+        	    okBtn.onclick = function () {
+        	        closeModal();
+        	        location.href = "/member/login";
+        	    };
+        	} else if(res === "MEMBER_NOT_FOUND") {
+                $msg.text(" 입력하신 아이디와 이메일 정보가 일치하는 회원이 없습니다.").css("color", "red");
             } else if(res === "EMAIL_NOT_VERIFIED") {
-                $msg.text("🚨 세션 인증이 만료되었습니다. 이메일 인증을 다시 진행해 주세요.").css("color", "red");
+                $msg.text("세션 인증이 만료되었습니다. 이메일 인증을 다시 진행해 주세요.").css("color", "red");
             } else {
-                $msg.text("❌ 시스템 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.").css("color", "red");
+                $msg.text("시스템 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.").css("color", "red");
             }
         });
     });
