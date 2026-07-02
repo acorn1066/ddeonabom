@@ -140,9 +140,6 @@
 	<select id="image" resultType="kh.ddeonabom.review.model.vo.Image">
 		select *
 		from tb_image
-		where travel_sub_no in 
-		    (select travel_sub_no
-		    from travel_list_sub
-		    where content_id = ${contentId})
+		where travel_sub_no = ${travelSubNo}
 	</select>
 </mapper>
