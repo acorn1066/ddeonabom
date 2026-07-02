@@ -2,7 +2,9 @@
  * 떠나봄 회원 인증 관련 공통 모듈 (auth.js)
  */
 
-// 비밀번호 정규식 및 일치 여부 실시간 검증 세팅
+let emailThrottleTimer;
+
+
 function initPasswordValidation(pwdInputSelector, pwdCheckSelector, ruleMsgSelector, mismatchMsgSelector) {
     let reg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()~_+=\{\}\[\]| \-])[A-Za-z\d!@#$%^&*()~_+=\{\}\[\]| \-]{8,20}$/;
 
@@ -38,15 +40,44 @@ function checkPasswordMatch(pwdInputSelector, pwdCheckSelector, mismatchMsgSelec
 }
 
 
-// 이메일 인증 통합 세팅 
+
+function resetEmailAuthUI(sendBtn, verifyBtn, authArea, authCodeInput, emailMsg) {
+    sessionStorage.setItem("emailVerified", "false");
+    sessionStorage.removeItem("verifiedEmail");
+    
+    
+    if (emailThrottleTimer) {
+        clearTimeout(emailThrottleTimer);
+    }
+    
+    if (authArea) $(authArea).hide();
+
+    $(authCodeInput).val("").prop("disabled", false);
+    $(verifyBtn).prop("disabled", false);
+    $(sendBtn).prop("disabled", false);
+
+    $(emailMsg).text("").css("color", "");
+}
+
+
+// ==========================================
+//이메일 인증 통합 세팅 
+// ==========================================
 function initEmailVerification({
     sendBtn, verifyBtn, authArea, emailMsg, authCodeInput,
     getEmailFunction,
-    successCallback //인증 성공 후 페이지별로 다르게 처리할 로직을 담는 콜백 함수
+    successCallback, // 인증 성공 후 페이지별로 다르게 처리할 로직을 담는 콜백 함수
+    beforeSendCallback
 }) {
     
     // 인증번호 발송
     $(sendBtn).click(function () {
+        if (typeof beforeSendCallback === "function") {
+            if (!beforeSendCallback()) {
+                return; // 뷰단 가입 전 검증(이메일 중복 체크 등) 실패 시 발송 중단
+            }
+        }
+        
         let email = getEmailFunction();
         if(!email || email.trim() === "") {
             $(emailMsg).text("이메일을 입력해 주세요.").css("color", "red");
@@ -56,8 +87,7 @@ function initEmailVerification({
 
         $(emailMsg).text("인증번호 발송 중...").css("color", "orange");
 
-        // 현재 주소창에 'find'가 있으면 계정 찾기용 발송 URL로 자동 스위칭
-        // 회원가입(/member/join), 수정(/member/edit) 시에는 기존 주소(/member/send) 그대로 동작
+      
         let sendUrl = window.location.href.includes("find") ? "/member/find-account/send" : "/member/send";
 
         $.ajax({
@@ -67,22 +97,25 @@ function initEmailVerification({
             success: function (res) {
                 if (res === "SUCCESS") {
                     sessionStorage.setItem("emailVerified", "false");
-                    // 아이디 찾기 화면처럼 기본적으로 열려있는 구조면 slideDown이 안 먹거나 무해함
+                    sessionStorage.removeItem("verifiedEmail");
+                    
                     if(authArea) $(authArea).slideDown(); 
                     $(emailMsg).text("인증번호가 발송되었습니다. 메일함을 확인해 주세요.").css("color", "green");
                     $(sendBtn).prop("disabled", true);
 
-                    setTimeout(function () {
+                    // 쓰로틀링 타이머 작동 (30초 제한 시작)
+                    emailThrottleTimer = setTimeout(function () {
                         $(sendBtn).prop("disabled", false);
                     }, 30000);
+                    
                 } else if (res === "NOT_FOUND") {
-                    $(emailMsg).text("❌ 가입되지 않은 이메일 주소입니다.").css("color", "red");
+                    $(emailMsg).text("가입되지 않은 이메일 주소입니다.").css("color", "red");
                 } else {
                     $(emailMsg).text("발송 실패").css("color", "red");
                 }
             },
             error: function() {
-                $(emailMsg).text("🚨 서버 통신 에러").css("color", "red");
+                $(emailMsg).text("서버 통신 에러").css("color", "red");
             }
         });
     });
@@ -96,11 +129,13 @@ function initEmailVerification({
             success: function(res) {
                 if (res === "SUCCESS") {
                     sessionStorage.setItem("emailVerified", "true");
+                    sessionStorage.setItem("verifiedEmail", getEmailFunction());
                     $(emailMsg).text("✔ 이메일 인증 완료").css("color", "green");
                     $(authCodeInput).prop("disabled", true);
                     $(verifyBtn).prop("disabled", true);
                     $(sendBtn).prop("disabled", true);
                     
+                    // 인증 성공 시 주입받은 각 페이지별 후처리 실행
                     if(typeof successCallback === "function") {
                         successCallback();
                     }
@@ -110,8 +145,10 @@ function initEmailVerification({
                 }
             },
             error: function() {
-                $(emailMsg).text("🚨 서버 통신 에러").css("color", "red");
+                $(emailMsg).text("서버 통신 에러").css("color", "red");
             }
         });
     });
+    
+ 
 }

@@ -8,7 +8,6 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script th:src="@{/js/tw.js}"></script>
-<script th:src="@{/js/tw.js}"></script>
 <script>
   tailwind.config = {
     theme: {
@@ -33,7 +32,7 @@
 <style> body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing:antialiased; letter-spacing:-0.01em; } </style>
 </head>
 <body class="bg-white text-ink">
-
+<th:block th:replace="~{views/common/modal :: modal}"></th:block>
 <header class="sticky top-0 z-50 h-header border-b border-line bg-white/80 backdrop-blur-md backdrop-saturate-150">
   <div class="mx-auto flex h-full max-w-wide items-center justify-between px-6">
     <a th:href="@{/}" class="flex items-center gap-2">
@@ -110,7 +109,7 @@ $(document).ready(function() {
         }
     });
 
-    // 최종 아이디 조회 처리 (컨트롤러 직통 타격)
+    
     $("#btnSubmitFindId").click(function() {
         let email = $("#userEmail").val().trim();
         
@@ -120,9 +119,9 @@ $(document).ready(function() {
                 $("#foundIdDisplay").text(res);
                 $("#findIdForm").addClass("hidden"); 
             } else if(res === "EMAIL_NOT_VERIFIED") {
-                $("#statusMsg").text("🚨 세션 인증이 만료되었습니다. 다시 인증해 주세요.").css("color", "red");
+                $("#statusMsg").text("세션 인증이 만료되었습니다. 다시 인증해 주세요.").css("color", "red");
             } else {
-                $("#statusMsg").text("❌ 해당 이메일로 등록된 아이디가 없습니다.").css("color", "red");
+                $("#statusMsg").text("해당 이메일로 등록된 아이디가 없습니다.").css("color", "red");
             }
         });
     });
