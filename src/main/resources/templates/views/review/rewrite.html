@@ -4,7 +4,7 @@
 <body class="bg-white text-ink">
 
 <div th:replace="~{views/common/navbar :: navbar}"></div>
-
+<div th:replace="~{views/common/modal :: modal}"></div>
 <main class="mx-auto max-w-3xl px-6 pb-24 pt-16">
   <h1 class="mb-2 text-3xl font-extrabold tracking-tight" 
       th:text="${review != null ? '여행 후기 수정' : '여행 후기 작성'}">여행 후기 작성</h1>
@@ -277,7 +277,7 @@ kakao.maps.load(function () {
     function addPlaceToMap(place) {
         const lat = place.mapy;
         const lng = place.mapx;
-        if (!lat || !lng) { alert('위치 정보가 없는 관광지입니다.'); return; }
+        if (!lat || !lng) { openInfoModal('위치 정보가 없는 관광지입니다.'); return; }
 
         const latlng = new kakao.maps.LatLng(lat, lng);
         const index  = markers.length + 1;
@@ -519,9 +519,9 @@ kakao.maps.load(function () {
     document.getElementById('submitBtn').addEventListener('click', function(e) {
         e.preventDefault();
         const titleInput = document.getElementById('travelTitle');
-        if (!titleInput || !titleInput.value.trim()) { alert("여행 제목을 입력해 주세요."); titleInput.focus(); return; }
+        if (!titleInput || !titleInput.value.trim()) { openInfoModal("여행 제목을 입력해 주세요."); titleInput.focus(); return; }
         const cards = document.querySelectorAll('.spot-card');
-        if (cards.length === 0) { alert("최소 한 개 이상의 관광지 후기를 추가해 주세요."); return; }
+        if (cards.length === 0) { openInfoModal("최소 한 개 이상의 관광지 후기를 추가해 주세요."); return; }
 
         const formData = new FormData();
         const travelNoVal = parseInt(document.querySelector('input[name="travelNo"]')?.value);
@@ -560,15 +560,21 @@ kakao.maps.load(function () {
         .then(res => {
             const isUpdate = parseInt(document.querySelector('input[name="travelNo"]')?.value) > 0;
             if (res.ok) {
-                alert(isUpdate ? "리뷰가 성공적으로 수정되었습니다." : "리뷰가 성공적으로 등록되었습니다.");
-                location.href = isUpdate
-                    ? "/reviews/detail?travelNo=" + document.querySelector('input[name="travelNo"]')?.value
-                    : "/reviews/list";
+                // 1. 먼저 모달창을 띄웁니다.
+                openInfoModal(isUpdate ? "리뷰가 성공적으로 수정되었습니다." : "리뷰가 성공적으로 등록되었습니다.");
+                
+                // 2. 3초(3000ms) 대기한 후에 화면을 전환합니다.
+                setTimeout(() => {
+                    location.href = isUpdate
+                        ? "/reviews/detail?travelNo=" + document.querySelector('input[name="travelNo"]')?.value
+                        : "/reviews/list";
+                }, 2000); // <-- 원하는 시간(ms)으로 숫자를 조절하세요!
+
             } else {
-                alert(isUpdate ? "리뷰 수정에 실패했습니다." : "리뷰 등록에 실패했습니다.");
+                openInfoModal(isUpdate ? "리뷰 수정에 실패했습니다." : "리뷰 등록에 실패했습니다.");
             }
         })
-        .catch(err => { console.error("에러 발생:", err); alert("통신 중 오류가 발생했습니다."); });
+        .catch(err => { console.error("에러 발생:", err); openInfoModal("통신 중 오류가 발생했습니다."); });
     });
 
     // ════ 기존 데이터 복원 ════
