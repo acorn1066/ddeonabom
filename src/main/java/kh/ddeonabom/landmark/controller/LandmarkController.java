@@ -39,10 +39,6 @@ public class LandmarkController {
 	@Value("${kakao.map.api-key}")
 	private String kakaoMapApiKey;
 	
-	private final AmazonS3 amazonS3;
-	@Value("${cloud.aws.s3.bucket}") 
-	private String bucket;
-	
 	// 관광지 리스트 가져오기
 	@GetMapping("list")
 	public String selectList(@RequestParam(value = "page", defaultValue = "1") int currentPage,
