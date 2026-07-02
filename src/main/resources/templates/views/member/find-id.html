@@ -8,7 +8,6 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script th:src="@{/js/tw.js}"></script>
-<script th:src="@{/js/tw.js}"></script>
 <script>
   tailwind.config = {
     theme: {
@@ -33,7 +32,7 @@
 <style> body { font-family:'Noto Sans KR', system-ui, sans-serif; -webkit-font-smoothing:antialiased; letter-spacing:-0.01em; } </style>
 </head>
 <body class="bg-white text-ink">
-
+<th:block th:replace="~{views/common/modal :: modal}"></th:block>
 <header class="sticky top-0 z-50 h-header border-b border-line bg-white/80 backdrop-blur-md backdrop-saturate-150">
   <div class="mx-auto flex h-full max-w-wide items-center justify-between px-6">
     <a th:href="@{/}" class="flex items-center gap-2">
@@ -95,8 +94,6 @@
 
 <script>
 $(document).ready(function() {
-    // 💡 [해결 핵심 3] 억지로 이벤트를 꼬아서 오버라이딩 하지 말고, 
-    // 기존에 검증된 auth.js의 규격(함수 주입식)을 그대로 사용하여 안전하게 초기화합니다.
     initEmailVerification({
         sendBtn: "#btnSendCode",
         verifyBtn: "#btnVerifyCode",
@@ -107,12 +104,12 @@ $(document).ready(function() {
             return $("#userEmail").val().trim();
         },
         successCallback: function() {
-            $("#btnSubmitFindId").prop("disabled", false); // 👈 속성만 풀면 보라색으로 알아서 변신합니다!
+            $("#btnSubmitFindId").prop("disabled", false);
             $("#userEmail").prop("readonly", true);
         }
     });
 
-    // 최종 아이디 조회 처리 (컨트롤러 직통 타격)
+    
     $("#btnSubmitFindId").click(function() {
         let email = $("#userEmail").val().trim();
         
@@ -122,9 +119,9 @@ $(document).ready(function() {
                 $("#foundIdDisplay").text(res);
                 $("#findIdForm").addClass("hidden"); 
             } else if(res === "EMAIL_NOT_VERIFIED") {
-                $("#statusMsg").text("🚨 세션 인증이 만료되었습니다. 다시 인증해 주세요.").css("color", "red");
+                $("#statusMsg").text("세션 인증이 만료되었습니다. 다시 인증해 주세요.").css("color", "red");
             } else {
-                $("#statusMsg").text("❌ 해당 이메일로 등록된 아이디가 없습니다.").css("color", "red");
+                $("#statusMsg").text("해당 이메일로 등록된 아이디가 없습니다.").css("color", "red");
             }
         });
     });

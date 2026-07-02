@@ -32,6 +32,4 @@ public interface ScheduleMapper {
 	
 	int updateScheduleVisibility(Map<String, Object> param);
 
-	void updateVisibility(int scheduleNo, int memberNo, String visibility);
-
 }
