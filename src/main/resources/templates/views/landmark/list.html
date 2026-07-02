@@ -79,6 +79,18 @@
 	      	th:classappend="${area == '충청'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	충청</a>
+	      <a th:href="@{/landmark/list(area='대구', keyword=${keyword}, contentTypeId=${contentTypeId})}"
+	      	th:classappend="${area == '대구'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	대구</a>
+	      <a th:href="@{/landmark/list(area='인천', keyword=${keyword}, contentTypeId=${contentTypeId})}"
+	      	th:classappend="${area == '인천'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	인천</a>
+	      <a th:href="@{/landmark/list(area='광주', keyword=${keyword}, contentTypeId=${contentTypeId})}"
+	      	th:classappend="${area == '광주'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
+	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
+	      	광주</a>
 	    </div>
 <!-- 	    <span class="mx-1.5 h-6 w-px bg-line"></span> -->
 	    <div class="flex flex-wrap gap-1.5">
@@ -94,10 +106,10 @@
 	      	th:classappend="${contentTypeId == 15} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	축제/공연/행사</a>
-	      <a th:href="@{/landmark/list(contentTypeId=25, keyword=${keyword}, area=${area})}"
-	      	th:classappend="${contentTypeId == 25} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
-	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
-	      	여행코스</a>
+<!-- 	      <a th:href="@{/landmark/list(contentTypeId=25, keyword=${keyword}, area=${area})}" -->
+<!-- 	      	th:classappend="${contentTypeId == 25} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'" -->
+<!-- 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink"> -->
+<!-- 	      	여행코스</a> -->
 	      <a th:href="@{/landmark/list(contentTypeId=28, keyword=${keyword}, area=${area})}"
 	      	th:classappend="${contentTypeId == 28} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
@@ -115,7 +127,11 @@
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	음식점</a>
 		    <div class="ml-auto">
-		      <select class="h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none"><option>추천순</option><option>조회순</option><option>후기 많은 순</option><option>평점 높은 순</option></select>
+		      <select class="h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none">
+		      	<option>조회순</option>
+		      	<option>후기 많은 순</option>
+		      	<option>평점 높은 순</option>
+		      </select>
 		    </div>
 	    </div>
 	  </div>
@@ -147,7 +163,7 @@
 	        </div>
 	      </th:block>
 	      <th:block th:if="${session.loginUser != null}">
-	        <span th:if="${niceList != null and niceList.contains(l.contentId)}" class="nice absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-brand"><svg width="17" height="17" viewBox="0 0 18 18" fill="currentColor" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span>
+	        <span th:if="${niceList != null and niceList.contains(l.contentId)}" class="nice absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-brand"><svg width="17" height="17" viewBox="0 0 18 18" fill="red" stroke="red" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span>
 	        <span th:unless="${niceList != null and niceList.contains(l.contentId)}" class="nice absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft text-muted"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 15.5S2.5 11 2.5 6.5A3.5 3.5 0 0 1 9 4a3.5 3.5 0 0 1 6.5 2.5C15.5 11 9 15.5 9 15.5Z"/></svg></span>
 	      </th:block>
 	      <th:block th:if="${session.loginUser == null}">	      
@@ -156,14 +172,16 @@
 	        <span class="absolute top-2.5 left-2.5 inline-flex h-7 items-center rounded-full bg-ink px-3 text-xs font-medium text-white">[[${contentType[l.contentTypeId]}]]</span>
 	      </div>
 	      <div class="p-4">
-	        <div class="text-17 font-bold tracking-tight">[[${l.title}]]</div>
+	        <div class="flex items-center justify-between text-17 font-bold tracking-tight">[[${l.title}]]
+	        	<span class="text-sm text-muted tabular-nums">후기 [[${review[l.contentId]}]]개</span>
+	        </div>
 	        <div class="mt-4 flex items-center justify-between border-t border-line pt-4">
 	        <th:block th:if="${l.addr1 != null and !#strings.isEmpty(l.addr1)}">
 	          <span class="text-13 text-muted">
 	          [[${l.addr1}]]</span>
 	        </th:block>
 	          <div class="id" style="display: none">[[${l.contentId}]]</div>
-	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">4.6</span></span>
+	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">[[${rating[l.contentId]}]]</span></span>
 	        </div>
 	      </div>
 	    </div>
@@ -256,7 +274,7 @@
 						success: data => {
 							console.log(data);
 							if(data > 0){
-								heart.setAttribute("fill", "blue");
+								heart.setAttribute("fill", "red");
 								nice.classList.add("text-brand");
 								nice.classList.remove("text-muted");
 							} else{

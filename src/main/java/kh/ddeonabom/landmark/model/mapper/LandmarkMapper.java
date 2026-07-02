@@ -10,7 +10,11 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
 
+import kh.ddeonabom.landmark.model.vo.LandReview;
 import kh.ddeonabom.landmark.model.vo.Landmark;
+import kh.ddeonabom.review.model.vo.Image;
+import kh.ddeonabom.review.model.vo.Review;
+import kh.ddeonabom.review.model.vo.ReviewSub;
 
 @Mapper
 public interface LandmarkMapper {
@@ -41,5 +45,17 @@ public interface LandmarkMapper {
 	Set<Integer> niceList(int memberNo);
 
 	int getWishListCountByParam(Map<String, Object> param);
+
+	int reviewCount(int contentId);
+	
+	// 관광지 후기 가져오기
+	ArrayList<LandReview> review(int contentId, RowBounds rowBounds);
+	
+	// 별점 평균
+	double rating(int contentId);
+
+	ArrayList<Image> image(int contentId);
+
+
 
 }

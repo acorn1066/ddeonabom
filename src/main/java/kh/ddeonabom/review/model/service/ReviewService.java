@@ -1,6 +1,5 @@
 package kh.ddeonabom.review.model.service;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class ReviewService {
 	
 	private final ReviewMapper reviewMapper;
-	private final AmazonS3 amazonS3;
+	private final AmazonS3 amazonS3; 
 	
 	@Value("${cloud.aws.s3.bucket}") 
 	private String bucket;
@@ -104,9 +103,31 @@ public class ReviewService {
 	}
 
 	public Review reviewUpdate(int travelNo) {
-		return reviewMapper.ReviewDetail(travelNo);
-	}
 
+	    Review review = reviewMapper.ReviewDetail(travelNo);
+
+	    if(review == null){
+	        return null;
+	    }
+
+	    List<ReviewSub> subList = reviewMapper.getReviewSubList(travelNo);
+
+	    for(ReviewSub sub : subList){
+
+	        List<Image> imgs =
+	                reviewMapper.getImageListBySubNo(sub.getTravelSubNo());
+
+	        sub.setImages(
+	                imgs.stream()
+	                        .map(Image::getImagePath)
+	                        .collect(Collectors.toList())
+	        );
+	    }
+
+	    review.setSubList(subList);
+
+	    return review;
+	}
 	@Transactional
 	public int updateReview(Review review) {
 
@@ -115,6 +136,16 @@ public class ReviewService {
 	    int result = 1;
 
 	    for (ReviewSub sub : review.getSubList()) {
+	    	
+	    	List<String> deleteImages = sub.getDeleteImages();
+
+	    	if (deleteImages != null && !deleteImages.isEmpty()) {
+	    	    for (String path : deleteImages) {
+	    	        if (path != null && !path.trim().isEmpty()) {
+	    	            reviewMapper.deleteImageByPath(path.trim());
+	    	        }
+	    	    }
+	    	}
 
 	        if (sub.getTravelSubNo() == 0) {
 	            reviewMapper.insertReviewSub(sub);

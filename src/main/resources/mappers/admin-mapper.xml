@@ -503,5 +503,25 @@
 	      AND TARGET_NO   = #{targetNo}
 	      AND REPORT_STATUS = 'N'
 	</update>
+	
+<!-- 	관리자의 의해 정지당한 회원의 게시글과 댓글 모두 삭제 -->
+	<update id="banMemberSchedule" parameterType="hashmap">
+		update schedule_main set schedule_status ='N' where id = #{id}
+	</update>
+	
+	<update id="banMemberReview" parameterType="hashmap">
+		update travel_list set status = 'N' where id = #{id}
+	</update>
+	
+	<update id="banMemberQlist" parameterType="hashmap">
+		update qlist set status = 'N' where id = #{id}
+	</update>
+	
+	<update id="banMemberReply" parameterType="hashmap">
+		update reply set status = 'N' where id = #{id}
+	</update>
+
+
+
 
 </mapper>

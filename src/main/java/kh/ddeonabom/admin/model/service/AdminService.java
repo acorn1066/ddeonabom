@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kh.ddeonabom.admin.model.mapper.AdminMapper;
 import kh.ddeonabom.admin.model.vo.AdminNotice;
@@ -48,12 +49,24 @@ public class AdminService {
     }
 	
 
-	public ArrayList<AdminNotice> selectNoticeList() {
+	public ArrayList<AdminNotice> selectNoticeList() { 
 		return mapper.selectNoticeList();
 	}
 
+	@Transactional
 	public int updateMemberStatus(HashMap<String, String> map) {
-		return mapper.updateMemberStatus(map);
+		int result = mapper.updateMemberStatus(map);
+		
+		if(result > 0 && "B".equals(map.get("val"))) {
+			mapper.banMemberSchedule(map);
+			mapper.banMemberReview(map);
+			mapper.banMemberQlist(map);
+			mapper.banMemberReply(map);
+		}
+		
+		return result;
+		
+		
 	}
 
 	public int updatePostStatus(AdminPost post) {

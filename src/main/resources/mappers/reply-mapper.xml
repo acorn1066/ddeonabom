@@ -41,23 +41,35 @@
 		AND   member_no = #{memberNo}
 	</update>
 	<select id="getMyCommentCount" parameterType="hashmap" resultType="_int">
-		SELECT COUNT(*)
-		FROM reply
-		WHERE member_no = #{memberNo}
-		  AND post_board = #{postBoard} AND status = 'Y'
-	</select>
+    SELECT COUNT(*)
+    FROM REPLY R
+    LEFT JOIN REPORT RP
+           ON R.POST_NO = RP.TARGET_NO
+          AND RP.TARGET_TYPE = 'reply'
+          AND RP.REPORT_STATUS = 'N'
+    WHERE R.MEMBER_NO = #{memberNo}
+      AND R.POST_BOARD = #{postBoard}
+      AND R.STATUS = 'Y'
+</select>
 
 	<select id="selectMyCommentList" parameterType="hashmap" resultType="Reply">
-
-		SELECT *
-		FROM (
-			SELECT r.*, ROW_NUMBER() OVER (ORDER BY r.create_date DESC) AS rnum
-			FROM reply r
-			WHERE r.member_no = #{memberNo}
-			  AND r.post_board = #{postBoard} AND r.status = 'Y'
-		)
-		WHERE rnum BETWEEN #{startRow} + 1 AND #{startRow} + #{listLimit}
-	</select>
+    SELECT *
+    FROM (
+        SELECT
+            R.*,
+            RP.REPORT_STATUS AS reportStatus,
+            ROW_NUMBER() OVER (ORDER BY R.CREATE_DATE DESC) AS rnum
+        FROM REPLY R
+        LEFT JOIN REPORT RP
+               ON R.POST_NO = RP.TARGET_NO
+              AND RP.TARGET_TYPE = 'reply'
+              AND RP.REPORT_STATUS = 'N'
+        WHERE R.MEMBER_NO = #{memberNo}
+          AND R.POST_BOARD = #{postBoard}
+          AND R.STATUS = 'Y'
+    )
+    WHERE rnum BETWEEN #{startRow} + 1 AND #{startRow} + #{listLimit}
+</select>
 	
 	
 

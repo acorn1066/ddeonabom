@@ -19,15 +19,41 @@
 		       l.title,
 		       l.addr1,
 		       max(dbms_lob.substr(l.firstimage, 4000, 1)) as firstimage,
+		       l.content_type_id as contentTypeId,
 		       count(n.nice_no) as landCount
 		from landmark l
 		left join nice n on n.post_no = l.content_id
 		                and n.post_board_fx = 'LJ'
-		group by l.content_id, l.title, l.addr1
+		group by l.content_id, l.title, l.addr1, l.content_type_id
 		order by landCount desc
 		fetch first 4 rows only
 	</select>
 	
+	<select id="selectTopSharedSchedules" resultType="kh.ddeonabom.share.model.vo.Share">
+	    SELECT m.schedule_no       AS scheduleNo,
+	           m.schedule_title    AS scheduleTitle,
+	           TO_CHAR(m.schedule_startdate, 'yyyy.mm.dd') AS scheduleStartdate,
+	           TO_CHAR(m.schedule_enddate,   'yyyy.mm.dd') AS scheduleEnddate,
+	           mb.nickname         AS memberNickname,
+	           (SELECT COUNT(*) FROM schedule_sub ss WHERE ss.schedule_no = m.schedule_no) AS placeCount,
+	           COUNT(n.nice_no)    AS likeCount
+	    FROM schedule_main m
+	    JOIN member mb ON mb.member_no = m.member_no
+	    LEFT JOIN nice n ON n.post_no = m.schedule_no AND n.post_board_fx = 'SR'
+	    WHERE m.schedule_status = 'Y'
+	      AND <choose>
+	              <when test="memberNo != null and memberNo > 0">
+	                  m.schedule_visibility IN ('Y', 'M')
+	              </when>
+	              <otherwise>
+	                  m.schedule_visibility = 'Y'
+	              </otherwise>
+	          </choose>
+	    GROUP BY m.schedule_no, m.schedule_title, m.schedule_startdate, m.schedule_enddate, mb.nickname
+	    ORDER BY likeCount DESC
+	    FETCH FIRST 5 ROWS ONLY
+	</select>
+
 	<select id="selectFeaturedSchedule" resultType="ScheduleMain">
 	    select m.schedule_no as scheduleNo,
 		       m.schedule_title as scheduleTitle,

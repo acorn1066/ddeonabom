@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import kh.ddeonabom.landmark.model.vo.Landmark;
 import kh.ddeonabom.main.model.mapper.MainMapper;
+import kh.ddeonabom.share.model.vo.Share;
 import kh.ddeonabom.schedule.model.vo.RoutePoint;
 import kh.ddeonabom.schedule.model.vo.ScheduleMain;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,10 @@ public class MainService {
 
 	public ScheduleMain selectFeaturedSchedule() {
 		return mainMapper.selectFeaturedSchedule();
+	}
+
+	public List<Share> getTopSharedSchedules(int memberNo) {
+		return mainMapper.selectTopSharedSchedules(memberNo);
 	}
 	
 	public List<Map<String, Double>> getFeaturedRoute(String coords) {

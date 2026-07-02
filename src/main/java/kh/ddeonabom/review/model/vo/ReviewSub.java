@@ -25,6 +25,7 @@ public class ReviewSub {
     private int contentId;
     // 조회한 이미지 경로 목록
     private List<String> images;
+    private List<String> deleteImages;
     private int rating;    
     // 이미지 업로드 파일
     private List<MultipartFile> imageFiles;

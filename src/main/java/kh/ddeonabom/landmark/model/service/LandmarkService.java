@@ -12,7 +12,11 @@ import org.springframework.stereotype.Service;
 
 import kh.ddeonabom.common.paging.PageInfo;
 import kh.ddeonabom.landmark.model.mapper.LandmarkMapper;
+import kh.ddeonabom.landmark.model.vo.LandReview;
 import kh.ddeonabom.landmark.model.vo.Landmark;
+import kh.ddeonabom.review.model.vo.Image;
+import kh.ddeonabom.review.model.vo.Review;
+import kh.ddeonabom.review.model.vo.ReviewSub;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -76,5 +80,25 @@ public class LandmarkService {
 	    return mapper.getWishListCountByParam(param);
 	}
 	
+	//관광지 별 후기 개수 가져오기
+	public int reviewCount(int contentId) {
+		return mapper.reviewCount(contentId);
+	}
+	
+	//관광지 후기 가져오기
+	public ArrayList<LandReview> review(int contentId, PageInfo pi) {
+		int offset = (pi.getCurrentPage() - 1) * pi.getBoardLimit();
+		RowBounds rowBounds = new RowBounds(offset, pi.getBoardLimit());
+		return mapper.review(contentId, rowBounds);
+	}
+	
+	// 별점 평균
+	public double rating(int contentId) {
+		return mapper.rating(contentId);
+	}
+
+	public ArrayList<Image> image(int contentId) {
+		return mapper.image(contentId);
+	}
 
 }

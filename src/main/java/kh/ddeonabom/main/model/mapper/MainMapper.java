@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import kh.ddeonabom.landmark.model.vo.Landmark;
 import kh.ddeonabom.schedule.model.vo.ScheduleMain;
+import kh.ddeonabom.share.model.vo.Share;
 
 @Mapper
 public interface MainMapper {
@@ -16,5 +17,7 @@ public interface MainMapper {
 	List<Landmark> selectPopularLandmarks();
 
 	ScheduleMain selectFeaturedSchedule();
+
+	List<Share> selectTopSharedSchedules(int memberNo);
 
 }

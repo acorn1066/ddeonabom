@@ -38,6 +38,11 @@ public class Review {
     private String nickname;
     private String reportStatus;
     
-  
+    public String getNickname() {
+        if (this.nickname != null && this.nickname.contains("_")) {
+            return "(탈퇴회원)";
+        }
+        return this.nickname;
+    }
 
 }

@@ -275,7 +275,7 @@
                 <div th:if="${type == 'qna'}">
                     <h2 class="text-xl font-bold text-ink mb-4"><i class="fa-solid fa-pen-to-square"></i> 내가 작성한 질문글</h2>
                     <div class="space-y-3 min-h-[300px]">
-                        <a th:each="post : ${postlist}" th:href="${post.reportStatus == 'N'} ? 'javascript:void(0);' : @{/qList/detail(qNo=${post.qNo}, tab='posts')}" class="p-4 border border-line rounded-xl hover:border-brand transition cursor-pointer bg-white flex justify-between items-center gap-4">
+                        <a th:each="post : ${postlist}" th:href="@{/qList/detail(qNo=${post.qNo}, tab='posts')}" class="p-4 border border-line rounded-xl hover:border-brand transition cursor-pointer bg-white flex justify-between items-center gap-4">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center flex-wrap gap-y-1">
                                     <span class="text-[10px] font-bold px-1.5 py-0.5 rounded mr-2 shrink-0" th:text="${post.category}" th:classappend="${post.category == '교통'} ? 'text-purple-600 bg-purple-50' : (${post.category == '숙소'} ? 'text-amber-600 bg-amber-50' : (${post.category == '맛집'} ? 'text-red-600 bg-red-50' : (${post.category == '일정'} ? 'text-blue-600 bg-blue-50' : 'text-slate-600 bg-slate-100')))"></span>
@@ -284,7 +284,7 @@
                                 <span class="text-xs text-faint block mt-1">질문 게시판</span>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
-                                <span th:if="${post.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 수정/삭제 제한</span>
+                                <span th:if="${post.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 신고 접수 수정/삭제 가능</span>
                                 <span class="text-xs text-faint whitespace-nowrap" th:text="${#dates.format(post.createDate,'yyyy-MM-dd')}"></span>
                             </div>
                         </a>
@@ -295,7 +295,7 @@
                 <div th:if="${type == 'review'}">
                     <h2 class="text-xl font-bold text-ink mb-4"><i class="fa-solid fa-pen-to-square"></i> 내가 작성한 리뷰글</h2>
                     <div class="space-y-3 min-h-[300px]">
-                        <a th:each="review : ${reviewlist}" th:href="${review.reportStatus == 'N'} ? 'javascript:void(0);' : @{/reviews/detail(travelNo=${review.travelNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition cursor-pointer bg-white flex justify-between items-center gap-4">
+                        <a th:each="review : ${reviewlist}" th:href="@{/reviews/detail(travelNo=${review.travelNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition cursor-pointer bg-white flex justify-between items-center gap-4">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center flex-wrap gap-y-1">
                                     <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded mr-2 shrink-0">여행후기</span>
@@ -304,7 +304,7 @@
                                 <span class="text-xs text-faint block mt-1">여행 리뷰</span>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
-                                <span th:if="${review.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 수정/삭제 제한</span>
+                                <span th:if="${review.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 신고 접수 수정/삭제 가능</span>
                                 <span class="text-xs text-faint whitespace-nowrap" th:text="${#dates.format(review.createDate, 'yyyy-MM-dd')}"></span>
                             </div>
                         </a>
@@ -314,7 +314,7 @@
                 <div th:if="${type == 'share'}">
                     <h2 class="text-xl font-bold text-ink mb-4"><i class="fa-solid fa-pen-to-square"></i> 내가 작성한 일정공유글</h2>
                     <div class="space-y-3 min-h-[300px]">
-                        <a th:each="share : ${sharelist}" th:href="${share.reportStatus == 'N'} ? 'javascript:void(0);' : @{/share/detail/{no}(no=${share.scheduleNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition cursor-pointer bg-white flex justify-between items-center gap-4">
+                        <a th:each="share : ${sharelist}" th:href="@{/share/detail/{no}(no=${share.scheduleNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition cursor-pointer bg-white flex justify-between items-center gap-4">
                             <div class="flex-1 min-w-0">
                             <div class="flex items-center flex-wrap gap-y-1">
                                     <span class="text-[10px] font-bold text-blue-600 bg-emerald-50 px-1.5 py-0.5 rounded mr-2 shrink-0">일정공유</span>
@@ -323,7 +323,7 @@
                                <span class="text-xs text-faint block mt-1">일정공유</span>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
-                                <span th:if="${share.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 수정/삭제 제한</span>
+                                <span th:if="${share.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 신고 접수 수정/삭제 가능</span>
                                 <span class="text-xs text-faint whitespace-nowrap" th:text="${#dates.format(share.createDate,'yyyy-MM-dd')}"></span>
                             </div>
                         </a>
@@ -350,13 +350,13 @@
                 <div th:if="${type == 'qna' or type == null}">
                     <h2 class="text-xl font-bold text-ink mb-4"><i class="fa-regular fa-comment"></i> 내가 작성한 질문 댓글</h2>
                     <div class="space-y-3 min-h-[300px]">
-                        <a th:each="comment : ${commentlist}" th:href="${comment.reportStatus == 'N'} ? 'javascript:void(0);' : @{/qList/detail(qNo=${comment.postNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition bg-white flex justify-between items-center gap-4 shadow-sm">
+                        <a th:each="comment : ${commentlist}" th:href="@{/qList/detail(qNo=${comment.postNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition bg-white flex justify-between items-center gap-4 shadow-sm">
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-semibold text-ink truncate" th:text="${comment.content}">댓글 내용</p>
                                 <span class="text-xs text-faint block mt-1">질문 게시판</span>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
-                                <span th:if="${comment.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 수정/삭제 제한</span>
+                                <span th:if="${comment.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 신고 접수 수정/삭제 가능</span>
                                 <span class="text-xs text-faint whitespace-nowrap" th:text="${#dates.format(comment.createDate, 'yyyy-MM-dd')}"></span>
                             </div>
                         </a>
@@ -367,13 +367,13 @@
                 <div th:if="${type == 'review'}">
                     <h2 class="text-xl font-bold text-ink mb-4"><i class="fa-regular fa-comment"></i> 내가 작성한 리뷰 댓글</h2>
                     <div class="space-y-3 min-h-[300px]">
-                        <a th:each="comment : ${commentlist}" th:href="${comment.reportStatus == 'Y'} ? 'javascript:void(0);' : @{/reviews/detail(travelNo=${comment.postNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition bg-white flex justify-between items-center gap-4 shadow-sm">
+                        <a th:each="comment : ${commentlist}" th:href="@{/reviews/detail(travelNo=${comment.postNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition bg-white flex justify-between items-center gap-4 shadow-sm">
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-semibold text-ink truncate" th:text="${comment.content}">댓글 내용</p>
                                 <span class="text-xs text-faint block mt-1">여행후기</span>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
-                                <span th:if="${comment.reportStatus == 'Y'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 수정/삭제 제한</span>
+                                <span th:if="${comment.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 신고 접수 수정/삭제 가능</span>
                                 <span class="text-xs text-faint whitespace-nowrap" th:text="${#dates.format(comment.createDate, 'yyyy-MM-dd')}"></span>
                             </div>
                         </a>
@@ -383,13 +383,13 @@
 				<div th:if="${type == 'share'}">
                     <h2 class="text-xl font-bold text-ink mb-4"><i class="fa-regular fa-comment"></i> 내가 작성한 일정공유 댓글</h2>
                     <div class="space-y-3 min-h-[300px]">
-                        <a th:each="comment : ${commentlist}" th:href="${comment.reportStatus == 'Y'} ? 'javascript:void(0);' : @{/share/detail/{no}(no=${comment.postNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition bg-white flex justify-between items-center gap-4 shadow-sm">
+                        <a th:each="comment : ${commentlist}" th:href=" @{/share/detail/{no}(no=${comment.postNo})}" class="p-4 border border-line rounded-xl hover:border-brand transition bg-white flex justify-between items-center gap-4 shadow-sm">
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-semibold text-ink truncate" th:text="${comment.content}">댓글 내용</p>
                                 <span class="text-xs text-faint block mt-1">일정공유</span>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
-                                <span th:if="${comment.reportStatus == 'Y'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 수정/삭제 제한</span>
+                                <span th:if="${comment.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 신고 접수 수정/삭제 가능</span>
                                 <span class="text-xs text-faint whitespace-nowrap" th:text="${#dates.format(comment.createDate, 'yyyy-MM-dd')}"></span>
                             </div>
                         </a>
@@ -502,7 +502,7 @@ function triggerInfoModal(title, text) {
 $(document).ready(function() {
     const urlParams = new URLSearchParams(window.location.search);
 
-    //  페이지 로드 시 컨텐츠 영역으로 자동 스크롤
+    
     if (urlParams.has('tab') || urlParams.has('page')) {
         document.getElementById('mypage-content')?.scrollIntoView({ behavior: 'smooth' });
     }

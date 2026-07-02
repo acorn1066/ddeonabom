@@ -27,4 +27,11 @@ public class QList {
 	private String visibility;
 	private int replyCount;
 	private String reportStatus;
+	
+	public String getWriter() {
+        if (this.writer != null && this.writer.contains("_")) {
+            return "(탈퇴회원)";
+        }
+        return this.writer;
+    }
 }
