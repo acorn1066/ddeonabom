@@ -101,7 +101,6 @@ function initEmailVerification({
                     $(verifyBtn).prop("disabled", true);
                     $(sendBtn).prop("disabled", true);
                     
-                    // 💡 [추가] 인증 성공 시, 주입받은 페이지별 추가 후처리 로직 실행
                     if(typeof successCallback === "function") {
                         successCallback();
                     }
