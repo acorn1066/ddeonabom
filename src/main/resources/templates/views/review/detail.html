@@ -174,7 +174,7 @@
 	  <div th:each="r : ${replyList}" class="border-t border-line py-4">
 	
 	    <div class="flex items-center gap-2">
-	      <span class="font-bold" th:text="${r.writer}">작성자</span>
+	      <span class="font-bold" th:text="${r.displayWriter}">작성자</span>
 	      <span class="text-xs text-muted" th:text="${r.createDate}">날짜</span>
 	      
 <!-- =================================================================	신고 ============================================================================ -->

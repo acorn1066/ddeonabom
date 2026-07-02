@@ -167,7 +167,7 @@
 		        th:if="${q.replyCount > 0}"
 		        th:text="|· 댓글 ${q.replyCount}|"></span>
 		  <span th:unless="${q.replyCount > 0}"></span>
-		  <span class="text-13 text-muted">[[${q.writer}]]</span>
+		  <span class="text-13 text-muted">[[${q.displayWriter}]]</span>
 		  <span class="text-13 text-muted tabular-nums">[[${q.createDate}]]</span>
 		  <span class="text-right text-13 text-muted tabular-nums">[[${q.count}]]</span>
 		</a>

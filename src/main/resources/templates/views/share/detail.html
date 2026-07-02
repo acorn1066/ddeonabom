@@ -168,15 +168,15 @@
            class="flex gap-3 border-t border-line py-4">
 
         <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full font-bold"
-              th:classappend="${reply.writer == null or #strings.startsWith(reply.writer, '(')} ? 'bg-gray-200 text-gray-400' : 'bg-sunk text-muted'">
-          <i th:if="${reply.writer == null or #strings.startsWith(reply.writer, '(')}" class="ti ti-user-x" style="font-size:14px"></i>
-          <th:block th:unless="${reply.writer == null or #strings.startsWith(reply.writer, '(')}" th:text="${#strings.substring(reply.writer, 0, 1)}">제</th:block>
+              th:classappend="${reply.writerStatus == 'N'} ? 'bg-gray-200 text-gray-400' : 'bg-sunk text-muted'">
+          <i th:if="${reply.writerStatus == 'N'}" class="ti ti-user-x" style="font-size:14px"></i>
+          <th:block th:unless="${reply.writerStatus == 'N'}" th:text="${#strings.substring(reply.displayWriter, 0, 1)}">제</th:block>
         </span>
 
         <div class="flex-1">
           <div class="mb-1 flex items-center gap-2">
             <span class="text-sm font-bold"
-                  th:text="${reply.writer != null and !#strings.startsWith(reply.writer, '(') ? reply.writer : '(탈퇴회원)'}">댓글작성자</span>
+                  th:text="${reply.displayWriter}">댓글작성자</span>
             <span class="text-xs text-faint tabular-nums"
                   th:text="${#dates.format(reply.createDate, 'yyyy.MM.dd')}">2026.04.15</span>
 
