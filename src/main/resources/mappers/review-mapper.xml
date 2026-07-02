@@ -62,7 +62,7 @@
 	    FETCH NEXT #{pi.boardLimit} ROWS ONLY
 	</select>
 	
-	<select id="selectListCount" resultType="int">
+	<select id="selectListCount" resultType="_int">
 	    SELECT COUNT(*)
 	    FROM TRAVEL_LIST T
 	    WHERE T.STATUS = 'Y'
@@ -176,16 +176,16 @@
 </select>
 	
 	<select id="getReviewDetail" parameterType="int" resultType="kh.ddeonabom.review.model.vo.Review">
-	    SELECT 
-        T.*,
-        (SELECT COUNT(*) 
-         FROM NICE N 
+	    SELECT
+        T.*, M.NICKNAME AS NICKNAME,
+        (SELECT COUNT(*)
+         FROM NICE N
          WHERE N.POST_NO = T.TRAVEL_NO) AS LIKE_COUNT
-	    FROM TRAVEL_LIST T
+	    FROM TRAVEL_LIST T JOIN MEMBER M ON T.MEMBER_NO = M.MEMBER_NO
 	    WHERE T.TRAVEL_NO = #{travelNo}
 	    AND T.STATUS = 'Y'
 	    AND T.VISIBILITY IN ('PUBLIC','MEMBER')
-	   
+
 	</select>
 	
 	<select id="getReviewSubList" parameterType="int" resultType="kh.ddeonabom.review.model.vo.ReviewSub">
