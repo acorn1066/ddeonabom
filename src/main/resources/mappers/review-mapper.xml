@@ -140,12 +140,13 @@
         T.TRAVEL_NO,
         T.TRAVEL_TITLE AS travelTitle,
         T.CREATE_DATE AS createDate,
-        RP.REPORT_STATUS AS reportStatus
+        CASE WHEN RP.REPORT_NO IS NULL THEN 'NONE' 
+             ELSE RP.REPORT_STATUS 
+        END AS reportStatus
     FROM TRAVEL_LIST T
     LEFT JOIN REPORT RP 
            ON T.TRAVEL_NO = RP.TARGET_NO 
-          AND RP.TARGET_TYPE = 'travel' 
-          AND RP.REPORT_STATUS = 'N'
+          AND RP.TARGET_TYPE = 'review'
     LEFT JOIN TRAVEL_LIST_SUB TS 
            ON T.TRAVEL_NO = TS.TRAVEL_NO
     

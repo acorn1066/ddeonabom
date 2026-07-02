@@ -180,8 +180,7 @@
 	<select id="selectMyBoardList" resultType="QList" parameterType="map">
     SELECT 
         p.*,
-        M.ID,
-        p.REPORT_STATUS AS reportStatus
+        M.ID
     FROM (
         SELECT 
             Q.Q_NO,
@@ -189,12 +188,14 @@
             Q.TITLE,
             Q.CONTENT,
             Q.STATUS,
-            Q.CATEGORY, Q.CREATE_DATE AS createDate,
-            RP.REPORT_STATUS FROM QLIST Q
-        LEFT JOIN REPORT RP
-          ON Q.Q_NO = RP.TARGET_NO 
-         AND RP.TARGET_TYPE = 'question' 
-         AND RP.REPORT_STATUS = 'N'
+            Q.CATEGORY, 
+            Q.CREATE_DATE AS createDate,
+            (SELECT CASE WHEN COUNT(*) > 0 THEN 'N' ELSE 'NONE' END
+             FROM REPORT 
+             WHERE TARGET_NO = Q.Q_NO 
+               AND TARGET_TYPE = 'question'
+               AND REPORT_STATUS = 'N') AS reportStatus
+        FROM QLIST Q
         WHERE Q.MEMBER_NO = #{memberNo}
           AND Q.STATUS = 'Y'
           <if test="keyword != null and keyword != ''">
