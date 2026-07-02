@@ -89,6 +89,15 @@ public interface AdminMapper {
 	int updateStatusByTarget(AdminReport report);
 
 	int getTodayMemberCount();
+
+//	관리자의 의해 정지당한 회원의 게시글과 댓글 모두 삭제
+	void banMemberSchedule(HashMap<String, String> map);
+
+	void banMemberReview(HashMap<String, String> map);
+
+	void banMemberQlist(HashMap<String, String> map);
+
+	void banMemberReply(HashMap<String, String> map);
 	
 	
 }
