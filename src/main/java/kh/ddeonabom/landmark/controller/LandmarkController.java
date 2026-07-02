@@ -3,6 +3,7 @@ package kh.ddeonabom.landmark.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -103,8 +104,13 @@ public class LandmarkController {
 //		System.out.println(reviewRating);
 //		System.out.println(reviewCount);
 		PageInfo pi = Pagination.getPageInfo(currentPage, reviewCount, 5, 6);
+		Map<Integer, List<Image>> reviewImage = new HashMap<>();
 		ArrayList<LandReview> landReview = lService.review(contentId, pi);
-		ArrayList<Image> reviewImage = lService.image(contentId); 
+		for(LandReview re : landReview) {
+			ArrayList<Image> image = lService.image(re.getTravelSubNo());
+			reviewImage.put(re.getTravelSubNo(), image);
+		}
+//		ArrayList<Image> reviewImage = lService.image(contentId); 
 		
 		System.out.println(landReview);
 		
