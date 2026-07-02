@@ -117,7 +117,7 @@
       <!-- 댓글 작성 폼 (목록 상단 고정) -->
       <div class="mb-6 border-t-2 border-ink pt-6">
         <h3 class="mb-4 text-base font-bold">댓글 작성</h3>
-        <form id="reply-form" th:action="@{/reply/insert}" method="post">
+        <form id="reply-form">
           <input type="hidden" name="postNo"    th:value="${q.qNo}" />
           <input type="hidden" name="postBoard" value="Q" />
           <div class="overflow-hidden rounded-xl border border-line bg-white transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand-soft">
@@ -174,7 +174,6 @@
              th:text="${reply.content}"></p>
           <!-- 인라인 수정 폼 (기본 숨김) -->
           <form th:id="|reply-edit-form-${reply.replyNo}|"
-                th:action="@{/reply/update}" method="post"
                 class="hidden mt-2">
             <input type="hidden" name="replyNo"   th:value="${reply.replyNo}" />
             <input type="hidden" name="postNo"    th:value="${q.qNo}" />
