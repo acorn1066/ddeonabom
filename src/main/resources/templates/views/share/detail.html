@@ -131,7 +131,7 @@
 
       <!-- 댓글 작성 폼 -->
       <div class="mb-6 border-t-2 border-ink pt-6">
-        <form id="reply-form" th:action="@{/reply/insert}" method="post">
+        <form id="reply-form">
           <input type="hidden" name="postNo"    th:value="${schedule.scheduleNo}" />
           <input type="hidden" name="postBoard" value="S" />
 
@@ -197,7 +197,6 @@
 
           <!-- 인라인 수정 폼 -->
           <form th:id="|reply-edit-form-${reply.replyNo}|"
-                th:action="@{/reply/update}" method="post"
                 class="hidden mt-2">
             <input type="hidden" name="replyNo"   th:value="${reply.replyNo}" />
             <input type="hidden" name="postNo"    th:value="${schedule.scheduleNo}" />
