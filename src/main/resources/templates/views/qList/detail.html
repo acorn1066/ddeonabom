@@ -292,12 +292,12 @@
     function appendReplyDOM(d) {
       document.querySelector('section').insertAdjacentHTML('beforeend', `
         <div id="reply-${d.replyNo}" class="flex gap-4 border-t border-line py-5">
-          <span class="flex h-10.5 w-10.5 flex-none items-center justify-center rounded-full font-bold \${d.writer && !d.writer.startsWith('(') ? 'bg-sunk text-muted' : 'bg-gray-200 text-gray-400'}">
-            \${d.writer && !d.writer.startsWith('(') ? d.writer.charAt(0) : '<i class=\"ti ti-user-x\" style=\"font-size:14px\"></i>'}
+          <span class="flex h-10.5 w-10.5 flex-none items-center justify-center rounded-full font-bold ${d.writer && !d.writer.startsWith('(') ? 'bg-sunk text-muted' : 'bg-gray-200 text-gray-400'}">
+            ${d.writer && !d.writer.startsWith('(') ? d.writer.charAt(0) : '<i class=\"ti ti-user-x\" style=\"font-size:14px\"></i>'}
           </span>
           <div class="flex-1">
             <div class="mb-1.5 flex items-center gap-2">
-              <span class="text-sm font-bold">\${d.writer && !d.writer.startsWith('(') ? d.writer : '(탈퇴회원)'}</span>
+              <span class="text-sm font-bold">${d.writer && !d.writer.startsWith('(') ? d.writer : '(탈퇴회원)'}</span>
               <span class="text-xs text-faint tabular-nums">${d.createDate}</span>
               <span class="ml-auto flex gap-2.5 text-xs text-muted">
                 <button type="button" class="hover:text-brand"
