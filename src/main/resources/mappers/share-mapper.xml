@@ -158,6 +158,7 @@
         SELECT
             sm.schedule_no,
             sm.schedule_title,
+            sm.schedule_status AS scheduleStatus,
             sm.schedule_startdate,
             sm.schedule_enddate,
             sm.create_date  AS createDate,

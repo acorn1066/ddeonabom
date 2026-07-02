@@ -229,11 +229,23 @@ public class ReviewController {
 
 	    reviewService.increaseCount(travelNo);
 	    Review review = reviewService.getReviewDetail(travelNo, loginUserNo);
-	    
 
+
+	    // 글이 존재하지 않으면 흰 배경 + 안내 모달 → 확인 시 목록 이동
 	    if (review == null) {
-	        return "redirect:/reviews/list";
+	        model.addAttribute("message",     "존재하지 않는 게시글입니다.");
+	        model.addAttribute("redirectUrl", "/reviews/list");
+	        return "views/common/blocked";
 	    }
+
+	    // 삭제(status='N')된 글은 관리자만 조회 가능(신고 처리용), 일반 사용자는 URL 직접 접근 차단
+	    boolean isAdmin = loginUser != null && "Y".equals(loginUser.getIsAdmin());
+	    if ("N".equals(review.getStatus()) && !isAdmin) {
+	        model.addAttribute("message",     "삭제된 게시글입니다.");
+	        model.addAttribute("redirectUrl", "/reviews/list");
+	        return "views/common/blocked";
+	    }
+
 	    if ("MEMBER".equals(review.getVisibility()) && loginUser == null) {
 	        model.addAttribute("alertMsg", "회원 전용 게시글입니다. 로그인 후 이용해주세요.");
 	        return "member/login";

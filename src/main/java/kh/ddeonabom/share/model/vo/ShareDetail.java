@@ -18,6 +18,7 @@ public class ShareDetail {
     // ── SCHEDULE_MAIN ──
     private int    scheduleNo;
     private String scheduleTitle;
+    private String scheduleStatus;      // 삭제 여부(Y/N) - URL 직접 접속 우회 차단용
     private Date   scheduleStartdate;   // java.sql.Date → #dates.format() 사용 가능
     private Date   scheduleEnddate;
     private Date   createDate;

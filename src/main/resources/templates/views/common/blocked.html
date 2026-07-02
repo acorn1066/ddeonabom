@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>안내</title>
+</head>
+<body style="margin:0;height:100vh;background:#ffffff;">
+
+    <!-- 흰 배경 위에 뜨는 안내 모달: 확인을 눌러야 목록으로 이동 -->
+    <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,.5);">
+        <div style="width:24rem;max-width:90%;background:#ffffff;border-radius:1rem;box-shadow:0 25px 50px -12px rgba(0,0,0,.25);padding:2rem 1.75rem;text-align:center;">
+            <div style="margin:0 auto .9rem;width:3rem;height:3rem;border-radius:9999px;background:#eef2ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;">
+                <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+                    <path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
+                </svg>
+            </div>
+            <h2 style="margin:0 0 .4rem;font-size:1.05rem;font-weight:800;color:#0f172a;">알림</h2>
+            <p style="margin:0 0 1.4rem;font-size:.875rem;color:#64748b;line-height:1.5;" th:text="${message}">삭제된 게시글입니다.</p>
+            <button id="confirmBtn"
+                    style="height:2.75rem;width:100%;border:none;border-radius:.75rem;background:#4f46e5;color:#ffffff;font-size:.875rem;font-weight:600;cursor:pointer;">확인</button>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const redirectUrl = /*[[${redirectUrl}]]*/ '/';
+        document.getElementById('confirmBtn').addEventListener('click', function () {
+            window.location.href = redirectUrl;
+        });
+    </script>
+</body>
+</html>

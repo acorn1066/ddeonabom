@@ -93,6 +93,27 @@ public class ShareController {
             ModelAndView mv) {
 
         ShareDetail schedule = shareService.selectShareDetail(scheduleNo);
+
+        // 글이 존재하지 않으면 흰 배경 + 안내 모달 → 확인 시 목록 이동
+        if (schedule == null) {
+            mv.addObject("message",     "존재하지 않는 게시글입니다.")
+              .addObject("redirectUrl", "/share/list")
+              .setViewName("views/common/blocked");
+            return mv;
+        }
+
+        // 로그인 사용자 기준 추천·찜 여부 (관리자 우회 판단에도 재사용)
+        Member loginUser = (Member) session.getAttribute("loginUser");
+
+        // 삭제(schedule_status='N')된 글은 관리자만 조회 가능(신고 처리용), 일반 사용자는 URL 직접 접근 차단
+        boolean isAdmin = loginUser != null && "Y".equals(loginUser.getIsAdmin());
+        if ("N".equals(schedule.getScheduleStatus()) && !isAdmin) {
+            mv.addObject("message",     "삭제된 게시글입니다.")
+              .addObject("redirectUrl", "/share/list")
+              .setViewName("views/common/blocked");
+            return mv;
+        }
+
         ArrayList<ShareDay> dayList = shareService.selectShareDayList(scheduleNo);
         ArrayList<Reply> replyList  = replyService.getReplyList(scheduleNo, "S");
 
@@ -103,8 +124,6 @@ public class ShareController {
                          - schedule.getScheduleStartdate().getTime()) / (1000L * 60 * 60 * 24);
         }
 
-        // 로그인 사용자 기준 추천·찜 여부
-        Member loginUser = (Member) session.getAttribute("loginUser");
         boolean isLiked  = false;
         boolean isWished = false;
         if (loginUser != null) {
