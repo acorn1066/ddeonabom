@@ -50,6 +50,8 @@ export const useBoards = (fetchUrl, idField = "boardId") => {
                     if (selectBoard && selectBoard[idField] === id) {
                         setSelectBoard(prev => ({ ...prev, [statusField]: newStatus }));
                     }
+                } else if (data == -1) {
+                    alert("관리자에 의해 정지된 회원의 게시글 입니다.");
                 } else {
                     alert("상태 변경에 실패하여 페이지를 새로고침합니다.");
                     window.location.reload();

@@ -524,6 +524,29 @@
 		update reply set status = 'N' 
 		where member_no = (select member_no from member where id = #{id})
 	</update>
+	
+<!-- 	계정 정진된 계정 게시글을 관리자가 실수로 게시하려 할때 막는거 -->
+
+	<select id="checkMemberStatusSchedule" parameterType="kh.ddeonabom.admin.model.vo.AdminPost" resultType="_int">
+	    select count(*) 
+	    from member m
+	    join schedule_main s on m.member_no = s.member_no
+	    where s.schedule_no = #{postNo} and m.status = 'B'
+	</select>
+	
+	<select id="checkMemberStatusReview" parameterType="kh.ddeonabom.admin.model.vo.AdminPost" resultType="_int">
+	    select count(*) 
+	    from member m
+	    join travel_list t on m.member_no = t.member_no
+	    where t.travel_no = #{postNo} and m.status = 'B'
+	</select>
+	
+	<select id="checkMemberStatusQuestion" parameterType="kh.ddeonabom.admin.model.vo.AdminPost" resultType="_int">
+	    select count(*) 
+	    from member m
+	    join qlist q on m.member_no = q.member_no
+	    where q.q_no = #{postNo} and m.status = 'B'
+	</select>
 
 
 
