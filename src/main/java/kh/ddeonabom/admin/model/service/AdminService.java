@@ -190,6 +190,18 @@ public class AdminService {
 		return mapper.getTodayMemberCount();
 	}
 
+	public int checkMemberStatusSchedule(AdminPost post) {
+		return mapper.checkMemberStatusSchedule(post) ;
+	}
+
+	public int checkMemberStatusReview(AdminPost post) {
+		return mapper.checkMemberStatusReview(post);
+	}
+
+	public int checkMemberStatusQuestion(AdminPost post) {
+		return mapper.checkMemberStatusQuestion(post);
+	}
+
 
 
 	
