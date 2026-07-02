@@ -649,7 +649,6 @@ const restoreSchedule = (data) => {
 
 ////////////지도 렌더링
 
-//기존 마커/폴리라인 제거
 const clearMap = () => {
  markers.forEach(m => m.setMap(null));
  polylines.forEach(p => p.setMap(null));
@@ -657,9 +656,8 @@ const clearMap = () => {
  polylines = [];
 };
 
-//선택된 날짜의 장소들을 마커 + 실도로 경로로 그림
 const drawRoute = async () => {
- if (!mapReady || !map) return;   // 지도 준비 전이면 대기
+ if (!mapReady || !map) return;
  clearMap();
 
  const key = selectedDate ? toDateKey(selectedDate) : null;
@@ -669,10 +667,9 @@ const drawRoute = async () => {
 
  const bounds = new kakao.maps.LatLngBounds();
 
- // 1) 마커 + 순번 라벨
  places.forEach((place, idx) => {
-     const lat = parseFloat(place.mapy);   // 위도
-     const lng = parseFloat(place.mapx);   // 경도
+     const lat = parseFloat(place.mapy);
+     const lng = parseFloat(place.mapx);
      if (isNaN(lat) || isNaN(lng)) return;
 
      const pos = new kakao.maps.LatLng(lat, lng);
@@ -680,7 +677,7 @@ const drawRoute = async () => {
      const marker = new kakao.maps.Marker({ position: pos, map });
      markers.push(marker);
 
-     // 순번 표시용 커스텀 오버레이
+     // 순번 표시용
      const overlay = new kakao.maps.CustomOverlay({
          position: pos,
          yAnchor: 2.1,
@@ -690,29 +687,25 @@ const drawRoute = async () => {
                 + `box-shadow:0 1px 3px rgba(0,0,0,.3)">${idx + 1}</div>`
      });
      overlay.setMap(map);
-     markers.push(overlay);   // 같이 정리되도록 markers에 넣음
+     markers.push(overlay);
 
      bounds.extend(pos);
  });
 
  map.setBounds(bounds);
 
- // 2) 장소 2곳 이상이면 실도로 경로
  if (places.length >= 2) {
      await drawRoadPath(places);
  }
 };
 
-//실도로 경로: 서버 프록시 호출 → vertexes로 폴리라인
 const drawRoadPath = async (places) => {
- // 좌표 유효한 것만 추림
  const points = places
      .map(p => ({ lat: parseFloat(p.mapy), lng: parseFloat(p.mapx) }))
      .filter(p => !isNaN(p.lat) && !isNaN(p.lng));
 
  if (points.length < 2) return;
 
- // 경유지 최대 5개 → 한 호출에 최대 7개 지점. 초과 시 구간 분할.
  const MAX_POINTS_PER_CALL = 7;
  const segments = [];
  for (let i = 0; i < points.length - 1; i += (MAX_POINTS_PER_CALL - 1)) {
@@ -796,7 +789,6 @@ const confirmDelete = () => {
 
 ////////////공유 토글
 
-//현재 공유 상태 (initialData에서 가져옴)
 // 현재 공유 상태
 let currentVisibility = (initialData && initialData.scheduleVisibility) || 'N';
 

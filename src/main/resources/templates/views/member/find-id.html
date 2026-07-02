@@ -95,8 +95,6 @@
 
 <script>
 $(document).ready(function() {
-    // 💡 [해결 핵심 3] 억지로 이벤트를 꼬아서 오버라이딩 하지 말고, 
-    // 기존에 검증된 auth.js의 규격(함수 주입식)을 그대로 사용하여 안전하게 초기화합니다.
     initEmailVerification({
         sendBtn: "#btnSendCode",
         verifyBtn: "#btnVerifyCode",
@@ -107,7 +105,7 @@ $(document).ready(function() {
             return $("#userEmail").val().trim();
         },
         successCallback: function() {
-            $("#btnSubmitFindId").prop("disabled", false); // 👈 속성만 풀면 보라색으로 알아서 변신합니다!
+            $("#btnSubmitFindId").prop("disabled", false);
             $("#userEmail").prop("readonly", true);
         }
     });

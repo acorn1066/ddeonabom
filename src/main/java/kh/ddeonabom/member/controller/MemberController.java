@@ -158,7 +158,7 @@ public class MemberController {
         // -------------------------------
         // 비밀번호 암호화
         // -------------------------------
-        m.setPwd(bcrypt.encode(m.getPwd())); // 👈 주입받은 'bcrypt' 객체를 그대로 사용
+        m.setPwd(bcrypt.encode(m.getPwd()));
         
         System.out.println("==============================================");
         System.out.println("★ [회원가입] 화면에서 서버로 넘어온 원본 비밀번호: [" + m.getPwd() + "]");
