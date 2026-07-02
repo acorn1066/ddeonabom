@@ -91,13 +91,21 @@ public interface AdminMapper {
 	int getTodayMemberCount();
 
 //	관리자의 의해 정지당한 회원의 게시글과 댓글 모두 삭제
-	void banMemberSchedule(HashMap<String, String> map);
+	int banMemberSchedule(HashMap<String, String> map);
 
-	void banMemberReview(HashMap<String, String> map);
+	int banMemberReview(HashMap<String, String> map);
 
-	void banMemberQlist(HashMap<String, String> map);
+	int banMemberQlist(HashMap<String, String> map);
 
-	void banMemberReply(HashMap<String, String> map);
+	int banMemberReply(HashMap<String, String> map);
+	
+	// 차단된 계정 관리자가 실수로 복구하려할때 막는 거
+
+	int checkMemberStatusSchedule(AdminPost post);
+
+	int checkMemberStatusReview(AdminPost post);
+
+	int checkMemberStatusQuestion(AdminPost post);
 	
 	
 }
