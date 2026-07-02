@@ -33,7 +33,7 @@
 	
 	<select id="selectLandmarkList">
 		select *
-		from landmark
+		from landmark l
 		<where>
 			<if test="contentTypeId != null">
 				and content_type_id = #{contentTypeId}
@@ -45,6 +45,20 @@
 				and (title like '%' || #{keyword} || '%' or addr1 like '%' || #{keyword} || '%')
 			</if>
 		</where>
+		<choose>
+			<when test="sort == 'review'">
+           		 order by (select count(*)
+                        from travel_list_sub ts
+                            join travel_list tl using(travel_no)
+                        where tl.status = 'Y' and ts.content_id = l.content_id) desc
+	        </when>
+	        <when test="sort == 'rating'">
+	            order by (select nvl(round(avg(rating), 1), 0)
+	                        from travel_list_sub
+	                        where content_id = l.content_id) desc
+	        </when>
+			<otherwise>order by land_count desc</otherwise>
+		</choose>
 	</select>
 	
 	<select id="landmarkDetail">

@@ -45,11 +45,12 @@ public class LandmarkController {
 								@RequestParam(value = "contentTypeId", required = false) Integer contentTypeId,
 								@RequestParam(value = "area", required = false) String area,
 								@RequestParam(value = "keyword", required = false) String keyword,
-								Model model, HttpServletRequest request, HttpSession session) {
+								Model model, HttpServletRequest request, HttpSession session,
+								@RequestParam(value = "sort", required = false, defaultValue = "view") String sort) {
 		
 		int listCount = lService.getListCount(contentTypeId, area, keyword);
 		PageInfo pi = Pagination.getPageInfo(currentPage, listCount, 10, 20);
-		ArrayList<Landmark> list = lService.selectLandmarkList(pi, contentTypeId, area, keyword);
+		ArrayList<Landmark> list = lService.selectLandmarkList(pi, contentTypeId, area, keyword, sort);
 //		System.out.println(list);
 		Map<Integer, Double> rating = new HashMap<>();
 		Map<Integer, Integer> review = new HashMap<>();
@@ -78,6 +79,7 @@ public class LandmarkController {
 			model.addAttribute("niceList", niceList);
 		}
 		
+		model.addAttribute("sort", sort);
 		model.addAttribute("review", review);
 		model.addAttribute("rating", rating);
 		model.addAttribute("keyword", keyword);

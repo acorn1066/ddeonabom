@@ -39,10 +39,10 @@ public class LandmarkService {
 	}
 	
 	// 관광지 리스트 가져오기
-	public ArrayList<Landmark> selectLandmarkList(PageInfo pi, Integer contentTypeId, String area, String keyword) {
+	public ArrayList<Landmark> selectLandmarkList(PageInfo pi, Integer contentTypeId, String area, String keyword, String sort) {
 		int offset = (pi.getCurrentPage() - 1) * pi.getBoardLimit();
 		RowBounds rowBounds = new RowBounds(offset, pi.getBoardLimit());
-		return mapper.selectLandmarkList(rowBounds, contentTypeId, area, keyword);
+		return mapper.selectLandmarkList(rowBounds, contentTypeId, area, keyword, sort);
 	}
 	
 	//관광지 세부 가져오기
