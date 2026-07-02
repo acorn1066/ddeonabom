@@ -23,13 +23,14 @@ public class QList {
 	private String status;
 	private int memberNo;
 	private String writer;
+	private String writerStatus;   // MEMBER.STATUS 조인 결과 (Y/N/B) - 화면 표시 가공용
 	private String category;
 	private String visibility;
 	private int replyCount;
 	private String reportStatus;
-	
-	public String getWriter() {
-        if (this.writer != null && this.writer.contains("_")) {
+
+	public String getDisplayWriter() {
+        if ("N".equals(this.writerStatus)) {
             return "(탈퇴회원)";
         }
         return this.writer;

@@ -23,10 +23,11 @@ public class Reply {
 	private int postNo;
 	private int memberNo;
 	private String writer;   // MEMBER 테이블 JOIN으로 가져올 nickname
+	private String writerStatus;   // MEMBER.STATUS 조인 결과 (Y/N/B) - 화면 표시 가공용
 	private String reportStatus;
-	
-	public String getWriter() {
-        if (this.writer != null && this.writer.contains("_")) {
+
+	public String getDisplayWriter() {
+        if ("N".equals(this.writerStatus)) {
             return "(탈퇴회원)";
         }
         return this.writer;
