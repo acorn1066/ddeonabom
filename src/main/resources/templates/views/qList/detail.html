@@ -26,17 +26,17 @@
 
       <div class="flex items-center gap-2.5">
 
-        <!-- ★ 아바타 첫글자: q.writer 첫 번째 문자 -->
+        <!-- ★ 아바타 첫글자: q.displayWriter 첫 번째 문자 -->
         <span class="flex h-9.5 w-9.5 items-center justify-center rounded-full font-bold"
-              th:classappend="${q.writer == null or #strings.startsWith(q.writer, '(')} ? 'bg-gray-200 text-gray-400' : 'bg-sunk text-muted'">
-          <i th:if="${q.writer == null or #strings.startsWith(q.writer, '(')}" class="ti ti-user-x" style="font-size:13px"></i>
-          <th:block th:unless="${q.writer == null or #strings.startsWith(q.writer, '(')}" th:text="${#strings.substring(q.writer, 0, 1)}"></th:block>
+              th:classappend="${q.writerStatus == 'N'} ? 'bg-gray-200 text-gray-400' : 'bg-sunk text-muted'">
+          <i th:if="${q.writerStatus == 'N'}" class="ti ti-user-x" style="font-size:13px"></i>
+          <th:block th:unless="${q.writerStatus == 'N'}" th:text="${#strings.substring(q.displayWriter, 0, 1)}"></th:block>
         </span>
 
         <div>
-          <!-- ★ 작성자명: q.writer 동적으로 -->
+          <!-- ★ 작성자명: q.displayWriter 동적으로 -->
           <div class="text-sm font-bold"
-               th:text="${q.writer != null and !#strings.startsWith(q.writer, '(') ? q.writer : '(탈퇴회원)'}"></div>
+               th:text="${q.displayWriter}"></div>
 
           <!-- ★ 날짜/조회수: span 3개로 분리 (정렬 기준점 확보) -->
           <div class="flex items-center gap-1 text-13 text-muted tabular-nums">
@@ -143,14 +143,14 @@
            th:id="|reply-${reply.replyNo}|"
            class="flex gap-4 border-t border-line py-5">
         <span class="flex h-10.5 w-10.5 flex-none items-center justify-center rounded-full font-bold"
-              th:classappend="${reply.writer == null or #strings.startsWith(reply.writer, '(')} ? 'bg-gray-200 text-gray-400' : 'bg-sunk text-muted'">
-          <i th:if="${reply.writer == null or #strings.startsWith(reply.writer, '(')}" class="ti ti-user-x" style="font-size:14px"></i>
-          <th:block th:unless="${reply.writer == null or #strings.startsWith(reply.writer, '(')}" th:text="${#strings.substring(reply.writer, 0, 1)}"></th:block>
+              th:classappend="${reply.writerStatus == 'N'} ? 'bg-gray-200 text-gray-400' : 'bg-sunk text-muted'">
+          <i th:if="${reply.writerStatus == 'N'}" class="ti ti-user-x" style="font-size:14px"></i>
+          <th:block th:unless="${reply.writerStatus == 'N'}" th:text="${#strings.substring(reply.displayWriter, 0, 1)}"></th:block>
         </span>
         <div class="flex-1">
           <div class="mb-1.5 flex items-center gap-2">
             <span class="text-sm font-bold"
-                  th:text="${reply.writer != null and !#strings.startsWith(reply.writer, '(') ? reply.writer : '(탈퇴회원)'}"></span>
+                  th:text="${reply.displayWriter}"></span>
             <span class="text-xs text-faint tabular-nums"
                   th:text="${#dates.format(reply.createDate, 'yyyy.MM.dd')}"></span>
             <span th:if="${session.loginUser != null and session.loginUser.memberNo == reply.memberNo}"
