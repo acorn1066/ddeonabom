@@ -195,7 +195,7 @@
             <!-- 작성자 아바타 + 닉네임 -->
             <span class="flex items-center gap-2 text-13 font-semibold">
               <span class="flex h-6.5 w-6.5 items-center justify-center rounded-full text-xs font-bold"
-                    th:classappend="${share.memberNickname == null or #strings.startsWith(share.memberNickname, '(')} ? 'bg-gray-200 text-gray-400' : 'bg-brand-soft text-brand-ink'">
+                    th:classappend="${share.memberNickname == null or #strings.startsWith(share.memberNickname, '(')} ? 'bg-gray-200 text-gray-400' : 'bg-avatar text-white'">
                 <i th:if="${share.memberNickname == null or #strings.startsWith(share.memberNickname, '(')}" class="ti ti-user-x" style="font-size:12px"></i>
                 <th:block th:unless="${share.memberNickname == null or #strings.startsWith(share.memberNickname, '(')}" th:text="${#strings.substring(share.memberNickname, 0, 1)}">닉</th:block>
               </span>

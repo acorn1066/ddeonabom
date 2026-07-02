@@ -10,6 +10,7 @@ tailwind.config = {
         sunk:  '#F4F5F8',   // 가라앉은 배경
         deep:  '#0E1116',   // 다크 섹션
         brand: { DEFAULT: '#1F47E6', ink: '#143BBE', soft: '#EBEEFD', light: '#8AA0FF' }, // 코발트 포인트
+        avatar: '#5775EC', // 닉네임 아바타 통일 색상 (brand 25% 틴트)
         ok:    '#1F8A5B',
         warn:  '#B2772A',
         err:   '#D23B33',

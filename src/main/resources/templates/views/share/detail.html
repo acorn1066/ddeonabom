@@ -31,9 +31,12 @@
       <!-- 작성자 정보 + 복사 버튼 -->
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-2.5">
-          <!-- 아바타: MEMBER.NICKNAME 첫 글자 -->
-          <span class="flex h-10.5 w-10.5 items-center justify-center rounded-full bg-brand font-extrabold text-white"
-                th:text="${#strings.substring(schedule.memberNickname, 0, 1)}">별</span>
+          <!-- 아바타: MEMBER.NICKNAME 첫 글자 (탈퇴회원은 아이콘으로 대체) -->
+          <span class="flex h-10.5 w-10.5 items-center justify-center rounded-full font-extrabold"
+                th:classappend="${schedule.memberNickname == null or #strings.startsWith(schedule.memberNickname, '(')} ? 'bg-gray-200 text-gray-400' : 'bg-avatar text-white'">
+            <i th:if="${schedule.memberNickname == null or #strings.startsWith(schedule.memberNickname, '(')}" class="ti ti-user-x" style="font-size:16px"></i>
+            <th:block th:unless="${schedule.memberNickname == null or #strings.startsWith(schedule.memberNickname, '(')}" th:text="${#strings.substring(schedule.memberNickname, 0, 1)}">별</th:block>
+          </span>
           <div>
             <div class="text-15 font-bold" th:text="${schedule.memberNickname}">별헤는밤</div>
             <div class="text-13 text-muted tabular-nums"
@@ -137,7 +140,7 @@
 
           <div class="flex gap-3">
             <!-- 아바타 -->
-            <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-brand-soft font-bold text-brand-ink"
+            <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-avatar font-bold text-white"
                   th:if="${session.loginUser != null}"
                   th:text="${#strings.substring(session.loginUser.nickname, 0, 1)}">나</span>
             <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-sunk font-bold text-faint"
@@ -168,7 +171,7 @@
            class="flex gap-3 border-t border-line py-4">
 
         <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full font-bold"
-              th:classappend="${reply.writerStatus == 'N'} ? 'bg-gray-200 text-gray-400' : 'bg-sunk text-muted'">
+              th:classappend="${reply.writerStatus == 'N'} ? 'bg-gray-200 text-gray-400' : 'bg-avatar text-white'">
           <i th:if="${reply.writerStatus == 'N'}" class="ti ti-user-x" style="font-size:14px"></i>
           <th:block th:unless="${reply.writerStatus == 'N'}" th:text="${#strings.substring(reply.displayWriter, 0, 1)}">제</th:block>
         </span>

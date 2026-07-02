@@ -2,11 +2,10 @@ package kh.ddeonabom.reply.controller;
 
 import java.util.Map;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 
 import jakarta.servlet.http.HttpSession;
@@ -15,7 +14,7 @@ import kh.ddeonabom.reply.model.vo.Reply;
 import kh.ddeonabom.reply.service.ReplyService;
 import lombok.RequiredArgsConstructor;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/reply")
 public class ReplyAjaxController {
@@ -24,7 +23,6 @@ public class ReplyAjaxController {
 	// ─── Ajax 댓글 CRUD (전체 게시판 공통: qList / share / review) ───────────
 
 	// Ajax 댓글 등록
-	@ResponseBody
 	@PostMapping("ajax/insert")
 	public Map<String, Object> ajaxInsertReply(@RequestBody Reply reply, HttpSession session) {
 		Map<String, Object> res = new HashMap<>();
@@ -54,7 +52,6 @@ public class ReplyAjaxController {
 	}
 
 	// Ajax 댓글 수정
-	@ResponseBody
 	@PostMapping("ajax/update")
 	public Map<String, Object> ajaxUpdateReply(@RequestBody Reply reply, HttpSession session) {
 		Map<String, Object> res = new HashMap<>();
@@ -75,7 +72,6 @@ public class ReplyAjaxController {
 	}
 
 	// Ajax 댓글 삭제
-	@ResponseBody
 	@PostMapping("ajax/delete")
 	public Map<String, Object> ajaxDeleteReply(@RequestBody Map<String, Object> body, HttpSession session) {
 		Map<String, Object> res = new HashMap<>();
