@@ -51,9 +51,9 @@ public class LandmarkController {
 		int listCount = lService.getListCount(contentTypeId, area, keyword);
 		PageInfo pi = Pagination.getPageInfo(currentPage, listCount, 10, 20);
 		ArrayList<Landmark> list = lService.selectLandmarkList(pi, contentTypeId, area, keyword, sort);
-//		System.out.println(list);
 		Map<Integer, Double> rating = new HashMap<>();
 		Map<Integer, Integer> review = new HashMap<>();
+		
 		for(Landmark l : list) {
 			double listRating = lService.rating(l.getContentId());
 			rating.put(l.getContentId(), listRating);
@@ -96,11 +96,18 @@ public class LandmarkController {
 	public String landmarkDetail(@PathVariable("contentId") int contentId, @PathVariable("page") int page,
 									Model model, HttpSession session, @RequestParam(value="page", defaultValue="1") int currentPage,
 									HttpServletRequest request) {
+		
+		Member loginUser = (Member)session.getAttribute("loginUser");
+		if(loginUser != null) {
+			int memberNo = loginUser.getMemberNo();			
+			int isNice = lService.landmarkNice(contentId, memberNo);
+			model.addAttribute("isNice", isNice);			
+		} 
+		
 		Landmark land = lService.landmarkDetail(contentId); 
 		int reviewCount = lService.reviewCount(contentId);
 		double reviewRating = lService.rating(contentId);
-//		System.out.println(reviewRating);
-//		System.out.println(reviewCount);
+		
 		PageInfo pi = Pagination.getPageInfo(currentPage, reviewCount, 5, 6);
 		Map<Integer, List<Image>> reviewImage = new HashMap<>();
 		ArrayList<LandReview> landReview = lService.review(contentId, pi);
@@ -108,9 +115,6 @@ public class LandmarkController {
 			ArrayList<Image> image = lService.image(re.getTravelSubNo());
 			reviewImage.put(re.getTravelSubNo(), image);
 		}
-//		ArrayList<Image> reviewImage = lService.image(contentId); 
-		
-		System.out.println(landReview);
 		
 		Map<Integer, String> contentType = new HashMap<>();
 		contentType.put(12, "관광지");
@@ -121,13 +125,6 @@ public class LandmarkController {
 		contentType.put(32, "숙박");
 		contentType.put(38, "쇼핑");
 		contentType.put(39, "음식점");
-		
-		Member loginUser = (Member)session.getAttribute("loginUser");
-		if(loginUser != null) {
-			int memberNo = loginUser.getMemberNo();			
-			int isNice = lService.landmarkNice(contentId, memberNo);
-			model.addAttribute("isNice", isNice);			
-		} 
 		
 		model.addAttribute("reviewImage", reviewImage);
 		model.addAttribute("reviewRating", reviewRating);
@@ -162,7 +159,6 @@ public class LandmarkController {
 	public int listNice(@RequestParam("contentId") int contentId, @RequestParam("memberNo") int memberNo) {
 		
 		int result = lService.landmarkNice(contentId, memberNo);
-		System.out.println(result);
 		
 		int newState;
 		if(result > 0) {

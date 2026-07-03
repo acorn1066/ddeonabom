@@ -35,8 +35,10 @@ public interface LandmarkMapper {
 	// 관광지 찜 여부확인
 	int landmarkNice(@Param("lNumber") int lNumber,@Param("memberNo") int memberNo);
 
+	// 찜 삭제
 	void deleteNice(@Param("lNumber") int lNumber,@Param("memberNo") int memberNo);
-
+	
+	// 찜 추가
 	void insertNice(@Param("lNumber") int lNumber,@Param("memberNo") int memberNo);
 
 	int getWishListCount(int memberNo);
@@ -46,7 +48,8 @@ public interface LandmarkMapper {
 	Set<Integer> niceList(int memberNo);
 
 	int getWishListCountByParam(Map<String, Object> param);
-
+	
+	//관광지 별 후기 개수 가져오기
 	int reviewCount(int contentId);
 	
 	// 관광지 후기 가져오기
@@ -54,8 +57,12 @@ public interface LandmarkMapper {
 	
 	// 별점 평균
 	double rating(int contentId);
-
+	
+	// 후기 이미지 가져오기
 	ArrayList<Image> image(int travelSubNo);
+	
+	// 조회 수 가져오기
+	int landCount(int contentId);
 
 
 
