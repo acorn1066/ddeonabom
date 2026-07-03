@@ -219,12 +219,12 @@
 			const reviews = document.querySelectorAll('.review')
 			for(review of reviews){
 				review.addEventListener('click', (e) => {
-					e.stopPropagation();
-					e.preventDefault();
 					
 					const loginUser = /*[[${session.loginUser}]]*/null;
 					const visibility = review.dataset.visibility;
 					if(visibility === 'MEMBER' && loginUser == null){
+						e.stopPropagation();
+						e.preventDefault();
 						openInfoModal('알림', '로그인이 필요합니다');
 						return;
 					}
