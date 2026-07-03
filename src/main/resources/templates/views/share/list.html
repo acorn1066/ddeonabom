@@ -241,7 +241,7 @@
   <div th:replace="~{views/common/modal :: modal}"></div>
   <footer th:replace="~{views/common/footer :: footer}"></footer>
 
-  <script>
+  <script th:inline="javascript">
     /* ─── 지역 필터 탭 클릭 → hidden input 변경 후 폼 제출 ─── */
     function selectRegion(value) {
       document.getElementById('region-input').value = value;
@@ -295,8 +295,6 @@
       }
     
     /* ============================================================ 공지사항 =================================================================  */
-    
-    
 
   </script>
 

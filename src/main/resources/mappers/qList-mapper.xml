@@ -79,7 +79,6 @@
 	    FROM qlist q
 	    JOIN member m ON q.member_no = m.member_no
 	    WHERE q.q_no = #{qNo}
-	    AND q.status = 'Y'
 	</select>
 
 	<update id="updateCount" parameterType="_int">

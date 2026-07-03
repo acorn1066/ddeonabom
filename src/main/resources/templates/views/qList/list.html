@@ -225,7 +225,7 @@
 	  const isLoggedIn = /*[[${session.loginUser != null}]]*/ false;
 	</script>
 
-	<script>
+	<script th:inline="javascript">
 	  function toggleSearchType() {
 	    const menu = document.getElementById('searchTypeMenu');
 	    const arrow = document.getElementById('searchTypeArrow');
@@ -339,7 +339,7 @@
 		  return true;
 		}
 	</script>
-	
+
 	<div th:replace="~{views/common/modal :: modal}"></div>
 	<footer th:replace="~{views/common/footer :: footer}"></footer>
 </body>

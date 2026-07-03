@@ -120,15 +120,37 @@ public class QListController {
 	
 	@GetMapping("detail")
 	public ModelAndView detailQList(@RequestParam("qNo") int qNo, HttpSession session, ModelAndView mv) {
-	    
+
 		if (session.getAttribute("loginUser") != null) {
 			qListService.updateCount(qNo);  // 로그인 회원만 조회수 +1
 		}
 	    QList q = qListService.detailQList(qNo);  // 단건 조회 서비스 호출
-	    
-	    // 회원 공개 글인데 비로그인 상태라면 모달 트리거 플래그 전달
-	    boolean loginRequired = "MEMBER".equals(q.getVisibility())
-	                            && session.getAttribute("loginUser") == null;
+
+	    // 글이 존재하지 않으면 흰 배경 + 안내 모달 → 확인 시 목록 이동
+	    if (q == null) {
+	        mv.addObject("message",     "존재하지 않는 게시글입니다.")
+	          .addObject("redirectUrl", "/qList/list")
+	          .setViewName("views/common/blocked");
+	        return mv;
+	    }
+
+	    // 삭제(status='N')된 글은 관리자만 조회 가능(신고 처리용), 일반 사용자는 URL 직접 접근 차단
+	    Member sessionUser = (Member) session.getAttribute("loginUser");
+	    boolean isAdmin = sessionUser != null && "Y".equals(sessionUser.getIsAdmin());
+	    if ("N".equals(q.getStatus()) && !isAdmin) {
+	        mv.addObject("message",     "삭제된 게시글입니다.")
+	          .addObject("redirectUrl", "/qList/list")
+	          .setViewName("views/common/blocked");
+	        return mv;
+	    }
+
+	    // 회원 공개 글인데 비로그인 상태면 내용을 아예 넘기지 않고 흰 배경 + 로그인 유도 모달로 차단
+	    if ("MEMBER".equals(q.getVisibility()) && session.getAttribute("loginUser") == null) {
+	        mv.addObject("message",     "로그인이 필요한 글입니다. 로그인 후 이용해주세요.")
+	          .addObject("redirectUrl", "/qList/list")
+	          .setViewName("views/common/blocked");
+	        return mv;
+	    }
 
 	    ArrayList<Reply> replyList = replyService.getReplyList(qNo, "Q");
 
@@ -141,7 +163,6 @@ public class QListController {
 	    mv.addObject("q", q)
 	    	.addObject("replyList",  replyList)
 	    	.addObject("replyCount", replyList.size())
-	    	.addObject("loginRequired", loginRequired)
 	    	.addObject("likeCount",  likeCount)
 	    	.addObject("isLiked",    isLiked)
 	    	.setViewName("views/qList/detail");
