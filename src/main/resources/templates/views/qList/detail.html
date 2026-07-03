@@ -5,7 +5,7 @@
   <div th:replace="~{views/common/navbar :: navbar}"></div>
 
   <!-- ════════════ MAIN ════════════ -->
-  <main th:if="${!loginRequired}" class="mx-auto max-w-post px-6 pb-24 pt-12">
+  <main class="mx-auto max-w-post px-6 pb-24 pt-12">
 
     <!-- ★ 브레드크럼: href 실제 경로로, 카테고리 동적으로 -->
     <div class="mb-5 text-13 text-muted">
@@ -227,22 +227,11 @@
     </div>
   </div>
 
-  <!-- 비로그인 + MEMBER 공개글 → 모달 트리거 -->
+  <!-- delete/edit/update 실패 시 컨트롤러가 redirect로 넘긴 알림 -->
   <script th:inline="javascript">
     window.addEventListener('DOMContentLoaded', function () {
-      const loginRequired = /*[[${loginRequired}]]*/ false;
       const errorMessage  = /*[[${errorMessage}]]*/ null;
-      if (loginRequired) {
-        openInfoModal(
-          '회원 전용 글입니다',
-          '로그인 후 이용하실 수 있어요.'
-        );
-        // 확인 버튼 → 목록으로 이동
-        document.querySelector('#modal-info button').onclick = function () {
-          location.href = '/qList/list';
-        };
-      } else if (errorMessage) {
-        // delete/edit/update 실패 시 컨트롤러가 redirect로 넘긴 알림
+      if (errorMessage) {
         openInfoModal('알림', errorMessage);
       }
     });
@@ -441,8 +430,6 @@
   </script>
 
   <div th:replace="~{views/common/modal :: modal}"></div>
-  <th:block th:if="${!loginRequired}">
-    <footer th:replace="~{views/common/footer :: footer}"></footer>
-  </th:block>
+  <footer th:replace="~{views/common/footer :: footer}"></footer>
 </body>
 </html>

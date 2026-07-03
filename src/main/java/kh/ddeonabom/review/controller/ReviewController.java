@@ -247,8 +247,9 @@ public class ReviewController {
 	    }
 
 	    if ("MEMBER".equals(review.getVisibility()) && loginUser == null) {
-	        model.addAttribute("alertMsg", "회원 전용 게시글입니다. 로그인 후 이용해주세요.");
-	        return "member/login";
+	        model.addAttribute("message",     "로그인이 필요한 글입니다. 로그인 후 이용해주세요.");
+	        model.addAttribute("redirectUrl", "/reviews/list");
+	        return "views/common/blocked";
 	    }
 	    
 	    ArrayList<Reply> replyList = replyService.getReplyList(travelNo, "T");

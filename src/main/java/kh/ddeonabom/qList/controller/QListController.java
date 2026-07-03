@@ -144,9 +144,13 @@ public class QListController {
 	        return mv;
 	    }
 
-	    // 회원 공개 글인데 비로그인 상태라면 모달 트리거 플래그 전달
-	    boolean loginRequired = "MEMBER".equals(q.getVisibility())
-	                            && session.getAttribute("loginUser") == null;
+	    // 회원 공개 글인데 비로그인 상태면 내용을 아예 넘기지 않고 흰 배경 + 로그인 유도 모달로 차단
+	    if ("MEMBER".equals(q.getVisibility()) && session.getAttribute("loginUser") == null) {
+	        mv.addObject("message",     "로그인이 필요한 글입니다. 로그인 후 이용해주세요.")
+	          .addObject("redirectUrl", "/qList/list")
+	          .setViewName("views/common/blocked");
+	        return mv;
+	    }
 
 	    ArrayList<Reply> replyList = replyService.getReplyList(qNo, "Q");
 
@@ -159,7 +163,6 @@ public class QListController {
 	    mv.addObject("q", q)
 	    	.addObject("replyList",  replyList)
 	    	.addObject("replyCount", replyList.size())
-	    	.addObject("loginRequired", loginRequired)
 	    	.addObject("likeCount",  likeCount)
 	    	.addObject("isLiked",    isLiked)
 	    	.setViewName("views/qList/detail");

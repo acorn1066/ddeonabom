@@ -114,6 +114,14 @@ public class ShareController {
             return mv;
         }
 
+        // 회원 공개 글인데 비로그인 상태면 내용을 아예 넘기지 않고 흰 배경 + 로그인 유도 모달로 차단
+        if ("M".equals(schedule.getScheduleVisibility()) && loginUser == null) {
+            mv.addObject("message",     "로그인이 필요한 글입니다. 로그인 후 이용해주세요.")
+              .addObject("redirectUrl", "/share/list")
+              .setViewName("views/common/blocked");
+            return mv;
+        }
+
         ArrayList<ShareDay> dayList = shareService.selectShareDayList(scheduleNo);
         ArrayList<Reply> replyList  = replyService.getReplyList(scheduleNo, "S");
 
