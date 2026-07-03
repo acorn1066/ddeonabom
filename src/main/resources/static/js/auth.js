@@ -39,6 +39,44 @@ function checkPasswordMatch(pwdInputSelector, pwdCheckSelector, mismatchMsgSelec
     }
 }
 
+// ==========================================
+// 닉네임 중복 확인 통합 세팅
+// ==========================================
+function initNicknameValidation({ btnSelector, inputSelector, msgSelector, onCheckResult }) {
+    $(btnSelector).click(function() {
+        let nickname = $(inputSelector).val().trim();
+        let $msg = $(msgSelector);
+        
+        if (nickname === "") {
+            $msg.text("닉네임을 입력해 주세요.").css("color", "red");
+            if (typeof onCheckResult === "function") onCheckResult(false, "");
+            return;
+        }
+        
+        // 닉네임 2~10자 정규식 (한글, 영문, 숫자)
+        let nickReg = /^[a-zA-Z0-9가-힣]{2,10}$/;
+        if (!nickReg.test(nickname)) {
+            $msg.text("닉네임은 특수문자 제외 2~10자리로 입력하세요.").css("color", "red");
+            if (typeof onCheckResult === "function") onCheckResult(false, "");
+            return;
+        }
+
+        $msg.text("중복 확인 중...").css("color", "orange");
+
+        $.get("/member/check-nickname", { nickname: nickname }, function(res) {
+            if (res === "AVAILABLE") {
+                $msg.text("사용 가능한 닉네임입니다.").css("color", "green");
+                if (typeof onCheckResult === "function") onCheckResult(true, nickname);
+            } else {
+                $msg.text("이미 사용중인 닉네임입니다.").css("color", "red");
+                if (typeof onCheckResult === "function") onCheckResult(false, "");
+            }
+        }).fail(function() {
+            $msg.text("서버 통신 오류가 발생했습니다.").css("color", "red");
+            if (typeof onCheckResult === "function") onCheckResult(false, "");
+        });
+    });
+}
 
 
 function resetEmailAuthUI(sendBtn, verifyBtn, authArea, authCodeInput, emailMsg) {

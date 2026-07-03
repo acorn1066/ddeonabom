@@ -47,62 +47,62 @@
 	      	th:classappend="${contentTypeId == null and area == null}? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	전체 지역</a>
-	      <a th:href="@{/landmark/list(area='서울', keyword=${keyword}, contentTypeId=${contentTypeId})}"
+	      <a th:href="@{/landmark/list(area='서울', keyword=${keyword}, contentTypeId=${contentTypeId}, sort=${sort})}"
 	      	th:classappend="${area == '서울'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	서울</a>
-	      <a th:href="@{/landmark/list(area='부산', keyword=${keyword}, contentTypeId=${contentTypeId})}"
+	      <a th:href="@{/landmark/list(area='부산', keyword=${keyword}, contentTypeId=${contentTypeId}, sort=${sort})}"
 	      	th:classappend="${area == '부산'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	부산</a>
-	      <a th:href="@{/landmark/list(area='경기', keyword=${keyword}, contentTypeId=${contentTypeId})}"
+	      <a th:href="@{/landmark/list(area='경기', keyword=${keyword}, contentTypeId=${contentTypeId}, sort=${sort})}"
 	      	th:classappend="${area == '경기'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	경기</a>
-	      <a th:href="@{/landmark/list(area='제주', keyword=${keyword}, contentTypeId=${contentTypeId})}"
+	      <a th:href="@{/landmark/list(area='제주', keyword=${keyword}, contentTypeId=${contentTypeId}, sort=${sort})}"
 	      	th:classappend="${area == '제주'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	제주</a>
-	      <a th:href="@{/landmark/list(area='강원', keyword=${keyword}, contentTypeId=${contentTypeId})}"
+	      <a th:href="@{/landmark/list(area='강원', keyword=${keyword}, contentTypeId=${contentTypeId}, sort=${sort})}"
 	      	th:classappend="${area == '강원'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	강원</a>
-	      <a th:href="@{/landmark/list(area='경상', keyword=${keyword}, contentTypeId=${contentTypeId})}"
+	      <a th:href="@{/landmark/list(area='경상', keyword=${keyword}, contentTypeId=${contentTypeId}, sort=${sort})}"
 	      	th:classappend="${area == '경상'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	경상</a>
-	      <a th:href="@{/landmark/list(area='전라', keyword=${keyword}, contentTypeId=${contentTypeId})}"
+	      <a th:href="@{/landmark/list(area='전라', keyword=${keyword}, contentTypeId=${contentTypeId}, sort=${sort})}"
 	      	th:classappend="${area == '전라'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	전라</a>
-	      <a th:href="@{/landmark/list(area='충청', keyword=${keyword}, contentTypeId=${contentTypeId})}"
+	      <a th:href="@{/landmark/list(area='충청', keyword=${keyword}, contentTypeId=${contentTypeId}, sort=${sort})}"
 	      	th:classappend="${area == '충청'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	충청</a>
-	      <a th:href="@{/landmark/list(area='대구', keyword=${keyword}, contentTypeId=${contentTypeId})}"
+	      <a th:href="@{/landmark/list(area='대구', keyword=${keyword}, contentTypeId=${contentTypeId}, sort=${sort})}"
 	      	th:classappend="${area == '대구'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	대구</a>
-	      <a th:href="@{/landmark/list(area='인천', keyword=${keyword}, contentTypeId=${contentTypeId})}"
+	      <a th:href="@{/landmark/list(area='인천', keyword=${keyword}, contentTypeId=${contentTypeId}, sort=${sort})}"
 	      	th:classappend="${area == '인천'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	인천</a>
-	      <a th:href="@{/landmark/list(area='광주', keyword=${keyword}, contentTypeId=${contentTypeId})}"
+	      <a th:href="@{/landmark/list(area='광주', keyword=${keyword}, contentTypeId=${contentTypeId}, sort=${sort})}"
 	      	th:classappend="${area == '광주'} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	광주</a>
 	    </div>
 <!-- 	    <span class="mx-1.5 h-6 w-px bg-line"></span> -->
 	    <div class="flex flex-wrap gap-1.5">
-	      <a th:href="@{/landmark/list(contentTypeId=12, keyword=${keyword}, area=${area})}"
+	      <a th:href="@{/landmark/list(contentTypeId=12, keyword=${keyword}, area=${area}, sort=${sort})}"
 	      	th:classappend="${contentTypeId == 12} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	관광지</a>
-	      <a th:href="@{/landmark/list(contentTypeId=14, keyword=${keyword}, area=${area})}"
+	      <a th:href="@{/landmark/list(contentTypeId=14, keyword=${keyword}, area=${area}, sort=${sort})}"
 	      	th:classappend="${contentTypeId == 14} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	문화시설</a>
-	      <a th:href="@{/landmark/list(contentTypeId=15, keyword=${keyword}, area=${area})}"
+	      <a th:href="@{/landmark/list(contentTypeId=15, keyword=${keyword}, area=${area}, sort=${sort})}"
 	      	th:classappend="${contentTypeId == 15} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	축제/공연/행사</a>
@@ -110,27 +110,31 @@
 <!-- 	      	th:classappend="${contentTypeId == 25} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'" -->
 <!-- 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink"> -->
 <!-- 	      	여행코스</a> -->
-	      <a th:href="@{/landmark/list(contentTypeId=28, keyword=${keyword}, area=${area})}"
+	      <a th:href="@{/landmark/list(contentTypeId=28, keyword=${keyword}, area=${area}, sort=${sort})}"
 	      	th:classappend="${contentTypeId == 28} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	레포츠</a>
-	      <a th:href="@{/landmark/list(contentTypeId=32, keyword=${keyword}, area=${area})}"
+	      <a th:href="@{/landmark/list(contentTypeId=32, keyword=${keyword}, area=${area}, sort=${sort})}"
 	      	th:classappend="${contentTypeId == 32} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	숙박</a>
-	      <a th:href="@{/landmark/list(contentTypeId=38, keyword=${keyword}, area=${area})}"
+	      <a th:href="@{/landmark/list(contentTypeId=38, keyword=${keyword}, area=${area}, sort=${sort})}"
 	      	th:classappend="${contentTypeId == 38} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	쇼핑</a>
-	      <a th:href="@{/landmark/list(contentTypeId=39, keyword=${keyword}, area=${area})}"
+	      <a th:href="@{/landmark/list(contentTypeId=39, keyword=${keyword}, area=${area}, sort=${sort})}"
 	      	th:classappend="${contentTypeId == 39} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	음식점</a>
 		    <div class="ml-auto">
-		      <select class="h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none">
-		      	<option>조회순</option>
-		      	<option>후기 많은 순</option>
-		      	<option>평점 높은 순</option>
+		      <select id="sortSelect"
+			        th:data-content-type-id="${contentTypeId}"
+			        th:data-area="${area}"
+			        th:data-keyword="${keyword}"	
+			        class="h-9 rounded-lg border border-line bg-white px-3 text-13 font-semibold text-ink outline-none">
+		      	<option value="view" th:selected="${sort == 'view' or sort == null}">조회순</option>
+		      	<option value="review" th:selected="${sort == 'review'}">후기 많은 순</option>
+		      	<option value="rating" th:selected="${sort == 'rating'}">평점 높은 순</option>
 		      </select>
 		    </div>
 	    </div>
@@ -196,7 +200,7 @@
 	  	</a>
 	  	
 	  	<a th:if="${pi.currentPage > 1}"
-	  		th:href="@{${loc}(page=${pi.currentPage - 1}, contentTypeId=${contentTypeId}, area=${area}, keyword=${keyword})}"
+	  		th:href="@{${loc}(page=${pi.currentPage - 1}, contentTypeId=${contentTypeId}, area=${area}, keyword=${keyword}, sort=${sort})}"
 	  		class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">
 	  	‹	
 	  	</a>
@@ -207,14 +211,14 @@
 		  	[[${p}]]
 		  	</span>
 		  	<a th:unless="${p == pi.currentPage}"
-		  		th:href="@{${loc}(page=${p}, contentTypeId=${contentTypeId}, area=${area}, keyword=${keyword})}"
+		  		th:href="@{${loc}(page=${p}, contentTypeId=${contentTypeId}, area=${area}, keyword=${keyword}, sort=${sort})}"
 		  		class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">
 		  	[[${p}]]
 		  	</a>
 	  	</th:block>
 	  	
 	  	<a th:if="${pi.currentPage < pi.maxPage}"
-	  		th:href="@{${loc}(page=${pi.currentPage + 1}, contentTypeId=${contentTypeId}, area=${area}, keyword=${keyword})}"
+	  		th:href="@{${loc}(page=${pi.currentPage + 1}, contentTypeId=${contentTypeId}, area=${area}, keyword=${keyword}, sort=${sort})}"
 	  		class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">
 	  	›	
 	  	</a>
@@ -289,6 +293,14 @@
 					})
 				})
 			}
+			
+			const sortSelect = document.querySelector('#sortSelect');
+			sortSelect.addEventListener('change', () => {
+			    const contentTypeId = sortSelect.dataset.contentTypeId || '';
+			    const area = sortSelect.dataset.area || '';
+			    const keyword = sortSelect.dataset.keyword || '';
+			    location.href = `/landmark/list?sort=${sortSelect.value}&contentTypeId=${contentTypeId}&area=${area}&keyword=${keyword}`;
+			});
 		}
 	</script>
 	<div th:replace="~{views/common/modal :: modal}"></div>

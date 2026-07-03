@@ -175,7 +175,12 @@
                 <input type="password" id="pwdCheck" class="form-control mb-1" placeholder="비밀번호 확인" autocomplete="new-password">
                 <small id="pwdMsg"></small>
 
-                <input type="text" name="nickname" class="form-control mb-2" placeholder="닉네임">
+                <label class="form-label font-weight-bold small mt-2">닉네임</label>
+				<div class="input-group mb-1">
+				    <input type="text" name="nickname" id="userNickname" class="form-control" placeholder="닉네임 입력">
+				    <button type="button" class="btn btn-outline-primary" id="checkNickBtn">중복 확인</button>
+				</div>
+				<small id="nickMsg" class="mb-3 d-block"></small>
 
                 <div class="input-group mb-2">
                     <input type="text" id="emailId" class="form-control" placeholder="이메일 아이디">
@@ -207,13 +212,28 @@
 
     <script>
         $(document).ready(function() {
-            // 비밀번호 실시간 검증 초기화
+            
             initPasswordValidation("input[name='pwd']", "#pwdCheck", "#pwdRuleMsg", "#pwdMsg");
             
             let isIdChecked = false;
             let checkedId = "";
+            
+            let isNickChecked = false;
+            let checkedNick = "";
 
-            //중복 확인 버튼 클릭 이벤트
+            // 스페이스 키 입력 자체 차단
+            $("input[name='pwd'], #pwdCheck").on("keydown", function(e) {
+                if (e.key === " ") {
+                    e.preventDefault();
+                }
+            });
+
+            // 붙여넣기 / 자동입력 대비 공백 제거
+            $("input[name='pwd'], #pwdCheck").on("input", function () {
+                $(this).val($(this).val().replace(/\s/g, ""));
+            });
+
+           
             $("#checkIdBtn").click(function() {
                 let id = $("#userId").val().trim();
                 let $idMsg = $("#idMsg");
@@ -246,7 +266,7 @@
                 });
             });
 
-            // 아이디 수정 시 중복 확인 초기화
+            
             $("#userId").on("input", function() {
                 if(isIdChecked && $(this).val().trim() !== checkedId) {
                     isIdChecked = false;
@@ -254,8 +274,28 @@
                     $("#idMsg").text("아이디가 변경되었습니다. 다시 중복 확인을 해주세요.").css("color", "orange");
                 }
             });
+
+            // auth.js 공통 닉네임 모듈 호출
+            initNicknameValidation({
+                btnSelector: "#checkNickBtn",
+                inputSelector: "#userNickname",
+                msgSelector: "#nickMsg",
+                onCheckResult: function(isValid, nickname) {
+                    isNickChecked = isValid;
+                    checkedNick = nickname;
+                }
+            });
+
             
-            // 이메일 인증 초기화 (중복 호출 제거 및 선제적 중복 체크 바인딩)
+            $("#userNickname").on("input", function() {
+                if (isNickChecked && $(this).val().trim() !== checkedNick) {
+                    isNickChecked = false;
+                    checkedNick = "";
+                    $("#nickMsg").text("닉네임이 변경되었습니다. 다시 중복 확인을 해주세요.").css("color", "orange");
+                }
+            });
+            
+            
 			initEmailVerification({
 			    sendBtn: "#sendCodeBtn",
 			    verifyBtn: "#verifyBtn",
@@ -265,7 +305,6 @@
 			    getEmailFunction: function() {
 			        return $("#emailId").val() + "@" + $("#emailDomain").val();
 			    },
-			    // 인증번호 발송 직전 실행될 인터셉터 콜백 함수
 			    beforeSendCallback: function() {
 			        let emailId = $("#emailId").val().trim();
 			        let email = emailId + "@" + $("#emailDomain").val();
@@ -274,20 +313,19 @@
 			        if (emailId === "") {
 			            if (typeof openInfoModal === 'function') openInfoModal("알림", "이메일 아이디를 입력해 주세요.");
 			            $emailMsg.text("이메일 아이디를 입력해 주세요.").css("color", "red");
-			            return false; // 발송 중단
+			            return false; 
 			        }
 			
 			        let isAvailable = false;
 			
-			        // 동기(Sync) 방식으로 이메일 중복 검사를 먼저 수행
 			        $.ajax({
 			            url: "/member/check-email", 
 			            type: "GET",
 			            data: { email: email },
-			            async: false, // 결과를 기다려야 하므로 동기 처리
+			            async: false, 
 			            success: function(res) {
 			                if (res === "AVAILABLE") {
-			                    isAvailable = true; // 가입 가능한 이메일일 때만 패스
+			                    isAvailable = true; 
 			                } else {
                     			if (typeof openInfoModal === 'function') openInfoModal("경고", "이미 가입된 이메일 주소입니다.");
 			                    $emailMsg.text("이미 가입된 이메일 주소입니다.").css("color", "red");
@@ -300,23 +338,12 @@
 			            }
 			        });
 			
-			        return isAvailable; // true면 auth.js에서 SMTP 메일 발송 시작, false면 차단
+			        return isAvailable; 
 			    }
 			});
 
-           
 			$("#emailId, #emailDomain").on("input change", function () {
-			    // 인증 번호를 받았거나, 인증이 완료되었거나 상관없이 
-			    // 유저가 이메일을 한 글자라도 수정하면 즉시 버튼을 초기화하고 30초 락을 해제함
-			    resetEmailAuthUI(
-			        "#sendCodeBtn", 
-			        "#verifyBtn", 
-			        "#authArea", 
-			        "#authCode", 
-			        "#emailMsg"
-			    );
-			    
-			    // 추가로 이메일이 바뀌었으니 안내 메시지 하나 띄워주기
+			    resetEmailAuthUI("#sendCodeBtn", "#verifyBtn", "#authArea", "#authCode", "#emailMsg");
 			    $("#emailMsg").text("이메일 주소가 변경되었습니다. 다시 인증해 주세요.").css("color", "orange");
 			});
 
@@ -324,16 +351,17 @@
             $("form").submit(function (e) {
                 e.preventDefault();
 
+                
                 let id = $("input[name='id']").val().trim();
                 if(id === ""){ 
                     if (typeof openInfoModal === 'function') openInfoModal("알림", "아이디를 입력하세요.");
                     return;
                 }
-                
                 if(!isIdChecked || $("#userId").val().trim() !== checkedId) {
                     if (typeof openInfoModal === 'function') openInfoModal("알림", "아이디 중복 확인이 필요합니다.");
                     return;
                 }
+                
                 
                 let pwd = $("input[name='pwd']").val();
                 let pwdCheck = $("#pwdCheck").val();
@@ -348,14 +376,21 @@
                     return; 
                 }
 
-                if (sessionStorage.getItem("emailVerified") !== "true") { 
-                    if (typeof openInfoModal === 'function') openInfoModal("알림", "이메일 인증이 필요합니다."); 
+             
+                let nickname = $("#userNickname").val().trim();
+                if(nickname === ""){ 
+                    $("#nickMsg").text("닉네임을 입력하세요.").css("color", "red");
+                    $("#userNickname").focus();
                     return; 
                 }
+                if(!isNickChecked || $("#userNickname").val().trim() !== checkedNick) {
+                    $("#nickMsg").text("닉네임 중복 확인이 필요합니다.").css("color", "red");
+                    return;
+                }
 
-                let nickname = $("input[name='nickname']").val().trim();
-                if(nickname === ""){ 
-                    if (typeof openInfoModal === 'function') openInfoModal("알림", "닉네임을 입력하세요."); 
+                // 이메일 인증 검증
+                if (sessionStorage.getItem("emailVerified") !== "true") { 
+                    if (typeof openInfoModal === 'function') openInfoModal("알림", "이메일 인증이 필요합니다."); 
                     return; 
                 }
 
@@ -375,11 +410,15 @@
                                 location.href = "/member/login";
                             }, 1500);
                         } else if(res === "EMAIL_NOT_VERIFIED"){
-                            if (typeof openInfoModal === 'function') openInfoModal("오류", "이메일 인증이 올바르지 않거나 변경되었습니다.");
+                            if (typeof openInfoModal === 'function') openInfoModal("오류", "이메일 인증이 올바르지 않거나 변경되었습니다.");   
                         } else if(res === "DUPLICATE_EMAIL"){
-                            if (typeof openInfoModal === 'function') openInfoModal("오류", "이미 가입된 이메일입니다.");
+                           
+                            $("#emailMsg").text("이미 가입된 이메일 주소입니다.").css("color", "red");
+                            $("#emailId").focus();
                         } else if(res === "DUPLICATE_nickname"){
-                            if (typeof openInfoModal === 'function') openInfoModal("오류", "이미 존재하는 닉네임입니다.");    
+                           
+                            $("#nickMsg").text("이미 존재하는 닉네임입니다.").css("color", "red");
+                            $("#userNickname").focus();
                         } else {
                             if (typeof openInfoModal === 'function') openInfoModal("오류", "회원가입에 실패했습니다.");
                         }

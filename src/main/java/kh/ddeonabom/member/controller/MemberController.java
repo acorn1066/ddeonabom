@@ -73,7 +73,17 @@ public class MemberController {
 	    }
 	    return "AVAILABLE"; // 사용 가능한 아이디
 	}
-	
+	@ResponseBody
+	@GetMapping("/check-nickname")
+	public String checkNickname(@RequestParam("nickname") String nickname) {
+
+	    boolean exists = mService.existsBynickname(nickname);
+
+	    if (exists) {
+	        return "DUPLICATE";
+	    }
+	    return "AVAILABLE";
+	}
 	// 이메일 인증번호 발송 (AJAX)
     // 입력한 이메일로 인증번호 전송
     // 서버 세션에 인증코드 저장
@@ -329,7 +339,7 @@ public class MemberController {
         
        
     }
-    // 수정 페이지에서 [회원 탈퇴] 링크를 클릭했을 때 (GET)
+   
     @GetMapping("/withdraw")
     public String withdrawPage() {
         return "/views/member/withdraw"; 
