@@ -96,10 +96,7 @@
       <div id="spotList" class="flex flex-col gap-4">
         <p id="spotEmpty" class="py-6 text-center text-sm text-muted">지도에서 장소를 추가하거나 아래 버튼을 눌러 직접 입력하세요.</p>
       </div>
-      <button type="button" id="addSpotBtn"
-        class="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line bg-sunk text-sm font-bold text-muted transition hover:border-brand hover:bg-brand-soft hover:text-brand">
-        <span class="text-lg">＋</span> 관광지 직접 추가
-      </button>
+      
     </div>
 
     <div class="mb-5 rounded-xl border border-line bg-white p-6 shadow-soft">
@@ -531,7 +528,7 @@ kakao.maps.load(function () {
         });
     }
 
-    document.getElementById('addSpotBtn').addEventListener('click', () => addSpotCard());
+    
     document.getElementById('submitBtn').addEventListener('click', function(e) {
         e.preventDefault();
         const titleInput = document.getElementById('travelTitle');
