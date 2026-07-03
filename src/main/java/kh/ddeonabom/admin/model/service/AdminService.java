@@ -50,9 +50,9 @@ public class AdminService {
     }
 	
 
-	public ArrayList<AdminNotice> selectNoticeList() { 
-		return mapper.selectNoticeList();
-	}
+//	public ArrayList<AdminNotice> selectNoticeList() { 
+//		return mapper.selectNoticeList();
+//	}
 
 	@Transactional
 	public int updateMemberStatus(HashMap<String, String> map) {
@@ -194,7 +194,7 @@ public class AdminService {
 	    if (mapper.checkDuplicateReport(report) > 0) return -1;
 
 	    // 신고 대상 작성자 조회 -> 본인 글/댓글이거나 관리자 글/댓글이면 신고 거부
-	    Map<String, Object> owner = mapper.getReportTargetOwner(report);
+	    HashMap<String, Object> owner = mapper.getReportTargetOwner(report);
 	    if (owner == null || owner.get("MEMBERNO") == null) return -2;   // 대상이 존재하지 않음
 
 	    int ownerNo = ((Number) owner.get("MEMBERNO")).intValue();
