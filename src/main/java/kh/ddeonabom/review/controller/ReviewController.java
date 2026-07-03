@@ -119,9 +119,7 @@ public class ReviewController {
 	    	if (scheduleNo != null) {
 	    	    ScheduleMain main = sService.selectScheduleDetail(scheduleNo);
 	    	    if (main != null && main.getMemberNo() == loginUser.getMemberNo()) {
-	    	        List<ScheduleSub> subList = sService.selectScheduleSubList(scheduleNo);
-	    	        
-	    	        //일정이랑 후기랑 이름이 안맞는 구간이 있어서 수정용
+	    	        List<ScheduleSub> subList = sService.selectScheduleSubList(scheduleNo);	    	   
 	    	       
 	    	        List<Map<String, Object>> mappedList = subList.stream().map(sub -> {
 	    	            Map<String, Object> m = new HashMap<>();
