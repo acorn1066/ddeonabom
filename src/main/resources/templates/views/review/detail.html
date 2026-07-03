@@ -1,6 +1,17 @@
 <!doctype html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{views/common/head :: head}"></head>
+<style>
+.travel-swiper {
+  padding-bottom: 24px; /* 점 인디케이터 들어갈 공간 확보 */
+}
+.travel-swiper .swiper-slide {
+  width: 256px;
+}
+.travel-swiper .swiper-pagination {
+  bottom: 0; /* 확보한 padding 영역 안에 위치 */
+}
+</style>
 <body class="bg-white text-ink">
 
 <div th:replace="~{views/common/navbar :: navbar}"></div>
@@ -90,7 +101,7 @@
     <div th:each="sub, idx : ${review.subList}" class="flex gap-5 border-t border-line py-6">
       <span class="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-brand text-15 font-extrabold text-white"
             th:text="${idx.count}">1</span>
-      <div class="flex-1">
+      <div class="flex-1 min-w-0">
         <div class="mb-3 flex items-center justify-between">
   
 		  <div class="text-lg font-bold tracking-tight"
@@ -109,12 +120,14 @@
         <p class="mb-4 text-15 leading-loose text-ink/85" th:text="${sub.travelSubContent}">내용</p>
 
         <!-- 이미지 목록 -->
-        <div class="mb-1 gap-2" th:if="${sub.images != null and not #lists.isEmpty(sub.images)}">
-          <div th:each="imgPath : ${sub.images}">
-            <img th:src="@{${imgPath}}" class="h-64 w-64 flex-none rounded-xl object-cover" />
-          </div>
-          
-        </div>
+        <div th:if="${sub.images != null and not #lists.isEmpty(sub.images)}" class="swiper travel-swiper mb-2">
+		  <div class="swiper-wrapper">
+		    <div class="swiper-slide" th:each="imgPath : ${sub.images}">
+		      <img th:src="@{${imgPath}}" class="h-64 w-64 rounded-xl object-cover" />
+		    </div>
+		  </div>
+		  <div class="swiper-pagination"></div>
+		</div>
         <a th:href="@{/landmark/{id}/1(id=${sub.contentId})}" class="mt-3 inline-flex items-center gap-1.5 text-13 font-semibold text-brand"> 
         	<span th:text="${sub.contentTitle}"></span>관광지 정보 →</a>
       </div>
@@ -577,7 +590,23 @@ function openReplyDeleteModal(replyNo) {
 	
 	}
 
-
+	function initSwipers() {
+	  document.querySelectorAll('.travel-swiper').forEach(el => {
+	    new Swiper(el, {
+	      slidesPerView: 'auto',
+	      spaceBetween: 8,
+	      grabCursor: true,       // 마우스 드래그(그랩) 커서 자동 처리
+	      pagination: {
+	        el: el.querySelector('.swiper-pagination'),
+	        clickable: true
+	      },
+	      mousewheel: {
+	        forceToAxis: true    // 세로 휠도 가로 슬라이드로
+	      }
+	    });
+	  });
+	}
+	window.addEventListener('DOMContentLoaded', initSwipers);
 </script>
 
 </body>
