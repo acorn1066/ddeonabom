@@ -133,7 +133,7 @@
 		select count(*)
 		from travel_list_sub ts
 		    join travel_list tl using(travel_no)
-		where tl.status = 'Y' and content_id = ${contentId}
+		where tl.status = 'Y' and content_id = #{contentId}
 	</select>
 	
 	<select id="review" resultType="kh.ddeonabom.landmark.model.vo.LandReview">
@@ -142,18 +142,24 @@
 		from travel_list tl
 		    join travel_list_sub ts using(travel_no)
 		    join member m using(member_no)
-		where tl.status = 'Y' and content_id = ${contentId}
+		where tl.status = 'Y' and content_id = #{contentId}
 	</select>
 	
 	<select id="rating">
 		select nvl(round(avg(rating), 1), 0)
 		from travel_list_sub
-		where content_id = ${contentId}
+		where content_id = #{contentId}
 	</select>
 	
 	<select id="image" resultType="kh.ddeonabom.review.model.vo.Image">
 		select *
 		from tb_image
-		where travel_sub_no = ${travelSubNo}
+		where travel_sub_no = #{travelSubNo}
 	</select>
+	
+	<update id="landCount">
+		update landmark
+		set land_count = land_count + 1
+		where content_id = #{contentId}
+	</update>
 </mapper>

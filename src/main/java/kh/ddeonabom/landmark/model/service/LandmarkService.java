@@ -47,18 +47,25 @@ public class LandmarkService {
 	
 	//관광지 세부 가져오기
 	public Landmark landmarkDetail(int contentId) {
-		return mapper.landmarkDetail(contentId);
+		Landmark l = mapper.landmarkDetail(contentId);
+		int result = mapper.landCount(contentId);
+		if(result > 0) {
+			l.setLandCount(l.getLandCount() + 1);
+		}
+		return l;
 	}
 	
 	// 관광지 찜 여부 확인
 	public int landmarkNice(int lNumber,int memberNo) {
 		return mapper.landmarkNice(lNumber, memberNo);
 	}
-
+	
+	// 찜 삭제
 	public void deleteNice(int lNumber, int memberNo) {
 		mapper.deleteNice(lNumber, memberNo);
 	}
-
+	
+	// 찜 추가
 	public void insertNice(int lNumber, int memberNo) {
 		mapper.insertNice(lNumber, memberNo);
 	}
@@ -96,7 +103,8 @@ public class LandmarkService {
 	public double rating(int contentId) {
 		return mapper.rating(contentId);
 	}
-
+	
+	// 이미지 경로 가져오기
 	public ArrayList<Image> image(int travelSubNo) {
 		return mapper.image(travelSubNo);
 	}

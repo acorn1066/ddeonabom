@@ -92,7 +92,7 @@
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	광주</a>
 	    </div>
-<!-- 	    <span class="mx-1.5 h-6 w-px bg-line"></span> -->
+	    
 	    <div class="flex flex-wrap gap-1.5">
 	      <a th:href="@{/landmark/list(contentTypeId=12, keyword=${keyword}, area=${area}, sort=${sort})}"
 	      	th:classappend="${contentTypeId == 12} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
@@ -106,10 +106,6 @@
 	      	th:classappend="${contentTypeId == 15} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
 	      	축제/공연/행사</a>
-<!-- 	      <a th:href="@{/landmark/list(contentTypeId=25, keyword=${keyword}, area=${area})}" -->
-<!-- 	      	th:classappend="${contentTypeId == 25} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'" -->
-<!-- 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink"> -->
-<!-- 	      	여행코스</a> -->
 	      <a th:href="@{/landmark/list(contentTypeId=28, keyword=${keyword}, area=${area}, sort=${sort})}"
 	      	th:classappend="${contentTypeId == 28} ? 'border-ink bg-ink text-white' : 'border-line bg-white text-muted'"
 	      	class="inline-flex h-9 cursor-pointer items-center rounded-full border px-4 text-13 font-semibold transition hover:border-muted hover:text-ink">
@@ -185,7 +181,10 @@
 	          [[${l.addr1}]]</span>
 	        </th:block>
 	          <div class="id" style="display: none">[[${l.contentId}]]</div>
-	          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">[[${rating[l.contentId]}]]</span></span>
+	          <div class="flex flex-col items-end gap-1">
+		          <span class="flex items-center gap-1 text-13 font-semibold"><span class="text-brand">★</span><span class="tabular-nums">[[${rating[l.contentId]}]]</span></span>
+		          <span class="text-13 text-muted">조회 [[${l.landCount}]]</span>
+	          </div>
 	        </div>
 	      </div>
 	    </div>
@@ -238,7 +237,6 @@
 		window.onload = () => {
 			const lists = document.querySelectorAll('.overflow-hidden');
 			for(list of lists) {
-// 				console.log(list);
 				list.addEventListener('click', (e) => {
 					console.log(e.target);
 					const div = e.target.closest('.overflow-hidden');
@@ -250,13 +248,9 @@
 			}
 			
 			const nices = document.querySelectorAll(".nice");
-// 			const heart = document.querySelector('#heart');
-// 			console.log(heart);
-// 			const contentId = div.querySelector('.overflow-hidden .id').innerText
 			for(nice of nices){
 				nice.addEventListener('click', (e) => {
 					e.stopPropagation();
-// 					console.log(e.target);
 					const div = e.target.closest('.overflow-hidden');
 					const contentId = div.querySelector('.id').innerText;
 					console.log(contentId);
@@ -303,6 +297,5 @@
 			});
 		}
 	</script>
-	<div th:replace="~{views/common/modal :: modal}"></div>
 </body>
 </html>
