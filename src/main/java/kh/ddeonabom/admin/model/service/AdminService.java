@@ -2,6 +2,7 @@ package kh.ddeonabom.admin.model.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -159,10 +160,19 @@ public class AdminService {
 	    return mapper.updateTargetStatus(report);
 	}
 
-	// 중복 신고 시 -1 반환
+	// 신고 등록: 중복 -1, 대상 없음 -2, 본인 글/댓글 -3, 관리자 글/댓글 -4, 성공 시 등록 결과(1)
 	public int insertReport(AdminReport report) {
-		if (mapper.checkDuplicateReport(report) > 0) return -1;
-		return mapper.insertReport(report);
+	    if (mapper.checkDuplicateReport(report) > 0) return -1;
+
+	    // 신고 대상 작성자 조회 -> 본인 글/댓글이거나 관리자 글/댓글이면 신고 거부
+	    Map<String, Object> owner = mapper.getReportTargetOwner(report);
+	    if (owner == null || owner.get("MEMBERNO") == null) return -2;   // 대상이 존재하지 않음
+
+	    int ownerNo = ((Number) owner.get("MEMBERNO")).intValue();
+	    if (ownerNo == report.getMemberNo()) return -3;                  // 본인 글/댓글
+	    if ("Y".equals(owner.get("ISADMIN"))) return -4;                 // 관리자 글/댓글
+
+	    return mapper.insertReport(report);
 	}
 
 	public ArrayList<HashMap<String, Object>> selectScheduleActivity() {
