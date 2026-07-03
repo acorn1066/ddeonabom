@@ -173,6 +173,7 @@
 	    loadTravelList(1);
 	});
 	function loadTravelList(page) {
+		currentPage = page;
 	    $.ajax({
 	        url: '/selectReviewList',
 	        type: 'GET',
@@ -206,7 +207,7 @@
 	                const cardHtml = `
 	                  <div 
 	                    class="flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-card cursor-pointer"
-	                    onclick="goDetail(${travel.travelNo}, '${travel.visibility}')"
+	                    onclick="goDetail(${travel.travelNo}, '${travel.visibility}', '${currentPage}')"
 	                  >
 	                    <div class="flex flex-1 flex-col gap-2 p-4">
 
@@ -271,6 +272,7 @@
 	        }
 	    }
 
+	    sessionStorage.setItem("reviewCurrentPage", currentPage);
 	    // 일반 or 로그인 사용자
 	    location.href = `/reviews/detail?travelNo=${travelNo}`;
 	}
@@ -328,7 +330,16 @@
 	}
 	
 	$(document).ready(function () {
-	    loadTravelList(1);
+
+	    const savedPage = sessionStorage.getItem("reviewCurrentPage");
+
+	    if (savedPage) {
+	        currentPage = parseInt(savedPage);
+	    } else {
+	        currentPage = 1;
+	    }
+
+	    loadTravelList(currentPage);
 	});
 	
 	
