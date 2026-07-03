@@ -215,9 +215,11 @@
     <!-- 페이징 -->
     <div th:if="${pi != null and pi.maxPage > 0}" class="flex justify-center gap-1 py-6">
       <!-- 이전 그룹 -->
-      <a th:if="${pi.startPage > 1}"
-         th:href="@{/share/list(page=${pi.startPage - 1}, region=${region}, searchInput=${searchInput})}"
+      <a th:if="${pi.currentPage > 1}"
+         th:href="@{/share/list(page=${pi.currentPage - 1}, region=${region}, searchInput=${searchInput})}"
          class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">‹</a>
+	<span th:unless="${pi.currentPage > 1}"
+		        class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-faint cursor-not-allowed opacity-40">‹</span>
 
       <!-- 페이지 번호 -->
       <th:block th:each="p : ${#numbers.sequence(pi.startPage, pi.endPage)}">
@@ -231,9 +233,12 @@
       </th:block>
 
       <!-- 다음 그룹 -->
-      <a th:if="${pi.endPage < pi.maxPage}"
-         th:href="@{/share/list(page=${pi.endPage + 1}, region=${region}, searchInput=${searchInput})}"
+      <a th:if="${pi.currentPage < pi.maxPage}"
+         th:href="@{/share/list(page=${pi.currentPage + 1}, region=${region}, searchInput=${searchInput})}"
          class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted hover:bg-sunk hover:text-ink">›</a>
+         
+         <span th:unless="${pi.currentPage < pi.maxPage}"
+		        class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium text-faint cursor-not-allowed opacity-40">›</span>
     </div>
 
   </main>
