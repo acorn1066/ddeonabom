@@ -295,9 +295,7 @@ public class AdminController {
 		@ResponseBody
 		@PatchMapping("reports/process")
 		public int processReport(@RequestBody AdminReport report) {
-			report.setReportStatus("Y");
-		    aService.updateTargetStatus(report);
-		    return aService.updateStatusByTarget(report);
+			 return aService.processReport(report);
 		}
 
 	

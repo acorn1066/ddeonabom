@@ -157,7 +157,36 @@ public class AdminService {
 	public int processReport(AdminReport report) {
 	    report.setReportStatus("Y");
 	    mapper.updateStatusByTarget(report);
-	    return mapper.updateTargetStatus(report);
+	    mapper.updateTargetStatus(report);
+	    
+	    int writerMemberNo = mapper.selectWriterByTarget(report);
+//	    System.out.println( writerMemberNo);
+	    
+	 // 같은 게시글이 올라와도 하나의 게시글로 신고처리 갯수를 세기
+	    HashMap<String, Object> map = new HashMap<>();
+	    map.put("memberNo", writerMemberNo);
+	    
+	    int reportCount = mapper.memberReportCount(map);
+//	    System.out.println(reportCount);
+	    
+
+	    // 3건 이상이면 자동 정지하도록
+	    if (reportCount >= 3) {
+//	    	 System.out.println("회원정지됨");
+	        mapper.blockMember(writerMemberNo);
+	        
+	        // id 조회 후 기존 ban 쿼리 재활용
+	        String writerId = mapper.selectIdByMemberNo(writerMemberNo);
+	        HashMap<String, String> banMap = new HashMap<>();
+	        banMap.put("id", writerId);
+	        
+	        mapper.banMemberReview(banMap);
+	        mapper.banMemberQlist(banMap);
+	        mapper.banMemberReply(banMap);
+	        mapper.banMemberSchedule(banMap);
+	    }
+
+	    return 1;
 	}
 
 	// 신고 등록: 중복 -1, 대상 없음 -2, 본인 글/댓글 -3, 관리자 글/댓글 -4, 성공 시 등록 결과(1)

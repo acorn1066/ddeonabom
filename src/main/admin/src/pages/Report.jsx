@@ -159,6 +159,7 @@ const Report = () => {
                         <tr className="border-b bg-gray-100 text-gray-700">
                             <th className="p-4 text-center font-semibold">번호</th>
                             <th className="p-4 text-center font-semibold">신고유형</th>
+                            <th className="p-4 text-center font-semibold">작성자</th>
                             <th className="p-4 text-center font-semibold">신고대상</th>
                             <th className="p-4 text-center font-semibold">신고자</th>
                             <th className="p-4 text-center font-semibold">신고일</th>
@@ -172,6 +173,7 @@ const Report = () => {
                                 <tr key={report.reportNo} className="border-b hover:bg-gray-50">
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.reportNo}</td>
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{boardTypeLabel[report.targetType]}</td>
+                                    <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.targetWriter}</td>
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.targetTitle}</td>
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.reporterName}</td>
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.reportDate.split('T')[0]}</td>
@@ -264,6 +266,7 @@ const Report = () => {
                     <div className="space-y-3">
                         <p><strong>신고번호 :</strong> {selectReport.reportNo}</p>
                         <p><strong>신고유형 :</strong> {boardTypeLabel[selectReport.targetType]}</p>
+                        <p><strong>작성자 :</strong> {selectReport.targetWriter}</p>
                         <p><strong>신고대상 :</strong> {selectReport.targetTitle}</p>
                         <p><strong>신고자 :</strong> {selectReport.reporterName}</p>
                         <p><strong>신고일 :</strong> {selectReport.reportDate.split('T')[0]}</p>

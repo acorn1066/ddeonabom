@@ -109,6 +109,14 @@ public interface AdminMapper {
 	int checkMemberStatusReview(AdminPost post);
 
 	int checkMemberStatusQuestion(AdminPost post);
+
+	int selectWriterByTarget(AdminReport report);
+
+	int memberReportCount(HashMap<String, Object> map);
+
+	void blockMember(int writerMemberNo);
+
+	String selectIdByMemberNo(int writerMemberNo);
 	
 	
 }
