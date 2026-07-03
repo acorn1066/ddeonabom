@@ -336,4 +336,12 @@
 	    DELETE FROM TB_IMAGE
 	    WHERE IMAGE_PATH = #{imagePath}
 	</delete>
+	
+	<select id="countImagesByTravelSubNo" resultType="_int">
+	    SELECT IMAGE_NO, IMAGE_PATH, FILE_NAME, RENAME_FILE, TRAVEL_SUB_NO
+	    FROM TB_IMAGE
+	    WHERE TRAVEL_SUB_NO = #{travelSubNo}
+	</select>
+	
+	
 </mapper>

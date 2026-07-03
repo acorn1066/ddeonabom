@@ -204,6 +204,11 @@ public class ReviewService {
 		return reviewMapper.getMyReviewCount(map);
 	}
 
+	public int countImagesByTravelSubNo(int travelSubNo) {
+		return reviewMapper.countImagesByTravelSubNo(travelSubNo);
+	}
+
+
 	
 
 }

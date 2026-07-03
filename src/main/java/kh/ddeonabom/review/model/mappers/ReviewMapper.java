@@ -68,6 +68,8 @@ public interface ReviewMapper {
 	void updateImagePath(@Param("travelSubNo") int travelSubNo,
             @Param("imagePath") String imagePath);
 
+	int countImagesByTravelSubNo(int travelSubNo);
+
 
 
 }

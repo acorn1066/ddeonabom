@@ -158,7 +158,7 @@ public class ReviewController {
 	}
 
     @PostMapping("/reviews/insert")
-    public String insertReviews(@ModelAttribute Review r, HttpServletRequest request, HttpSession session) {
+    public String insertReviews(@ModelAttribute Review r, HttpServletRequest request, HttpSession session, Model model) {
 
         Member loginUser = (Member) session.getAttribute("loginUser");
         if (loginUser != null) {
@@ -177,6 +177,10 @@ public class ReviewController {
                     reviewService.insertReviewSub(sub); 
 
                     List<MultipartFile> cardFiles = sub.getImageFiles();
+                    if (cardFiles != null && cardFiles.size() > 5) {
+                        model.addAttribute("msg", "이미지는 최대 5장까지 업로드 가능합니다.");
+                        return "review/write"; 
+                    }
                     if (cardFiles != null) {
                         for (MultipartFile file : cardFiles) {
                             if (file != null && !file.isEmpty()) {
