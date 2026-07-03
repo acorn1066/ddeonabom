@@ -109,9 +109,9 @@
         <p class="mb-4 text-15 leading-loose text-ink/85" th:text="${sub.travelSubContent}">내용</p>
 
         <!-- 이미지 목록 -->
-        <div class="mb-1 flex gap-2" th:if="${sub.images != null and not #lists.isEmpty(sub.images)}">
+        <div class="mb-1 gap-2" th:if="${sub.images != null and not #lists.isEmpty(sub.images)}">
           <div th:each="imgPath : ${sub.images}">
-            <img th:src="@{${imgPath}}" class="h-64 w-full rounded-xl object-cover" />
+            <img th:src="@{${imgPath}}" class="h-64 w-64 flex-none rounded-xl object-cover" />
           </div>
           
         </div>
