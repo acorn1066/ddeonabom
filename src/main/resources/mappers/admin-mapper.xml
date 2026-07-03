@@ -434,7 +434,7 @@
 	                R.TARGET_NO                           AS targetNo,
 	                R.REASON                              AS reason,
 	                R.REPORT_STATUS                       AS reportStatus,
-	                TO_CHAR(R.REPORT_DATE, 'YYYY-MM-DD')  AS reportDate,
+	                R.REPORT_DATE  AS reportDate,
 	                R.MEMBER_NO                           AS memberNo,
 	                M.NICKNAME                            AS reporterName,
 	                CASE
