@@ -1,0 +1,100 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./src/main/resources/templates/**/*.html",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        ink:   '#14161C',
+        muted: '#5C6373',
+        faint: '#9AA0AE',
+        line:  '#E7E9EF',
+        sunk:  '#F4F5F8',
+        deep:  '#0E1116',
+        brand: { DEFAULT: '#1F47E6', ink: '#143BBE', soft: '#EBEEFD', light: '#8AA0FF' },
+        avatar: '#5775EC',
+        ok:    '#1F8A5B',
+        warn:  '#B2772A',
+        err:   '#D23B33',
+      },
+      fontFamily: {
+        sans: ['"Noto Sans KR"', 'system-ui', 'sans-serif'],
+      },
+      borderRadius: {
+        '2xl': '18px',
+      },
+      boxShadow: {
+        soft: '0 1px 2px rgba(20,22,28,0.04), 0 1px 3px rgba(20,22,28,0.06)',
+        card: '0 2px 6px rgba(20,22,28,0.05), 0 8px 24px rgba(20,22,28,0.07)',
+        pop:  '0 8px 16px rgba(20,22,28,0.06), 0 24px 48px rgba(20,22,28,0.10)',
+      },
+      spacing: {
+        header: '68px',
+        '6.5': '26px',
+        '7.5': '30px',
+        '8.5': '34px',
+        '9.5': '38px',
+        '10.5': '42px',
+        '13': '52px',
+        '18': '72px',
+        '22': '88px',
+        '70': '280px',
+      },
+      minHeight: {
+        feature: '270px',
+        authshell: 'calc(100vh - 68px)',
+        photo: '460px',
+        composer: '104px',
+      },
+      minWidth: {
+        date: '150px',
+      },
+      aspectRatio: {
+        portrait: '5 / 6',
+        card: '4 / 5',
+        photo: '4 / 3',
+      },
+      gridTemplateColumns: {
+        hero: '1.05fr 0.95fr',
+        mypage: '220px 1fr',
+        detail: '1.4fr 1fr',
+        infotable: '120px 1fr',
+        plan: '460px 1fr',
+        qarow: '1fr 90px 130px 110px 80px',
+        admin: '1.6fr 1fr',
+      },
+      height: {
+        plan: 'calc(100vh - 68px)',
+      },
+      maxWidth: {
+        site: '1200px',
+        wide: '1320px',
+        board: '1000px',
+        post: '820px',
+        postwide: '920px',
+        index: '1240px',
+        vw80: '80vw',
+      },
+      width: {
+        errmap: '340px',
+      },
+      fontSize: {
+        '11':    ['11px', '1.4'],
+        '13':    ['13px', '1.5'],
+        '15':    ['15px', '1.5'],
+        '17':    ['17px', '1.4'],
+        '22':    ['22px', '1.2'],
+        '28':    ['28px', '1.3'],
+        '32':    ['32px', '1.2'],
+        '56':    ['56px', { lineHeight: '1', letterSpacing: '-0.045em' }],
+        display: ['76px', { lineHeight: '1.04', letterSpacing: '-0.045em' }],
+        hero:    ['60px', { lineHeight: '1.05', letterSpacing: '-0.045em' }],
+        h1:      ['44px', { lineHeight: '1.12', letterSpacing: '-0.03em' }],
+        h2:      ['36px', { lineHeight: '1.1',  letterSpacing: '-0.03em' }],
+        quote:   ['52px', { lineHeight: '1.28', letterSpacing: '-0.03em' }],
+      },
+    },
+  },
+  plugins: [],
+}

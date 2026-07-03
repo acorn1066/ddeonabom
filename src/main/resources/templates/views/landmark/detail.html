@@ -123,7 +123,7 @@
 	        	<img th:each="img:${reviewImage[re.travelSubNo]}"
 	        		th:src="${img.imagePath}" class="h-18 w-18 rounded-lg bg-sunk">
 	        </div>
-	        <div class="flex items-center gap-1.5 border-t border-line pt-3 text-xs text-muted">📍 <a th:data-visibility="${re.visibility}" th:data-travel-no="${re.travelNo}" th:href="@{/reviews/detail(travelNo=${re.travelNo})}" class="review font-semibold text-brand">[[${re.travelTitle}]]</a> 후기 중</div>
+	        <div class="flex items-center gap-1.5 border-t border-line pt-3 text-xs text-muted"><a th:data-visibility="${re.visibility}" th:data-travel-no="${re.travelNo}" th:href="@{/reviews/detail(travelNo=${re.travelNo})}" class="review font-semibold text-brand">[[${re.travelTitle}]]</a> 후기 중</div>
 	      </div>
 	    </div>
 	    <div th:if="${pi.listCount == 0}" class="col-span-2 flex flex-col items-center justify-center py-16 text-center">
