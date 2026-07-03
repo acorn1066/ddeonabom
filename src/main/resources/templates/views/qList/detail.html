@@ -417,7 +417,7 @@
         if (!data.success) return;
         const btn   = document.getElementById('like-btn');
         const count = document.getElementById('like-count');
-        count.textContent = data.count;
+        count.textContent = data.likeCount;
         if (data.liked) {
           btn.classList.remove('border-line', 'bg-white', 'text-muted', 'hover:border-brand', 'hover:text-brand');
           btn.classList.add('border-brand', 'bg-brand', 'text-white');
@@ -425,6 +425,7 @@
           btn.classList.remove('border-brand', 'bg-brand', 'text-white');
           btn.classList.add('border-line', 'bg-white', 'text-muted', 'hover:border-brand', 'hover:text-brand');
         }
+        showToast(data.liked ? '추천했어요!' : '추천을 취소했어요.');
       });
     }
   </script>

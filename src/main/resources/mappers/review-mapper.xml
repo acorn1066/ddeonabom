@@ -237,19 +237,22 @@
 	    SELECT COUNT(*)
 	    FROM NICE
 	    WHERE POST_NO = #{travelNo}
+	      AND POST_BOARD_FX = 'TR'
 	      AND MEMBER_NO = #{memberNo}
 	</select>
-	
+
 	<delete id="deleteLike">
 	    DELETE FROM NICE
 	    WHERE POST_NO = #{travelNo}
+	      AND POST_BOARD_FX = 'TR'
 	      AND MEMBER_NO = #{memberNo}
 	</delete>
-	
+
 	<select id="selectLikeCount" resultType="int">
 	    SELECT COUNT(*)
 	    FROM NICE
 	    WHERE POST_NO = #{travelNo}
+	      AND POST_BOARD_FX = 'TR'
 	</select>
 	
 	<select id="getTravelWithSubList" parameterType="long" resultMap="reviewDetailMap">
