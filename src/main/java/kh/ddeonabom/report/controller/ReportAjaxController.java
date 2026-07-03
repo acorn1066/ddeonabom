@@ -49,6 +49,15 @@ public class ReportAjaxController {
 		if (res == -1) {
 			result.put("status", "duplicate");
 			result.put("message", "이미 신고한 콘텐츠입니다.");
+		} else if (res == -2) {
+			result.put("status", "error");
+			result.put("message", "존재하지 않는 게시글/댓글입니다.");
+		} else if (res == -3) {
+			result.put("status", "error");
+			result.put("message", "본인 게시글/댓글은 신고할 수 없습니다.");
+		} else if (res == -4) {
+			result.put("status", "error");
+			result.put("message", "관리자 게시글/댓글은 신고할 수 없습니다.");
 		} else if (res > 0) {
 			result.put("status", "success");
 			result.put("message", "신고가 접수되었습니다.");
