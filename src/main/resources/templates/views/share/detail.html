@@ -100,7 +100,7 @@
               th:class="${isLiked} ?
                 'inline-flex h-12 items-center gap-2 rounded-full border border-brand bg-brand-soft px-6 text-15 font-bold text-brand transition hover:bg-brand hover:text-white' :
                 'inline-flex h-12 items-center gap-2 rounded-full border border-line bg-white px-6 text-15 font-bold transition hover:bg-sunk'">
-        ♥ 추천 <b id="like-count" class="tabular-nums" th:text="${schedule.likeCount}">184</b>
+        <i class="far fa-thumbs-up"></i> 추천 <b id="like-count" class="tabular-nums" th:text="${schedule.likeCount}">184</b>
       </button>
 
       <!-- 찜(스크랩) 버튼 : 본인 글이면 미노출 -->

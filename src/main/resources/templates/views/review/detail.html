@@ -72,16 +72,11 @@
   </div>
 
   <!-- 요약 카드 -->
-  <div class="my-6 grid grid-cols-3 gap-3 overflow-x-auto">
+  <div class="my-6 grid grid-cols-2 gap-3 overflow-x-auto">
     <div class="rounded-xl bg-sunk p-4 text-center flex flex-col items-center justify-center gap-1">
       <b class="text-2xl font-extrabold tracking-tight tabular-nums"
          th:text="${review.subList != null ? #lists.size(review.subList) : 0} + '곳'">N곳</b>
       <span class="text-13 text-muted">들른 관광지</span>
-    </div>
-    <div class="rounded-xl bg-sunk p-4 text-center flex flex-col items-center justify-center gap-1">
-      <b id="likeCount" class="text-2xl font-extrabold tracking-tight tabular-nums"
-         th:text="${review.likeCount}">0</b>
-      <span class="text-13 text-muted">추천수</span>
     </div>
     <div class="rounded-xl bg-sunk p-4 text-center flex flex-col items-center justify-center gap-1">
 	  <b class="text-2xl font-extrabold tracking-tight tabular-nums"
@@ -113,7 +108,6 @@
 			        th:text="${i <= (sub.rating != null ? sub.rating : 0)} ? '★' : '☆'"
 			        th:class="${i <= (sub.rating != null ? sub.rating : 0)} ? 'text-yellow-400' : 'text-gray-300'">
 			  </span>
-			  <span class="ml-1 text-muted" th:text="${sub.rating}">5</span>
 			</div>
 			
 		</div>
@@ -136,10 +130,12 @@
 
   <!-- 추천 버튼 -->
   <div class="mt-4 flex items-center justify-center gap-3 border-t-2 border-ink py-7">
-    <button id="likeBtn" th:data-travel-no="${review.travelNo}"
+    <button id="like-btn" th:data-travel-no="${review.travelNo}"
             onclick="toggleLike()"
-            class="inline-flex h-12 items-center gap-2 rounded-full border border-line bg-white px-7 text-15 font-bold transition hover:bg-sunk">
-      ♥ 추천 <b id="likeCount" th:text="${review.likeCount}">0</b>
+            th:class="${isLiked} ?
+              'inline-flex h-12 items-center gap-2 rounded-full border border-brand bg-brand-soft px-7 text-15 font-bold text-brand transition hover:bg-brand hover:text-white' :
+              'inline-flex h-12 items-center gap-2 rounded-full border border-line bg-white px-7 text-15 font-bold transition hover:bg-sunk'">
+      <i class="far fa-thumbs-up"></i> 추천 <b id="like-count" class="tabular-nums" th:text="${review.likeCount}">0</b>
     </button>
   </div>
 
@@ -407,23 +403,34 @@ function toggleLike() {
   if (!loginUser) {
     openInfoModal(
       "로그인이 필요합니다",
-      "좋아요는 로그인 후 이용 가능합니다."
+      "추천은 로그인 후 이용 가능합니다."
     );
     return;
   }
 
-  const travelNo = document.getElementById('likeBtn').dataset.travelNo;
+  const travelNo = document.getElementById('like-btn').dataset.travelNo;
 
   fetch('/reviews/like', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json;charset=UTF-8'
     },
     body: JSON.stringify({ travelNo })
   })
   .then(res => res.json())
   .then(data => {
-    document.getElementById('likeCount').textContent = data.likeCount;
+    if (!data.success) { openInfoModal('알림', data.message || '처리 중 오류가 발생했어요.'); return; }
+
+    document.getElementById('like-count').textContent = data.likeCount;
+
+    const btn = document.getElementById('like-btn');
+    if (data.liked) {
+      btn.className = 'inline-flex h-12 items-center gap-2 rounded-full border border-brand bg-brand-soft px-7 text-15 font-bold text-brand transition hover:bg-brand hover:text-white';
+    } else {
+      btn.className = 'inline-flex h-12 items-center gap-2 rounded-full border border-line bg-white px-7 text-15 font-bold transition hover:bg-sunk';
+    }
+
+    showToast(data.liked ? '추천했어요!' : '추천을 취소했어요.');
   });
 }
 const replyLoginRequired = /*[[${session.loginUser == null}]]*/ true;

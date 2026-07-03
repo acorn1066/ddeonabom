@@ -259,10 +259,13 @@ public class ReviewController {
 	    model.addAttribute("review", review);
 	    model.addAttribute("kakaoApiKey", kakaoApiKey);
 
+	    boolean isLiked = loginUser != null && reviewService.isLiked(travelNo, loginUser.getMemberNo());
+	    model.addAttribute("isLiked", isLiked);
+
 	    return "views/review/detail";
 	}
-	
-	
+
+
 	@PostMapping("/reviews/like")
 	@ResponseBody
 	public Map<String, Object> like(@RequestBody Map<String, Integer> param,
@@ -272,16 +275,13 @@ public class ReviewController {
 
 	    Member loginUser = (Member) session.getAttribute("loginUser");
 	    if (loginUser == null) {
-	        throw new RuntimeException("로그인이 필요합니다.");
+	        return Map.of("success", false, "message", "로그인이 필요합니다.");
 	    }
-	    int memberNo = loginUser.getMemberNo();
 
-	    int likeCount = reviewService.toggleLike(travelNo, memberNo);
+	    boolean liked     = reviewService.toggleLike(travelNo, loginUser.getMemberNo());
+	    int     likeCount = reviewService.getLikeCount(travelNo);
 
-	    Map<String, Object> result = new HashMap<>();
-	    result.put("likeCount", likeCount);
-
-	    return result;
+	    return Map.of("success", true, "liked", liked, "likeCount", likeCount);
 	}
 	
 	@GetMapping("/reviews/update")
