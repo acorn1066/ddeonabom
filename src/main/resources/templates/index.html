@@ -173,7 +173,7 @@
 
       <div class="grid grid-cols-4 gap-6" th:if="${popularLandmarks != null and !popularLandmarks.isEmpty()}">
         <a th:each="landmark, stat : ${popularLandmarks}"
-           th:href="@{/landmark/detail/{no}(no=${landmark.contentId})}"
+           th:href="@{/landmark/{contentId}/{page}(contentId=${landmark.contentId}, page=1)}"
            class="flex flex-col gap-3">
           <div class="relative flex aspect-card items-center justify-center overflow-hidden rounded-xl border border-line bg-sunk">
             <span class="absolute left-3 top-3 inline-flex h-6.5 w-6.5 items-center justify-center rounded-lg bg-ink text-sm font-bold text-white"
