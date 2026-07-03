@@ -2,6 +2,7 @@ package kh.ddeonabom.admin.model.mapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -79,6 +80,8 @@ public interface AdminMapper {
 	int insertReport(AdminReport report);
 
 	int checkDuplicateReport(AdminReport report);
+
+	Map<String, Object> getReportTargetOwner(AdminReport report);
 
 	ArrayList<HashMap<String, Object>> selectScheduleActivity();
 

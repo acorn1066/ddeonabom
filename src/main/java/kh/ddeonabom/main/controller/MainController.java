@@ -30,6 +30,6 @@ public class MainController {
         if (featured != null) {
             model.addAttribute("featuredRoute", mainService.getFeaturedRoute(featured.getCoords()));
         }
-        return "/index";
+        return "index";
     }
 }

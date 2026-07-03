@@ -60,13 +60,28 @@
             NVL(RP.REPORT_STATUS, 'NONE') AS reportStatus,
             ROW_NUMBER() OVER (ORDER BY R.CREATE_DATE DESC) AS rnum
         FROM REPLY R
+        
+        LEFT JOIN QLIST Q 
+               ON R.POST_NO = Q.Q_NO AND R.POST_BOARD = 'Q' AND Q.STATUS = 'Y'
+        LEFT JOIN TRAVEL_LIST REV 
+               ON R.POST_NO = REV.TRAVEL_NO AND R.POST_BOARD = 'T' AND REV.STATUS = 'Y'
+        LEFT JOIN SCHEDULE_MAIN S 
+               ON R.POST_NO = S.SCHEDULE_NO AND R.POST_BOARD = 'S' AND S.SCHEDULE_STATUS = 'Y'
+               
         LEFT JOIN REPORT RP
                ON R.REPLY_NO = RP.TARGET_NO
               AND RP.TARGET_TYPE = 'reply'
               AND RP.REPORT_STATUS = 'N' 
+              
         WHERE R.MEMBER_NO = #{memberNo}
           AND R.POST_BOARD = #{postBoard}
           AND R.STATUS = 'Y'
+          
+          AND (
+              (R.POST_BOARD = 'Q' AND Q.Q_NO IS NOT NULL) OR
+              (R.POST_BOARD = 'T' AND REV.TRAVEL_NO IS NOT NULL) OR
+              (R.POST_BOARD = 'S' AND S.SCHEDULE_NO IS NOT NULL)
+          )
     )
     WHERE rnum BETWEEN #{startRow} + 1 AND #{startRow} + #{listLimit}
 </select>

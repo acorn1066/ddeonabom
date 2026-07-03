@@ -94,10 +94,7 @@
 	  <div id="spotList" class="flex flex-col gap-4">
 	    <p id="spotEmpty" class="py-6 text-center text-sm text-muted">지도에서 장소를 추가하거나 아래 버튼을 눌러 직접 입력하세요.</p>
 	  </div>
-	  <button type="button" id="addSpotBtn"
-	    class="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line bg-sunk text-sm font-bold text-muted transition hover:border-brand hover:bg-brand-soft hover:text-brand">
-	    <span class="text-lg">＋</span> 관광지 직접 추가
-	  </button>
+	  
 	</div>
 
     <!-- 3. 공개 설정 -->
@@ -447,12 +444,19 @@ kakao.maps.load(function () {
 	
 	  initStars(div);
 		//파일명 표시
+	  const MAX_FILES = 5;
 	  const fileInput = div.querySelector('input[type="file"]');
 	  const fileNameList = div.querySelector('.file-name-list');
 	  let allFiles = []; // 누적 파일 저장
 	
 	  fileInput.addEventListener('change', function() {
 	      // 새로 선택한 파일 누적
+	      const newFiles = Array.from(this.files);
+	      if (allFiles.length + newFiles.length > MAX_FILES) {
+			    openInfoModal("제한", `이미지는 최대 ${MAX_FILES}장까지 업로드 가능합니다.`);
+			    fileInput.value = ""; 
+			    return;
+			}
 	      Array.from(this.files).forEach(file => {
 	          // 중복 파일 제외
 	          if (!allFiles.find(f => f.name === file.name && f.size === file.size)) {
@@ -470,7 +474,7 @@ kakao.maps.load(function () {
 	      allFiles.forEach((file, i) => {
 	          const p = document.createElement('p');
 	          p.className = 'flex items-center gap-1';
-	          p.innerHTML = `📎 ${file.name} <button type="button" class="text-red-400 text-xs ml-1" data-index="${i}">✕</button>`;
+	          p.innerHTML = ` ${file.name} <button type="button" class="text-red-400 text-xs ml-1" data-index="${i}">✕</button>`;
 	          fileNameList.appendChild(p);
 	      });
 	
@@ -579,8 +583,7 @@ kakao.maps.load(function () {
 
 	    form.submit();
 	});
-	// ── 관광지 직접 추가 버튼 ─────────────────
-	document.getElementById('addSpotBtn').addEventListener('click', () => addSpotCard());
+	
 	
 	//일정에서 넘어온 경우 카드 복원
 	const scheduleSubList = /*[[${review != null ? review.subList : null}]]*/ null;

@@ -403,6 +403,26 @@
     VALUES (SEQ_REPORT.NEXTVAL, #{targetType}, #{targetNo}, #{reason}, SYSDATE, #{memberNo})
 </insert>
 
+<select id="getReportTargetOwner" parameterType="AdminReport" resultType="hashmap">
+    <choose>
+        <when test="targetType == 'question'">
+            SELECT Q.MEMBER_NO AS MEMBERNO, M.IS_ADMIN AS ISADMIN
+            FROM QLIST Q JOIN MEMBER M ON Q.MEMBER_NO = M.MEMBER_NO
+            WHERE Q.Q_NO = #{targetNo}
+        </when>
+        <when test="targetType == 'review'">
+            SELECT T.MEMBER_NO AS MEMBERNO, M.IS_ADMIN AS ISADMIN
+            FROM TRAVEL_LIST T JOIN MEMBER M ON T.MEMBER_NO = M.MEMBER_NO
+            WHERE T.TRAVEL_NO = #{targetNo}
+        </when>
+        <when test="targetType == 'reply'">
+            SELECT R.MEMBER_NO AS MEMBERNO, M.IS_ADMIN AS ISADMIN
+            FROM REPLY R JOIN MEMBER M ON R.MEMBER_NO = M.MEMBER_NO
+            WHERE R.REPLY_NO = #{targetNo}
+        </when>
+    </choose>
+</select>
+
 <select id="getReportCount" parameterType="map" resultType="_int">
     SELECT COUNT(*)
     FROM REPORT R

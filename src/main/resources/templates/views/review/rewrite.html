@@ -455,15 +455,31 @@ kakao.maps.load(function () {
             label.textContent = RATING_LABELS[rating];
             label.style.color = BRAND;
         }
-
+        
+        const MAX_FILES = 5;
         const fileInput = div.querySelector('input[type="file"]');
         const fileNameList = div.querySelector('.file-name-list');
         let allFiles = [];
 
         fileInput.addEventListener('change', function() {
+            const existingCount = div.querySelectorAll('.existing-img-wrap').length;
+            let rejected = false;
+
             Array.from(this.files).forEach(file => {
-                if (!allFiles.find(f => f.name === file.name && f.size === file.size)) allFiles.push(file);
+                if (allFiles.find(f => f.name === file.name && f.size === file.size)) return;
+
+                if (existingCount + allFiles.length >= MAX_FILES) {
+                    rejected = true;
+                    return;
+                }
+
+                allFiles.push(file);
             });
+
+            if (rejected) {
+                openInfoModal(`사진은 기존 사진 포함 최대 ${MAX_FILES}장까지 등록할 수 있습니다.`);
+            }
+
             const dt = new DataTransfer();
             allFiles.forEach(file => dt.items.add(file));
             fileInput.files = dt.files;
@@ -522,6 +538,15 @@ kakao.maps.load(function () {
         if (!titleInput || !titleInput.value.trim()) { openInfoModal("여행 제목을 입력해 주세요."); titleInput.focus(); return; }
         const cards = document.querySelectorAll('.spot-card');
         if (cards.length === 0) { openInfoModal("최소 한 개 이상의 관광지 후기를 추가해 주세요."); return; }
+        
+        for (const card of cards) {
+            const existingCount = card.querySelectorAll('.existing-img-wrap').length;
+            const newCount = card.querySelector('input[type="file"]')?.files.length || 0;
+            if (existingCount + newCount > 5) {
+                openInfoModal("사진은 관광지당 기존 사진 포함 최대 5장까지 등록할 수 있습니다.");
+                return;
+            }
+        }
 
         const formData = new FormData();
         const travelNoVal = parseInt(document.querySelector('input[name="travelNo"]')?.value);
@@ -560,15 +585,14 @@ kakao.maps.load(function () {
         .then(res => {
             const isUpdate = parseInt(document.querySelector('input[name="travelNo"]')?.value) > 0;
             if (res.ok) {
-                // 1. 먼저 모달창을 띄웁니다.
+
                 openInfoModal(isUpdate ? "리뷰가 성공적으로 수정되었습니다." : "리뷰가 성공적으로 등록되었습니다.");
                 
-                // 2. 3초(3000ms) 대기한 후에 화면을 전환합니다.
                 setTimeout(() => {
                     location.href = isUpdate
                         ? "/reviews/detail?travelNo=" + document.querySelector('input[name="travelNo"]')?.value
                         : "/reviews/list";
-                }, 2000); // <-- 원하는 시간(ms)으로 숫자를 조절하세요!
+                }, 1500); 
 
             } else {
                 openInfoModal(isUpdate ? "리뷰 수정에 실패했습니다." : "리뷰 등록에 실패했습니다.");
