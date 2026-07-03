@@ -29,7 +29,6 @@ public interface AdminMapper {
 
     ArrayList<Member> selectMembers(HashMap<String, Object> map);
 
-	ArrayList<AdminNotice> selectNoticeList();
 
 	int updateMemberStatus(HashMap<String, String> map);
 
@@ -81,7 +80,7 @@ public interface AdminMapper {
 
 	int checkDuplicateReport(AdminReport report);
 
-	Map<String, Object> getReportTargetOwner(AdminReport report);
+	HashMap<String, Object> getReportTargetOwner(AdminReport report);
 
 	ArrayList<HashMap<String, Object>> selectScheduleActivity();
 
