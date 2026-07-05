@@ -13,14 +13,14 @@
     SELECT COUNT(*)
     FROM MEMBER
     WHERE EMAIL = #{email}
-      AND STATUS = 'Y'
+      
 </select>
 
 <select id="existsBynickname" resultType="int">
     SELECT COUNT(*)
     FROM MEMBER
     WHERE nickname = #{nickname}
-      AND STATUS = 'Y'
+     
 </select>
 
 <insert id="insertMember">
