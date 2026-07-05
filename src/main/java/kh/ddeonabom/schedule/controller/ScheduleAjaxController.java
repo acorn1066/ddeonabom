@@ -101,7 +101,6 @@ public class ScheduleAjaxController {
             return result;
         }
 
-        // origin / destination / waypoints 조립 (경도,위도 순)
         RoutePoint origin = points.get(0);
         RoutePoint dest = points.get(points.size() - 1);
         String originStr = origin.getLng() + "," + origin.getLat();
@@ -141,7 +140,6 @@ public class ScheduleAjaxController {
             for (JsonNode section : sections) {
                 for (JsonNode road : section.path("roads")) {
                     JsonNode vertexes = road.path("vertexes");
-                    // [x, y, x, y, ...] → 짝수=경도, 홀수=위도
                     for (int i = 0; i + 1 < vertexes.size(); i += 2) {
                         Map<String, Double> c = new HashMap<>();
                         c.put("lng", vertexes.get(i).asDouble());

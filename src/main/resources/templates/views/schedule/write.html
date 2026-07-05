@@ -739,7 +739,7 @@ const drawRoadPath = async (places) => {
          polylines.push(polyline);
      } catch (e) {
          console.error('경로 표시 실패', e);
-         // 실패한 구간은 직선 fallback (이게 없으면 동선이 끊겨 보임)
+         // 실패한 구간은 직선으로
          const fallback = new kakao.maps.Polyline({
              path: seg.map(p => new kakao.maps.LatLng(p.lat, p.lng)),
              strokeWeight: 4,
