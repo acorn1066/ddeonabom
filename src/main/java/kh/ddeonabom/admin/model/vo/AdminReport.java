@@ -28,5 +28,8 @@ public class AdminReport {
 	    private String targetTitle;
 	    private String reporterName; 
 	    private String targetWriter;
+	    
+	    private Integer postNo;
+	    private String postBoard;
 
 }

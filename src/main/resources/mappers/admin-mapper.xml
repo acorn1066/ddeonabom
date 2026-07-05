@@ -467,7 +467,16 @@
 	                    WHEN R.TARGET_TYPE = 'review'   THEN TM.NICKNAME
 	                    WHEN R.TARGET_TYPE = 'question' THEN QM.NICKNAME
 	                    WHEN R.TARGET_TYPE = 'reply'    THEN RPM.NICKNAME
-                	END AS targetWriter
+                	END AS targetWriter,
+                	
+					CASE
+					    WHEN R.TARGET_TYPE = 'reply' THEN RP.POST_NO
+					    ELSE NULL
+					END AS postNo,
+					CASE
+					    WHEN R.TARGET_TYPE = 'reply' THEN RP.POST_BOARD
+					    ELSE NULL
+					END AS postBoard
 	            FROM REPORT R
 	            JOIN MEMBER M              ON R.MEMBER_NO  = M.MEMBER_NO
 	            LEFT JOIN TRAVEL_LIST T    ON R.TARGET_TYPE = 'review'   AND R.TARGET_NO = T.TRAVEL_NO
