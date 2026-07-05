@@ -77,16 +77,24 @@ public class ReviewService {
 		reviewMapper.increaseCount(travelNo);
 	}
 
-	public int toggleLike(int travelNo, int memberNo) {
+	/** 추천 여부 */
+	public boolean isLiked(int travelNo, int memberNo) {
+	    return reviewMapper.existsLike(travelNo, memberNo) > 0;
+	}
 
-	    int cnt = reviewMapper.existsLike(travelNo, memberNo);
-
-	    if (cnt > 0) {
+	/** 추천 toggle: true = 추천됨, false = 취소됨 */
+	public boolean toggleLike(int travelNo, int memberNo) {
+	    if (reviewMapper.existsLike(travelNo, memberNo) > 0) {
 	        reviewMapper.deleteLike(travelNo, memberNo);
+	        return false;
 	    } else {
 	        reviewMapper.insertLike(travelNo, memberNo);
+	        return true;
 	    }
+	}
 
+	/** 전체 추천 수 */
+	public int getLikeCount(int travelNo) {
 	    return reviewMapper.selectLikeCount(travelNo);
 	}
 	public ArrayList<Review> selectMyReviewList(HashMap<String, Object> reviewMap) {

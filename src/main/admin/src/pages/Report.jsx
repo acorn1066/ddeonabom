@@ -222,15 +222,25 @@ const Report = () => {
                     onClose={closeModal}
                     footer={
                         <>
-                            {(selectReport.targetType === "review" || selectReport.targetType === "question") && (() => {
-                                const urlMap = {
-                                    review: `http://localhost:8080/reviews/detail?travelNo=${selectReport.targetNo}`,
-                                    question: `http://localhost:8080/qList/detail?qNo=${selectReport.targetNo}`,
-                                };
-                                const isDisabled = selectReport.reportStatus === "Y";
-                                return (
+                            {(() => {
+                                let url = null;
+
+                                if (selectReport.targetType === "review") {
+                                    url = `http://localhost:8080/reviews/detail?travelNo=${selectReport.targetNo}`;
+                                } else if (selectReport.targetType === "question") {
+                                    url = `http://localhost:8080/qList/detail?qNo=${selectReport.targetNo}`;
+                                } else if (selectReport.targetType === "reply") {
+                                    const replyUrlMap = {
+                                        Q: `http://localhost:8080/qList/detail?qNo=${selectReport.postNo}`,
+                                        T: `http://localhost:8080/reviews/detail?travelNo=${selectReport.postNo}`,
+                                        S: `http://localhost:8080/share/detail?shareNo=${selectReport.postNo}`,
+                                    };
+                                    url = replyUrlMap[selectReport.postBoard];
+                                }
+                                const isDisabled = selectReport.targetType !== "reply" && selectReport.reportStatus === "Y";
+                                return url ? (
                                     <button
-                                        onClick={() => !isDisabled && (window.location.href = urlMap[selectReport.targetType])}
+                                        onClick={() => !isDisabled && (window.location.href = url)}
                                         disabled={isDisabled}
                                         className={`rounded-lg px-4 py-2 text-white ${isDisabled
                                             ? "bg-indigo-300 cursor-not-allowed"
@@ -239,7 +249,7 @@ const Report = () => {
                                     >
                                         게시글 보기
                                     </button>
-                                );
+                                ) : null;
                             })()}
                             {selectReport.reportStatus === "N" && (
                                 <>

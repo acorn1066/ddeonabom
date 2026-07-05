@@ -516,7 +516,7 @@ public class MemberController {
 	    model.addAttribute("tab", tab);
 
 	 // ==========================================
-	    //  관심 일정/관광지 목록 탭 (기본값)
+	    //  관심 일정/관광지 목록 탭
 	    // ==========================================
 	    if("wishlist".equals(tab)) {
 	        // 관심 목록 탭의 기본 sub-type은 'spot' (관광지)
@@ -542,7 +542,7 @@ public class MemberController {
 	            
 	            model.addAttribute("wishlist", wishlist); 
 	            model.addAttribute("pi", pi);
-	        } 
+	        }  // 관광지 관심목록 조회
 	        else if("plan".equals(type)) {
 	            int listCount = shareService.getWishPlanCount(loginUser.getMemberNo()); 
 	            PageInfo pi = Pagination.getPageInfo(page, listCount, 5, 8);
@@ -555,7 +555,7 @@ public class MemberController {
 	            
 	            model.addAttribute("wishlist", wishlist);
 	            model.addAttribute("pi", pi);
-	        }
+	        } // 일정 관심목록 조회
 	        
 	        // 관광지 카테고리 배지용 매핑 데이터 (Spot/Plan 공용 혹은 Spot 페이지 출력용)
 	        Map<Integer, String> contentType = new HashMap<>();
@@ -598,7 +598,7 @@ public class MemberController {
 
 	            model.addAttribute("postlist", postlist);
 	            model.addAttribute("pi", pi);
-	        }
+	        }// 질문글 조회
 	        else if("review".equals(type)) {
 	            int listCount = rListService.getMyReviewCount(map);
 	            PageInfo pi = Pagination.getPageInfo(page, listCount, 5, 8);
@@ -610,7 +610,7 @@ public class MemberController {
 
 	            model.addAttribute("reviewlist", reviewlist);
 	            model.addAttribute("pi", pi);
-	        }
+	        }// 리뷰글 조회
 	        else if("share".equals(type)) {
 	        	int listCount =shareService.selectMyShareCount(map);
 	        	PageInfo pi = Pagination.getPageInfo(page, listCount, 5, 8);
@@ -623,7 +623,7 @@ public class MemberController {
 
 	            model.addAttribute("sharelist", sharelist);
 	            model.addAttribute("pi", pi);
-	        }
+	        }// 일정공유글 조회
 	    }
 
 	    // ==========================================

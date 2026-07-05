@@ -112,7 +112,7 @@ const Notice = () => {
                                 <tr key={n.noticeNo} className="border-b hover:bg-gray-50">
 
                                     <td className="p-4 text-center">{n.noticeNo}</td>
-                                    <td className="p-4" className="cursor-pointer hover:text-blue-600" onClick={() => navigate(`/notice/detail/${n.noticeNo}`)}>{n.title}</td>
+                                    <td className="p-4 text-center cursor-pointer hover:text-blue-600" onClick={() => navigate(`/notice/detail/${n.noticeNo}`)}>{n.title}</td>
                                     <td className="p-4 text-center">{n.memberName}</td>
                                     <td className="p-4 text-center">{n.createDate.split("T")[0]}</td>
                                     <td className="p-4 text-center">{n.modifyDate ? n.modifyDate.split("T")[0] : "-"}</td>

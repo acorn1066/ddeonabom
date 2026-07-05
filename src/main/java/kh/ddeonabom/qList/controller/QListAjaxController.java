@@ -29,9 +29,9 @@ public class QListAjaxController {
             return Map.of("success", false, "message", "로그인이 필요합니다.");
         }
 
-        boolean liked = qListService.toggleLike(qNo, loginUser.getMemberNo());
-        int     count = qListService.getLikeCount(qNo);
+        boolean liked     = qListService.toggleLike(qNo, loginUser.getMemberNo());
+        int     likeCount = qListService.getLikeCount(qNo);
 
-        return Map.of("success", true, "liked", liked, "count", count);
+        return Map.of("success", true, "liked", liked, "likeCount", likeCount);
     }
 }

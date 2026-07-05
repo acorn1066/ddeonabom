@@ -101,7 +101,6 @@ public class ScheduleAjaxController {
             return result;
         }
 
-        // origin / destination / waypoints 조립 (경도,위도 순)
         RoutePoint origin = points.get(0);
         RoutePoint dest = points.get(points.size() - 1);
         String originStr = origin.getLng() + "," + origin.getLat();
@@ -133,7 +132,6 @@ public class ScheduleAjaxController {
                 return result;
             }
 
-            // 응답 파싱: routes[0].sections[].roads[].vertexes
             ObjectMapper om = new ObjectMapper();
             JsonNode root = om.readTree(conn.getInputStream());
             JsonNode sections = root.path("routes").path(0).path("sections");
@@ -141,7 +139,6 @@ public class ScheduleAjaxController {
             for (JsonNode section : sections) {
                 for (JsonNode road : section.path("roads")) {
                     JsonNode vertexes = road.path("vertexes");
-                    // [x, y, x, y, ...] → 짝수=경도, 홀수=위도
                     for (int i = 0; i + 1 < vertexes.size(); i += 2) {
                         Map<String, Double> c = new HashMap<>();
                         c.put("lng", vertexes.get(i).asDouble());
@@ -174,10 +171,9 @@ public class ScheduleAjaxController {
             return result;
         }
 
-        // Y/M/N 외 값 방어
         if (!List.of("Y", "M", "N").contains(visibility)) {
             result.put("success", false);
-            result.put("message", "올바르지 않은 공개 설정이에요.");
+            result.put("message", "올바르지 않은 공개 설정입니다.");
             return result;
         }
 
@@ -188,7 +184,7 @@ public class ScheduleAjaxController {
         } catch (Exception e) {
             e.printStackTrace();
             result.put("success", false);
-            result.put("message", "공유 설정 변경에 실패했어요.");
+            result.put("message", "공유 설정 변경에 실패했습니다.");
         }
         return result;
     }
