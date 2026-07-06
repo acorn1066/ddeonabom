@@ -341,8 +341,10 @@ public class ReviewController {
 
 	            ReviewSub sub = new ReviewSub();
 
+	            sub.setTravelNo(travelNo);
 	            sub.setContentTitle(title);
 	            sub.setTravelSubNo(parseIntSafe(request.getParameter("subList[" + i + "].travelSubNo")));
+	            sub.setTravelSubSeq(subList.size() + 1);
 	            sub.setLat(parseDoubleSafe(request.getParameter("subList[" + i + "].lat")));
 	            sub.setLng(parseDoubleSafe(request.getParameter("subList[" + i + "].lng")));
 
@@ -365,7 +367,6 @@ public class ReviewController {
 	            }
 
 	            int contentId = parseIntSafe(request.getParameter("subList[" + i + "].contentId"));
-	            if (contentId <= 0) continue;
 
 	            sub.setContentId(contentId);
 
