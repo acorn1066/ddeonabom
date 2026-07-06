@@ -308,7 +308,9 @@
         SET 
             TRAVEL_TITLE      = #{travelTitle},
             TRAVEL_START_DATE = #{travelStartDate, jdbcType=DATE}, 
-            TRAVEL_END_DATE   = #{travelEndDate, jdbcType=DATE}
+            TRAVEL_END_DATE   = #{travelEndDate, jdbcType=DATE},
+            VISIBILITY        = #{visibility, jdbcType=VARCHAR},
+        REGION            = #{region, jdbcType=VARCHAR}
         WHERE TRAVEL_NO = #{travelNo}
     </update>
     
