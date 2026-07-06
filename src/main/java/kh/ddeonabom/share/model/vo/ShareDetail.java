@@ -16,14 +16,14 @@ import lombok.ToString;
 public class ShareDetail {
 
     // ── SCHEDULE_MAIN ──
-    private int    scheduleNo;
+    private Integer    scheduleNo;
     private String scheduleTitle;
     private String scheduleStatus;      // 삭제 여부(Y/N) - URL 직접 접속 우회 차단용
     private String scheduleVisibility;  // 공개 범위(Y=전체공개/M=회원공개/N=비공개) - 회원 전용 글 URL 직접 접속 차단용
     private Date   scheduleStartdate;   // java.sql.Date → #dates.format() 사용 가능
     private Date   scheduleEnddate;
     private Date   createDate;
-    private int    memberNo;
+    private Integer    memberNo;
 
     // ── MEMBER (JOIN) ──
     private String memberNickname;
@@ -33,8 +33,8 @@ public class ShareDetail {
     private String coords;              // 전체 장소 좌표 "mapx,mapy;..." (SVG 루트용)
 
     // ── 집계 (서브쿼리) ──
-    private int    likeCount;           // NICE WHERE POST_BOARD_FX='SR'
-    private int    placeCount;          // SCHEDULE_SUB COUNT
+    private Integer    likeCount;           // NICE WHERE POST_BOARD_FX='SR'
+    private Integer    placeCount;          // SCHEDULE_SUB COUNT
     
     public String getMemberNickname() {
         if (this.memberNickname != null && this.memberNickname.contains("_")) {

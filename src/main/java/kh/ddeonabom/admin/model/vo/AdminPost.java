@@ -21,7 +21,7 @@ public class AdminPost {
 	private String status;
 	private String content;
 	
-    private int postNo;     
+    private Integer postNo;     
     private String boardType;
     
     private String contentTitle;     // CONTENT_TITLE (부제목)

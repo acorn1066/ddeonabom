@@ -40,7 +40,7 @@ public class AdminController {
 	
 	@GetMapping("dash")
 		public String adminDash() {
-		return "redirect:http://localhost:5173";
+		return "redirect:/admin/dashboard";
 	}
 	
 	@GetMapping("/dashboard")

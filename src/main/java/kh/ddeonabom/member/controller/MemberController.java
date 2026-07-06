@@ -244,7 +244,7 @@ public class MemberController {
             
             // 관리자면 admin 페이지 우선 이동
             if ("Y".equals(loginUser.getIsAdmin())) {
-                return "redirect:/admin/dash";
+            	return "redirect:/admin/dashboard";
             }
             
             if (targetUrl != null && targetUrl.startsWith("/") && !targetUrl.startsWith("//")) {
@@ -342,7 +342,7 @@ public class MemberController {
    
     @GetMapping("/withdraw")
     public String withdrawPage() {
-        return "/views/member/withdraw"; 
+        return "views/member/withdraw"; 
     }
 
     @PostMapping("/withdraw")

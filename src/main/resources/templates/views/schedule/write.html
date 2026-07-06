@@ -656,101 +656,124 @@ const clearMap = () => {
  polylines = [];
 };
 
+let routeReqId = 0;
+
 const drawRoute = async () => {
- if (!mapReady || !map) return;
- clearMap();
+    if (!mapReady || !map) return;
+    const myReqId = ++routeReqId;
 
- const key = selectedDate ? toDateKey(selectedDate) : null;
- const places = key ? (placesByDate[key] || []) : [];
+    clearMap();
 
- if (places.length === 0) return;
+    const key = selectedDate ? toDateKey(selectedDate) : null;
+    const places = key ? (placesByDate[key] || []) : [];
 
- const bounds = new kakao.maps.LatLngBounds();
+    if (places.length === 0) return;
 
- places.forEach((place, idx) => {
-     const lat = parseFloat(place.mapy);
-     const lng = parseFloat(place.mapx);
-     if (isNaN(lat) || isNaN(lng)) return;
+    const bounds = new kakao.maps.LatLngBounds();
 
-     const pos = new kakao.maps.LatLng(lat, lng);
+    places.forEach((place, idx) => {
+        const lat = parseFloat(place.mapy);
+        const lng = parseFloat(place.mapx);
+        if (isNaN(lat) || isNaN(lng)) return;
 
-     const marker = new kakao.maps.Marker({ position: pos, map });
-     markers.push(marker);
+        const pos = new kakao.maps.LatLng(lat, lng);
+        const marker = new kakao.maps.Marker({ position: pos, map });
+        markers.push(marker);
 
-     // 순번 표시용
-     const overlay = new kakao.maps.CustomOverlay({
-         position: pos,
-         yAnchor: 2.1,
-         content: `<div style="background:#2563eb;color:#fff;width:22px;height:22px;`
-                + `border-radius:50%;display:flex;align-items:center;justify-content:center;`
-                + `font-size:12px;font-weight:700;border:2px solid #fff;`
-                + `box-shadow:0 1px 3px rgba(0,0,0,.3)">${idx + 1}</div>`
-     });
-     overlay.setMap(map);
-     markers.push(overlay);
+        const overlay = new kakao.maps.CustomOverlay({
+            position: pos,
+            yAnchor: 2.1,
+            content: `<div style="background:#2563eb;color:#fff;width:22px;height:22px;`
+                   + `border-radius:50%;display:flex;align-items:center;justify-content:center;`
+                   + `font-size:12px;font-weight:700;border:2px solid #fff;`
+                   + `box-shadow:0 1px 3px rgba(0,0,0,.3)">${idx + 1}</div>`
+        });
+        overlay.setMap(map);
+        markers.push(overlay);
 
-     bounds.extend(pos);
- });
+        bounds.extend(pos);
+    });
 
- map.setBounds(bounds);
+    map.setBounds(bounds);
 
- if (places.length >= 2) {
-     await drawRoadPath(places);
- }
+    if (places.length >= 2) {
+        await drawRoadPath(places, myReqId);
+    }
 };
 
-const drawRoadPath = async (places) => {
- const points = places
-     .map(p => ({ lat: parseFloat(p.mapy), lng: parseFloat(p.mapx) }))
-     .filter(p => !isNaN(p.lat) && !isNaN(p.lng));
+const drawRoadPath = async (places, myReqId) => {
+    const points = places
+        .map(p => ({ lat: parseFloat(p.mapy), lng: parseFloat(p.mapx) }))
+        .filter(p => !isNaN(p.lat) && !isNaN(p.lng));
 
- if (points.length < 2) return;
+    if (points.length < 2) return;
 
- const MAX_POINTS_PER_CALL = 7;
- const segments = [];
- for (let i = 0; i < points.length - 1; i += (MAX_POINTS_PER_CALL - 1)) {
-     const slice = points.slice(i, i + MAX_POINTS_PER_CALL);
-     if (slice.length >= 2) segments.push(slice);
- }
+    const MAX_POINTS_PER_CALL = 7;
+    const segments = [];
+    for (let i = 0; i < points.length - 1; i += (MAX_POINTS_PER_CALL - 1)) {
+        const slice = points.slice(i, i + MAX_POINTS_PER_CALL);
+        if (slice.length >= 2) segments.push(slice);
+    }
 
- for (const seg of segments) {
-     try {
-         const res = await fetch('/schedule/route', {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ points: seg })
-         });
-         if (!res.ok) throw new Error('route ' + res.status);
-         const data = await res.json();
-		
-         const linePath = (data.path || []).map(
-             c => new kakao.maps.LatLng(c.lat, c.lng)
-         );
-         if (linePath.length < 2) continue;
+    for (const seg of segments) {
+        if (myReqId !== routeReqId) return; // 더 최신 요청이 있으면 중단
 
-         const polyline = new kakao.maps.Polyline({
-             path: linePath,
-             strokeWeight: 5,
-             strokeColor: '#2563eb',
-             strokeOpacity: 0.85,
-             strokeStyle: 'solid'
-         });
-         polyline.setMap(map);
-         polylines.push(polyline);
-     } catch (e) {
-         console.error('경로 표시 실패', e);
-         // 실패한 구간은 직선으로
-         const fallback = new kakao.maps.Polyline({
-             path: seg.map(p => new kakao.maps.LatLng(p.lat, p.lng)),
-             strokeWeight: 4,
-             strokeColor: '#94a3b8',
-             strokeOpacity: 0.7,
-             strokeStyle: 'shortdash'
-         });
-         fallback.setMap(map);
-         polylines.push(fallback);
-     }
- }
+        await fetch('/schedule/route', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ points: seg })
+        })
+        .then(response => response.json())
+        .then(data => {
+        	console.log(data);
+        	console.log(myReqId);
+        	console.log(routeReqId);
+        	if (myReqId !== routeReqId) return; // 응답 왔을 때도 재확인
+            
+            if (data.routeError) {
+                showToast('일부 구간의 경로를 표시할 수 없어요: ' + data.routeError, false);
+                const fallback = new kakao.maps.Polyline({
+                    path: seg.map(p => new kakao.maps.LatLng(p.lat, p.lng)),
+                    strokeWeight: 4,
+                    strokeColor: '#94a3b8',
+                    strokeOpacity: 0.7,
+                    strokeStyle: 'shortdash'
+                });
+                fallback.setMap(map);
+                polylines.push(fallback);
+                console.log('폴백 폴리라인 그려짐:', fallback); // 확인용
+                return;
+            }
+
+            const linePath = (data.path || []).map(
+                c => new kakao.maps.LatLng(c.lat, c.lng)
+            );
+            if (linePath.length < 2) return;
+
+            const polyline = new kakao.maps.Polyline({
+                path: linePath,
+                strokeWeight: 5,
+                strokeColor: '#2563eb',
+                strokeOpacity: 0.85,
+                strokeStyle: 'solid'
+            });
+            polyline.setMap(map);
+            polylines.push(polyline);
+        })
+        .catch(e => {
+            if (myReqId !== routeReqId) return;
+            console.error('경로 표시 실패', e);
+            const fallback = new kakao.maps.Polyline({
+                path: seg.map(p => new kakao.maps.LatLng(p.lat, p.lng)),
+                strokeWeight: 4,
+                strokeColor: '#94a3b8',
+                strokeOpacity: 0.7,
+                strokeStyle: 'shortdash'
+            });
+            fallback.setMap(map);
+            polylines.push(fallback);
+        });
+    }
 };
 
 const confirmDelete = () => {

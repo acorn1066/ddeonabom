@@ -53,7 +53,7 @@ public class ScheduleAjaxController {
 
         try {
             int scheduleNo;
-            if (schedule.getScheduleNo() != 0) {
+            if (schedule.getScheduleNo()!=null && schedule.getScheduleNo() != 0) {
                 // scheduleNo 있으면 수정
                 scheduleNo = sService.updateSchedule(schedule);
             } else {
@@ -92,7 +92,8 @@ public class ScheduleAjaxController {
     
     @PostMapping("/route")
     public Map<String, Object> getRoute(@RequestBody RouteRequest req) {
-        List<RoutePoint> points = req.getPoints();
+    	System.out.println("getRoute 호출됨, points 개수: " + (req.getPoints() != null ? req.getPoints().size() : "null"));
+    	List<RoutePoint> points = req.getPoints();
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Double>> path = new ArrayList<>();
 
@@ -100,12 +101,10 @@ public class ScheduleAjaxController {
             result.put("path", path);
             return result;
         }
-
         RoutePoint origin = points.get(0);
         RoutePoint dest = points.get(points.size() - 1);
         String originStr = origin.getLng() + "," + origin.getLat();
         String destStr = dest.getLng() + "," + dest.getLat();
-
         StringBuilder waypoints = new StringBuilder();
         for (int i = 1; i < points.size() - 1; i++) {
             if (waypoints.length() > 0) waypoints.append("|");
@@ -134,8 +133,16 @@ public class ScheduleAjaxController {
 
             ObjectMapper om = new ObjectMapper();
             JsonNode root = om.readTree(conn.getInputStream());
-            JsonNode sections = root.path("routes").path(0).path("sections");
+            JsonNode routeNode = root.path("routes").path(0);
+            int resultCode = routeNode.path("result_code").asInt(-1);
 
+            if (resultCode != 0) {
+                result.put("path", path);
+                result.put("routeError", routeNode.path("result_msg").asText("경로를 찾을 수 없습니다."));
+                return result;
+            }
+
+            JsonNode sections = routeNode.path("sections");
             for (JsonNode section : sections) {
                 for (JsonNode road : section.path("roads")) {
                     JsonNode vertexes = road.path("vertexes");

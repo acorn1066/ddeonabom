@@ -174,7 +174,7 @@ const Report = () => {
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.reportNo}</td>
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{boardTypeLabel[report.targetType]}</td>
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.targetWriter}</td>
-                                    <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.targetTitle}</td>
+                                    <td className="p-4 text-center cursor-pointer max-w-[200px] truncate" onClick={() => handleReportClick(report)}>{report.targetTitle}</td>
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.reporterName}</td>
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.reportDate.split('T')[0]}</td>
                                     <td className="p-4 text-center">

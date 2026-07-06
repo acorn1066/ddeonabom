@@ -16,7 +16,7 @@ import lombok.ToString;
 @ToString
 
 public class ScheduleMain {
-	private int scheduleNo;
+	private Integer scheduleNo;
 	private String scheduleTitle;
 	private String scheduleStatus;
 	private Date createDate;
@@ -24,13 +24,13 @@ public class ScheduleMain {
 	private String scheduleStartdate;
 	private String scheduleEnddate;
 	private String scheduleVisibility;
-	private int memberNo;
+	private Integer memberNo;
 	
 	private List<ScheduleSub> places;
 	private Integer placeCount;
 	private String coords;
 	
 	private String firstAddr;
-	private int likeCount;
+	private Integer likeCount;
 
 }

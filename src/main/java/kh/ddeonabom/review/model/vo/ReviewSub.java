@@ -17,16 +17,16 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class ReviewSub {
-	private int travelSubNo;
+	private Integer travelSubNo;
     private String travelSubContent;
-    private int travelSubSeq;
+    private Integer travelSubSeq;
     private Date travelSubDate;
-    private int travelNo;
-    private int contentId;
+    private Integer travelNo;
+    private Integer contentId;
     // 조회한 이미지 경로 목록
     private List<String> images;
     private List<String> deleteImages;
-    private int rating;    
+    private Integer rating;    
     // 이미지 업로드 파일
     private List<MultipartFile> imageFiles;
     private Double lat;

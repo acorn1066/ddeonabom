@@ -17,7 +17,7 @@ import NoticeDetail from "./pages/NoticeDetail";
 const App = () => {
     return (
         <AdminProvider>
-            <BrowserRouter>
+            <BrowserRouter basename="/admin">
                 <Routes>
 
                     <Route path="/" element={<Navigate to="/dashboard" />} />

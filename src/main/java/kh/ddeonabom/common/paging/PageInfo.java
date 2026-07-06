@@ -12,11 +12,11 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class PageInfo {
-	private int currentPage; 
-	private int listCount;
-	private int pageLimit;
-	private int maxPage;
-	private int startPage;
-	private int endPage;
-	private int boardLimit;
+	private Integer currentPage; 
+	private Integer listCount;
+	private Integer pageLimit;
+	private Integer maxPage;
+	private Integer startPage;
+	private Integer endPage;
+	private Integer boardLimit;
 }

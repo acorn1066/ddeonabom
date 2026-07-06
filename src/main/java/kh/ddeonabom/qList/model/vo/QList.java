@@ -14,19 +14,19 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class QList {
-	private int qNo;
+	private Integer qNo;
 	private String title;
 	private String content;
 	private Date createDate;
 	private Date modifyDate;
-	private int count;
+	private Integer count;
 	private String status;
-	private int memberNo;
+	private Integer memberNo;
 	private String writer;
 	private String writerStatus;   // MEMBER.STATUS 조인 결과 (Y/N/B) - 화면 표시 가공용
 	private String category;
 	private String visibility;
-	private int replyCount;
+	private Integer replyCount;
 	private String reportStatus;
 
 	public String getDisplayWriter() {

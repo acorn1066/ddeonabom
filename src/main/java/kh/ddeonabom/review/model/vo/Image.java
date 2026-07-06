@@ -12,10 +12,10 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class Image {
-	private int imageNo;
+	private Integer imageNo;
     private String imagePath;
     private String fileName;
     private String renameFile;
-    private int travelSubNo;
+    private Integer travelSubNo;
 
 }

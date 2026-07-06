@@ -16,7 +16,7 @@ import lombok.ToString;
 public class SharePlace {
 
     private Date   subDate;   // SCHEDULE_SUB.SCHEDULE_SUB_DATE (DAY 그룹핑 기준)
-    private int    subSeq;    // SCHEDULE_SUB.SCHEDULE_SUB_SEQ  (순서)
+    private Integer    subSeq;    // SCHEDULE_SUB.SCHEDULE_SUB_SEQ  (순서)
     private String title;     // LANDMARK.TITLE
     private String addr1;     // LANDMARK.ADDR1
     private String mapX;      // LANDMARK.MAPX (경도)

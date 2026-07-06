@@ -14,13 +14,13 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class AdminNotice {
-	private int noticeNo;
+	private Integer noticeNo;
 	private String title;
 	private String content;
 	private String status;
 	private Date createDate;
 	private Date modifyDate;
-	private int memberNo;
+	private Integer memberNo;
 	
 	private String memberName;
 
