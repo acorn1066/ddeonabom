@@ -53,7 +53,7 @@ public class ScheduleAjaxController {
 
         try {
             int scheduleNo;
-            if (schedule.getScheduleNo() != 0) {
+            if (schedule.getScheduleNo()!=null && schedule.getScheduleNo() != 0) {
                 // scheduleNo 있으면 수정
                 scheduleNo = sService.updateSchedule(schedule);
             } else {

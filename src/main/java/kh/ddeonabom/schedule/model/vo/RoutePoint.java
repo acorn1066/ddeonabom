@@ -15,6 +15,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class RoutePoint {
-	private double lat;
-    private double lng;
+	private Double lat;
+    private Double lng;
 }

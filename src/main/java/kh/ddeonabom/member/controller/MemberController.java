@@ -342,7 +342,7 @@ public class MemberController {
    
     @GetMapping("/withdraw")
     public String withdrawPage() {
-        return "/views/member/withdraw"; 
+        return "views/member/withdraw"; 
     }
 
     @PostMapping("/withdraw")

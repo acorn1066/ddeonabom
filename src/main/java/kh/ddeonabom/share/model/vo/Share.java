@@ -16,7 +16,7 @@ import lombok.ToString;
 public class Share {
 
     // ── SCHEDULE_MAIN ──
-    private int    scheduleNo;
+    private Integer    scheduleNo;
     private String scheduleTitle;
     private String scheduleStartdate;   // TO_CHAR 포맷 문자열 (yyyy.mm.dd)
     private String scheduleEnddate;
@@ -24,17 +24,17 @@ public class Share {
     private Date   createDate;
 
     // ── MEMBER (JOIN) ──
-    private int    memberNo;
+    private Integer    memberNo;
     private String memberNickname;      // MEMBER.NICKNAME
 
     // ── 집계 (서브쿼리) ──
-    private int    placeCount;          // SCHEDULE_SUB COUNT
-    private int    likeCount;           // NICE WHERE POST_BOARD_FX='SR'
-    private int    replyCount;          // REPLY WHERE POST_BOARD='S'
+    private Integer    placeCount;          // SCHEDULE_SUB COUNT
+    private Integer    likeCount;           // NICE WHERE POST_BOARD_FX='SR'
+    private Integer    replyCount;          // REPLY WHERE POST_BOARD='S'
 
     // ── LANDMARK (첫 번째 장소 기반) ──
     private String firstImage;          // LANDMARK.FIRSTIMAGE2 (카드 썸네일)
-    private int    firstContentTypeId;  // LANDMARK.CONTENT_TYPE_ID (플레이스홀더용)
+    private Integer    firstContentTypeId;  // LANDMARK.CONTENT_TYPE_ID (플레이스홀더용)
     private String firstTitle;          // LANDMARK.TITLE (플레이스홀더 장소명용)
     private String firstAddr;           // LANDMARK.ADDR1 (지역 뱃지용)
     private String coords;              // "mapx,mapy;mapx,mapy;..." (SVG 루트용)
