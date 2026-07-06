@@ -251,19 +251,7 @@
     });
 
     /* ── 토스트 ── */
-   const toastQueue = [];
-let isShowingToast = false;
-
-function showToast(message, showIcon = true, duration = 3000) {
-    toastQueue.push({ message, showIcon, duration });
-    processToastQueue();
-}
-
-function processToastQueue() {
-    if (isShowingToast || toastQueue.length === 0) return;
-    isShowingToast = true;
-
-    const { message, showIcon, duration } = toastQueue.shift();
+   function showToast(message, showIcon = true, duration = 3000) {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = 'pointer-events-auto inline-flex items-center gap-2.5 rounded-full bg-slate-900 py-3 px-4 text-sm font-semibold text-white shadow-lg';
@@ -287,11 +275,7 @@ function processToastQueue() {
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateY(8px)';
-        toast.addEventListener('transitionend', () => {
-            toast.remove();
-            isShowingToast = false;
-            processToastQueue();
-        }, { once: true });
+        toast.addEventListener('transitionend', () => toast.remove(), { once: true });
     }, duration);
 }
 
