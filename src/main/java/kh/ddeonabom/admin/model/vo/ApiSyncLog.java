@@ -15,16 +15,16 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class ApiSyncLog {
-	private int logId;
-    private int lastPage;
-    private int totalPages;
+	private Integer logId;
+    private Integer lastPage;
+    private Integer totalPages;
     private Date collectSync;
     private Date updateSync;
     private String status;
-    private int dailyCalls;
+    private Integer dailyCalls;
     private Date lastResetDate;
-    private int lastOverviewId;
-    private int count;
-    private int overviewCount;
+    private Integer lastOverviewId;
+    private Integer count;
+    private Integer overviewCount;
     private String apiKey;
 }

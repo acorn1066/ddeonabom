@@ -15,11 +15,11 @@ import lombok.ToString;
 @ToString
 
 public class ScheduleSub {
-	private int scheduleSubNo;
+	private Integer scheduleSubNo;
 	private String scheduleSubDate;
-	private int scheduleSubSeq;
-	private int scheduleNo;
-	private int contentId;
+	private Integer scheduleSubSeq;
+	private Integer scheduleNo;
+	private Integer contentId;
 	
 	private String title;
     private String addr1;
@@ -28,6 +28,6 @@ public class ScheduleSub {
     private String mapy;
     
     private String contentTitle;
-    private double lat;
-    private double lng;
+    private Double lat;
+    private Double lng;
 }

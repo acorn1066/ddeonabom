@@ -16,13 +16,13 @@ import lombok.ToString;
 
 public class AdminReport {
 	
-	 private int reportNo;
+	 private Integer reportNo;
 	    private String targetType;
-	    private int targetNo;
+	    private Integer targetNo;
 	    private String reason;
 	    private String reportStatus;
 	    private Date reportDate;
-	    private int memberNo;
+	    private Integer memberNo;
 	    
 	    // 조회용 추가 필드 신고자 이름 제목 등
 	    private String targetTitle;

@@ -14,14 +14,14 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class LandReview {
-	private int travelNo;
+	private Integer travelNo;
 	private String nickName;
 	private Date createDate;
-	private int rating;
+	private Integer rating;
 	private String travelTitle;
 	private String travelSubContent;
 	private String visibility;
-	private int travelSubNo;
+	private Integer travelSubNo;
 	
 	public String getNickName() {
         if (this.nickName != null && this.nickName.contains("_")) {

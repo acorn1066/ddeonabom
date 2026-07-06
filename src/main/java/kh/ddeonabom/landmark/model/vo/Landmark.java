@@ -12,15 +12,15 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class Landmark {
-	private int contentId;
+	private Integer contentId;
 	private String addr1;
 	private String addr2;
-	private double mapx;
-	private double mapy;
+	private Double mapx;
+	private Double mapy;
 	private String tel;
 	private String title;
-	private int landCount;
-	private int contentTypeId;
+	private Integer landCount;
+	private Integer contentTypeId;
 	private String overview;
 	private String firstimage;
 	private String firstimage2;

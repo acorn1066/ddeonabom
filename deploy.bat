@@ -24,7 +24,7 @@ goto :full_deploy
 echo.
 echo === STEP 1/6 Backend build ===
 cd /d "%PROJECT_ROOT%"
-call gradlew.bat build
+call gradlew.bat clean build
 if errorlevel 1 (
     echo.
     echo [FAILED] Backend build error. Stopping deploy.
@@ -73,7 +73,7 @@ goto :end
 echo.
 echo === Backend-only deploy ===
 cd /d "%PROJECT_ROOT%"
-call gradlew.bat build
+call gradlew.bat clean build
 if errorlevel 1 (
     echo [FAILED] Build error. Stopping.
     goto :end
