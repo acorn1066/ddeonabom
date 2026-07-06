@@ -41,7 +41,7 @@ public interface LandmarkMapper {
 	// 찜 추가
 	void insertNice(@Param("lNumber") int lNumber,@Param("memberNo") int memberNo);
 
-	int getWishListCount(int memberNo);
+	
 
 	ArrayList<Landmark> selectMyWishList(HashMap<String, Object> map);
 
@@ -63,6 +63,8 @@ public interface LandmarkMapper {
 	
 	// 조회 수 가져오기
 	int landCount(int contentId);
+
+	int getWishListCount(HashMap<String, Object> map);
 
 
 

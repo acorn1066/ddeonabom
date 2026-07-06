@@ -70,10 +70,8 @@ public class LandmarkService {
 		mapper.insertNice(lNumber, memberNo);
 	}
 
-	public int getWishListCount(int memberNo) {
-		
-		return mapper.getWishListCount(memberNo);
-	}
+	
+	
 
 	public ArrayList<Landmark> selectMyWishList(HashMap<String, Object> map) {
 		return mapper.selectMyWishList(map);
@@ -107,6 +105,11 @@ public class LandmarkService {
 	// 이미지 경로 가져오기
 	public ArrayList<Image> image(int travelSubNo) {
 		return mapper.image(travelSubNo);
+	}
+
+	public int getWishListCount(HashMap<String, Object> map) {
+		
+		return mapper.getWishListCount(map);
 	}
 
 }

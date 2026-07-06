@@ -65,6 +65,7 @@
 	            </when>
 	            <when test="searchType == 'writer'">
 	                AND m.nickname LIKE '%' || #{searchInput} || '%'
+	                AND m.status = 'Y' 
 	            </when>
 	        </choose>
 	    </if>
