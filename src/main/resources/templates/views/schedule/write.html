@@ -716,7 +716,7 @@ const drawRoadPath = async (places, myReqId) => {
     }
 
     for (const seg of segments) {
-        if (myReqId !== routeReqId) return; // 더 최신 요청이 있으면 중단
+        if (myReqId !== routeReqId) return;
 
         await fetch('/schedule/route', {
             method: 'POST',
@@ -725,10 +725,7 @@ const drawRoadPath = async (places, myReqId) => {
         })
         .then(response => response.json())
         .then(data => {
-        	console.log(data);
-        	console.log(myReqId);
-        	console.log(routeReqId);
-        	if (myReqId !== routeReqId) return; // 응답 왔을 때도 재확인
+        	if (myReqId !== routeReqId) return;
             
             if (data.routeError) {
                 showToast('일부 구간의 경로를 표시할 수 없어요: ' + data.routeError, false);

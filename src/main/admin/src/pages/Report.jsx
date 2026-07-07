@@ -226,14 +226,14 @@ const Report = () => {
                                 let url = null;
 
                                 if (selectReport.targetType === "review") {
-                                    url = `http://localhost:8080/reviews/detail?travelNo=${selectReport.targetNo}`;
+                                    url = `http://3.34.10.120/reviews/detail?travelNo=${selectReport.targetNo}`;
                                 } else if (selectReport.targetType === "question") {
-                                    url = `http://localhost:8080/qList/detail?qNo=${selectReport.targetNo}`;
+                                    url = `http://3.34.10.120/qList/detail?qNo=${selectReport.targetNo}`;
                                 } else if (selectReport.targetType === "reply") {
                                     const replyUrlMap = {
-                                        Q: `http://localhost:8080/qList/detail?qNo=${selectReport.postNo}`,
-                                        T: `http://localhost:8080/reviews/detail?travelNo=${selectReport.postNo}`,
-                                        S: `http://localhost:8080/share/detail?shareNo=${selectReport.postNo}`,
+                                        Q: `http://3.34.10.120/qList/detail?qNo=${selectReport.postNo}`,
+                                        T: `http://3.34.10.120/reviews/detail?travelNo=${selectReport.postNo}`,
+                                        S: `http://3.34.10.120/share/detail?shareNo=${selectReport.postNo}`,
                                     };
                                     url = replyUrlMap[selectReport.postBoard];
                                 }
