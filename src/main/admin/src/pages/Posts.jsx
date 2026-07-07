@@ -184,7 +184,7 @@
 
                                 {boardType === "공유" && (
                                     <button
-                                        onClick={() => window.location.href = `http://localhost:8080/share/detail/${selectPost.postNo}`}
+                                        onClick={() => window.location.href = `http://3.34.10.120/share/detail/${selectPost.postNo}`}
                                         disabled={selectPost.status === "N"}
                                         className={`rounded-lg px-4 py-2 text-white ${selectPost.status === "N"
                                                 ? "bg-indigo-300 cursor-not-allowed"

@@ -11,7 +11,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/react': {
-        target: 'http://localhost:8080',
+        target: 'http://3.34.10.120/',
         changeOrigin: true,
          rewrite: path => path.replace(/^\/react/, '')
       }

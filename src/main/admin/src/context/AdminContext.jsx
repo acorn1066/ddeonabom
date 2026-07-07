@@ -20,7 +20,7 @@ export const AdminProvider = ({ children }) => {
             .then(res => {
                 if (res.status === 403) {
                     alert('접근 권한이 없습니다.');
-                    location.href = 'http://localhost:8080';
+                    location.href = 'http://3.34.10.120/';
                     return null;
                 } else{
                     setLoading(true);

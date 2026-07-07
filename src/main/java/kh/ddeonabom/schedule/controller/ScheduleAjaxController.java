@@ -92,7 +92,6 @@ public class ScheduleAjaxController {
     
     @PostMapping("/route")
     public Map<String, Object> getRoute(@RequestBody RouteRequest req) {
-    	System.out.println("getRoute 호출됨, points 개수: " + (req.getPoints() != null ? req.getPoints().size() : "null"));
     	List<RoutePoint> points = req.getPoints();
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Double>> path = new ArrayList<>();
@@ -156,6 +155,7 @@ public class ScheduleAjaxController {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            result.put("routeError", "경로 조회 중 오류가 발생했어요.");
         }
 
         result.put("path", path);
