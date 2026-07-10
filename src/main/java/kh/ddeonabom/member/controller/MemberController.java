@@ -535,13 +535,11 @@ public class MemberController {
 	        // 공통으로 사용할 map 선언 및 회원번호 주입
 	        HashMap<String, Object> map = new HashMap<>();
 	        map.put("memberNo", loginUser.getMemberNo());
-	        map.put("keyword", keyword);
 	        
 	        if("spot".equals(type)) {
-	            int listCount = lService.getWishListCount(loginUser.getMemberNo()); 
+	            int listCount = lService.getWishListCount(map); 
 	            PageInfo pi = Pagination.getPageInfo(page, listCount, 5, 8);
 	            
-	            //  pi가 생성된 직후에 map에 담아주어야 안전합니다.
 	            map.put("startRow", (pi.getCurrentPage() - 1) * pi.getBoardLimit());
 	            map.put("listLimit", pi.getBoardLimit());
 	            
@@ -563,7 +561,6 @@ public class MemberController {
 	            model.addAttribute("wishlist", wishlist);
 	            model.addAttribute("pi", pi);
 	        } // 일정 관심목록 조회
-	        
 	        // 관광지 카테고리 배지용 매핑 데이터 (Spot/Plan 공용 혹은 Spot 페이지 출력용)
 	        Map<Integer, String> contentType = new HashMap<>();
 	        contentType.put(12, "관광지");

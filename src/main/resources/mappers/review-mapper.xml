@@ -132,8 +132,8 @@
                 )
             </otherwise>
         </choose>
-    </if>
-</select>
+   	 </if>
+	</select>
 
 <select id="selectMyReviewList" parameterType="map" resultType="Review">
     SELECT DISTINCT
