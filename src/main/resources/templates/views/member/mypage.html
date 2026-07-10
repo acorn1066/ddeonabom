@@ -285,7 +285,9 @@
                                 <span class="text-xs text-faint block mt-1">질문 게시판</span>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
-                                <span th:if="${post.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 신고 접수 수정/삭제 가능</span>
+                                <span th:if="${post.reportStatus == 'N'}" 
+                                class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap">
+                                <i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 신고 접수 수정/삭제 가능</span>
                                 <span class="text-xs text-faint whitespace-nowrap" th:text="${#dates.format(post.createDate,'yyyy-MM-dd')}"></span>
                             </div>
                         </a>
@@ -305,7 +307,9 @@
                                 <span class="text-xs text-faint block mt-1">여행 리뷰</span>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
-                                <span th:if="${review.reportStatus == 'N'}" class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 신고 접수 수정/삭제 가능</span>
+                                <span th:if="${review.reportStatus == 'N'}" 
+                                class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 text-xs font-semibold px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap">
+                                <i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 신고 접수 수정/삭제 가능</span>
                                 <span class="text-xs text-faint whitespace-nowrap" th:text="${#dates.format(review.createDate, 'yyyy-MM-dd')}"></span>
                             </div>
                         </a>
