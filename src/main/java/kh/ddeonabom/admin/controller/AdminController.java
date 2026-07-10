@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -37,11 +38,15 @@ import lombok.RequiredArgsConstructor;
 public class AdminController {
 	
 	 private final AdminService aService;
-	
+	 
+	@Value("${admin.url}")
+	private String adminUrl;
+
 	@GetMapping("dash")
-		public String adminDash() {
-		return "redirect:/admin/dashboard";
+	public String adminDash() {
+	    return "redirect:" + adminUrl;
 	}
+	
 	
 	@GetMapping("/dashboard")
 	@ResponseBody
