@@ -154,6 +154,7 @@ public class AdminService {
 		return mapper.updateReportStatus(report);
 	}
 
+	
 	public int processReport(AdminReport report) {
 	    report.setReportStatus("Y");
 	    mapper.updateStatusByTarget(report);

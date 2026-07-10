@@ -154,17 +154,17 @@ const Report = () => {
                 <div className="border-b p-4">
                     <h2 className="text-xl font-bold">신고 목록</h2>
                 </div>
-                <table className="w-full table-auto">
+                <table className="w-full table-fixed">
                     <thead>
                         <tr className="border-b bg-gray-100 text-gray-700">
-                            <th className="p-4 text-center font-semibold">번호</th>
-                            <th className="p-4 text-center font-semibold">신고유형</th>
-                            <th className="p-4 text-center font-semibold">작성자</th>
-                            <th className="p-4 text-center font-semibold">신고대상</th>
-                            <th className="p-4 text-center font-semibold">신고자</th>
-                            <th className="p-4 text-center font-semibold">신고일</th>
-                            <th className="p-4 text-center font-semibold">상태</th>
-                            <th className="p-4 text-center font-semibold">관리</th>
+                            <th className="w-[6%] p-4 text-center font-semibold">번호</th>
+                            <th className="w-[10%] p-4 text-center font-semibold">신고유형</th>
+                            <th className="w-[10%] p-4 text-center font-semibold">작성자</th>
+                            <th className="w-[24%] p-4 text-center font-semibold">신고대상</th>
+                            <th className="w-[10%] p-4 text-center font-semibold">신고자</th>
+                            <th className="w-[14%] p-4 text-center font-semibold">신고일</th>
+                            <th className="w-[10%] p-4 text-center font-semibold">상태</th>
+                            <th className="w-[16%] p-4 text-center font-semibold">관리</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -173,9 +173,9 @@ const Report = () => {
                                 <tr key={report.reportNo} className="border-b hover:bg-gray-50">
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.reportNo}</td>
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{boardTypeLabel[report.targetType]}</td>
-                                    <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.targetWriter}</td>
-                                    <td className="p-4 text-center cursor-pointer max-w-[200px] truncate" onClick={() => handleReportClick(report)}>{report.targetTitle}</td>
-                                    <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.reporterName}</td>
+                                    <td className="p-4 text-center cursor-pointer truncate" onClick={() => handleReportClick(report)}>{report.targetWriter}</td>
+                                    <td className="p-4 text-center cursor-pointer truncate" onClick={() => handleReportClick(report)}>{report.targetTitle}</td>
+                                    <td className="p-4 text-center cursor-pointer truncate" onClick={() => handleReportClick(report)}>{report.reporterName}</td>
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.reportDate.split('T')[0]}</td>
                                     <td className="p-4 text-center">
                                         <span className={`rounded-full px-3 py-1 text-sm font-semibold ${statusBadgeClass[report.reportStatus]}`}>
