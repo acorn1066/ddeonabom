@@ -154,17 +154,17 @@ const Report = () => {
                 <div className="border-b p-4">
                     <h2 className="text-xl font-bold">신고 목록</h2>
                 </div>
-                <table className="w-full table-auto">
+                <table className="w-full table-fixed">
                     <thead>
                         <tr className="border-b bg-gray-100 text-gray-700">
-                            <th className="p-4 text-center font-semibold">번호</th>
-                            <th className="p-4 text-center font-semibold">신고유형</th>
-                            <th className="p-4 text-center font-semibold">작성자</th>
-                            <th className="p-4 text-center font-semibold">신고대상</th>
-                            <th className="p-4 text-center font-semibold">신고자</th>
-                            <th className="p-4 text-center font-semibold">신고일</th>
-                            <th className="p-4 text-center font-semibold">상태</th>
-                            <th className="p-4 text-center font-semibold">관리</th>
+                            <th className="w-[6%] p-4 text-center font-semibold">번호</th>
+                            <th className="w-[10%] p-4 text-center font-semibold">신고유형</th>
+                            <th className="w-[10%] p-4 text-center font-semibold">작성자</th>
+                            <th className="w-[24%] p-4 text-center font-semibold">신고대상</th>
+                            <th className="w-[10%] p-4 text-center font-semibold">신고자</th>
+                            <th className="w-[14%] p-4 text-center font-semibold">신고일</th>
+                            <th className="w-[10%] p-4 text-center font-semibold">상태</th>
+                            <th className="w-[16%] p-4 text-center font-semibold">관리</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -173,9 +173,9 @@ const Report = () => {
                                 <tr key={report.reportNo} className="border-b hover:bg-gray-50">
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.reportNo}</td>
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{boardTypeLabel[report.targetType]}</td>
-                                    <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.targetWriter}</td>
-                                    <td className="p-4 text-center cursor-pointer max-w-[200px] truncate" onClick={() => handleReportClick(report)}>{report.targetTitle}</td>
-                                    <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.reporterName}</td>
+                                    <td className="p-4 text-center cursor-pointer truncate" onClick={() => handleReportClick(report)}>{report.targetWriter}</td>
+                                    <td className="p-4 text-center cursor-pointer truncate" onClick={() => handleReportClick(report)}>{report.targetTitle}</td>
+                                    <td className="p-4 text-center cursor-pointer truncate" onClick={() => handleReportClick(report)}>{report.reporterName}</td>
                                     <td className="p-4 text-center cursor-pointer" onClick={() => handleReportClick(report)}>{report.reportDate.split('T')[0]}</td>
                                     <td className="p-4 text-center">
                                         <span className={`rounded-full px-3 py-1 text-sm font-semibold ${statusBadgeClass[report.reportStatus]}`}>
@@ -226,14 +226,14 @@ const Report = () => {
                                 let url = null;
 
                                 if (selectReport.targetType === "review") {
-                                    url = `http://localhost:8080/reviews/detail?travelNo=${selectReport.targetNo}`;
+                                    url = `http://3.34.10.120/reviews/detail?travelNo=${selectReport.targetNo}`;
                                 } else if (selectReport.targetType === "question") {
-                                    url = `http://localhost:8080/qList/detail?qNo=${selectReport.targetNo}`;
+                                    url = `http://3.34.10.120/qList/detail?qNo=${selectReport.targetNo}`;
                                 } else if (selectReport.targetType === "reply") {
                                     const replyUrlMap = {
-                                        Q: `http://localhost:8080/qList/detail?qNo=${selectReport.postNo}`,
-                                        T: `http://localhost:8080/reviews/detail?travelNo=${selectReport.postNo}`,
-                                        S: `http://localhost:8080/share/detail?shareNo=${selectReport.postNo}`,
+                                        Q: `http://3.34.10.120/qList/detail?qNo=${selectReport.postNo}`,
+                                        T: `http://3.34.10.120/reviews/detail?travelNo=${selectReport.postNo}`,
+                                        S: `http://3.34.10.120/share/detail?shareNo=${selectReport.postNo}`,
                                     };
                                     url = replyUrlMap[selectReport.postBoard];
                                 }

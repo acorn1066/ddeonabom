@@ -45,7 +45,7 @@
   <th:block th:unless="${session.loginUser == null}">
   
 	    <th:block th:if="${session.loginUser.isAdmin == 'Y'}">
-	        <a href="/admin/dashboard" class="inline-flex h-9 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-sunk">관리자 페이지</a>
+	        <a th:href="${adminUrl}"  class="inline-flex h-9 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-sunk">관리자 페이지</a>
 	    </th:block>
   
       <a href="/member/mypage" class="inline-flex h-9 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-sunk">마이페이지</a>

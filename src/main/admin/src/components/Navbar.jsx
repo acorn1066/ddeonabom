@@ -23,7 +23,7 @@ const Navbar = () => {
 
           {/* 메인 사이트 이동 */}
           <a
-            href="http://localhost:8080"
+            href="http://3.34.10.120/"
             className="rounded-lg border border-white/20 px-4 py-2 text-sm hover:bg-white/10"
           >
             사이트로

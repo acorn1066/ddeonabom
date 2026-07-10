@@ -3,8 +3,8 @@ package kh.ddeonabom.share.controller;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpSession;
@@ -24,8 +24,10 @@ public class ShareAjaxController {
 
     @PostMapping("/like")
     public Map<String, Object> toggleLike(
-            @RequestParam("scheduleNo") int scheduleNo,
+            @RequestBody Map<String, Integer> body,
             HttpSession session) {
+
+        int scheduleNo = body.get("scheduleNo");
 
         Member loginUser = (Member) session.getAttribute("loginUser");
         if (loginUser == null) {
@@ -40,8 +42,10 @@ public class ShareAjaxController {
 
     @PostMapping("/wish")
     public Map<String, Object> toggleWish(
-            @RequestParam("scheduleNo") int scheduleNo,
+            @RequestBody Map<String, Integer> body,
             HttpSession session) {
+
+        int scheduleNo = body.get("scheduleNo");
 
         Member loginUser = (Member) session.getAttribute("loginUser");
         if (loginUser == null) {
@@ -61,8 +65,10 @@ public class ShareAjaxController {
 
     @PostMapping("/copy")
     public Map<String, Object> copySchedule(
-            @RequestParam("scheduleNo") int scheduleNo,
+            @RequestBody Map<String, Integer> body,
             HttpSession session) {
+
+        int scheduleNo = body.get("scheduleNo");
 
         Member loginUser = (Member) session.getAttribute("loginUser");
         if (loginUser == null) {

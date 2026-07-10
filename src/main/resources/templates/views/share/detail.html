@@ -354,7 +354,7 @@
         try {
           const res = await fetch('/schedule/route', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json;charset=UTF-8' },
             body: JSON.stringify({ points: seg })
           });
           const data = await res.json();
@@ -529,18 +529,18 @@
     }
 
     /* ─── 추천 토글 ─── */
-    async function toggleLike(scheduleNo) {
+    function toggleLike(scheduleNo) {
       if (loginRequired) {
         openInfoModal('로그인이 필요합니다', '로그인 후 추천할 수 있어요.');
         return;
       }
-      try {
-        const res  = await fetch('/share/like', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: 'scheduleNo=' + scheduleNo
-        });
-        const data = await res.json();
+      fetch('/share/like', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        body: JSON.stringify({ scheduleNo: scheduleNo })
+      })
+      .then(res => res.json())
+      .then(data => {
         if (!data.success) { showToast(data.message || '처리 중 오류가 발생했어요.', false); return; }
 
         isLiked = data.liked;
@@ -553,24 +553,25 @@
           btn.className = 'inline-flex h-12 items-center gap-2 rounded-full border border-line bg-white px-6 text-15 font-bold transition hover:bg-sunk';
         }
         showToast(isLiked ? '추천했어요!' : '추천을 취소했어요.');
-      } catch (e) {
+      })
+      .catch(() => {
         showToast('처리 중 오류가 발생했어요.', false);
-      }
+      });
     }
 
     /* ─── 찜 토글 ─── */
-    async function toggleWish(scheduleNo) {
+    function toggleWish(scheduleNo) {
       if (loginRequired) {
         openInfoModal('로그인이 필요합니다', '로그인 후 찜할 수 있어요.');
         return;
       }
-      try {
-        const res  = await fetch('/share/wish', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: 'scheduleNo=' + scheduleNo
-        });
-        const data = await res.json();
+      fetch('/share/wish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        body: JSON.stringify({ scheduleNo: scheduleNo })
+      })
+      .then(res => res.json())
+      .then(data => {
         if (!data.success) { showToast(data.message || '처리 중 오류가 발생했어요.', false); return; }
 
         isWished = data.wished;
@@ -583,9 +584,10 @@
           btn.textContent = '☆ 찜';
         }
         showToast(isWished ? '찜했어요!' : '찜을 취소했어요.');
-      } catch (e) {
+      })
+      .catch(() => {
         showToast('처리 중 오류가 발생했어요.', false);
-      }
+      });
     }
 
     /* ─── 내 일정으로 복사 ─── */
@@ -597,23 +599,24 @@
       openConfirmModal(
         '이 일정을 복사할까요?',
         '내 일정 목록에 동일한 일정이 추가돼요.',
-        async function () {
-          try {
-            const res  = await fetch('/share/copy', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: 'scheduleNo=' + scheduleNo
-            });
-            const data = await res.json();
+        function () {
+          fetch('/share/copy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+            body: JSON.stringify({ scheduleNo: scheduleNo })
+          })
+          .then(res => res.json())
+          .then(data => {
             if (data.success) {
               showToast('일정을 내 목록에 추가했어요!');
               setTimeout(() => { location.href = '/schedule/list'; }, 900);
             } else {
               showToast(data.message || '복사에 실패했어요.', false);
             }
-          } catch (e) {
+          })
+          .catch(() => {
             showToast('복사 중 오류가 발생했어요.', false);
-          }
+          });
         }
       );
     }

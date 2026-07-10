@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -200,6 +201,12 @@ public class MemberController {
 
         return "FAIL";
     }
+    
+    
+    @Value("${admin.url}")
+    private String adminUrl;
+    
+    
     @GetMapping("/login")
     public String loginPage(@RequestParam(value="targetUrl", required=false) String targetUrl, Model model) {
         model.addAttribute("targetUrl", targetUrl);
@@ -243,9 +250,9 @@ public class MemberController {
           }
             
             // 관리자면 admin 페이지 우선 이동
-            if ("Y".equals(loginUser.getIsAdmin())) {
-            	return "redirect:/admin/dashboard";
-            }
+	        if ("Y".equals(loginUser.getIsAdmin())) {
+	            return "redirect:" + adminUrl;
+	        }
             
             if (targetUrl != null && targetUrl.startsWith("/") && !targetUrl.startsWith("//")) {
                 return "redirect:" + targetUrl;

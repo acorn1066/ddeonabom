@@ -122,6 +122,15 @@ public class ShareController {
             return mv;
         }
 
+        // 비공개(N) 일정은 작성자 본인만 조회 가능 — URL 직접 접근 차단
+        boolean isOwner = loginUser != null && loginUser.getMemberNo() == schedule.getMemberNo();
+        if ("N".equals(schedule.getScheduleVisibility()) && !isOwner) {
+            mv.addObject("message",     "비공개 일정입니다.")
+              .addObject("redirectUrl", "/share/list")
+              .setViewName("views/common/blocked");
+            return mv;
+        }
+
         ArrayList<ShareDay> dayList = shareService.selectShareDayList(scheduleNo);
         ArrayList<Reply> replyList  = replyService.getReplyList(scheduleNo, "S");
 
