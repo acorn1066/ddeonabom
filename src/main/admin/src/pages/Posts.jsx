@@ -123,15 +123,15 @@
                         </h2>
                     </div>
 
-                    <table className="w-full table-auto">
+                    <table className="w-full table-fixed">
 
                         <thead>
                             <tr className="border-b bg-gray-100 text-gray-700">
 
-                                <th className="p-4 text-center font-semibold">제목</th>
-                                <th className="p-4 text-center font-semibold">작성자</th>
-                                <th className="p-4 text-center font-semibold">작성일</th>
-                                <th className="p-4 text-center font-semibold">상태</th>
+                                <th className="w-1/2 p-4 text-center font-semibold">제목</th>
+                                <th className="w-[15%] p-4 text-center font-semibold">작성자</th>
+                                <th className="w-[20%] p-4 text-center font-semibold">작성일</th>
+                                <th className="w-[15%] p-4 text-center font-semibold">상태</th>
 
                             </tr>
                         </thead>
@@ -141,9 +141,9 @@
                                 posts.map((post, index) => (
 
                                     <tr key={index} className="border-b hover:bg-gray-50">
-                                        <td className="p-4 text-center cursor-pointer" onClick={() => handlePostClick(post)}>{post.title}</td>
-                                        <td className="p-4 text-center cursor-pointer" onClick={() => handlePostClick(post)}>{post.nickname}</td>
-                                        <td className="p-4 text-center cursor-pointer" onClick={() => handlePostClick(post)}>{post.createDate.split('T')[0]}</td>
+                                        <td className="p-4 text-center cursor-pointer truncate" onClick={() => handlePostClick(post)}>{post.title}</td>
+                                        <td className="p-4 text-center cursor-pointer truncate" onClick={() => handlePostClick(post)}>{post.nickname}</td>
+                                        <td className="p-4 text-center cursor-pointer truncate" onClick={() => handlePostClick(post)}>{post.createDate.split('T')[0]}</td>
                                         <td className="p-4">
                                             <div className="flex justify-center gap-2">
 
