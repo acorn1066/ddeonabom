@@ -20,6 +20,22 @@ KH 정보교육원 파이널 프로젝트 (6인 팀)
 
 ---
 
+## Screenshots
+
+| 메인 | 관광지 탐색 |
+|---|---|
+| ![메인](./screenshots/01-main.png) | ![관광지 탐색](./screenshots/02-landmark.png) |
+
+| 일정 플래너 | 일정 공유 |
+|---|---|
+| ![일정 플래너](./screenshots/03-schedule.png) | ![일정 공유](./screenshots/04-share.png) |
+
+| 여행 후기 |
+|---|
+| ![여행 후기](./screenshots/05-review.png) |
+
+---
+
 ## Collaborators
 
 | 이름 | 역할 |
@@ -77,7 +93,7 @@ KH 정보교육원 파이널 프로젝트 (6인 팀)
 | 일정 공유 | 완성한 일정을 게시글 형태로 공유, URL 우회 접속 차단 |
 | 여행 후기 | 이미지 첨부 후기 작성/수정, 댓글 |
 | 질문 게시판 | 여행 관련 Q&A |
-| 관광지 탐색 | API 연동 데이터를 지도에서 탐색 |
+| 관광지 탐색 | TourAPI 연동 데이터를 지도에서 탐색 |
 | 신고 | 게시글/댓글 신고 |
 | 관리자 페이지 | 회원·게시글 관리, 공지 작성, 신고 처리, TourAPI 동기화, 통계 대시보드 (React SPA, `/admin`) |
 
@@ -108,3 +124,4 @@ ddeonabom/
 ```
 
 각 도메인 패키지는 `controller / service / model(vo, mapper)` 계층으로 구성되어 있습니다.
+
